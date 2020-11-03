@@ -10,7 +10,7 @@ enum class StateStatus {
     UNKNOWN = 2
 };
 
-State::State(StateStatus stateStatus, int stateID)
+State::State(StateStatus stateStatus, unsigned int stateID)
     : stateStatus(stateStatus), stateID(stateID) {}
 
 TransitionFunction::TransitionFunction(State& fromState, State& toState, char& symbol)
@@ -29,7 +29,7 @@ vector<State> DFA::getAcceptingStates() {
 }
 
 void DFA::addState(StateStatus& stateStatus, unsigned int& statusID) {
-    this->states.push_back(State(stateStatus, statusID));
+    this->states.emplace_back(stateStatus, statusID);
 }
 
 void DFA::describe(bool detail) {
@@ -63,10 +63,10 @@ void DFA::describe(bool detail) {
     }
 }
 
-String::String(string& stringValue, bool accepting, unsigned int& length)
+StringInstance::StringInstance(string& stringValue, bool accepting, unsigned int& length)
     : stringValue(stringValue), accepting(accepting), length(length) {}
 
-String::String(string& text, const string& delimiter) {
+StringInstance::StringInstance(string& text, const string& delimiter) {
     this->stringValue = "";
     size_t pos = 0;
     std::string token;
@@ -97,20 +97,20 @@ String::String(string& text, const string& delimiter) {
     }
 }
 
-vector<String> GetListOfStringsFromFile(string fileName) {
-    vector<String> listOfStrings;
+vector<StringInstance> GetListOfStringsFromFile(string fileName) {
+    vector<StringInstance> listOfStrings;
     std::ifstream infile(fileName);
     string line;
     // ignore first line
     std::getline(infile, line);
     while (std::getline(infile, line))
     {
-        listOfStrings.push_back(String(line, " "));
+        listOfStrings.emplace_back(line, " ");
     }
     return listOfStrings;
 }
 
-DFA GetPTAFromListOfStrings(vector<String>& strings, bool APTA) {
+DFA GetPTAFromListOfStringInstances(vector<StringInstance>& strings, bool APTA) {
     bool exists;
     unsigned int count;
     vector<char> alphabet;
@@ -121,55 +121,75 @@ DFA GetPTAFromListOfStrings(vector<String>& strings, bool APTA) {
     startingState = State(StateStatus::UNKNOWN, 0);
     states.push_back(startingState);
 
-    for (String& string : strings) {
+    for (StringInstance& string : strings) {
         if (!APTA && !string.accepting)
             continue;
         currentState = startingState;
 
-        count = 0;
-        for (char& character : string.stringValue) {
-            count++;
-            exists = false;
-            // alphabet check
-            if (std::find(alphabet.begin(), alphabet.end(), character) == alphabet.end())
-                alphabet.push_back(character);
-
-            for (TransitionFunction& transitionFunction : transitionFunctions) {
-                if (transitionFunction.fromState.stateID == currentState.stateID && transitionFunction.symbol == character) {
-                    currentState = transitionFunction.toState;
-                    exists = true;
-                    break;
+        if (string.length == 0) {
+            if (string.accepting) {
+                if (startingState.stateStatus == StateStatus::REJECTING) {
+                    throw "Error, starting state already set to rejecting, cannot set to accepting.";
+                } 
+                else {
+                    startingState.stateStatus = StateStatus::ACCEPTING;
                 }
             }
-
-            if (!exists) {
-                // last symbol in string check
-                if (count == string.stringValue.size()) {
-                    if (string.accepting)
-                        states.push_back(State(StateStatus::ACCEPTING, static_cast<int>(states.size())));
-                    else
-                        states.push_back(State(StateStatus::REJECTING, static_cast<int>(states.size())));
+            else{
+                if (startingState.stateStatus == StateStatus::ACCEPTING) {
+                    throw "Error, starting state already set to accepting, cannot set to rejecting.";
                 }
                 else {
-                    states.push_back(State(StateStatus::UNKNOWN, static_cast<int>(states.size())));
+                    startingState.stateStatus = StateStatus::REJECTING;
                 }
-                transitionFunctions.push_back(TransitionFunction(currentState, states[states.size() - 1], character));
-                currentState = states[states.size() - 1];
             }
-            else {
-                // last symbol in string check
-                if (count == string.stringValue.size()) {
-                    if (string.accepting) {
-                        if (currentState.stateStatus == StateStatus::REJECTING)
-                            throw "Error, state already set to rejecting, cannot set to accepting";
+        }
+        else {
+            count = 0;
+            for (char& character : string.stringValue) {
+                count++;
+                exists = false;
+                // alphabet check
+                if (std::find(alphabet.begin(), alphabet.end(), character) == alphabet.end())
+                    alphabet.push_back(character);
+
+                for (TransitionFunction& transitionFunction : transitionFunctions) {
+                    if (transitionFunction.fromState.stateID == currentState.stateID && transitionFunction.symbol == character) {
+                        currentState = transitionFunction.toState;
+                        exists = true;
+                        break;
+                    }
+                }
+
+                if (!exists) {
+                    // last symbol in string check
+                    if (count == string.stringValue.size()) {
+                        if (string.accepting)
+                            states.emplace_back(StateStatus::ACCEPTING, static_cast<unsigned int>(states.size()));
                         else
-                            currentState.stateStatus = StateStatus::ACCEPTING;
+                            states.emplace_back(StateStatus::REJECTING, static_cast<unsigned int>(states.size()));
                     }
                     else {
-                        if (currentState.stateStatus == StateStatus::ACCEPTING)
-                            throw "Error, state already set to accepting, cannot set to rejecting";
-                        else
-                            currentState.stateStatus = StateStatus::REJECTING;
+                        states.emplace_back(StateStatus::UNKNOWN, static_cast<unsigned int>(states.size()));
+                    }
+                    transitionFunctions.emplace_back(currentState, states[states.size() - 1], character);
+                    currentState = states[states.size() - 1];
+                }
+                else {
+                    // last symbol in string check
+                    if (count == string.stringValue.size()) {
+                        if (string.accepting) {
+                            if (currentState.stateStatus == StateStatus::REJECTING)
+                                throw "Error, state already set to rejecting, cannot set to accepting";
+                            else
+                                currentState.stateStatus = StateStatus::ACCEPTING;
+                        }
+                        else {
+                            if (currentState.stateStatus == StateStatus::ACCEPTING)
+                                throw "Error, state already set to accepting, cannot set to rejecting";
+                            else
+                                currentState.stateStatus = StateStatus::REJECTING;
+                        }
                     }
                 }
             }
@@ -178,7 +198,6 @@ DFA GetPTAFromListOfStrings(vector<String>& strings, bool APTA) {
 
     return DFA(states, startingState, alphabet, transitionFunctions);
 }
-
 PYBIND11_MODULE(DFA_Toolkit, module)
 {
     module.doc() = R"pbdoc(
@@ -197,17 +216,17 @@ PYBIND11_MODULE(DFA_Toolkit, module)
 		   DFA.getAcceptingStates
 		   DFA.addState
 		   DFA.describe
-           String
+           StringInstance
            GetListOfStringsFromFile
-           GetPTAFromListOfStrings 
+           GetPTAFromListOfStringInstances 
     )pbdoc";
     module.def("GetListOfStringsFromFile", &GetListOfStringsFromFile, R"pbdoc(
-        Parses an Abbadingo DFA dataset into a list of String objects.
+        Parses an Abbadingo DFA dataset into a list of StringInstance objects.
 
         File format should follow Abaddingo dataset structure. Single parameter for file dir/name.
     )pbdoc");
-    module.def("GetPTAFromListOfStrings", &GetPTAFromListOfStrings, R"pbdoc(
-        Parses a list of String objects into a APTA or PTA as a DFA object.
+    module.def("GetPTAFromListOfStringInstances", &GetPTAFromListOfStringInstances, R"pbdoc(
+        Parses a list of StringInstance objects into a APTA or PTA as a DFA object.
 
         Gets the Augumented Prefix Tree Acceptor or the Prefix Tree Acceptor.
         First Parameter -> List of Strings
@@ -254,10 +273,10 @@ PYBIND11_MODULE(DFA_Toolkit, module)
         .def_readwrite("alphabet", &DFA::alphabet, "DFA's alphabet as a list of characters.")
         .def_readwrite("transitionFunctions", &DFA::transitionFunctions, "DFA's transition functions as a list of TransitionFunction objects.");
 
-    pybind11::class_<String>(module, "String", "Represents either a positive or a negative string of a given DFA.")
+    pybind11::class_<StringInstance>(module, "StringInstance", "Represents either a positive or a negative string instance of a given DFA.")
         .def(pybind11::init<string&, bool, unsigned int&>(), "constructor1", pybind11::arg("text"), pybind11::arg("accepting"), pybind11::arg("length"))
         .def(pybind11::init<string&, const string&>(), "constructor2", pybind11::arg("text"), pybind11::arg("delimiter"))
-        .def_readwrite("accepting", &String::accepting, "String is an accepting string if value true and vica versa for false.")
-        .def_readwrite("length", &String::length, "String's length.")
-        .def_readwrite("stringValue", &String::stringValue, "String's value.");
+        .def_readwrite("accepting", &StringInstance::accepting, "String is an accepting string if value is true and vica versa for false.")
+        .def_readwrite("length", &StringInstance::length, "String's length.")
+        .def_readwrite("stringValue", &StringInstance::stringValue, "String's value.");
 }

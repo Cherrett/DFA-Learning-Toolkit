@@ -12,7 +12,7 @@ public:
     unsigned int stateID;
 
     State() = default;
-    State(StateStatus stateStatus, int stateID);
+    State(StateStatus stateStatus, unsigned int stateID);
 };
 
 class TransitionFunction {
@@ -39,17 +39,17 @@ public:
     void describe(bool detail);
 };
 
-class String {
+class StringInstance {
 public:
     string stringValue;
     bool accepting;
     unsigned int length;
 
-    String(string& stringValue, bool accepting, unsigned int& length);
-    String(string& text, const string& delimiter);
+    StringInstance(string& stringValue, bool accepting, unsigned int& length);
+    StringInstance(string& text, const string& delimiter);
 };
 
-vector<String> GetListOfStringsFromFile(string fileName);
+vector<StringInstance> GetListOfStringsFromFile(string fileName);
 
 // Get (Augmented) Prefix Tree Acceptor from list of Strings
-DFA GetPTAFromListOfStrings(vector<String>& strings, bool APTA);
+DFA GetPTAFromListOfStringInstances(vector<StringInstance>& strings, bool APTA);

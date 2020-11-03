@@ -1,7 +1,7 @@
 # import PreProcessing
 # import String
 # import DFA
-from DFA_Toolkit import GetListOfStringsFromFile, GetPTAFromListOfStrings, UNKNOWN, State
+from DFA_Toolkit import GetListOfStringsFromFile, GetPTAFromListOfStrings, UNKNOWN, State, DFA
 from timeit import Timer
 
 
