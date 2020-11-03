@@ -6,6 +6,10 @@
 # PyCharm
 .idea/
 
+# Sphinx Docs
+CPP/docs/_build
+CPP/docs/_generate
+
 # User-specific files
 *.rsuser
 *.suo
