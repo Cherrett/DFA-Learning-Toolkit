@@ -1,0 +1,1 @@
+.. automodule:: DFA_Toolkit

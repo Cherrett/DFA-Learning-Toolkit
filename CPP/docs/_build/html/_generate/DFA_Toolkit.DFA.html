@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DFA_Toolkit.DFA &#8212; DFA Toolkit 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="DFA_Toolkit.DFA.getAcceptingStates" href="DFA_Toolkit.DFA.getAcceptingStates.html" />
+    <link rel="prev" title="DFA_Toolkit.TransitionFunction" href="DFA_Toolkit.TransitionFunction.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="dfa-toolkit-dfa">
+<h1>DFA_Toolkit.DFA<a class="headerlink" href="#dfa-toolkit-dfa" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="DFA_Toolkit.DFA">
+<em class="property">class </em><code class="sig-prename descclassname">DFA_Toolkit.</code><code class="sig-name descname">DFA</code><a class="headerlink" href="#DFA_Toolkit.DFA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a DFA.</p>
+<dl class="py method">
+<dt id="DFA_Toolkit.DFA.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#DFA_Toolkit.DFA" title="DFA_Toolkit.DFA">DFA_Toolkit.DFA</a></span></em>, <em class="sig-param"><span class="n">states</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="DFA_Toolkit.State.html#DFA_Toolkit.State" title="DFA_Toolkit.State">DFA_Toolkit.State</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">startingState</span><span class="p">:</span> <span class="n"><a class="reference internal" href="DFA_Toolkit.State.html#DFA_Toolkit.State" title="DFA_Toolkit.State">DFA_Toolkit.State</a></span></em>, <em class="sig-param"><span class="n">alphabet</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">transitionFunctions</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="DFA_Toolkit.TransitionFunction.html#DFA_Toolkit.TransitionFunction" title="DFA_Toolkit.TransitionFunction">DFA_Toolkit.TransitionFunction</a><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#DFA_Toolkit.DFA.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>constructor</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#DFA_Toolkit.DFA.__init__" title="DFA_Toolkit.DFA.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, states, startingState, …)</p></td>
+<td><p>constructor</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="DFA_Toolkit.DFA.addState.html#DFA_Toolkit.DFA.addState" title="DFA_Toolkit.DFA.addState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">addState</span></code></a>(self, arg0, arg1)</p></td>
+<td><p>Adds a State object to the DFA’s states.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="DFA_Toolkit.DFA.describe.html#DFA_Toolkit.DFA.describe" title="DFA_Toolkit.DFA.describe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">describe</span></code></a>(self, arg0)</p></td>
+<td><p>Prints DFA’s details.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="DFA_Toolkit.DFA.getAcceptingStates.html#DFA_Toolkit.DFA.getAcceptingStates" title="DFA_Toolkit.DFA.getAcceptingStates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getAcceptingStates</span></code></a>(self)</p></td>
+<td><p>Returns DFA’s accepting states as a list of State objects.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">alphabet</span></code></p></td>
+<td><p>DFA’s alphabet as a list of characters.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">startingState</span></code></p></td>
+<td><p>DFA’s starting state as a State object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">states</span></code></p></td>
+<td><p>DFA’s states as a list of State objects.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">transitionFunctions</span></code></p></td>
+<td><p>DFA’s transition functions as a list of TransitionFunction objects.</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">DFA Toolkit</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../DFA_Toolkit.html">A DFA-Toolkit</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="DFA_Toolkit.StateStatus.html">DFA_Toolkit.StateStatus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DFA_Toolkit.State.html">DFA_Toolkit.State</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DFA_Toolkit.TransitionFunction.html">DFA_Toolkit.TransitionFunction</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">DFA_Toolkit.DFA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DFA_Toolkit.DFA.getAcceptingStates.html">DFA_Toolkit.DFA.getAcceptingStates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DFA_Toolkit.DFA.addState.html">DFA_Toolkit.DFA.addState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DFA_Toolkit.DFA.describe.html">DFA_Toolkit.DFA.describe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DFA_Toolkit.String.html">DFA_Toolkit.String</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DFA_Toolkit.GetListOfStringsFromFile.html">DFA_Toolkit.GetListOfStringsFromFile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DFA_Toolkit.GetPTAFromListOfStrings.html">DFA_Toolkit.GetPTAFromListOfStrings</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../DFA_Toolkit.html">A DFA-Toolkit</a><ul>
+      <li>Previous: <a href="DFA_Toolkit.TransitionFunction.html" title="previous chapter">DFA_Toolkit.TransitionFunction</a></li>
+      <li>Next: <a href="DFA_Toolkit.DFA.getAcceptingStates.html" title="next chapter">DFA_Toolkit.DFA.getAcceptingStates</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Daniel Cherrett.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/_generate/DFA_Toolkit.DFA.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

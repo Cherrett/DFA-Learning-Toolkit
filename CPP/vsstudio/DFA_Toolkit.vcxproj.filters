@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\dach01\OneDrive - Betsson Group\Documents\FYP-Code\CPP\source\module\DFA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\dach01\OneDrive - Betsson Group\Documents\FYP-Code\CPP\source\module\DFA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\dach01\OneDrive - Betsson Group\Documents\FYP-Code\CPP\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{33F042E8-7D6E-3FFD-B684-9AB1E4E72602}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{49717049-BA1B-3152-8B90-7CC1673385E9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

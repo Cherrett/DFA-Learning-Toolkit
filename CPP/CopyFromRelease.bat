@@ -1,0 +1,1 @@
+COPY C:\Users\dach01\"OneDrive - Betsson Group"\Documents\FYP-Code\CPP\vsstudio\Release\DFA_Toolkit.cp38-win_amd64.pyd C:\Users\dach01\AppData\Local\Programs\Python\Python38\Lib\site-packages\DFA_Toolkit.cp38-win_amd64.pyd
