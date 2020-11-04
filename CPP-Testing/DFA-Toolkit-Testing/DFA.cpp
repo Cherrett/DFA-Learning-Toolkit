@@ -8,7 +8,7 @@ enum class StateStatus {
     UNKNOWN = 2
 };
 
-State::State(StateStatus stateStatus, int stateID)
+State::State(StateStatus stateStatus, unsigned int stateID)
     : stateStatus(stateStatus), stateID(stateID) {}
 
 TransitionFunction::TransitionFunction(State& fromState, State& toState, char& symbol)
@@ -27,7 +27,7 @@ vector<State> DFA::getAcceptingStates() {
 }
 
 void DFA::addState(StateStatus& stateStatus, unsigned int& statusID) {
-    this->states.push_back(State(stateStatus, statusID));
+    this->states.emplace_back(stateStatus, statusID);
 }
 
 void DFA::describe(bool detail) {
@@ -61,10 +61,10 @@ void DFA::describe(bool detail) {
     }
 }
 
-String::String(string& stringValue, bool accepting, unsigned int& length)
+StringInstance::StringInstance(string& stringValue, bool accepting, unsigned int& length)
     : stringValue(stringValue), accepting(accepting), length(length) {}
 
-String::String(string& text, const string& delimiter) {
+StringInstance::StringInstance(string& text, const string& delimiter) {
     this->stringValue = "";
     size_t pos = 0;
     std::string token;
@@ -95,23 +95,35 @@ String::String(string& text, const string& delimiter) {
     }
 }
 
-vector<String> GetListOfStringsFromFile(string fileName) {
-    vector<String> listOfStrings;
+bool StringInstance::operator< (const StringInstance& otherString) const {
+    return length < otherString.length;
+}
+
+vector<StringInstance> GetListOfStringInstancesFromFile(string fileName) {
+    vector<StringInstance> listOfStrings;
     std::ifstream infile(fileName);
     string line;
     // ignore first line
     std::getline(infile, line);
-    if (line.length() == 0) {
-        throw "File not valid";
-    }
     while (std::getline(infile, line))
     {
-        listOfStrings.push_back(String(line, " "));
+        listOfStrings.emplace_back(line, " ");
     }
     return listOfStrings;
 }
 
-DFA GetPTAFromListOfStrings(vector<String>& strings, bool APTA) {
+void SortListOfStringInstancesInternal(vector<StringInstance>& strings) {
+    sort(strings.begin(), strings.end());
+}
+
+vector<StringInstance> SortListOfStringInstances(vector<StringInstance> strings) {
+    sort(strings.begin(), strings.end());
+    return strings;
+}
+
+DFA GetPTAFromListOfStringInstances(vector<StringInstance>& strings, bool APTA) {
+    SortListOfStringInstancesInternal(strings);
+
     bool exists;
     unsigned int count;
     vector<char> alphabet;
@@ -119,14 +131,24 @@ DFA GetPTAFromListOfStrings(vector<String>& strings, bool APTA) {
     vector<TransitionFunction> transitionFunctions;
     State startingState, currentState;
 
-    startingState = State(StateStatus::UNKNOWN, 0);
+    if (strings[0].length == 0) {
+        if (strings[0].accepting) {
+            startingState = State(StateStatus::ACCEPTING, 0);
+        }
+        else {
+            startingState = State(StateStatus::REJECTING, 0);
+        }
+    }
+    else {
+        startingState = State(StateStatus::UNKNOWN, 0);
+    }
+
     states.push_back(startingState);
 
-    for (String& string : strings) {
+    for (StringInstance& string : strings) {
         if (!APTA && !string.accepting)
             continue;
         currentState = startingState;
-
         count = 0;
         for (char& character : string.stringValue) {
             count++;
@@ -147,14 +169,14 @@ DFA GetPTAFromListOfStrings(vector<String>& strings, bool APTA) {
                 // last symbol in string check
                 if (count == string.stringValue.size()) {
                     if (string.accepting)
-                        states.push_back(State(StateStatus::ACCEPTING, static_cast<int>(states.size())));
+                        states.emplace_back(StateStatus::ACCEPTING, static_cast<unsigned int>(states.size()));
                     else
-                        states.push_back(State(StateStatus::REJECTING, static_cast<int>(states.size())));
+                        states.emplace_back(StateStatus::REJECTING, static_cast<unsigned int>(states.size()));
                 }
                 else {
-                    states.push_back(State(StateStatus::UNKNOWN, static_cast<int>(states.size())));
+                    states.emplace_back(StateStatus::UNKNOWN, static_cast<unsigned int>(states.size()));
                 }
-                transitionFunctions.push_back(TransitionFunction(currentState, states[states.size() - 1], character));
+                transitionFunctions.emplace_back(currentState, states[states.size() - 1], character);
                 currentState = states[states.size() - 1];
             }
             else {

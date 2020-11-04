@@ -1,8 +1,10 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <algorithm>
 using std::string;
 using std::vector;
+using std::sort;
 
 enum class StateStatus;
 
@@ -47,9 +49,13 @@ public:
 
     StringInstance(string& stringValue, bool accepting, unsigned int& length);
     StringInstance(string& text, const string& delimiter);
+    bool operator< (const StringInstance& otherString) const;
 };
 
-vector<StringInstance> GetListOfStringsFromFile(string fileName);
+vector<StringInstance> GetListOfStringInstancesFromFile(string fileName);
+
+void SortListOfStringInstancesInternal(vector<StringInstance>& strings);
+vector<StringInstance> SortListOfStringInstances(vector<StringInstance> strings);
 
 // Get (Augmented) Prefix Tree Acceptor from list of Strings
 DFA GetPTAFromListOfStringInstances(vector<StringInstance>& strings, bool APTA);
