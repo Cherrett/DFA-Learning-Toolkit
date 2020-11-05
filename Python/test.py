@@ -8,6 +8,8 @@ def test():
     APTA = GetPTAFromListOfStringInstances(listOfStrings, True)
     APTA.describe(False)
 
+    print("DFA Depth:", APTA.depth())
+
     temp = State(UNKNOWN, len(APTA.states))
     APTA.states.append(temp)
 
