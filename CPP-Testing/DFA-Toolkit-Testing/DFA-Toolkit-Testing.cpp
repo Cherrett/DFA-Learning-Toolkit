@@ -8,7 +8,7 @@ int main()
     vector<StringInstance> listOfStrings;
     try 
     {
-        listOfStrings = GetListOfStringInstancesFromFile("dataset4\\train.a");
+        listOfStrings = GetListOfStringInstancesFromFile("dataset3\\train.a");
     }
     catch (const char* msg) {
         std::cerr << msg << std::endl;
@@ -41,6 +41,6 @@ int main()
     }
     
     auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<seconds>(stop - start);
+    auto duration = duration_cast<milliseconds>(stop - start);
     std::cout << "Average time: " << duration.count() << std::endl;
 }

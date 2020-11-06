@@ -417,7 +417,7 @@ PYBIND11_MODULE(DFA_Toolkit, module)
         Returns the DFA's depth by traversing the DFA. This method does not take any arguments.
     )pbdoc")
         .def("describe", &DFA::describe, R"pbdoc(
-        Prints DFA's details.
+        Prints the DFA's details.
 
         If the boolean argument is true, all of the DFA's details are printed while if it is false, only an overwiew is printed. This method does not return anything.
     )pbdoc")

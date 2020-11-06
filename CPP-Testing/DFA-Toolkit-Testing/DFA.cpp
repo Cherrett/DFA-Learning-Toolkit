@@ -54,7 +54,7 @@ unsigned int DFA::depth() {
     return max_value;
 }
 
-void DFA::depthUtil(int stateID, int count, map<unsigned int, unsigned int>& stateMap) {
+void DFA::depthUtil(unsigned int stateID, int count, map<unsigned int, unsigned int>& stateMap) {
     stateMap[stateID] = count;
 
     for (TransitionFunction& transitionFunction : this->transitionFunctions) {

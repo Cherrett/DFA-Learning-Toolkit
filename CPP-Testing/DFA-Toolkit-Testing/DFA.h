@@ -42,7 +42,7 @@ public:
     void describe(bool detail);
 
 private:
-    void depthUtil(int stateID, int count, map<unsigned int, unsigned int>& stateMap);
+    void depthUtil(unsigned int stateID, int count, map<unsigned int, unsigned int>& stateMap);
 };
 
 class StringInstance {
