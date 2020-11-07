@@ -17,33 +17,39 @@ enum class StateStatus {
 State::State(StateStatus stateStatus, unsigned int stateID)
     : stateStatus(stateStatus), stateID(stateID) {}
 
-TransitionFunction::TransitionFunction(State& fromState, State& toState, char& symbol)
-    : fromState(fromState), toState(toState), symbol(symbol) {}
+//TransitionFunction::TransitionFunction(State& fromState, State& toState, char& symbol)
+//    : fromState(fromState), toState(toState), symbol(symbol) {}
 
-DFA::DFA(vector<State>& states, State& startingState, vector<char>& alphabet, vector<TransitionFunction>& transitionFunctions)
-    : states(states), startingState(startingState), alphabet(alphabet), transitionFunctions(transitionFunctions) {}
+DFA::DFA(map<unsigned int, State>& states, State& startingState, vector<char>& alphabet)
+    : states(states), startingState(startingState), alphabet(alphabet) {}
 
 vector<State> DFA::getAcceptingStates() {
     vector<State> acceptingStates;
 
-    for (State state : this->states)
-        if (state.stateStatus == StateStatus::ACCEPTING)
-            acceptingStates.push_back(state);
+    map<unsigned int, State>::iterator it;
+    for (it = this->states.begin(); it != this->states.end(); it++)
+        if (it->second.stateStatus == StateStatus::ACCEPTING)
+            acceptingStates.push_back(it->second);
+
     return acceptingStates;
 }
 
-void DFA::addState(StateStatus& stateStatus, unsigned int& statusID) {
-    this->states.emplace_back(stateStatus, statusID);
+void DFA::addState(StateStatus& stateStatus) {
+    this->states[this->states.size()] = State(stateStatus, this->states.size());
 }
 
-void DFA::addTransitionFunction(State& fromState, State& toState, char& symbol) {
-    this->transitionFunctions.emplace_back(fromState, toState, symbol);
-}
+//void DFA::addState(State& state) {
+//    this->states[state.stateID] = state;
+//}
+
+//void DFA::addTransitionFunction(State& fromState, State& toState, char& symbol) {
+//    this->transitionFunctions.emplace_back(fromState, toState, symbol);
+//}
 
 unsigned int DFA::depth() {
     map<unsigned int, unsigned int> stateMap;
 
-    depthUtil(this->startingState.stateID, 0, stateMap);
+    depthUtil(this->startingState, 0, stateMap);
 
     unsigned int max_value = 0;
     std::map<unsigned int, unsigned int>::iterator map_iterator;
@@ -54,29 +60,39 @@ unsigned int DFA::depth() {
     return max_value;
 }
 
-void DFA::depthUtil(unsigned int stateID, int count, map<unsigned int, unsigned int>& stateMap) {
-    stateMap[stateID] = count;
+void DFA::depthUtil(State& state, int count, map<unsigned int, unsigned int>& stateMap) {
+    stateMap[state.stateID] = count;
 
-    for (TransitionFunction& transitionFunction : this->transitionFunctions) {
+    std::map<char, unsigned int>::iterator transitions_iterator;
+    for (transitions_iterator = state.transitions.begin(); transitions_iterator != state.transitions.end(); ++transitions_iterator) {
+        if (stateMap.count(transitions_iterator->second) == 0)
+            depthUtil(this->states[transitions_iterator->second], count + 1, stateMap);
+    }
+
+    /*for (TransitionFunction& transitionFunction : this->transitionFunctions) {
         if (transitionFunction.fromState.stateID == stateID && stateMap.count(transitionFunction.toState.stateID) == 0) {
             depthUtil(transitionFunction.toState.stateID, count + 1, stateMap);
         }
-    }
+    }*/
 }
 
 void DFA::describe(bool detail) {
     std::cout << "This DFA has " << this->states.size() << " states and " << this->alphabet.size() << " alphabet" << std::endl;
     if (detail) {
         std::cout << "States:" << std::endl;
-        for (State& state : this->states) {
-            if (state.stateStatus == StateStatus::ACCEPTING) {
-                std::cout << state.stateID << " ACCEPTING" << std::endl;
+        //for (State& state : this->states) {
+
+        map<unsigned int, State>::iterator statesIterator;
+        for (statesIterator = this->states.begin(); statesIterator != this->states.end(); statesIterator++)
+        {
+            if (statesIterator->second.stateStatus == StateStatus::ACCEPTING) {
+                std::cout << statesIterator->first << " ACCEPTING" << std::endl;
             }
-            else if (state.stateStatus == StateStatus::REJECTING) {
-                std::cout << state.stateID << " REJECTING" << std::endl;
+            else if (statesIterator->second.stateStatus == StateStatus::REJECTING) {
+                std::cout << statesIterator->first << " REJECTING" << std::endl;
             }
             else {
-                std::cout << state.stateID << " UNKNOWN" << std::endl;
+                std::cout << statesIterator->first << " UNKNOWN" << std::endl;
             }
         }
         std::cout << "Accepting States:" << std::endl;
@@ -88,10 +104,10 @@ void DFA::describe(bool detail) {
         for (char& character : this->alphabet) {
             std::cout << character << std::endl;
         }
-        std::cout << "Transition Functions:" << std::endl;
+        /*std::cout << "Transition Functions:" << std::endl;
         for (TransitionFunction& transitionFunction : this->transitionFunctions) {
             std::cout << transitionFunction.fromState.stateID << "->" << transitionFunction.toState.stateID << "=" << transitionFunction.symbol << std::endl;
-        }
+        }*/
     }
 }
 
@@ -170,28 +186,27 @@ DFA GetPTAFromListOfStringInstances(vector<StringInstance>& strings, bool APTA) 
     bool exists;
     unsigned int count;
     vector<char> alphabet;
-    vector<State> states;
-    vector<TransitionFunction> transitionFunctions;
-    State startingState, currentState;
+    map<unsigned int, State> states;
+    //vector<TransitionFunction> transitionFunctions;
+    unsigned int startingStateID = 0;
+    unsigned int currentStateID;
 
     if (strings[0].length == 0) {
         if (strings[0].stringStatus == StateStatus::ACCEPTING) {
-            startingState = State(StateStatus::ACCEPTING, 0);
+            states[0] = State(StateStatus::ACCEPTING, 0);
         }
         else {
-            startingState = State(StateStatus::REJECTING, 0);
+            states[0] = State(StateStatus::REJECTING, 0);
         }
     }
     else {
-        startingState = State(StateStatus::UNKNOWN, 0);
+        states[0] = State(StateStatus::UNKNOWN, 0);
     }
-
-    states.push_back(startingState);
 
     for (StringInstance& string : strings) {
         if (!APTA && string.stringStatus != StateStatus::ACCEPTING)
             continue;
-        currentState = startingState;
+        currentStateID = startingStateID;
         count = 0;
         for (char& character : string.stringValue) {
             count++;
@@ -200,49 +215,57 @@ DFA GetPTAFromListOfStringInstances(vector<StringInstance>& strings, bool APTA) 
             if (std::find(alphabet.begin(), alphabet.end(), character) == alphabet.end())
                 alphabet.push_back(character);
 
-            for (TransitionFunction& transitionFunction : transitionFunctions) {
+            map<char, unsigned int>::iterator transitionIterator = states[currentStateID].transitions.find(character);
+            if (transitionIterator != states[currentStateID].transitions.end())
+            {
+                currentStateID = transitionIterator->second;
+                exists = true;
+            }
+
+            /*for (TransitionFunction& transitionFunction : transitionFunctions) {
                 if (transitionFunction.fromState.stateID == currentState.stateID && transitionFunction.symbol == character) {
                     currentState = transitionFunction.toState;
                     exists = true;
                     break;
                 }
-            }
+            }*/
 
             if (!exists) {
                 // last symbol in string check
                 if (count == string.stringValue.size()) {
                     if (string.stringStatus == StateStatus::ACCEPTING)
-                        states.emplace_back(StateStatus::ACCEPTING, static_cast<unsigned int>(states.size()));
+                        states[states.size()] = State(StateStatus::ACCEPTING, states.size());
                     else
-                        states.emplace_back(StateStatus::REJECTING, static_cast<unsigned int>(states.size()));
+                        states[states.size()] = State(StateStatus::REJECTING, states.size());
                 }
                 else {
-                    states.emplace_back(StateStatus::UNKNOWN, static_cast<unsigned int>(states.size()));
+                    states[states.size()] = State(StateStatus::UNKNOWN, states.size());
                 }
-                transitionFunctions.emplace_back(currentState, states[states.size() - 1], character);
-                currentState = states[states.size() - 1];
+                states[currentStateID].transitions[character] = states[states.size() - 1].stateID;
+                //transitionFunctions.emplace_back(currentState, states[states.size() - 1], character);
+                currentStateID = states[states.size() - 1].stateID;
             }
             else {
                 // last symbol in string check
                 if (count == string.stringValue.size()) {
                     if (string.stringStatus == StateStatus::ACCEPTING) {
-                        if (currentState.stateStatus == StateStatus::REJECTING)
+                        if (states[currentStateID].stateStatus == StateStatus::REJECTING)
                             throw "Error, state already set to rejecting, cannot set to accepting";
                         else
-                            currentState.stateStatus = StateStatus::ACCEPTING;
+                            states[currentStateID].stateStatus = StateStatus::ACCEPTING;
                     }
                     else {
-                        if (currentState.stateStatus == StateStatus::ACCEPTING)
+                        if (states[currentStateID].stateStatus == StateStatus::ACCEPTING)
                             throw "Error, state already set to accepting, cannot set to rejecting";
                         else
-                            currentState.stateStatus = StateStatus::REJECTING;
+                            states[currentStateID].stateStatus = StateStatus::REJECTING;
                     }
                 }
             }
         }
     }
 
-    return DFA(states, startingState, alphabet, transitionFunctions);
+    return DFA(states, states[startingStateID], alphabet);
 }
 
 bool StringInstanceConsistentWithDFA(StringInstance& string, DFA& dfa) {
@@ -258,13 +281,20 @@ bool StringInstanceConsistentWithDFA(StringInstance& string, DFA& dfa) {
         count++;
         exists = false;
 
-        for (TransitionFunction& transitionFunction : dfa.transitionFunctions) {
+        map<char, unsigned int>::iterator transitionIterator = currentState.transitions.find(character);
+        if (transitionIterator != currentState.transitions.end())
+        {
+            currentState = dfa.states[transitionIterator->second];
+            exists = true;
+        }
+
+        /*for (TransitionFunction& transitionFunction : dfa.transitionFunctions) {
             if (transitionFunction.fromState.stateID == currentState.stateID && transitionFunction.symbol == character) {
                 currentState = transitionFunction.toState;
                 exists = true;
                 break;
             }
-        }
+        }*/
 
         if (!exists) {
             return false;
@@ -317,13 +347,20 @@ StateStatus GetStringStatusInRegardToDFA(StringInstance& string, DFA& dfa) {
         count++;
         exists = false;
 
-        for (TransitionFunction& transitionFunction : dfa.transitionFunctions) {
+        map<char, unsigned int>::iterator transitionIterator = currentState.transitions.find(character);
+        if (transitionIterator != currentState.transitions.end())
+        {
+            currentState = dfa.states[transitionIterator->second];
+            exists = true;
+        }
+
+        /*for (TransitionFunction& transitionFunction : dfa.transitionFunctions) {
             if (transitionFunction.fromState.stateID == currentState.stateID && transitionFunction.symbol == character) {
                 currentState = transitionFunction.toState;
                 exists = true;
                 break;
             }
-        }
+        }*/
 
         if (!exists) {
             return StateStatus::UNKNOWN;

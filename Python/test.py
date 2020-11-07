@@ -3,15 +3,15 @@ from timeit import Timer
 
 
 def test():
-    listOfStrings = GetListOfStringInstancesFromFile('dataset3\\train.a')
+    listOfStrings = GetListOfStringInstancesFromFile('dataset4\\train.a')
     # listOfStrings = SortListOfStringInstances(listOfStrings)
     APTA = GetPTAFromListOfStringInstances(listOfStrings, True)
     APTA.describe(False)
 
     print("DFA Depth:", APTA.depth())
 
-    temp = State(UNKNOWN, len(APTA.states))
-    APTA.states.append(temp)
+    # temp = State(UNKNOWN, len(APTA.states))
+    APTA.addState(UNKNOWN)
 
 # print('Starting state: ', len(dfa.getStartingState()))
 # print('number of states: ', len(dfa.getStates()))

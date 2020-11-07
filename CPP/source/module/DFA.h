@@ -14,35 +14,26 @@ class State {
 public:
     StateStatus stateStatus;
     unsigned int stateID;
+    map<char, unsigned int> transitions;
 
     State() = default;
     State(StateStatus stateStatus, unsigned int stateID);
 };
 
-class TransitionFunction {
-public:
-    State fromState, toState;
-    char symbol;
-
-    TransitionFunction(State& fromState, State& toState, char& symbol);
-};
-
 class DFA {
 public:
-    vector<State> states;
+    map<unsigned int, State> states;
     State startingState;
     vector<char> alphabet;
-    vector<TransitionFunction> transitionFunctions;
 
-    DFA(vector<State>& states, State& startingState, vector<char>& alphabet, vector<TransitionFunction>& transitionFunctions);
+    DFA(map<unsigned int, State>& states, State& startingState, vector<char>& alphabet);
     vector<State> getAcceptingStates();
-    void addState(StateStatus& stateStatus, unsigned int& statusID);
-    void addTransitionFunction(State& fromState, State& toState, char& symbol);
+    void addState(StateStatus& stateStatus);
     unsigned int depth(); 
     void describe(bool detail);
 
 private:
-    void depthUtil(int stateID, int count, map<unsigned int, unsigned int>& stateMap);
+    void depthUtil(State& state, int count, map<unsigned int, unsigned int>& stateMap);
 };
 
 class StringInstance {
