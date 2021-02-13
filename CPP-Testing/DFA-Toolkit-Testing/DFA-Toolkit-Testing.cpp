@@ -8,7 +8,7 @@ int main()
     vector<StringInstance> listOfStrings;
     try 
     {
-        listOfStrings = GetListOfStringInstancesFromFile("dataset3\\train.a");
+        listOfStrings = GetListOfStringInstancesFromFile("dataset1\\train.a");
     }
     catch (const char* msg) {
         std::cerr << msg << std::endl;
@@ -34,6 +34,11 @@ int main()
         listOfStrings = GetListOfStringInstancesFromFile("dataset3\\test.a");
         stateStatus = GetStringStatusInRegardToDFA(listOfStrings[0], APTA);
         std::cout << "Done" << std::endl;*/
+
+        vector<StringInstance> acceptingStrings = GetAcceptingStringInstances(listOfStrings);
+        vector<StringInstance> rejectingStrings = GetRejectingStringInstances(listOfStrings);
+
+        DFA finalDFA = RPNI(acceptingStrings, rejectingStrings);
     }
     catch (const char* msg) {
         std::cerr << msg << std::endl;

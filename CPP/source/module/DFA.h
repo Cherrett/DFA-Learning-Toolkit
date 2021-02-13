@@ -8,7 +8,11 @@ using std::vector;
 using std::map;
 using std::sort;
 
-enum class StateStatus;
+enum class StateStatus {
+    ACCEPTING = 1,
+    REJECTING = 0,
+    UNKNOWN = 2
+};
 
 class State {
 public:
@@ -28,6 +32,7 @@ public:
 
     DFA(map<unsigned int, State>& states, State& startingState, vector<char>& alphabet);
     vector<State> getAcceptingStates();
+    vector<State> getRejectingStates();
     void addState(StateStatus& stateStatus);
     unsigned int depth(); 
     void describe(bool detail);
@@ -60,3 +65,7 @@ bool StringInstanceConsistentWithDFA(StringInstance& string, DFA& dfa);
 bool ListOfStringInstancesConsistentWithDFA(vector<StringInstance>& strings, DFA& dfa);
 
 StateStatus GetStringStatusInRegardToDFA(StringInstance& string, DFA& dfa);
+
+vector<StringInstance> GetAcceptingStringInstances(vector<StringInstance> strings);
+
+vector<StringInstance> GetRejectingStringInstances(vector<StringInstance> strings);

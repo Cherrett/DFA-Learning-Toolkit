@@ -8,7 +8,11 @@ using std::vector;
 using std::map;
 using std::sort;
 
-enum class StateStatus;
+enum class StateStatus {
+    ACCEPTING = 1,
+    REJECTING = 0,
+    UNKNOWN = 2
+};
 
 class State {
 public:
@@ -18,6 +22,18 @@ public:
 
     State() = default;
     State(StateStatus stateStatus, unsigned int stateID);
+    State(StateStatus stateStatus, unsigned int stateID, map<char, unsigned int> transitions);
+};
+
+class NFA_State {
+public:
+    StateStatus stateStatus;
+    unsigned int stateID;
+    map<char, vector<unsigned int>> transitions;
+
+    NFA_State() = default;
+    NFA_State(StateStatus stateStatus, unsigned int stateID);
+    NFA_State(StateStatus stateStatus, unsigned int stateID, map<char, vector<unsigned int>> transitions);
 };
 
 //class TransitionFunction {
@@ -38,6 +54,7 @@ public:
 
     DFA(map<unsigned int, State>& states, State& startingState, vector<char>& alphabet);
     vector<State> getAcceptingStates();
+    vector<State> getRejectingStates();
     void addState(StateStatus& stateStatus);
     //void addState(State& state);
     //void addTransitionFunction(State& fromState, State& toState, char& symbol);
@@ -46,6 +63,15 @@ public:
 
 private:
     void depthUtil(State& state, int count, map<unsigned int, unsigned int>& stateMap);
+};
+
+class NFA {
+public:
+    map<unsigned int, NFA_State> states;
+    NFA_State startingState;
+    vector<char> alphabet;
+
+    NFA(map<unsigned int, NFA_State>& states, NFA_State& startingState, vector<char>& alphabet);
 };
 
 class StringInstance {
@@ -72,3 +98,31 @@ bool StringInstanceConsistentWithDFA(StringInstance& string, DFA& dfa);
 bool ListOfStringInstancesConsistentWithDFA(vector<StringInstance>& strings, DFA& dfa);
 
 StateStatus GetStringStatusInRegardToDFA(StringInstance& string, DFA& dfa);
+
+vector<StringInstance> GetAcceptingStringInstances(vector<StringInstance> strings);
+
+vector<StringInstance> GetRejectingStringInstances(vector<StringInstance> strings);
+
+bool isNFAdeterministic(NFA nfa);
+
+NFA RPNI_Derive(DFA dfa, vector<vector<unsigned int>> partition);
+
+struct RPNI_Deterministic_Merge_object {
+public:
+    vector<vector<unsigned int>> partition;
+    DFA dfa;
+
+    RPNI_Deterministic_Merge_object(vector<vector<unsigned int>> partition, DFA dfa);
+};
+
+NFA RPNI_Merge(NFA nfa, unsigned int state1, unsigned int state2);
+
+RPNI_Deterministic_Merge_object RPNI_Deterministic_Merge(NFA nfa, vector<vector<unsigned int>> partition);
+
+bool RPNI_StringInstanceConsistentWithDFA(StringInstance& string, DFA& dfa);
+
+bool RPNI_ListOfNegativeStringInstancesConsistentWithDFA(vector<StringInstance>& strings, DFA& dfa);
+
+DFA NFAtoDFA(NFA nfa);
+
+DFA RPNI(vector<StringInstance>& acceptingStrings, vector<StringInstance>& rejectingStrings);

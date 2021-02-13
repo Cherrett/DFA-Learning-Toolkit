@@ -8,19 +8,25 @@
 using concurrency::parallel_for_each;
 std::mutex m;
 
-enum class StateStatus {
-    ACCEPTING = 1,
-    REJECTING = 0,
-    UNKNOWN = 2
-};
-
 State::State(StateStatus stateStatus, unsigned int stateID)
     : stateStatus(stateStatus), stateID(stateID) {}
+
+State::State(StateStatus stateStatus, unsigned int stateID, map<char, unsigned int> transitions)
+    : stateStatus(stateStatus), stateID(stateID), transitions(transitions) {}
+
+NFA_State::NFA_State(StateStatus stateStatus, unsigned int stateID)
+    : stateStatus(stateStatus), stateID(stateID) {}
+
+NFA_State::NFA_State(StateStatus stateStatus, unsigned int stateID, map<char, vector<unsigned int>> transitions)
+    : stateStatus(stateStatus), stateID(stateID), transitions(transitions) {}
 
 //TransitionFunction::TransitionFunction(State& fromState, State& toState, char& symbol)
 //    : fromState(fromState), toState(toState), symbol(symbol) {}
 
 DFA::DFA(map<unsigned int, State>& states, State& startingState, vector<char>& alphabet)
+    : states(states), startingState(startingState), alphabet(alphabet) {}
+
+NFA::NFA(map<unsigned int, NFA_State>& states, NFA_State& startingState, vector<char>& alphabet)
     : states(states), startingState(startingState), alphabet(alphabet) {}
 
 vector<State> DFA::getAcceptingStates() {
@@ -32,6 +38,17 @@ vector<State> DFA::getAcceptingStates() {
             acceptingStates.push_back(it->second);
 
     return acceptingStates;
+}
+
+vector<State> DFA::getRejectingStates() {
+    vector<State> rejectingStates;
+
+    map<unsigned int, State>::iterator it;
+    for (it = this->states.begin(); it != this->states.end(); it++)
+        if (it->second.stateStatus == StateStatus::REJECTING)
+            rejectingStates.push_back(it->second);
+
+    return rejectingStates;
 }
 
 void DFA::addState(StateStatus& stateStatus) {
@@ -136,18 +153,24 @@ StringInstance::StringInstance(string& text, const string& delimiter) {
 
     // length
     pos = text.find(delimiter);
-    token = text.substr(0, pos);
-    std::istringstream(token) >> this->length;
-    text.erase(0, pos + 1);
 
-    while ((pos = text.find(delimiter)) != std::string::npos) {
+    if (pos != std::string::npos) {
         token = text.substr(0, pos);
-        this->stringValue.append(token);
+        std::istringstream(token) >> this->length;
         text.erase(0, pos + 1);
-    }
 
-    if (text.length() != 0) {
-        this->stringValue.append(text);
+        while ((pos = text.find(delimiter)) != std::string::npos) {
+            token = text.substr(0, pos);
+            this->stringValue.append(token);
+            text.erase(0, pos + 1);
+        }
+
+        if (text.length() != 0) {
+            this->stringValue.append(text);
+        }
+    }
+    else {
+        this->length = 0;
     }
 }
 
@@ -288,14 +311,6 @@ bool StringInstanceConsistentWithDFA(StringInstance& string, DFA& dfa) {
             exists = true;
         }
 
-        /*for (TransitionFunction& transitionFunction : dfa.transitionFunctions) {
-            if (transitionFunction.fromState.stateID == currentState.stateID && transitionFunction.symbol == character) {
-                currentState = transitionFunction.toState;
-                exists = true;
-                break;
-            }
-        }*/
-
         if (!exists) {
             return false;
         }
@@ -354,14 +369,6 @@ StateStatus GetStringStatusInRegardToDFA(StringInstance& string, DFA& dfa) {
             exists = true;
         }
 
-        /*for (TransitionFunction& transitionFunction : dfa.transitionFunctions) {
-            if (transitionFunction.fromState.stateID == currentState.stateID && transitionFunction.symbol == character) {
-                currentState = transitionFunction.toState;
-                exists = true;
-                break;
-            }
-        }*/
-
         if (!exists) {
             return StateStatus::UNKNOWN;
         }
@@ -380,4 +387,275 @@ StateStatus GetStringStatusInRegardToDFA(StringInstance& string, DFA& dfa) {
         }
     }
     return StateStatus::UNKNOWN;
+}
+
+vector<StringInstance> GetAcceptingStringInstances(vector<StringInstance> strings) {
+    vector<StringInstance> acceptingStrings;
+
+    for (StringInstance& stringInstance : strings) {
+        if (stringInstance.stringStatus == StateStatus::ACCEPTING) {
+            acceptingStrings.emplace_back(stringInstance);
+        }
+    }
+    return acceptingStrings;
+}
+
+vector<StringInstance> GetRejectingStringInstances(vector<StringInstance> strings) {
+    vector<StringInstance> rejectingStrings;
+
+    for (StringInstance& stringInstance : strings) {
+        if (stringInstance.stringStatus == StateStatus::REJECTING) {
+            rejectingStrings.emplace_back(stringInstance);
+        }
+    }
+    return rejectingStrings;
+}
+
+bool isNFAdeterministic(NFA nfa) {
+    for (map<unsigned int, NFA_State>::iterator it = nfa.states.begin(); it != nfa.states.end(); it++) {
+        for (map<char, vector<unsigned int>>::iterator it2 = it->second.transitions.begin(); it2 != it->second.transitions.end(); it2++) {
+            if (it2->second.size() > 1) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+NFA RPNI_Derive(DFA dfa, vector<vector<unsigned int>> partition) {
+    map<unsigned int, unsigned int> new_mappings;
+    map<unsigned int, NFA_State> states;
+    
+    for (vector<unsigned int>& currentBlock : partition) {
+        StateStatus stateStatus = StateStatus::UNKNOWN;
+        map<char, vector<unsigned int>> transitions;
+
+        for (unsigned int& stateID : currentBlock) {
+            if (dfa.states[stateID].stateStatus == StateStatus::ACCEPTING) {
+                stateStatus = StateStatus::ACCEPTING;
+            }
+            for (map<char, unsigned int>::iterator it = dfa.states[stateID].transitions.begin(); it != dfa.states[stateID].transitions.end(); it++) {
+                if (transitions.count(it->first) == 0) {
+                    transitions[it->first] = vector<unsigned int>{it->second};
+                }
+                else {
+                    if (std::find(transitions[it->first].begin(), transitions[it->first].end(), it->second) == transitions[it->first].end()) 
+                        transitions[it->first].emplace_back(it->second);
+                }
+            }
+            new_mappings[stateID] = states.size();
+        }
+        states[states.size()] = NFA_State(stateStatus, states.size(), transitions);
+    }
+    // update new states via mappings
+    for (map<unsigned int, NFA_State>::iterator it = states.begin(); it != states.end(); it++) {
+        for (map<char, vector<unsigned int>>::iterator it2 = it->second.transitions.begin(); it2 != it->second.transitions.end(); it2++) {
+            for (unsigned int i = 0; i < it2->second.size(); i++)
+                it2->second[i] = new_mappings[it2->second[i]];
+        }
+    }
+
+    return NFA(states, states[new_mappings[dfa.startingState.stateID]], dfa.alphabet);
+}
+
+NFA RPNI_Merge(NFA nfa, unsigned int state1, unsigned int state2) {
+    StateStatus stateStatus = StateStatus::UNKNOWN;
+    for (map<unsigned int, NFA_State>::iterator it = nfa.states.begin(); it != nfa.states.end(); it++) {
+        if (it->first == state1) {
+            if (it->second.stateStatus == StateStatus::ACCEPTING)
+                stateStatus = StateStatus::ACCEPTING;
+        }
+        else if (it->first == state2) {
+            if (it->second.stateStatus == StateStatus::ACCEPTING)
+                stateStatus = StateStatus::ACCEPTING;
+            for (map<char, vector<unsigned int>>::iterator it2 = it->second.transitions.begin(); it2 != it->second.transitions.end(); it2++) {
+                for (unsigned int i = 0; i < it2->second.size(); i++) {
+                    if (nfa.states[state1].transitions.count(it2->first) == 0) {
+                        nfa.states[state1].transitions[it2->first] = vector<unsigned int>{ it2->second.at(i) };
+                    }
+                    else {
+                        if (std::find(nfa.states[state1].transitions[it2->first].begin(), nfa.states[state1].transitions[it2->first].end(), it2->second.at(i)) == nfa.states[state1].transitions[it2->first].end())
+                            nfa.states[state1].transitions[it2->first].emplace_back(it2->second.at(i));               
+                    }
+                }
+            }
+            continue;
+        }
+        
+        for (map<char, vector<unsigned int>>::iterator it2 = it->second.transitions.begin(); it2 != it->second.transitions.end(); it2++) {
+            for (unsigned int i = 0; i < it2->second.size(); i++)
+                if (it2->second[i] == state2)
+                    if (std::find(it2->second.begin(), it2->second.end(), state1) == it2->second.end())
+                        it2->second[i] = state1;
+                    else
+                        it2->second.erase(it2->second.begin() + i);
+        }
+    }
+
+    nfa.states.erase(state2);
+    nfa.states[state1].stateStatus = stateStatus;
+
+    if (nfa.startingState.stateID == state2)
+        nfa.startingState = nfa.states[state1];
+
+    return nfa;
+}
+
+RPNI_Deterministic_Merge_object::RPNI_Deterministic_Merge_object(vector<vector<unsigned int>> partition, DFA dfa)
+    : partition(partition), dfa(dfa) {};
+
+RPNI_Deterministic_Merge_object RPNI_Deterministic_Merge(NFA nfa, vector<vector<unsigned int>> partition) {
+    //map<unsigned int, State> newStates;
+    
+    while (!isNFAdeterministic(nfa)) {
+        //vector<vector<unsigned int>> newPartition;
+        bool exit_loop = false;
+        for (map<unsigned int, NFA_State>::iterator it = nfa.states.begin(); it != nfa.states.end(); it++) {
+            //vector<unsigned int> newBlock;
+            for (map<char, vector<unsigned int>>::iterator it2 = it->second.transitions.begin(); it2 != it->second.transitions.end(); it2++) {
+                if (it2->second.size() > 1) {
+                    // merging
+                    unsigned int state1 = it2->second[0];
+                    unsigned int state2 = it2->second[1];
+                    nfa = RPNI_Merge(nfa, state1, state2);
+                    for (unsigned int element : partition.at(state2))
+                        partition.at(state1).push_back(element);
+                    partition.erase(partition.begin()+state2);
+                    // need to create normalization function after merge
+                    exit_loop = true;
+                    break;
+                }
+            }
+            if (exit_loop)
+                break;
+        }
+    }
+    
+
+    return RPNI_Deterministic_Merge_object(partition, NFAtoDFA(nfa));
+}
+
+DFA NFAtoDFA(NFA nfa) {
+    map<unsigned int, State> states;
+
+    for (map<unsigned int, NFA_State>::iterator it = nfa.states.begin(); it != nfa.states.end(); it++) {
+        states[it->first] = State(it->second.stateStatus, it->second.stateID);
+        for (map<char, vector<unsigned int>>::iterator it2 = it->second.transitions.begin(); it2 != it->second.transitions.end(); it2++) {
+            states[it->first].transitions[it2->first] = it2->second.at(0);
+        }
+    }    
+
+    return DFA(states, states[nfa.startingState.stateID], nfa.alphabet);
+}
+
+bool RPNI_StringInstanceConsistentWithDFA(StringInstance& string, DFA& dfa) {
+    bool exists;
+    State currentState = dfa.startingState;
+    unsigned int count = 0;
+
+    if (string.length == 0) {
+        if (dfa.startingState.stateStatus == StateStatus::ACCEPTING) {
+            return false;
+        }
+    }
+    else {
+        for (char& character : string.stringValue) {
+            count++;
+            exists = false;
+
+            map<char, unsigned int>::iterator transitionIterator = currentState.transitions.find(character);
+            if (transitionIterator != currentState.transitions.end())
+            {
+                currentState = dfa.states[transitionIterator->second];
+                exists = true;
+            }
+
+            if (!exists) {
+                return true;
+            }
+            else {
+                // last symbol in string check
+                if (count == string.stringValue.size()) {
+                    if (currentState.stateStatus == StateStatus::ACCEPTING) {
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+    return true;
+}
+
+bool RPNI_ListOfNegativeStringInstancesConsistentWithDFA(vector<StringInstance>& strings, DFA& dfa) {
+    bool consistent = true;
+
+    parallel_for_each(begin(strings), end(strings), [&](StringInstance string) {
+
+        if (!consistent) {
+            return;
+        }
+        else {
+            if (!RPNI_StringInstanceConsistentWithDFA(string, dfa)) {
+                m.lock();
+                consistent = false;
+                m.unlock();
+                return;
+            }
+        }
+        });
+
+    return consistent;
+}
+
+DFA RPNI(vector<StringInstance>& acceptingStrings, vector<StringInstance>& rejectingStrings) {
+    DFA PTA = GetPTAFromListOfStringInstances(acceptingStrings, false);
+    DFA currentHypothesis = PTA;
+    DFA tempHypothesis = PTA;
+    vector<vector<unsigned int>> currentPartition;
+
+    for (map<unsigned int, State>::iterator it = currentHypothesis.states.begin(); it != currentHypothesis.states.end(); it++)
+        currentPartition.emplace_back(vector<unsigned int>{it->first});
+
+    for (int i = 1; i < PTA.states.size(); i++) {
+        for (int j = 0; j < i; j++) {
+            // merge the block which contains state i with the block which contains state j
+            vector<vector<unsigned int>> tempPartition;
+            
+            vector<unsigned int> tempBlock = vector<unsigned int>{};
+            for (vector<unsigned int> block : currentPartition) {
+                if (std::find(block.begin(), block.end(), i) != block.end()) {
+                    for (unsigned int state : block)
+                        tempBlock.emplace_back(state);
+                }
+                else if (std::find(block.begin(), block.end(), j) != block.end()){
+                    for (unsigned int state : block)
+                        tempBlock.emplace_back(state);
+                }
+                else {
+                    tempPartition.emplace_back(block);
+                }
+            }
+            tempPartition.emplace_back(tempBlock);
+
+            // get quotient automaton
+            NFA tempHypothesisNFA = RPNI_Derive(PTA, tempPartition);
+
+            if (isNFAdeterministic(tempHypothesisNFA)) {
+                tempHypothesis = NFAtoDFA(tempHypothesisNFA);            
+            }
+            else {
+                // determinize the quotient automaton (if necessary) by state merging
+                RPNI_Deterministic_Merge_object temp = RPNI_Deterministic_Merge(tempHypothesisNFA, tempPartition);
+                tempHypothesis = temp.dfa;
+                tempPartition = temp.partition;
+            }
+            // Does tempDFA reject all negative strings?
+            if (RPNI_ListOfNegativeStringInstancesConsistentWithDFA(rejectingStrings, tempHypothesis)) {
+                // Treat tempHypothesis as the current hypothesis
+                currentHypothesis = tempHypothesis;
+                currentPartition = tempPartition;
+            }    
+        }
+    }
+    return currentHypothesis;
 }

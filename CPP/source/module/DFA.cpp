@@ -10,12 +10,6 @@
 using concurrency::parallel_for_each;
 std::mutex m;
 
-enum class StateStatus {
-    ACCEPTING = 1,
-    REJECTING = 0,
-    UNKNOWN = 2
-};
-
 State::State(StateStatus stateStatus, unsigned int stateID)
     : stateStatus(stateStatus), stateID(stateID) {}
 
@@ -31,6 +25,17 @@ vector<State> DFA::getAcceptingStates() {
             acceptingStates.push_back(it->second);
 
     return acceptingStates;
+}
+
+vector<State> DFA::getRejectingStates() {
+    vector<State> rejectingStates;
+
+    map<unsigned int, State>::iterator it;
+    for (it = this->states.begin(); it != this->states.end(); it++)
+        if (it->second.stateStatus == StateStatus::REJECTING)
+            rejectingStates.push_back(it->second);
+
+    return rejectingStates;
 }
 
 void DFA::addState(StateStatus& stateStatus) {
@@ -335,6 +340,28 @@ StateStatus GetStringStatusInRegardToDFA(StringInstance& string, DFA& dfa) {
         }
     }
     return StateStatus::UNKNOWN;
+}
+
+vector<StringInstance> GetAcceptingStringInstances(vector<StringInstance> strings) {
+    vector<StringInstance> acceptingStrings;
+
+    for (StringInstance& stringInstance : strings) {
+        if (stringInstance.stringStatus == StateStatus::ACCEPTING) {
+            acceptingStrings.emplace_back(stringInstance);
+        }
+    }
+    return acceptingStrings;
+}
+
+vector<StringInstance> GetRejectingStringInstances(vector<StringInstance> strings) {
+    vector<StringInstance> rejectingStrings;
+
+    for (StringInstance& stringInstance : strings) {
+        if (stringInstance.stringStatus == StateStatus::REJECTING) {
+            rejectingStrings.emplace_back(stringInstance);
+        }
+    }
+    return rejectingStrings;
 }
 
 PYBIND11_MODULE(DFA_Toolkit, module)
