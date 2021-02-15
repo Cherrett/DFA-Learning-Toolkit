@@ -11,15 +11,15 @@ def test():
     print("DFA Depth:", APTA.depth())
 
     # temp = State(UNKNOWN, len(APTA.states))
-    APTA.addState(UNKNOWN)
+    # APTA.addState(UNKNOWN)
 
 # print('Starting state: ', len(dfa.getStartingState()))
 # print('number of states: ', len(dfa.getStates()))
 # print('number of transitionFunctions: ', len(dfa.getTransitionFunctions()))
 # print('started timings')
 Cython = Timer(lambda: test())
-Cython_value = Cython.timeit(number=1)
-print('Average time:', Cython_value)
+Cython_value = Cython.timeit(number=5)
+print('Average time:', Cython_value/5)
 # Original = Timer(lambda: dfa.describe())
 # Original_value = Original.timeit(number=1000)
 # print('Original code average time:', Original_value)

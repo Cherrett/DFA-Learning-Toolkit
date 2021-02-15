@@ -15,7 +15,7 @@ func main() {
 
 	fmt.Println("DFA Depth:", APTA.Depth())
 
-	APTA.AddState(2)
+	//APTA.AddState(DFA.UNKNOWN)
 
 	elapsed := time.Since(start)
 	fmt.Printf("Time: %s\n", elapsed)
