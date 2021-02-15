@@ -83,13 +83,14 @@ func StringInstanceConsistentWithDFA(stringInstance StringInstance, dfa DFA) boo
 	}
 
 	exists := false
-	currentState := dfa.startingState
+	currentStateID := dfa.startingState.stateID
 	var count uint = 0
 	for _, character := range stringInstance.stringValue{
 		count++
 		exists = false
-		if value, ok := currentState.transitions[character]; ok {
-			currentState = dfa.states[value]
+
+		if dfa.transitionTable[currentStateID][character] != 0 {
+			currentStateID = dfa.transitionTable[currentStateID][character]
 			exists = true
 		}
 
@@ -100,11 +101,11 @@ func StringInstanceConsistentWithDFA(stringInstance StringInstance, dfa DFA) boo
 		// last symbol in string check
 		if count == stringInstance.length {
 			if stringInstance.stringStatus == ACCEPTING {
-				if currentState.stateStatus == REJECTING {
+				if dfa.states[currentStateID].stateStatus == REJECTING {
 					return false
 				}
 			}else {
-				if currentState.stateStatus == ACCEPTING {
+				if dfa.states[currentStateID].stateStatus == ACCEPTING {
 					return false
 				}
 			}

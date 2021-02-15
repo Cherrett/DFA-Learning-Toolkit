@@ -15,29 +15,13 @@ const (
 type State struct {
 	stateStatus StateStatus
 	stateID     uint
-	transitions map[int32]uint
-}
-
-func NewState(stateStatus StateStatus, stateID uint, transitions map[int32]uint) *State{
-	if stateStatus < 0 || stateStatus > 2{
-		panic("State Status must be 0 (REJECTING), 1 (ACCEPTING) or 2 (UNKNOWN)")
-	}
-
-	if stateID < 0{
-		panic("State ID must be 0 or bigger")
-	}
-
-	return &State{
-		stateStatus: stateStatus,
-		stateID:     stateID,
-		transitions: transitions,
-	}
 }
 
 type DFA struct {
-	states        map[uint]State
-	startingState State
-	alphabet      map[int32]bool
+	states          map[uint]State
+	startingState   State
+	alphabet        map[int32]bool
+	transitionTable map[uint]map[int32]uint
 }
 
 func (dfa DFA) GetAcceptingStates() []State {
@@ -65,14 +49,26 @@ func (dfa DFA) GetRejectingStates() []State {
 }
 
 func (dfa *DFA) AddState(stateStatus StateStatus) {
-	dfa.states[uint(len(dfa.states))] = *NewState(stateStatus, uint(len(dfa.states)), map[int32]uint{})
+	newID := uint(len(dfa.states) + 1)
+	dfa.states[newID] = State{stateID: newID, stateStatus: stateStatus}
+	dfa.transitionTable[newID] = make(map[int32]uint)
+	for k := range dfa.alphabet {
+		dfa.transitionTable[newID][k] = 0
+	}
+}
+
+func (dfa *DFA) AddToAlphabet(letter int32) {
+	dfa.alphabet[letter] = true
+	for k := range dfa.transitionTable {
+		dfa.transitionTable[k][letter] = 0
+	}
 }
 
 func (dfa DFA) Depth() uint {
 	var stateMap = make(map[uint]uint)
 	var maxValue uint
 
-	stateMap = dfa.DepthUtil(dfa.startingState, 0, stateMap)
+	stateMap = dfa.DepthUtil(dfa.startingState.stateID, 0, stateMap)
 
 	for _, v := range stateMap {
 		if v > maxValue {
@@ -83,12 +79,19 @@ func (dfa DFA) Depth() uint {
 	return maxValue
 }
 
-func (dfa DFA) DepthUtil(state State, count uint, stateMap map[uint]uint) map[uint]uint {
-	stateMap[state.stateID] = count
+func (dfa DFA) DepthUtil(stateID uint, count uint, stateMap map[uint]uint) map[uint]uint {
+	stateMap[stateID] = count
 
-	for _, v := range state.transitions {
-		if _, ok := stateMap[v]; !ok {
-			stateMap = dfa.DepthUtil(dfa.states[v], count+1, stateMap)
+	for _, v := range dfa.transitionTable[stateID] {
+		for key := range dfa.alphabet{
+			if dfa.transitionTable[v][key] != 0{
+				if _, ok := stateMap[v]; !ok {
+					tempStateMap := dfa.DepthUtil(dfa.transitionTable[v][key], count+1, stateMap)
+					if tempStateMap[dfa.transitionTable[v][key]] > stateMap[dfa.transitionTable[v][key]]{
+						stateMap = tempStateMap
+					}
+				}
+			}
 		}
 	}
 
@@ -131,77 +134,80 @@ func (dfa DFA) Describe(detail bool) {
 func GetPTAFromListOfStringInstances(strings []StringInstance, APTA bool) DFA {
 	strings = SortListOfStringInstances(strings)
 	var exists bool
-	var count int
-	var alphabet = make(map[int32]bool)
-	var states = make(map[uint]State)
-	var startingStateID uint = 0
+	var count uint
 	var currentStateID uint
+	dfa := DFA{
+		states: make(map[uint]State),
+		alphabet:        make(map[int32]bool),
+		transitionTable: make(map[uint]map[int32]uint),
+	}
+
+	dfa.AddState(UNKNOWN)
+	dfa.startingState = dfa.states[1]
 
 	if strings[0].length == 0 {
 		if strings[0].stringStatus == ACCEPTING {
-			states[0] = *NewState(ACCEPTING, 0, map[int32]uint{})
+			dfa.startingState.stateStatus = ACCEPTING
 		} else {
-			states[0] = *NewState(REJECTING, 0, map[int32]uint{})
+			dfa.startingState.stateStatus = REJECTING
 		}
-	} else {
-		states[0] = *NewState(UNKNOWN, 0, map[int32]uint{})
 	}
 
 	for _, stringInstance := range strings {
 		if !APTA && stringInstance.stringStatus != ACCEPTING {
 			continue
 		}
-		currentStateID = startingStateID
+		currentStateID = dfa.startingState.stateID
 		count = 0
 		for _, character := range stringInstance.stringValue {
 			count++
 			exists = false
 			// new alphabet check
-			if !alphabet[character] {
-				alphabet[character] = true
+			if !dfa.alphabet[character] {
+				dfa.AddToAlphabet(character)
 			}
 
-			if value, ok := states[currentStateID].transitions[character]; ok {
-				currentStateID = value
+			if dfa.transitionTable[currentStateID][character] != 0 {
+				currentStateID = dfa.transitionTable[currentStateID][character]
 				exists = true
 			}
 
 			if !exists {
 				// last symbol in string check
-				if count == len(stringInstance.stringValue) {
+				if count == stringInstance.length {
 					if stringInstance.stringStatus == ACCEPTING {
-						states[uint(len(states))] = *NewState(ACCEPTING, uint(len(states)), map[int32]uint{})
+						dfa.AddState(ACCEPTING)
 					} else {
-						states[uint(len(states))] = *NewState(REJECTING, uint(len(states)), map[int32]uint{})
+						dfa.AddState(REJECTING)
 					}
 				} else {
-					states[uint(len(states))] = *NewState(UNKNOWN, uint(len(states)), map[int32]uint{})
+					dfa.AddState(UNKNOWN)
 				}
-				states[currentStateID].transitions[character] = states[uint(len(states))-1].stateID
-				currentStateID = states[uint(len(states))-1].stateID
+				dfa.transitionTable[currentStateID][character] = uint(len(dfa.states))
+				currentStateID = uint(len(dfa.states))
 			} else {
 				// last symbol in string check
-				if count == len(stringInstance.stringValue) {
+				if count == stringInstance.length {
 					if stringInstance.stringStatus == ACCEPTING {
-						if states[currentStateID].stateStatus == REJECTING {
+						if dfa.states[currentStateID].stateStatus == REJECTING {
 							panic("State already set to rejecting, cannot set to accepting")
 						} else {
-							tempState := states[currentStateID]
+							tempState := dfa.states[currentStateID]
 							tempState.stateStatus = ACCEPTING
-							states[currentStateID] = tempState
+							dfa.states[currentStateID] = tempState
 						}
 					} else {
-						if states[currentStateID].stateStatus == ACCEPTING {
+						if dfa.states[currentStateID].stateStatus == ACCEPTING {
 							panic("State already set to accepting, cannot set to rejecting")
 						} else {
-							tempState := states[currentStateID]
+							tempState := dfa.states[currentStateID]
 							tempState.stateStatus = REJECTING
-							states[currentStateID] = tempState
+							dfa.states[currentStateID] = tempState
 						}
 					}
 				}
 			}
 		}
 	}
-	return DFA{states, states[startingStateID], alphabet}
+	return dfa
 }
