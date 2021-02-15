@@ -18,6 +18,22 @@ type State struct {
 	transitions map[int32]uint
 }
 
+func NewState(stateStatus StateStatus, stateID uint, transitions map[int32]uint) *State{
+	if stateStatus < 0 || stateStatus > 2{
+		panic("State Status must be 0 (REJECTING), 1 (ACCEPTING) or 2 (UNKNOWN)")
+	}
+
+	if stateID < 0{
+		panic("State ID must be 0 or bigger")
+	}
+
+	return &State{
+		stateStatus: stateStatus,
+		stateID:     stateID,
+		transitions: transitions,
+	}
+}
+
 type DFA struct {
 	states        map[uint]State
 	startingState State
@@ -49,7 +65,7 @@ func (dfa DFA) GetRejectingStates() []State {
 }
 
 func (dfa *DFA) AddState(stateStatus StateStatus) {
-	dfa.states[uint(len(dfa.states))] = State{stateStatus, uint(len(dfa.states)), map[int32]uint{}}
+	dfa.states[uint(len(dfa.states))] = *NewState(stateStatus, uint(len(dfa.states)), map[int32]uint{})
 }
 
 func (dfa DFA) Depth() uint {
@@ -123,12 +139,12 @@ func GetPTAFromListOfStringInstances(strings []StringInstance, APTA bool) DFA {
 
 	if strings[0].length == 0 {
 		if strings[0].stringStatus == ACCEPTING {
-			states[0] = State{ACCEPTING, 0, map[int32]uint{}}
+			states[0] = *NewState(ACCEPTING, 0, map[int32]uint{})
 		} else {
-			states[0] = State{REJECTING, 0, map[int32]uint{}}
+			states[0] = *NewState(REJECTING, 0, map[int32]uint{})
 		}
 	} else {
-		states[0] = State{UNKNOWN, 0, map[int32]uint{}}
+		states[0] = *NewState(UNKNOWN, 0, map[int32]uint{})
 	}
 
 	for _, stringInstance := range strings {
@@ -154,12 +170,12 @@ func GetPTAFromListOfStringInstances(strings []StringInstance, APTA bool) DFA {
 				// last symbol in string check
 				if count == len(stringInstance.stringValue) {
 					if stringInstance.stringStatus == ACCEPTING {
-						states[uint(len(states))] = State{ACCEPTING, uint(len(states)), map[int32]uint{}}
+						states[uint(len(states))] = *NewState(ACCEPTING, uint(len(states)), map[int32]uint{})
 					} else {
-						states[uint(len(states))] = State{REJECTING, uint(len(states)), map[int32]uint{}}
+						states[uint(len(states))] = *NewState(REJECTING, uint(len(states)), map[int32]uint{})
 					}
 				} else {
-					states[uint(len(states))] = State{UNKNOWN, uint(len(states)), map[int32]uint{}}
+					states[uint(len(states))] = *NewState(UNKNOWN, uint(len(states)), map[int32]uint{})
 				}
 				states[currentStateID].transitions[character] = states[uint(len(states))-1].stateID
 				currentStateID = states[uint(len(states))-1].stateID
