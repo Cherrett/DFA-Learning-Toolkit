@@ -16,6 +16,7 @@ func main() {
 	fmt.Println("DFA Depth:", APTA.Depth())
 
 	//APTA.AddState(DFA.UNKNOWN)
+	fmt.Println(DFA.ListOfStringInstancesConsistentWithDFA(listOfStrings, APTA))
 
 	elapsed := time.Since(start)
 	fmt.Printf("Time: %s\n", elapsed)

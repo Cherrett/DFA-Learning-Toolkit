@@ -1,4 +1,4 @@
-from DFA_Toolkit import GetListOfStringInstancesFromFile, GetPTAFromListOfStringInstances, UNKNOWN, State, SortListOfStringInstances
+from DFA_Toolkit import GetListOfStringInstancesFromFile, GetPTAFromListOfStringInstances, UNKNOWN, State, SortListOfStringInstances, ListOfStringInstancesConsistentWithDFA
 from timeit import Timer
 
 
@@ -12,7 +12,7 @@ def test():
 
     # temp = State(UNKNOWN, len(APTA.states))
     # APTA.addState(UNKNOWN)
-
+    print(ListOfStringInstancesConsistentWithDFA(listOfStrings, APTA))
 # print('Starting state: ', len(dfa.getStartingState()))
 # print('number of states: ', len(dfa.getStates()))
 # print('number of transitionFunctions: ', len(dfa.getTransitionFunctions()))

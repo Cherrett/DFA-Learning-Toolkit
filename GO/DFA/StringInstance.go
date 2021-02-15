@@ -75,3 +75,51 @@ func SortListOfStringInstances(strings []StringInstance) []StringInstance {
 	})
 	return strings
 }
+
+func StringInstanceConsistentWithDFA(stringInstance StringInstance, dfa DFA) bool{
+	// Skip unknown strings (test data)
+	if stringInstance.stringStatus == UNKNOWN{
+		return true
+	}
+
+	exists := false
+	currentState := dfa.startingState
+	var count uint = 0
+	for _, character := range stringInstance.stringValue{
+		count++
+		exists = false
+		if value, ok := currentState.transitions[character]; ok {
+			currentState = dfa.states[value]
+			exists = true
+		}
+
+		if !exists {
+			return false
+		}
+
+		// last symbol in string check
+		if count == stringInstance.length {
+			if stringInstance.stringStatus == ACCEPTING {
+				if currentState.stateStatus == REJECTING {
+					return false
+				}
+			}else {
+				if currentState.stateStatus == ACCEPTING {
+					return false
+				}
+			}
+		}
+	}
+	return true
+}
+
+func ListOfStringInstancesConsistentWithDFA(stringInstances []StringInstance, dfa DFA) bool{
+	//consistent := true
+
+	for _, stringInstance := range stringInstances {
+		if !StringInstanceConsistentWithDFA(stringInstance, dfa) {
+			return false
+		}
+	}
+	return true
+}

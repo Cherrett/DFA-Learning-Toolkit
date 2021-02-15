@@ -316,7 +316,7 @@ bool StringInstanceConsistentWithDFA(StringInstance& string, DFA& dfa) {
         }
         else {
             // last symbol in string check
-            if (count == string.stringValue.size()) {
+            if (count == string.length) {
                 if (string.stringStatus == StateStatus::ACCEPTING) {
                     if (currentState.stateStatus == StateStatus::REJECTING) {
                         return false;

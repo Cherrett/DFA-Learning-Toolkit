@@ -8,7 +8,7 @@ int main()
     vector<StringInstance> listOfStrings;
     try 
     {
-        listOfStrings = GetListOfStringInstancesFromFile("dataset1\\train.a");
+        listOfStrings = GetListOfStringInstancesFromFile("dataset4\\train.a");
     }
     catch (const char* msg) {
         std::cerr << msg << std::endl;
@@ -20,6 +20,8 @@ int main()
         DFA APTA = GetPTAFromListOfStringInstances(listOfStrings, true);
         APTA.describe(false);
         
+        std::cout << "DFA Depth: " << APTA.depth() << std::endl;
+
         //vector <StringInstance> listOfStringsTesting = GetListOfStringInstancesFromFile("dataset3\\test.a");
         if (ListOfStringInstancesConsistentWithDFA(listOfStrings, APTA)) {
             std::cout << "Consistent" << std::endl;
@@ -27,7 +29,6 @@ int main()
             std::cout << "Not Consistent" << std::endl;
         }
 
-        std::cout << "Max Depth: " << APTA.depth() << std::endl;
         /*StateStatus stateStatus = GetStringStatusInRegardToDFA(listOfStrings[0], APTA);
         stateStatus = GetStringStatusInRegardToDFA(listOfStrings[8], APTA);
         stateStatus = GetStringStatusInRegardToDFA(listOfStrings[9], APTA);
@@ -35,10 +36,10 @@ int main()
         stateStatus = GetStringStatusInRegardToDFA(listOfStrings[0], APTA);
         std::cout << "Done" << std::endl;*/
 
-        vector<StringInstance> acceptingStrings = GetAcceptingStringInstances(listOfStrings);
-        vector<StringInstance> rejectingStrings = GetRejectingStringInstances(listOfStrings);
+        //vector<StringInstance> acceptingStrings = GetAcceptingStringInstances(listOfStrings);
+        //vector<StringInstance> rejectingStrings = GetRejectingStringInstances(listOfStrings);
 
-        DFA finalDFA = RPNI(acceptingStrings, rejectingStrings);
+        //DFA finalDFA = RPNI(acceptingStrings, rejectingStrings);
     }
     catch (const char* msg) {
         std::cerr << msg << std::endl;
@@ -47,5 +48,5 @@ int main()
     
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(stop - start);
-    std::cout << "Average time: " << duration.count() << std::endl;
+    std::cout << "Time: " << duration.count() << std::endl;
 }

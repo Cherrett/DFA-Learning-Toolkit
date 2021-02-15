@@ -1,0 +1,9 @@
+dataset4/train.a (Get APTA and depth)
+C++ : 1.37s
+C++ -> Python : 1.44s/1.53s
+GO : 0.60s
+
+dataset4/train.a (Get APTA, depth and check if list of string instances consistent with DFA)
+C++ : 1.50s
+C++ -> Python : 1.53s
+GO : 0.72s
