@@ -116,36 +116,39 @@ func GetPTAFromListOfStringInstances(strings []StringInstance, APTA bool) DFA {
 	strings = SortListOfStringInstances(strings)
 	var exists bool
 	var count int
-	var alphabet = make(map[int32]bool)
-	var states = make(map[uint]State)
-	var startingStateID uint = 0
 	var currentStateID uint
+	dfa := DFA{
+		states:        make(map[uint]State),
+		alphabet:      make(map[int32]bool),
+	}
 
 	if strings[0].length == 0 {
 		if strings[0].stringStatus == ACCEPTING {
-			states[0] = State{ACCEPTING, 0, map[int32]uint{}}
+			dfa.states[0] = State{ACCEPTING, 0, map[int32]uint{}}
 		} else {
-			states[0] = State{REJECTING, 0, map[int32]uint{}}
+			dfa.states[0] = State{REJECTING, 0, map[int32]uint{}}
 		}
 	} else {
-		states[0] = State{UNKNOWN, 0, map[int32]uint{}}
+		dfa.states[0] = State{UNKNOWN, 0, map[int32]uint{}}
 	}
+
+	dfa.startingState = dfa.states[0]
 
 	for _, stringInstance := range strings {
 		if !APTA && stringInstance.stringStatus != ACCEPTING {
 			continue
 		}
-		currentStateID = startingStateID
+		currentStateID = dfa.startingState.stateID
 		count = 0
 		for _, character := range stringInstance.stringValue {
 			count++
 			exists = false
 			// new alphabet check
-			if !alphabet[character] {
-				alphabet[character] = true
+			if !dfa.alphabet[character] {
+				dfa.alphabet[character] = true
 			}
 
-			if value, ok := states[currentStateID].transitions[character]; ok {
+			if value, ok := dfa.states[currentStateID].transitions[character]; ok {
 				currentStateID = value
 				exists = true
 			}
@@ -154,38 +157,36 @@ func GetPTAFromListOfStringInstances(strings []StringInstance, APTA bool) DFA {
 				// last symbol in string check
 				if count == len(stringInstance.stringValue) {
 					if stringInstance.stringStatus == ACCEPTING {
-						states[uint(len(states))] = State{ACCEPTING, uint(len(states)), map[int32]uint{}}
+						dfa.AddState(ACCEPTING)
 					} else {
-						states[uint(len(states))] = State{REJECTING, uint(len(states)), map[int32]uint{}}
-					}
+						dfa.AddState(REJECTING)					}
 				} else {
-					states[uint(len(states))] = State{UNKNOWN, uint(len(states)), map[int32]uint{}}
-				}
-				states[currentStateID].transitions[character] = states[uint(len(states))-1].stateID
-				currentStateID = states[uint(len(states))-1].stateID
+					dfa.AddState(UNKNOWN)				}
+				dfa.states[currentStateID].transitions[character] = dfa.states[uint(len(dfa.states))-1].stateID
+				currentStateID = dfa.states[uint(len(dfa.states))-1].stateID
 			} else {
 				// last symbol in string check
 				if count == len(stringInstance.stringValue) {
 					if stringInstance.stringStatus == ACCEPTING {
-						if states[currentStateID].stateStatus == REJECTING {
+						if dfa.states[currentStateID].stateStatus == REJECTING {
 							panic("State already set to rejecting, cannot set to accepting")
 						} else {
-							tempState := states[currentStateID]
+							tempState := dfa.states[currentStateID]
 							tempState.stateStatus = ACCEPTING
-							states[currentStateID] = tempState
+							dfa.states[currentStateID] = tempState
 						}
 					} else {
-						if states[currentStateID].stateStatus == ACCEPTING {
+						if dfa.states[currentStateID].stateStatus == ACCEPTING {
 							panic("State already set to accepting, cannot set to rejecting")
 						} else {
-							tempState := states[currentStateID]
+							tempState := dfa.states[currentStateID]
 							tempState.stateStatus = REJECTING
-							states[currentStateID] = tempState
+							dfa.states[currentStateID] = tempState
 						}
 					}
 				}
 			}
 		}
 	}
-	return DFA{states, states[startingStateID], alphabet}
+	return dfa
 }
