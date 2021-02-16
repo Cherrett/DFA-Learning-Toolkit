@@ -114,7 +114,6 @@ func (dfa DFA) Describe(detail bool) {
 
 func GetPTAFromListOfStringInstances(strings []StringInstance, APTA bool) DFA {
 	strings = SortListOfStringInstances(strings)
-	var exists bool
 	var count int
 	var currentStateID uint
 	dfa := DFA{
@@ -142,7 +141,6 @@ func GetPTAFromListOfStringInstances(strings []StringInstance, APTA bool) DFA {
 		count = 0
 		for _, character := range stringInstance.stringValue {
 			count++
-			exists = false
 			// new alphabet check
 			if !dfa.alphabet[character] {
 				dfa.alphabet[character] = true
@@ -150,21 +148,6 @@ func GetPTAFromListOfStringInstances(strings []StringInstance, APTA bool) DFA {
 
 			if value, ok := dfa.states[currentStateID].transitions[character]; ok {
 				currentStateID = value
-				exists = true
-			}
-
-			if !exists {
-				// last symbol in string check
-				if count == len(stringInstance.stringValue) {
-					if stringInstance.stringStatus == ACCEPTING {
-						dfa.AddState(ACCEPTING)
-					} else {
-						dfa.AddState(REJECTING)					}
-				} else {
-					dfa.AddState(UNKNOWN)				}
-				dfa.states[currentStateID].transitions[character] = dfa.states[uint(len(dfa.states))-1].stateID
-				currentStateID = dfa.states[uint(len(dfa.states))-1].stateID
-			} else {
 				// last symbol in string check
 				if count == len(stringInstance.stringValue) {
 					if stringInstance.stringStatus == ACCEPTING {
@@ -185,6 +168,17 @@ func GetPTAFromListOfStringInstances(strings []StringInstance, APTA bool) DFA {
 						}
 					}
 				}
+			}else{
+				// last symbol in string check
+				if count == len(stringInstance.stringValue) {
+					if stringInstance.stringStatus == ACCEPTING {
+						dfa.AddState(ACCEPTING)
+					} else {
+						dfa.AddState(REJECTING)					}
+				} else {
+					dfa.AddState(UNKNOWN)				}
+				dfa.states[currentStateID].transitions[character] = dfa.states[uint(len(dfa.states))-1].stateID
+				currentStateID = dfa.states[uint(len(dfa.states))-1].stateID
 			}
 		}
 	}

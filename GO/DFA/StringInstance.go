@@ -83,32 +83,26 @@ func StringInstanceConsistentWithDFA(stringInstance StringInstance, dfa DFA) boo
 		return true
 	}
 
-	exists := false
 	currentState := dfa.startingState
 	var count uint = 0
 	for _, character := range stringInstance.stringValue{
 		count++
-		exists = false
 		if value, ok := currentState.transitions[character]; ok {
 			currentState = dfa.states[value]
-			exists = true
-		}
-
-		if !exists {
-			return false
-		}
-
-		// last symbol in string check
-		if count == stringInstance.length {
-			if stringInstance.stringStatus == ACCEPTING {
-				if currentState.stateStatus == REJECTING {
-					return false
-				}
-			}else {
-				if currentState.stateStatus == ACCEPTING {
-					return false
+			// last symbol in string check
+			if count == stringInstance.length {
+				if stringInstance.stringStatus == ACCEPTING {
+					if currentState.stateStatus == REJECTING {
+						return false
+					}
+				}else {
+					if currentState.stateStatus == ACCEPTING {
+						return false
+					}
 				}
 			}
+		}else{
+			return false
 		}
 	}
 	return true
@@ -133,26 +127,20 @@ func ListOfStringInstancesConsistentWithDFA(stringInstances []StringInstance, df
 }
 
 func GetStringStatusInRegardToDFA(stringInstance StringInstance, dfa DFA) StateStatus{
-	exists := false
 	currentStateID := dfa.startingState.stateID
 	count := uint(0)
 
 	for _, character := range stringInstance.stringValue {
 		count++
-		exists = false
 
 		if value, ok := dfa.states[currentStateID].transitions[character]; ok {
 			currentStateID = value
-			exists = true
-		}
-
-		if !exists{
-			return UNKNOWN
-		}else{
 			// last symbol in string check
 			if count == stringInstance.length{
 				return dfa.states[currentStateID].stateStatus
 			}
+		}else{
+			return UNKNOWN
 		}
 	}
 	return UNKNOWN

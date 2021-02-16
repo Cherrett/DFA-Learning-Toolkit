@@ -206,11 +206,9 @@ vector<StringInstance> SortListOfStringInstances(vector<StringInstance> strings)
 DFA GetPTAFromListOfStringInstances(vector<StringInstance>& strings, bool APTA) {
     SortListOfStringInstancesInternal(strings);
 
-    bool exists;
     unsigned int count;
     vector<char> alphabet;
     map<unsigned int, State> states;
-    //vector<TransitionFunction> transitionFunctions;
     unsigned int startingStateID = 0;
     unsigned int currentStateID;
 
@@ -233,7 +231,6 @@ DFA GetPTAFromListOfStringInstances(vector<StringInstance>& strings, bool APTA) 
         count = 0;
         for (char& character : string.stringValue) {
             count++;
-            exists = false;
             // alphabet check
             if (std::find(alphabet.begin(), alphabet.end(), character) == alphabet.end())
                 alphabet.push_back(character);
@@ -242,33 +239,6 @@ DFA GetPTAFromListOfStringInstances(vector<StringInstance>& strings, bool APTA) 
             if (transitionIterator != states[currentStateID].transitions.end())
             {
                 currentStateID = transitionIterator->second;
-                exists = true;
-            }
-
-            /*for (TransitionFunction& transitionFunction : transitionFunctions) {
-                if (transitionFunction.fromState.stateID == currentState.stateID && transitionFunction.symbol == character) {
-                    currentState = transitionFunction.toState;
-                    exists = true;
-                    break;
-                }
-            }*/
-
-            if (!exists) {
-                // last symbol in string check
-                if (count == string.length) {
-                    if (string.stringStatus == StateStatus::ACCEPTING)
-                        states[states.size()] = State(StateStatus::ACCEPTING, states.size());
-                    else
-                        states[states.size()] = State(StateStatus::REJECTING, states.size());
-                }
-                else {
-                    states[states.size()] = State(StateStatus::UNKNOWN, states.size());
-                }
-                states[currentStateID].transitions[character] = states[states.size() - 1].stateID;
-                //transitionFunctions.emplace_back(currentState, states[states.size() - 1], character);
-                currentStateID = states[states.size() - 1].stateID;
-            }
-            else {
                 // last symbol in string check
                 if (count == string.length) {
                     if (string.stringStatus == StateStatus::ACCEPTING) {
@@ -285,6 +255,20 @@ DFA GetPTAFromListOfStringInstances(vector<StringInstance>& strings, bool APTA) 
                     }
                 }
             }
+            else {
+                // last symbol in string check
+                if (count == string.length) {
+                    if (string.stringStatus == StateStatus::ACCEPTING)
+                        states[states.size()] = State(StateStatus::ACCEPTING, states.size());
+                    else
+                        states[states.size()] = State(StateStatus::REJECTING, states.size());
+                }
+                else {
+                    states[states.size()] = State(StateStatus::UNKNOWN, states.size());
+                }
+                states[currentStateID].transitions[character] = states[states.size() - 1].stateID;
+                currentStateID = states[states.size() - 1].stateID;
+            }
         }
     }
 
@@ -297,37 +281,29 @@ bool StringInstanceConsistentWithDFA(StringInstance& string, DFA& dfa) {
         return true;
     }
 
-    bool exists;
     State currentState = dfa.startingState;
     unsigned int count = 0;
     for (char& character : string.stringValue) {
         count++;
-        exists = false;
 
         map<char, unsigned int>::iterator transitionIterator = currentState.transitions.find(character);
         if (transitionIterator != currentState.transitions.end())
         {
             currentState = dfa.states[transitionIterator->second];
-            exists = true;
-        }
-
-        if (!exists) {
-            return false;
-        }
-        else {
             // last symbol in string check
             if (count == string.length) {
                 if (string.stringStatus == StateStatus::ACCEPTING) {
-                    if (currentState.stateStatus == StateStatus::REJECTING) {
+                    if (currentState.stateStatus == StateStatus::REJECTING)
                         return false;
-                    }
                 }
                 else {
-                    if (currentState.stateStatus == StateStatus::ACCEPTING) {
+                    if (currentState.stateStatus == StateStatus::ACCEPTING)
                         return false;
-                    }
                 }
             }
+        }
+        else {
+            return false;
         }
     }
     return true;
@@ -355,28 +331,21 @@ bool ListOfStringInstancesConsistentWithDFA(vector<StringInstance>& strings, DFA
 }
 
 StateStatus GetStringStatusInRegardToDFA(StringInstance& string, DFA& dfa) {
-    bool exists;
     State currentState = dfa.startingState;
     unsigned int count = 0;
     for (char& character : string.stringValue) {
         count++;
-        exists = false;
 
         map<char, unsigned int>::iterator transitionIterator = currentState.transitions.find(character);
         if (transitionIterator != currentState.transitions.end())
         {
             currentState = dfa.states[transitionIterator->second];
-            exists = true;
-        }
-
-        if (!exists) {
-            return StateStatus::UNKNOWN;
+            // last symbol in string check
+            if (count == string.length)
+                return currentState.stateStatus;
         }
         else {
-            // last symbol in string check
-            if (count == string.length) {
-                return currentState.stateStatus;
-            }
+            return StateStatus::UNKNOWN;
         }
     }
     return StateStatus::UNKNOWN;
