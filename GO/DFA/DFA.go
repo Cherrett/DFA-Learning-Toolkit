@@ -124,12 +124,12 @@ func GetPTAFromListOfStringInstances(strings []StringInstance, APTA bool) DFA {
 
 	if strings[0].length == 0 {
 		if strings[0].stringStatus == ACCEPTING {
-			dfa.states[0] = State{ACCEPTING, 0, map[int32]uint{}}
+			dfa.AddState(ACCEPTING)
 		} else {
-			dfa.states[0] = State{REJECTING, 0, map[int32]uint{}}
+			dfa.AddState(REJECTING)
 		}
 	} else {
-		dfa.states[0] = State{UNKNOWN, 0, map[int32]uint{}}
+		dfa.AddState(UNKNOWN)
 	}
 
 	dfa.startingState = dfa.states[0]

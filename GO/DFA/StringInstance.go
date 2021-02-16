@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 type StringInstance struct {
@@ -114,12 +115,19 @@ func StringInstanceConsistentWithDFA(stringInstance StringInstance, dfa DFA) boo
 }
 
 func ListOfStringInstancesConsistentWithDFA(stringInstances []StringInstance, dfa DFA) bool{
-	//consistent := true
+	consistent := true
+	var wg sync.WaitGroup
+	wg.Add(len(stringInstances))
 
 	for _, stringInstance := range stringInstances {
-		if !StringInstanceConsistentWithDFA(stringInstance, dfa) {
-			return false
-		}
+		go func(stringInstance StringInstance, dfa DFA){
+			defer wg.Done()
+			if consistent {
+				consistent = StringInstanceConsistentWithDFA(stringInstance, dfa)
+			}
+		}(stringInstance, dfa)
 	}
-	return true
+
+	wg.Wait()
+	return consistent
 }
