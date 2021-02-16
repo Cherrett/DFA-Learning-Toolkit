@@ -1,4 +1,4 @@
-package DFA
+package DFA_Toolkit
 
 import (
 	"fmt"
@@ -80,7 +80,7 @@ func (dfa DFA) DepthUtil(state State, count uint, stateMap map[uint]uint) map[ui
 }
 
 func (dfa DFA) Describe(detail bool) {
-	fmt.Println("This DFA has", len(dfa.states), "states and", len(dfa.alphabet), "alphabet")
+	fmt.Println("This DFA_Toolkit has", len(dfa.states), "states and", len(dfa.alphabet), "alphabet")
 	if detail {
 		fmt.Println("States:")
 		for k, v := range dfa.states {

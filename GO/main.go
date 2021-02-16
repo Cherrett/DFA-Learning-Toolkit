@@ -1,7 +1,7 @@
 package main
 
 import (
-	"./DFA"
+	"./DFA_Toolkit"
 	"fmt"
 	"time"
 )
@@ -13,14 +13,14 @@ func main() {
 	for i := 0; i < iterations; i++ {
 		start := time.Now()
 
-		listOfStrings := DFA.GetListOfStringInstancesFromFile("dataset4/train.a")
-		APTA := DFA.GetPTAFromListOfStringInstances(listOfStrings, true)
+		listOfStrings := DFA_Toolkit.GetListOfStringInstancesFromFile("dataset4/train.a")
+		APTA := DFA_Toolkit.GetPTAFromListOfStringInstances(listOfStrings, true)
 		APTA.Describe(false)
 
-		fmt.Println("DFA Depth:", APTA.Depth())
+		fmt.Println("DFA_Toolkit Depth:", APTA.Depth())
 
-		//APTA.AddState(DFA.UNKNOWN)
-		fmt.Println(DFA.ListOfStringInstancesConsistentWithDFA(listOfStrings, APTA))
+		//APTA.AddState(DFA_Toolkit.UNKNOWN)
+		fmt.Println(DFA_Toolkit.ListOfStringInstancesConsistentWithDFA(listOfStrings, APTA))
 
 		timings = append(timings, time.Since(start).Milliseconds())
 	}

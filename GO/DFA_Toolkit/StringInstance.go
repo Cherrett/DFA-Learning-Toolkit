@@ -1,4 +1,4 @@
-package DFA
+package DFA_Toolkit
 
 import (
 	"bufio"
