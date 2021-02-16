@@ -7,17 +7,26 @@ import (
 )
 
 func main() {
-	start := time.Now()
+	var timings []int64
+	iterations := 5
 
-	listOfStrings := DFA.GetListOfStringInstancesFromFile("dataset4/train.a")
-	APTA := DFA.GetPTAFromListOfStringInstances(listOfStrings, true)
-	APTA.Describe(false)
+	for i := 0; i < iterations; i++ {
+		start := time.Now()
 
-	fmt.Println("DFA Depth:", APTA.Depth())
+		listOfStrings := DFA.GetListOfStringInstancesFromFile("dataset4/train.a")
+		APTA := DFA.GetPTAFromListOfStringInstances(listOfStrings, true)
+		APTA.Describe(false)
 
-	//APTA.AddState(DFA.UNKNOWN)
-	fmt.Println(DFA.ListOfStringInstancesConsistentWithDFA(listOfStrings, APTA))
+		fmt.Println("DFA Depth:", APTA.Depth())
 
-	elapsed := time.Since(start)
-	fmt.Printf("Time: %s\n", elapsed)
+		//APTA.AddState(DFA.UNKNOWN)
+		fmt.Println(DFA.ListOfStringInstancesConsistentWithDFA(listOfStrings, APTA))
+
+		timings = append(timings, time.Since(start).Milliseconds())
+	}
+	var sum int64
+	for _, timing := range timings{
+		sum += timing
+	}
+	fmt.Printf("Average Time: %vms\n", sum/int64(iterations))
 }
