@@ -131,3 +131,29 @@ func ListOfStringInstancesConsistentWithDFA(stringInstances []StringInstance, df
 	wg.Wait()
 	return consistent
 }
+
+func GetStringStatusInRegardToDFA(stringInstance StringInstance, dfa DFA) StateStatus{
+	exists := false
+	currentStateID := dfa.startingState.stateID
+	count := uint(0)
+
+	for _, character := range stringInstance.stringValue {
+		count++
+		exists = false
+
+		if value, ok := dfa.states[currentStateID].transitions[character]; ok {
+			currentStateID = value
+			exists = true
+		}
+
+		if !exists{
+			return UNKNOWN
+		}else{
+			// last symbol in string check
+			if count == stringInstance.length{
+				return dfa.states[currentStateID].stateStatus
+			}
+		}
+	}
+	return UNKNOWN
+}

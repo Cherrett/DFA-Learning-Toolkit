@@ -255,7 +255,7 @@ DFA GetPTAFromListOfStringInstances(vector<StringInstance>& strings, bool APTA) 
 
             if (!exists) {
                 // last symbol in string check
-                if (count == string.stringValue.size()) {
+                if (count == string.length) {
                     if (string.stringStatus == StateStatus::ACCEPTING)
                         states[states.size()] = State(StateStatus::ACCEPTING, states.size());
                     else
@@ -270,7 +270,7 @@ DFA GetPTAFromListOfStringInstances(vector<StringInstance>& strings, bool APTA) 
             }
             else {
                 // last symbol in string check
-                if (count == string.stringValue.size()) {
+                if (count == string.length) {
                     if (string.stringStatus == StateStatus::ACCEPTING) {
                         if (states[currentStateID].stateStatus == StateStatus::REJECTING)
                             throw "Error, state already set to rejecting, cannot set to accepting";
@@ -374,15 +374,8 @@ StateStatus GetStringStatusInRegardToDFA(StringInstance& string, DFA& dfa) {
         }
         else {
             // last symbol in string check
-            if (count == string.stringValue.size()) {
-                switch (currentState.stateStatus) {
-                case StateStatus::ACCEPTING:
-                    return StateStatus::ACCEPTING;
-                case StateStatus::REJECTING:
-                    return StateStatus::REJECTING;
-                case StateStatus::UNKNOWN:
-                    return StateStatus::UNKNOWN;
-                }
+            if (count == string.length) {
+                return currentState.stateStatus;
             }
         }
     }
@@ -575,7 +568,7 @@ bool RPNI_StringInstanceConsistentWithDFA(StringInstance& string, DFA& dfa) {
             }
             else {
                 // last symbol in string check
-                if (count == string.stringValue.size()) {
+                if (count == string.length) {
                     if (currentState.stateStatus == StateStatus::ACCEPTING) {
                         return false;
                     }
