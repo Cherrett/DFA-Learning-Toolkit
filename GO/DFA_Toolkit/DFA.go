@@ -52,6 +52,10 @@ func (dfa *DFA) AddState(stateStatus StateStatus) {
 	dfa.states[uint(len(dfa.states))] = State{stateStatus, uint(len(dfa.states)), map[int32]uint{}}
 }
 
+func (dfa *DFA) RemoveState(state State) {
+	delete(dfa.states, state.stateID)
+}
+
 func (dfa DFA) Depth() uint {
 	var stateMap = make(map[uint]uint)
 	var maxValue uint
@@ -117,8 +121,8 @@ func GetPTAFromListOfStringInstances(strings []StringInstance, APTA bool) DFA {
 	var count int
 	var currentStateID uint
 	dfa := DFA{
-		states:        make(map[uint]State),
-		alphabet:      make(map[int32]bool),
+		states:   make(map[uint]State),
+		alphabet: make(map[int32]bool),
 	}
 
 	if strings[0].length == 0 {
@@ -168,15 +172,17 @@ func GetPTAFromListOfStringInstances(strings []StringInstance, APTA bool) DFA {
 						}
 					}
 				}
-			}else{
+			} else {
 				// last symbol in string check
 				if count == len(stringInstance.stringValue) {
 					if stringInstance.stringStatus == ACCEPTING {
 						dfa.AddState(ACCEPTING)
 					} else {
-						dfa.AddState(REJECTING)					}
+						dfa.AddState(REJECTING)
+					}
 				} else {
-					dfa.AddState(UNKNOWN)				}
+					dfa.AddState(UNKNOWN)
+				}
 				dfa.states[currentStateID].transitions[character] = dfa.states[uint(len(dfa.states))-1].stateID
 				currentStateID = dfa.states[uint(len(dfa.states))-1].stateID
 			}
@@ -185,13 +191,110 @@ func GetPTAFromListOfStringInstances(strings []StringInstance, APTA bool) DFA {
 	return dfa
 }
 
-func (dfa DFA) AccuracyOfDFA(stringInstances []StringInstance) float32{
+func (dfa DFA) AccuracyOfDFA(stringInstances []StringInstance) float32 {
 	correctClassifications := float32(0)
 
-	for _, stringInstance := range stringInstances{
-		if stringInstance.stringStatus == GetStringStatusInRegardToDFA(stringInstance, dfa){
+	for _, stringInstance := range stringInstances {
+		if stringInstance.stringStatus == GetStringStatusInRegardToDFA(stringInstance, dfa) {
 			correctClassifications++
 		}
 	}
-	return correctClassifications/float32(len(stringInstances))
+	return correctClassifications / float32(len(stringInstances))
+}
+
+func (dfa DFA) UnreachableStates() []State {
+	reachableStates := map[uint]bool{dfa.startingState.stateID: true}
+	currentStates := map[uint]bool{dfa.startingState.stateID: true}
+
+	for len(currentStates) != 0 {
+		nextStates := map[uint]bool{}
+		for stateID := range currentStates {
+			for character := range dfa.alphabet {
+				if _, ok := dfa.states[stateID].transitions[character]; ok {
+					nextStates[dfa.states[stateID].transitions[character]] = true
+				}
+			}
+		}
+		// Don’t visit states we know to be reachable
+		currentStates = map[uint]bool{}
+		for stateID := range nextStates {
+			if !reachableStates[stateID] {
+				currentStates[stateID] = true
+			}
+		}
+
+		// States in Current are definitely reachable.
+		for stateID := range currentStates {
+			if !reachableStates[stateID] {
+				reachableStates[stateID] = true
+			}
+		}
+	}
+
+	var unReachableStates []State
+	for _, state := range dfa.states {
+		if !reachableStates[state.stateID] {
+			unReachableStates = append(unReachableStates, state)
+		}
+	}
+
+	return unReachableStates
+}
+
+func (dfa *DFA) RemoveUnreachableStates() {
+	unreachableStates := dfa.UnreachableStates()
+	for _, unreachableState := range unreachableStates {
+		dfa.RemoveState(unreachableState)
+	}
+}
+
+type StateIDPair struct {
+	state1 uint
+	state2 uint
+}
+
+func (dfa DFA) Mark() [][]State {
+	distinguishablePairs := map[StateIDPair]bool{}
+
+	dfa.RemoveUnreachableStates()
+	for stateID, state := range dfa.states {
+		for stateID2, state2 := range dfa.states {
+			if stateID != stateID2 && state.stateStatus != state2.stateStatus &&
+				!distinguishablePairs[StateIDPair{state.stateID, state2.stateID}] &&
+				!distinguishablePairs[StateIDPair{state2.stateID, state.stateID}] {
+				distinguishablePairs[StateIDPair{state.stateID, state2.stateID}] = true
+			}
+		}
+	}
+
+	oldCount := 0
+	for oldCount != len(distinguishablePairs) {
+		oldCount = len(distinguishablePairs)
+
+		for stateID, state := range dfa.states {
+			for stateID2, state2 := range dfa.states {
+				if stateID == stateID2 || distinguishablePairs[StateIDPair{state.stateID, state2.stateID}] ||
+					distinguishablePairs[StateIDPair{state2.stateID, state.stateID}] {
+					continue
+				} else {
+					for character := range dfa.alphabet {
+						if resultantStateID1, ok := dfa.states[state.stateID].transitions[character]; ok {
+							if resultantStateID2, ok := dfa.states[state2.stateID].transitions[character]; ok {
+								if distinguishablePairs[StateIDPair{resultantStateID1, resultantStateID2}] ||
+									distinguishablePairs[StateIDPair{resultantStateID2, resultantStateID1}] {
+									distinguishablePairs[StateIDPair{state.stateID, state2.stateID}] = true
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	var distinguishablePairsList [][]State
+	for stateIDPair := range distinguishablePairs {
+		distinguishablePairsList = append(distinguishablePairsList, []State{dfa.states[stateIDPair.state1], dfa.states[stateIDPair.state2]})
+	}
+	return distinguishablePairsList
 }
