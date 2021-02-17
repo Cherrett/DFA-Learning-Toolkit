@@ -8,12 +8,12 @@ import (
 
 func main() {
 	var timings []int64
-	iterations := 5
+	iterations := 1
 
 	for i := 0; i < iterations; i++ {
 		start := time.Now()
 
-		listOfStrings := DFA_Toolkit.GetListOfStringInstancesFromFile("dataset4/train.a")
+		listOfStrings := DFA_Toolkit.GetListOfStringInstancesFromFile("dataset1/train.a")
 		APTA := DFA_Toolkit.GetPTAFromListOfStringInstances(listOfStrings, true)
 		APTA.Describe(false)
 
@@ -22,6 +22,10 @@ func main() {
 		//APTA.AddState(DFA_Toolkit.UNKNOWN)
 		fmt.Println(DFA_Toolkit.ListOfStringInstancesConsistentWithDFA(listOfStrings, APTA))
 
+		result := DFA_Toolkit.RPNI(DFA_Toolkit.GetAcceptingStringInstances(listOfStrings),
+			DFA_Toolkit.GetRejectingStringInstances(listOfStrings))
+
+		result.Describe(false)
 		timings = append(timings, time.Since(start).Milliseconds())
 	}
 	var sum int64
