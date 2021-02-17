@@ -145,3 +145,27 @@ func GetStringStatusInRegardToDFA(stringInstance StringInstance, dfa DFA) StateS
 	}
 	return UNKNOWN
 }
+
+func GetAcceptingStringInstances(stringInstances []StringInstance) []StringInstance{
+	var acceptingInstances []StringInstance
+
+	for _, stringInstance := range stringInstances {
+		if stringInstance.stringStatus == ACCEPTING {
+			acceptingInstances = append(acceptingInstances, stringInstance)
+		}
+	}
+
+	return acceptingInstances
+}
+
+func GetRejectingStringInstances(stringInstances []StringInstance) []StringInstance{
+	var rejectingInstances []StringInstance
+
+	for _, stringInstance := range stringInstances {
+		if stringInstance.stringStatus == REJECTING {
+			rejectingInstances = append(rejectingInstances, stringInstance)
+		}
+	}
+
+	return rejectingInstances
+}

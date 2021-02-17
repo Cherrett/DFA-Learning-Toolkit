@@ -184,3 +184,14 @@ func GetPTAFromListOfStringInstances(strings []StringInstance, APTA bool) DFA {
 	}
 	return dfa
 }
+
+func (dfa DFA) AccuracyOfDFA(stringInstances []StringInstance) float32{
+	correctClassifications := float32(0)
+
+	for _, stringInstance := range stringInstances{
+		if stringInstance.stringStatus == GetStringStatusInRegardToDFA(stringInstance, dfa){
+			correctClassifications++
+		}
+	}
+	return correctClassifications/float32(len(stringInstances))
+}
