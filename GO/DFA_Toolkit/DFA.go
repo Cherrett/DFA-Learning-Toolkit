@@ -4,63 +4,238 @@ import (
 	"fmt"
 )
 
-type StateStatus uint8
-
-const (
-	REJECTING = iota // 0
-	ACCEPTING        // 1
-	UNKNOWN          // 2
-)
-
-type State struct {
-	stateStatus StateStatus
-	stateID     uint
-	transitions map[int32]uint
-}
-
 type DFA struct {
-	states        map[uint]State
-	startingState uint
-	alphabet      map[int32]bool
+	states        []State
+	startingState int
+	symbolMap     map[int32]int
 }
 
-func (dfa DFA) GetAcceptingStates() []State {
-	var acceptingStates []State
+func NewDFA() DFA {
+	return DFA{states: make([]State, 0), startingState: -1, symbolMap: make(map[int32]int)}
+}
 
-	for _, v := range dfa.states {
-		if v.stateStatus == ACCEPTING {
-			acceptingStates = append(acceptingStates, v)
+func (dfa *DFA) AddState(stateStatus StateStatus) int {
+	transitions := make([]int, len(dfa.symbolMap))
+	for i := range transitions {
+		transitions[i] = -1
+	}
+	dfa.states = append(dfa.states, State{stateStatus, transitions})
+	return len(dfa.states) - 1
+}
+
+func (dfa *DFA) RemoveState(stateID int) {
+	// panic if stateID to be removed is the starting state
+	if dfa.startingState == stateID {
+		panic("Cannot remove starting state")
+	}
+	// remove state from slice of states
+	dfa.states = append(dfa.states[:stateID], dfa.states[stateID+1:]...)
+	// update transitions to account for new stateIDs and for removed state
+	for stateIndex := range dfa.states {
+		for symbol := 0; symbol < len(dfa.symbolMap); symbol++ {
+			if dfa.states[stateIndex].transitions[symbol] == stateID {
+				dfa.states[stateIndex].transitions[symbol] = -1
+			} else if dfa.states[stateIndex].transitions[symbol] > stateID {
+				dfa.states[stateIndex].transitions[symbol] -= 1
+			}
 		}
 	}
+}
 
+func (dfa DFA) GetSymbolID(symbol int32) int{
+	return dfa.symbolMap[symbol]
+}
+
+func (dfa *DFA) AddSymbol(symbol int32){
+	dfa.symbolMap[symbol] = len(dfa.symbolMap)
+	for stateIndex := range dfa.states {
+		dfa.states[stateIndex].transitions = append(dfa.states[stateIndex].transitions, -1)
+	}
+}
+
+func (dfa *DFA) RemoveSymbol(symbol int32){
+	// TODO: CONTINUE THIS FUNCTION
+	//symbolID := dfa.symbolMap[symbol]
+	// remove symbol from symbolMap
+	//delete(dfa.symbolMap, symbol)
+	// update transitions to account for removed symbol
+	//for stateIndex := range dfa.states {
+	//	for symbol := 0; symbol < len(dfa.symbolMap); symbol++ {
+	//		if dfa.states[stateIndex].transitions[symbol] == stateID {
+	//			dfa.states[stateIndex].transitions[symbol] = -1
+	//		} else if dfa.states[stateIndex].transitions[symbol] > stateID {
+	//			dfa.states[stateIndex].transitions[symbol] -= 1
+	//		}
+	//	}
+	//}
+}
+
+func (dfa *DFA) AddTransition(symbol int, fromStateID int, toStateID int) {
+	// error checking
+	if fromStateID > len(dfa.states)-1 || fromStateID < 0 {
+		panic("fromStateID is out of range")
+	} else if toStateID > len(dfa.states)-1 || toStateID < 0 {
+		panic("toStateID is out of range")
+	} else if symbol > len(dfa.symbolMap)-1 || symbol < 0 {
+		panic("symbol is out of range")
+	}
+	// add transition to fromState's transitions
+	dfa.states[fromStateID].transitions[symbol] = toStateID
+}
+
+func (dfa *DFA) RemoveTransition(symbol int, fromStateID int) {
+	// error checking
+	if fromStateID > len(dfa.states)-1 || fromStateID < 0 {
+		panic("fromStateID is out of range")
+	} else if symbol > len(dfa.symbolMap)-1 || symbol < 0 {
+		panic("symbol is out of range")
+	}
+	// remove transition to fromState's transitions
+	dfa.states[fromStateID].transitions[symbol] = -1
+}
+
+func (dfa DFA) AllStates() []int {
+	var allStates []int
+
+	for stateID := range dfa.states {
+		allStates = append(allStates, stateID)
+	}
+	return allStates
+}
+
+func (dfa DFA) AcceptingStates() []int {
+	var acceptingStates []int
+
+	for stateID := range dfa.states {
+		if dfa.states[stateID].stateStatus == ACCEPTING {
+			acceptingStates = append(acceptingStates, stateID)
+		}
+	}
 	return acceptingStates
 }
 
-func (dfa DFA) GetRejectingStates() []State {
-	var rejectingStates []State
+func (dfa DFA) RejectingStates() []int {
+	var acceptingStates []int
 
-	for _, v := range dfa.states {
-		if v.stateStatus == REJECTING {
-			rejectingStates = append(rejectingStates, v)
+	for stateID := range dfa.states {
+		if dfa.states[stateID].stateStatus == REJECTING {
+			acceptingStates = append(acceptingStates, stateID)
 		}
 	}
-
-	return rejectingStates
+	return acceptingStates
 }
 
-func (dfa *DFA) AddState(stateStatus StateStatus) {
-	dfa.states[uint(len(dfa.states))] = State{stateStatus, uint(len(dfa.states)), map[int32]uint{}}
+func (dfa DFA) UnknownStates() []int {
+	var acceptingStates []int
+
+	for stateID := range dfa.states {
+		if dfa.states[stateID].stateStatus == UNKNOWN {
+			acceptingStates = append(acceptingStates, stateID)
+		}
+	}
+	return acceptingStates
 }
 
-func (dfa *DFA) RemoveState(state State) {
-	delete(dfa.states, state.stateID)
+func (dfa DFA) AllStatesCount() int {
+	return len(dfa.states)
+}
+
+func (dfa DFA) AcceptingStatesCount() int {
+	count := 0
+
+	for stateID := range dfa.states {
+		if dfa.states[stateID].stateStatus == ACCEPTING {
+			count++
+		}
+	}
+	return count
+}
+
+func (dfa DFA) RejectingStatesCount() int {
+	count := 0
+
+	for stateID := range dfa.states {
+		if dfa.states[stateID].stateStatus == REJECTING {
+			count++
+		}
+	}
+	return count
+}
+
+func (dfa DFA) UnknownStatesCount() int {
+	count := 0
+
+	for stateID := range dfa.states {
+		if dfa.states[stateID].stateStatus == UNKNOWN {
+			count++
+		}
+	}
+	return count
+}
+
+func (dfa DFA) TransitionsCount() int{
+	count := 0
+
+	for stateIndex := range dfa.states {
+		for symbol := 0; symbol < len(dfa.symbolMap); symbol++ {
+			if dfa.states[stateIndex].transitions[symbol] != -1 {
+				count++
+			}
+		}
+	}
+	return count
+}
+
+func (dfa DFA) TransitionsCountForSymbol(symbol int) int{
+	count := 0
+
+	for stateIndex := range dfa.states {
+		if dfa.states[stateIndex].transitions[symbol] != -1 {
+			count++
+		}
+	}
+	return count
+}
+
+func (dfa DFA) LeavesCount() int{
+	count := 0
+
+	for stateIndex := range dfa.states {
+		transitionsCount := 0
+		for symbol := 0; symbol < len(dfa.symbolMap); symbol++ {
+			if dfa.states[stateIndex].transitions[symbol] != -1 {
+				transitionsCount++
+			}
+		}
+		if transitionsCount == 0{
+			count++
+		}
+	}
+	return count
+}
+
+func (dfa DFA) LoopsCount() int{
+	count := 0
+
+	for stateIndex := range dfa.states {
+		transitionsCount := 0
+		for symbol := 0; symbol < len(dfa.symbolMap); symbol++ {
+			if dfa.states[stateIndex].transitions[symbol] != -1 {
+				transitionsCount++
+			}
+		}
+		if transitionsCount == 0{
+			count++
+		}
+	}
+	return count
 }
 
 func (dfa DFA) Depth() uint {
-	var stateMap = make(map[uint]uint)
+	var stateMap = make(map[int]uint)
 	var maxValue uint
 
-	stateMap = dfa.DepthUtil(dfa.states[dfa.startingState], 0, stateMap)
+	stateMap = dfa.DepthUtil(dfa.startingState, 0, stateMap)
 
 	for _, v := range stateMap {
 		if v > maxValue {
@@ -71,12 +246,12 @@ func (dfa DFA) Depth() uint {
 	return maxValue
 }
 
-func (dfa DFA) DepthUtil(state State, count uint, stateMap map[uint]uint) map[uint]uint {
-	stateMap[state.stateID] = count
+func (dfa DFA) DepthUtil(stateID int, count uint, stateMap map[int]uint) map[int]uint {
+	stateMap[stateID] = count
 
-	for _, v := range state.transitions {
-		if _, ok := stateMap[v]; !ok {
-			stateMap = dfa.DepthUtil(dfa.states[v], count+1, stateMap)
+	for symbol := range dfa.states[stateID].transitions {
+		if dfa.states[stateID].transitions[symbol] != -1 {
+			stateMap = dfa.DepthUtil(dfa.states[stateID].transitions[symbol], count+1, stateMap)
 		}
 	}
 
@@ -84,11 +259,11 @@ func (dfa DFA) DepthUtil(state State, count uint, stateMap map[uint]uint) map[ui
 }
 
 func (dfa DFA) Describe(detail bool) {
-	fmt.Println("This DFA has", len(dfa.states), "states and", len(dfa.alphabet), "alphabet")
+	fmt.Println("This DFA has", len(dfa.states), "states and", len(dfa.symbolMap), "alphabet")
 	if detail {
 		fmt.Println("Alphabet:")
-		for key := range dfa.alphabet {
-			fmt.Println(string(key))
+		for symbol, index := range dfa.symbolMap{
+			fmt.Println(index,"-",string(symbol))
 		}
 		fmt.Println("Starting State:", dfa.startingState)
 		fmt.Println("States:")
@@ -107,39 +282,35 @@ func (dfa DFA) Describe(detail bool) {
 		}
 		fmt.Println("Transitions:")
 		for fromStateID, fromState := range dfa.states {
-			for char, toStateID := range fromState.transitions{
-				fmt.Println(fromStateID, "--", string(char), "->", toStateID)
+			for symbol, toStateID := range fromState.transitions {
+				fmt.Println(fromStateID, "--", symbol, "->", toStateID)
 			}
 		}
 	}
 }
 
-func (dfa *DFA) UpdateStateStatus(stateID uint, stateStatus StateStatus) {
-	tempState := dfa.states[stateID]
-	tempState.stateStatus = stateStatus
-	dfa.states[stateID] = tempState
-}
-
 func GetPTAFromListOfStringInstances(strings []StringInstance, APTA bool) DFA {
 	strings = SortListOfStringInstances(strings)
+	alphabet := make(map[int32]bool)
 	var count int
-	var currentStateID uint
-	dfa := DFA{
-		states:   make(map[uint]State),
-		alphabet: make(map[int32]bool),
-	}
+	var currentStateID, newStateID int
+	dfa := NewDFA()
+	//dfa := DFA{
+	//	states:   make(map[uint]State),
+	//	alphabet: make(map[int32]bool),
+	//}
 
 	if strings[0].length == 0 {
 		if strings[0].stringStatus == ACCEPTING {
-			dfa.AddState(ACCEPTING)
+			currentStateID = dfa.AddState(ACCEPTING)
 		} else {
-			dfa.AddState(REJECTING)
+			currentStateID = dfa.AddState(REJECTING)
 		}
 	} else {
-		dfa.AddState(UNKNOWN)
+		currentStateID = dfa.AddState(UNKNOWN)
 	}
 
-	dfa.startingState = dfa.states[0].stateID
+	dfa.startingState = currentStateID
 
 	for _, stringInstance := range strings {
 		if !APTA && stringInstance.stringStatus != ACCEPTING {
@@ -147,28 +318,31 @@ func GetPTAFromListOfStringInstances(strings []StringInstance, APTA bool) DFA {
 		}
 		currentStateID = dfa.startingState
 		count = 0
-		for _, character := range stringInstance.stringValue {
+		for _, symbol := range stringInstance.stringValue {
 			count++
 			// new alphabet check
-			if !dfa.alphabet[character] {
-				dfa.alphabet[character] = true
+			if !alphabet[symbol] {
+				dfa.AddSymbol(symbol)
+				alphabet[symbol] = true
 			}
 
-			if value, ok := dfa.states[currentStateID].transitions[character]; ok {
-				currentStateID = value
+			symbolID := dfa.GetSymbolID(symbol)
+
+			if dfa.states[currentStateID].transitions[symbolID] != -1 {
+				currentStateID = dfa.states[currentStateID].transitions[symbolID]
 				// last symbol in string check
 				if count == len(stringInstance.stringValue) {
 					if stringInstance.stringStatus == ACCEPTING {
 						if dfa.states[currentStateID].stateStatus == REJECTING {
 							panic("State already set to rejecting, cannot set to accepting")
 						} else {
-							dfa.UpdateStateStatus(currentStateID, ACCEPTING)
+							dfa.states[currentStateID].UpdateStateStatus(ACCEPTING)
 						}
 					} else {
 						if dfa.states[currentStateID].stateStatus == ACCEPTING {
 							panic("State already set to accepting, cannot set to rejecting")
 						} else {
-							dfa.UpdateStateStatus(currentStateID, REJECTING)
+							dfa.states[currentStateID].UpdateStateStatus(REJECTING)
 						}
 					}
 				}
@@ -176,15 +350,15 @@ func GetPTAFromListOfStringInstances(strings []StringInstance, APTA bool) DFA {
 				// last symbol in string check
 				if count == len(stringInstance.stringValue) {
 					if stringInstance.stringStatus == ACCEPTING {
-						dfa.AddState(ACCEPTING)
+						newStateID = dfa.AddState(ACCEPTING)
 					} else {
-						dfa.AddState(REJECTING)
+						newStateID = dfa.AddState(REJECTING)
 					}
 				} else {
-					dfa.AddState(UNKNOWN)
+					newStateID = dfa.AddState(UNKNOWN)
 				}
-				dfa.states[currentStateID].transitions[character] = dfa.states[uint(len(dfa.states))-1].stateID
-				currentStateID = dfa.states[uint(len(dfa.states))-1].stateID
+				dfa.states[currentStateID].transitions[symbolID] = newStateID
+				currentStateID = newStateID
 			}
 		}
 	}
@@ -202,21 +376,21 @@ func (dfa DFA) AccuracyOfDFA(stringInstances []StringInstance) float32 {
 	return correctClassifications / float32(len(stringInstances))
 }
 
-func (dfa DFA) UnreachableStates() []State {
-	reachableStates := map[uint]bool{dfa.startingState: true}
-	currentStates := map[uint]bool{dfa.startingState: true}
+func (dfa DFA) UnreachableStates() []int {
+	reachableStates := map[int]bool{dfa.startingState: true}
+	currentStates := map[int]bool{dfa.startingState: true}
 
 	for len(currentStates) != 0 {
-		nextStates := map[uint]bool{}
+		nextStates := map[int]bool{}
 		for stateID := range currentStates {
-			for character := range dfa.alphabet {
-				if _, ok := dfa.states[stateID].transitions[character]; ok {
-					nextStates[dfa.states[stateID].transitions[character]] = true
+			for symbol := 0; symbol < len(dfa.symbolMap); symbol++ {
+				if dfa.states[stateID].transitions[symbol] != -1{
+					nextStates[dfa.states[stateID].transitions[symbol]] = true
 				}
 			}
 		}
 		// Don’t visit states we know to be reachable
-		currentStates = map[uint]bool{}
+		currentStates = map[int]bool{}
 		for stateID := range nextStates {
 			if !reachableStates[stateID] {
 				currentStates[stateID] = true
@@ -231,10 +405,10 @@ func (dfa DFA) UnreachableStates() []State {
 		}
 	}
 
-	var unReachableStates []State
-	for _, state := range dfa.states {
-		if !reachableStates[state.stateID] {
-			unReachableStates = append(unReachableStates, state)
+	var unReachableStates []int
+	for stateID := range dfa.states {
+		if !reachableStates[stateID] {
+			unReachableStates = append(unReachableStates, stateID)
 		}
 	}
 
@@ -243,26 +417,26 @@ func (dfa DFA) UnreachableStates() []State {
 
 func (dfa *DFA) RemoveUnreachableStates() {
 	unreachableStates := dfa.UnreachableStates()
-	for _, unreachableState := range unreachableStates {
-		dfa.RemoveState(unreachableState)
+	for stateID := range unreachableStates {
+		dfa.RemoveState(stateID)
 	}
 }
 
 type StateIDPair struct {
-	state1 uint
-	state2 uint
+	state1 int
+	state2 int
 }
 
-func (dfa DFA) Mark() [][]State {
+func (dfa DFA) Mark() [][]int {
 	distinguishablePairs := map[StateIDPair]bool{}
 
 	dfa.RemoveUnreachableStates()
 	for stateID, state := range dfa.states {
 		for stateID2, state2 := range dfa.states {
 			if stateID != stateID2 && state.stateStatus != state2.stateStatus &&
-				!distinguishablePairs[StateIDPair{state.stateID, state2.stateID}] &&
-				!distinguishablePairs[StateIDPair{state2.stateID, state.stateID}] {
-				distinguishablePairs[StateIDPair{state.stateID, state2.stateID}] = true
+				!distinguishablePairs[StateIDPair{stateID, stateID2}] &&
+				!distinguishablePairs[StateIDPair{stateID2, stateID}] {
+				distinguishablePairs[StateIDPair{stateID, stateID2}] = true
 			}
 		}
 	}
@@ -273,16 +447,16 @@ func (dfa DFA) Mark() [][]State {
 
 		for stateID, state := range dfa.states {
 			for stateID2, state2 := range dfa.states {
-				if stateID == stateID2 || distinguishablePairs[StateIDPair{state.stateID, state2.stateID}] ||
-					distinguishablePairs[StateIDPair{state2.stateID, state.stateID}] {
+				if stateID == stateID2 || distinguishablePairs[StateIDPair{stateID, stateID2}] ||
+					distinguishablePairs[StateIDPair{stateID2, stateID}] {
 					continue
 				} else {
-					for character := range dfa.alphabet {
-						if resultantStateID1, ok := dfa.states[state.stateID].transitions[character]; ok {
-							if resultantStateID2, ok := dfa.states[state2.stateID].transitions[character]; ok {
-								if distinguishablePairs[StateIDPair{resultantStateID1, resultantStateID2}] ||
-									distinguishablePairs[StateIDPair{resultantStateID2, resultantStateID1}] {
-									distinguishablePairs[StateIDPair{state.stateID, state2.stateID}] = true
+					for symbol := 0; symbol < len(dfa.symbolMap); symbol++ {
+						if state.transitions[symbol] != -1 {
+							if state2.transitions[symbol] != -1 {
+								if distinguishablePairs[StateIDPair{state.transitions[symbol], state2.transitions[symbol]}] ||
+									distinguishablePairs[StateIDPair{state2.transitions[symbol], state.transitions[symbol]}] {
+									distinguishablePairs[StateIDPair{stateID, stateID2}] = true
 								}
 							}
 						}
@@ -292,9 +466,9 @@ func (dfa DFA) Mark() [][]State {
 		}
 	}
 
-	var distinguishablePairsList [][]State
+	var distinguishablePairsList [][]int
 	for stateIDPair := range distinguishablePairs {
-		distinguishablePairsList = append(distinguishablePairsList, []State{dfa.states[stateIDPair.state1], dfa.states[stateIDPair.state2]})
+		distinguishablePairsList = append(distinguishablePairsList, []int{stateIDPair.state1, stateIDPair.state2})
 	}
 	return distinguishablePairsList
 }

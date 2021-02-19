@@ -89,10 +89,10 @@ func StringInstanceConsistentWithDFA(stringInstance StringInstance, dfa DFA) boo
 
 	currentState := dfa.states[dfa.startingState]
 	var count uint = 0
-	for _, character := range stringInstance.stringValue{
+	for _, symbol := range stringInstance.stringValue{
 		count++
-		if value, ok := currentState.transitions[character]; ok {
-			currentState = dfa.states[value]
+		if currentState.transitions[dfa.GetSymbolID(symbol)] != -1 {
+			currentState = dfa.states[currentState.transitions[dfa.GetSymbolID(symbol)]]
 			// last symbol in string check
 			if count == stringInstance.length {
 				if stringInstance.stringStatus == ACCEPTING {
@@ -134,11 +134,11 @@ func GetStringStatusInRegardToDFA(stringInstance StringInstance, dfa DFA) StateS
 	currentStateID := dfa.startingState
 	count := uint(0)
 
-	for _, character := range stringInstance.stringValue {
+	for _, symbol := range stringInstance.stringValue {
 		count++
 
-		if value, ok := dfa.states[currentStateID].transitions[character]; ok {
-			currentStateID = value
+		if dfa.states[currentStateID].transitions[dfa.GetSymbolID(symbol)] != -1 {
+			currentStateID = dfa.states[currentStateID].transitions[dfa.GetSymbolID(symbol)]
 			// last symbol in string check
 			if count == stringInstance.length{
 				return dfa.states[currentStateID].stateStatus
