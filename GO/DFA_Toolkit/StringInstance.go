@@ -81,6 +81,10 @@ func StringInstanceConsistentWithDFA(stringInstance StringInstance, dfa DFA) boo
 	// Skip unknown strings (test data)
 	if stringInstance.stringStatus == UNKNOWN{
 		return true
+	}else if stringInstance.length == 0 {
+		if dfa.startingState.stateStatus == ACCEPTING{
+			return stringInstance.stringStatus == ACCEPTING
+		}
 	}
 
 	currentState := dfa.startingState
@@ -102,7 +106,7 @@ func StringInstanceConsistentWithDFA(stringInstance StringInstance, dfa DFA) boo
 				}
 			}
 		}else{
-			return false
+			return !(stringInstance.stringStatus == ACCEPTING)
 		}
 	}
 	return true

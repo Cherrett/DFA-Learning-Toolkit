@@ -84,8 +84,13 @@ func (dfa DFA) DepthUtil(state State, count uint, stateMap map[uint]uint) map[ui
 }
 
 func (dfa DFA) Describe(detail bool) {
-	fmt.Println("This DFA_Toolkit has", len(dfa.states), "states and", len(dfa.alphabet), "alphabet")
+	fmt.Println("This DFA has", len(dfa.states), "states and", len(dfa.alphabet), "alphabet")
 	if detail {
+		fmt.Println("Alphabet:")
+		for key := range dfa.alphabet {
+			fmt.Println(string(key))
+		}
+		fmt.Println("Starting State:", dfa.startingState.stateID)
 		fmt.Println("States:")
 		for k, v := range dfa.states {
 			switch v.stateStatus {
@@ -100,20 +105,19 @@ func (dfa DFA) Describe(detail bool) {
 				break
 			}
 		}
-		fmt.Println("Accepting States:")
-		for _, v := range dfa.GetAcceptingStates() {
-			fmt.Println(v.stateID)
-		}
-		fmt.Println("Rejecting States:")
-		for _, v := range dfa.GetRejectingStates() {
-			fmt.Println(v.stateID)
-		}
-		fmt.Println("Starting State:", dfa.startingState.stateID)
-		fmt.Println("Alphabet:")
-		for key := range dfa.alphabet {
-			fmt.Println(string(key))
+		fmt.Println("Transitions:")
+		for fromStateID, fromState := range dfa.states {
+			for char, toStateID := range fromState.transitions{
+				fmt.Println(fromStateID, "--", string(char), "->", toStateID)
+			}
 		}
 	}
+}
+
+func (dfa *DFA) UpdateStateStatus(stateID uint, stateStatus StateStatus) {
+	tempState := dfa.states[stateID]
+	tempState.stateStatus = stateStatus
+	dfa.states[stateID] = tempState
 }
 
 func GetPTAFromListOfStringInstances(strings []StringInstance, APTA bool) DFA {
@@ -158,17 +162,13 @@ func GetPTAFromListOfStringInstances(strings []StringInstance, APTA bool) DFA {
 						if dfa.states[currentStateID].stateStatus == REJECTING {
 							panic("State already set to rejecting, cannot set to accepting")
 						} else {
-							tempState := dfa.states[currentStateID]
-							tempState.stateStatus = ACCEPTING
-							dfa.states[currentStateID] = tempState
+							dfa.UpdateStateStatus(currentStateID, ACCEPTING)
 						}
 					} else {
 						if dfa.states[currentStateID].stateStatus == ACCEPTING {
 							panic("State already set to accepting, cannot set to rejecting")
 						} else {
-							tempState := dfa.states[currentStateID]
-							tempState.stateStatus = REJECTING
-							dfa.states[currentStateID] = tempState
+							dfa.UpdateStateStatus(currentStateID, REJECTING)
 						}
 					}
 				}
