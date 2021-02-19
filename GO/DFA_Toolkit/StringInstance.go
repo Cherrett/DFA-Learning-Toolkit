@@ -82,12 +82,12 @@ func StringInstanceConsistentWithDFA(stringInstance StringInstance, dfa DFA) boo
 	if stringInstance.stringStatus == UNKNOWN{
 		return true
 	}else if stringInstance.length == 0 {
-		if dfa.startingState.stateStatus == ACCEPTING{
+		if dfa.states[dfa.startingState].stateStatus == ACCEPTING{
 			return stringInstance.stringStatus == ACCEPTING
 		}
 	}
 
-	currentState := dfa.startingState
+	currentState := dfa.states[dfa.startingState]
 	var count uint = 0
 	for _, character := range stringInstance.stringValue{
 		count++
@@ -131,7 +131,7 @@ func ListOfStringInstancesConsistentWithDFA(stringInstances []StringInstance, df
 }
 
 func GetStringStatusInRegardToDFA(stringInstance StringInstance, dfa DFA) StateStatus{
-	currentStateID := dfa.startingState.stateID
+	currentStateID := dfa.startingState
 	count := uint(0)
 
 	for _, character := range stringInstance.stringValue {

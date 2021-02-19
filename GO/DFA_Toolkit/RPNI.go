@@ -10,7 +10,7 @@ type NFAState struct {
 
 type NFA struct {
 	states        map[uint]NFAState
-	startingState NFAState
+	startingState uint
 	alphabet      map[int32]bool
 }
 
@@ -47,7 +47,7 @@ func (nfa NFA) ToDFA() DFA{
 		}
 	}
 
-	dfa.startingState = dfa.states[nfa.startingState.stateID]
+	dfa.startingState = dfa.states[nfa.startingState].stateID
 	return dfa
 }
 
@@ -97,6 +97,8 @@ func RPNIDerive(dfa DFA, partition []map[uint]bool) NFA{
 			}
 		}
 	}
+	// update starting state via mappings
+	nfa.startingState = newMappings[dfa.startingState]
 
 	return nfa
 }
@@ -143,8 +145,8 @@ func RPNIMerge(nfa NFA, state1 uint, state2 uint) NFA{
 	delete(nfa.states, state2)
 	nfa.UpdateStateStatus(state1, stateStatus)
 
-	if nfa.startingState.stateID == state2{
-		nfa.startingState.stateID = state1
+	if nfa.startingState == state2{
+		nfa.startingState = state1
 	}
 
 	return nfa
@@ -200,10 +202,10 @@ func RPNIDeterministicMerge(nfa NFA, partition []map[uint]bool) (DFA, []map[uint
 
 func RPNIStringInstanceConsistentWithDFA(stringInstance StringInstance, dfa DFA) bool{
 	if stringInstance.length == 0{
-		return !(dfa.startingState.stateStatus == ACCEPTING)
+		return !(dfa.states[dfa.startingState].stateStatus == ACCEPTING)
 	}
 
-	currentState := dfa.startingState
+	currentState := dfa.states[dfa.startingState]
 	var count uint = 0
 	for _, character := range stringInstance.stringValue{
 		count++

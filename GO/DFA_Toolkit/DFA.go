@@ -20,7 +20,7 @@ type State struct {
 
 type DFA struct {
 	states        map[uint]State
-	startingState State
+	startingState uint
 	alphabet      map[int32]bool
 }
 
@@ -60,7 +60,7 @@ func (dfa DFA) Depth() uint {
 	var stateMap = make(map[uint]uint)
 	var maxValue uint
 
-	stateMap = dfa.DepthUtil(dfa.startingState, 0, stateMap)
+	stateMap = dfa.DepthUtil(dfa.states[dfa.startingState], 0, stateMap)
 
 	for _, v := range stateMap {
 		if v > maxValue {
@@ -90,7 +90,7 @@ func (dfa DFA) Describe(detail bool) {
 		for key := range dfa.alphabet {
 			fmt.Println(string(key))
 		}
-		fmt.Println("Starting State:", dfa.startingState.stateID)
+		fmt.Println("Starting State:", dfa.startingState)
 		fmt.Println("States:")
 		for k, v := range dfa.states {
 			switch v.stateStatus {
@@ -139,13 +139,13 @@ func GetPTAFromListOfStringInstances(strings []StringInstance, APTA bool) DFA {
 		dfa.AddState(UNKNOWN)
 	}
 
-	dfa.startingState = dfa.states[0]
+	dfa.startingState = dfa.states[0].stateID
 
 	for _, stringInstance := range strings {
 		if !APTA && stringInstance.stringStatus != ACCEPTING {
 			continue
 		}
-		currentStateID = dfa.startingState.stateID
+		currentStateID = dfa.startingState
 		count = 0
 		for _, character := range stringInstance.stringValue {
 			count++
@@ -203,8 +203,8 @@ func (dfa DFA) AccuracyOfDFA(stringInstances []StringInstance) float32 {
 }
 
 func (dfa DFA) UnreachableStates() []State {
-	reachableStates := map[uint]bool{dfa.startingState.stateID: true}
-	currentStates := map[uint]bool{dfa.startingState.stateID: true}
+	reachableStates := map[uint]bool{dfa.startingState: true}
+	currentStates := map[uint]bool{dfa.startingState: true}
 
 	for len(currentStates) != 0 {
 		nextStates := map[uint]bool{}
