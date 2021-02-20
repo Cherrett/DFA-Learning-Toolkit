@@ -8,4 +8,4 @@ C++ : 1.50s
 C++ -> Python : 1.53s
 GO : 0.70s
 GO (Parallel) : 0.59s
-GO (Parallel) after 19/02 changes : 0.61s
+GO (Parallel) after 19/02 changes : 0.28s
