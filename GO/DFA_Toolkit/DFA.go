@@ -36,9 +36,13 @@ func (dfa *DFA) RemoveState(stateID int) {
 			if dfa.states[stateIndex].transitions[symbolID] == stateID {
 				dfa.states[stateIndex].transitions[symbolID] = -1
 			} else if dfa.states[stateIndex].transitions[symbolID] > stateID {
-				dfa.states[stateIndex].transitions[symbolID] -= 1
+				dfa.states[stateIndex].transitions[symbolID]--
 			}
 		}
+	}
+	// update starting state
+	if dfa.startingState > stateID{
+		dfa.startingState--
 	}
 }
 
@@ -70,7 +74,7 @@ func (dfa *DFA) RemoveSymbol(symbol rune){
 	//		if dfa.states[stateIndex].transitions[symbol] == stateID {
 	//			dfa.states[stateIndex].transitions[symbol] = -1
 	//		} else if dfa.states[stateIndex].transitions[symbol] > stateID {
-	//			dfa.states[stateIndex].transitions[symbol] -= 1
+	//			dfa.states[stateIndex].transitions[symbol]--
 	//		}
 	//	}
 	//}
@@ -256,7 +260,7 @@ func (dfa DFA) DepthUtil(stateID int, count uint, stateMap map[int]uint) map[int
 	stateMap[stateID] = count
 
 	for symbolID := range dfa.states[stateID].transitions {
-		if dfa.states[stateID].transitions[symbolID] != -1 {
+		if dfa.states[stateID].transitions[symbolID] > stateID {
 			stateMap = dfa.DepthUtil(dfa.states[stateID].transitions[symbolID], count+1, stateMap)
 		}
 	}
@@ -423,8 +427,8 @@ func (dfa DFA) UnreachableStates() []int {
 
 func (dfa *DFA) RemoveUnreachableStates() {
 	unreachableStates := dfa.UnreachableStates()
-	for stateID := range unreachableStates {
-		dfa.RemoveState(stateID)
+	for index, stateID := range unreachableStates {
+		dfa.RemoveState(stateID-index)
 	}
 }
 
@@ -433,15 +437,16 @@ type StateIDPair struct {
 	state2 int
 }
 
-func (dfa DFA) Mark() [][]int {
+func (dfa *DFA) Mark() (map[StateIDPair]bool, map[StateIDPair]bool) {
 	distinguishablePairs := map[StateIDPair]bool{}
+	indistinguishablePairs := map[StateIDPair]bool{}
+	allPairs := map[StateIDPair]bool{}
 
 	dfa.RemoveUnreachableStates()
-	for stateID, state := range dfa.states {
-		for stateID2, state2 := range dfa.states {
-			if stateID != stateID2 && state.stateStatus != state2.stateStatus &&
-				!distinguishablePairs[StateIDPair{stateID, stateID2}] &&
-				!distinguishablePairs[StateIDPair{stateID2, stateID}] {
+	for stateID := range dfa.states {
+		for stateID2 := stateID + 1; stateID2 < len(dfa.states); stateID2++ {
+			allPairs[StateIDPair{stateID, stateID2}] = true
+			if dfa.states[stateID].stateStatus != dfa.states[stateID2].stateStatus{
 				distinguishablePairs[StateIDPair{stateID, stateID2}] = true
 			}
 		}
@@ -451,17 +456,16 @@ func (dfa DFA) Mark() [][]int {
 	for oldCount != len(distinguishablePairs) {
 		oldCount = len(distinguishablePairs)
 
-		for stateID, state := range dfa.states {
-			for stateID2, state2 := range dfa.states {
-				if stateID == stateID2 || distinguishablePairs[StateIDPair{stateID, stateID2}] ||
-					distinguishablePairs[StateIDPair{stateID2, stateID}] {
+		for stateID := range dfa.states {
+			for stateID2 := stateID + 1; stateID2 < len(dfa.states); stateID2++ {
+				if distinguishablePairs[StateIDPair{stateID, stateID2}] {
 					continue
 				} else {
 					for symbolID := 0; symbolID < len(dfa.symbolMap); symbolID++ {
-						if state.transitions[symbolID] != -1 {
-							if state2.transitions[symbolID] != -1 {
-								if distinguishablePairs[StateIDPair{state.transitions[symbolID], state2.transitions[symbolID]}] ||
-									distinguishablePairs[StateIDPair{state2.transitions[symbolID], state.transitions[symbolID]}] {
+						if dfa.states[stateID].transitions[symbolID] != -1 {
+							if dfa.states[stateID2].transitions[symbolID] != -1 {
+								if distinguishablePairs[StateIDPair{dfa.states[stateID].transitions[symbolID], dfa.states[stateID2].transitions[symbolID]}] ||
+									distinguishablePairs[StateIDPair{dfa.states[stateID2].transitions[symbolID], dfa.states[stateID].transitions[symbolID]}] {
 									distinguishablePairs[StateIDPair{stateID, stateID2}] = true
 								}
 							}
@@ -476,5 +480,125 @@ func (dfa DFA) Mark() [][]int {
 	for stateIDPair := range distinguishablePairs {
 		distinguishablePairsList = append(distinguishablePairsList, []int{stateIDPair.state1, stateIDPair.state2})
 	}
-	return distinguishablePairsList
+
+	for pair := range allPairs{
+		if !distinguishablePairs[StateIDPair{pair.state1, pair.state2}]{
+			indistinguishablePairs[StateIDPair{pair.state1, pair.state2}] = true
+		}
+	}
+
+	return distinguishablePairs, indistinguishablePairs
+}
+
+func (dfa DFA) Minimise() DFA{
+	// get distinguishable and indistinguishable state pairs using Mark function
+	_, indistinguishablePairs := dfa.Mark()
+
+	// Partition states into blocks
+	var currentPartition []map[int]bool
+	for stateID := range dfa.states{
+		exists := false
+		for _, block := range currentPartition{
+			if block[stateID]{
+				exists = true
+			}
+		}
+		if !exists{
+			indistinguishable := false
+			for indistinguishablePair := range indistinguishablePairs{
+				if indistinguishablePair.state1 == stateID{
+					for blockIndex, block := range currentPartition{
+						if block[indistinguishablePair.state2]{
+							currentPartition[blockIndex][stateID] = true
+							indistinguishable = true
+							break
+						}
+					}
+					if indistinguishable{
+						break
+					}
+				}else if indistinguishablePair.state2 == stateID{
+					for blockIndex, block := range currentPartition{
+						if block[indistinguishablePair.state1]{
+							currentPartition[blockIndex][stateID] = true
+							indistinguishable = true
+							break
+						}
+					}
+					if indistinguishable{
+						break
+					}
+				}
+			}
+			if !indistinguishable{
+				currentPartition = append(currentPartition, map[int]bool{stateID: true})
+			}
+		}
+	}
+	resultantDFA := DFA{symbolMap: dfa.symbolMap}
+
+	// Create a new state for each block
+	for blockIndex := range currentPartition{
+		var stateStatus StateStatus = UNKNOWN
+		for stateID := range currentPartition[blockIndex] {
+			stateStatus = dfa.states[stateID].stateStatus
+			break
+		}
+		resultantDFA.AddState(stateStatus)
+	}
+
+	// Initial State
+	for blockIndex := range currentPartition{
+		found := false
+		for stateID := range currentPartition[blockIndex] {
+			if stateID == dfa.startingState{
+				resultantDFA.startingState = blockIndex
+				found = true
+				break
+			}
+		}
+		if found{
+			break
+		}
+	}
+
+	// Transitions
+	for stateID := range dfa.states{
+		stateBlockIndex := 0
+		found := false
+		for blockIndex := range currentPartition{
+			for stateID2 := range currentPartition[blockIndex] {
+				if stateID == stateID2{
+					stateBlockIndex = blockIndex
+					found = true
+					break
+				}
+			}
+			if found{
+				break
+			}
+		}
+
+		for symbolID := range dfa.states[stateID].transitions{
+			resultantStateBlockIndex := 0
+			if resultantDFA.states[stateBlockIndex].transitions[symbolID] == -1 && dfa.states[stateID].transitions[symbolID] != -1{
+				found := false
+				for blockIndex := range currentPartition{
+					for stateID2 := range currentPartition[blockIndex] {
+						if dfa.states[stateID].transitions[symbolID] == stateID2{
+							resultantStateBlockIndex = blockIndex
+							found = true
+							break
+						}
+					}
+					if found{
+						break
+					}
+				}
+				resultantDFA.states[stateBlockIndex].transitions[symbolID] = resultantStateBlockIndex
+			}
+		}
+	}
+
+	return resultantDFA
 }
