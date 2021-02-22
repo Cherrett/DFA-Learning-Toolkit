@@ -3,12 +3,14 @@ package DFA_Toolkit
 import (
 	"math"
 	"math/rand"
+	"time"
 )
 
 func AbbadingoDFA(numberOfStates int, exact bool) DFA{
 	dfaSize := (5.0 * numberOfStates) / 4.0
 	dfaDepth := uint((2.0 * math.Log2(float64(numberOfStates))) - 2.0)
-
+	// random seed
+	rand.Seed(time.Now().UnixNano())
 	for{
 		dfa := NewDFA()
 		dfa.AddSymbols([]rune{'a', 'b'})
@@ -25,7 +27,6 @@ func AbbadingoDFA(numberOfStates int, exact bool) DFA{
 			dfa.AddTransition(dfa.GetSymbolID('a'), stateID, rand.Intn(len(dfa.states)))
 			dfa.AddTransition(dfa.GetSymbolID('b'), stateID, rand.Intn(len(dfa.states)))
 		}
-
 		dfa.startingState = rand.Intn(len(dfa.states))
 
 		dfa.Minimise()
