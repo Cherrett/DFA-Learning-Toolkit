@@ -241,31 +241,86 @@ func (dfa DFA) LoopsCount() int{
 	return count
 }
 
-func (dfa DFA) Depth() uint {
-	var stateMap = make(map[int]uint)
-	var maxValue uint
+func (dfa DFA) IsTree() bool{
+	var visitedStates = make(map[int]bool)
 
-	stateMap = dfa.DepthUtil(dfa.startingState, 0, stateMap)
-
-	for _, v := range stateMap {
-		if v > maxValue {
-			maxValue = v
+	for stateID := range dfa.states{
+		for symbolID := range dfa.states[stateID].transitions{
+			if dfa.states[stateID].transitions[symbolID] != -1 && visitedStates[dfa.states[stateID].transitions[symbolID]]{
+				return false
+			}else{
+				visitedStates[dfa.states[stateID].transitions[symbolID]] = true
+			}
 		}
 	}
 
-	return maxValue
+	return true
 }
 
-func (dfa DFA) DepthUtil(stateID int, count uint, stateMap map[int]uint) map[int]uint {
-	stateMap[stateID] = count
+func (dfa DFA) Depth() uint {
+	if dfa.IsTree(){
+		return uint(dfa.DepthUtilTree(dfa.startingState))
+	}else{
+		var maxValue uint
+		var stateMap = make(map[int]uint)
 
-	for symbolID := range dfa.states[stateID].transitions {
-		if dfa.states[stateID].transitions[symbolID] > stateID {
-			stateMap = dfa.DepthUtil(dfa.states[stateID].transitions[symbolID], count+1, stateMap)
+		for stateID := range dfa.states{
+			stateMap[stateID] = dfa.DepthUtilNonTree(stateID)
+		}
+
+		for _, v := range stateMap {
+			if v > maxValue {
+				maxValue = v
+			}
+		}
+		return maxValue
+	}
+}
+
+func (dfa DFA) DepthUtilTree(stateID int) int{
+	if stateID == -1{
+		return -1
+	}
+	var depths []int
+	maxValue := -1
+
+	for _, symbolID := range dfa.symbolMap{
+		depths = append(depths, dfa.DepthUtilTree(dfa.states[stateID].transitions[symbolID]))
+	}
+
+	for _, depth := range depths {
+		if depth > maxValue {
+			maxValue = depth
 		}
 	}
 
-	return stateMap
+	return maxValue + 1
+}
+
+func (dfa DFA) DepthUtilNonTree(targetStateID int) uint{
+	visitedStates := map[int]bool{dfa.startingState: true}
+	queue := [][]int{{dfa.startingState, 0}}
+
+	for len(queue) > 0{
+		stateID := queue[0][0]
+		depth := queue[0][1]
+		queue = append(queue[:0], queue[1:]...)
+
+		if stateID == targetStateID{
+			return uint(depth)
+		}
+
+		for symbolID := range dfa.states[stateID].transitions {
+			if dfa.states[stateID].transitions[symbolID] != -1 && dfa.states[stateID].transitions[symbolID] != stateID {
+				if !visitedStates[dfa.states[stateID].transitions[symbolID]] {
+					queue = append(queue, []int{dfa.states[stateID].transitions[symbolID], depth +1})
+					visitedStates[dfa.states[stateID].transitions[symbolID]] = true
+				}
+			}
+		}
+	}
+
+	return 0
 }
 
 func (dfa DFA) Describe(detail bool) {
