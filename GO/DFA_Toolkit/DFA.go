@@ -2,6 +2,7 @@ package DFA_Toolkit
 
 import (
 	"fmt"
+	"reflect"
 )
 
 type DFA struct {
@@ -644,4 +645,25 @@ func (dfa DFA) Minimise() DFA{
 	}
 
 	return resultantDFA
+}
+
+func (dfa DFA) Clone() DFA{
+	return DFA{states: dfa.states, startingState: dfa.startingState, symbolMap: dfa.symbolMap}
+}
+
+func (dfa DFA) Equal(dfa2 DFA) bool{
+	// need to confirm
+	for stateID := range dfa.states{
+		for symbolID := range dfa.states[stateID].transitions{
+			if dfa.states[stateID].transitions[symbolID] != dfa2.states[stateID].transitions[symbolID]{
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+func (dfa DFA) SameAs(dfa2 DFA) bool {
+	return reflect.DeepEqual(dfa, dfa2)
 }
