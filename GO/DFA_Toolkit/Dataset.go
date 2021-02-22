@@ -54,8 +54,8 @@ func (stringInstance StringInstance) ConsistentWithDFA(dfa DFA) bool{
 	var count uint = 0
 	for _, symbol := range stringInstance.value{
 		count++
-		if currentState.transitions[dfa.GetSymbolID(symbol)] != -1 {
-			currentState = dfa.states[currentState.transitions[dfa.GetSymbolID(symbol)]]
+		if currentState.transitions[dfa.SymbolID(symbol)] != -1 {
+			currentState = dfa.states[currentState.transitions[dfa.SymbolID(symbol)]]
 			// last symbol in string check
 			if count == stringInstance.length {
 				if stringInstance.status == ACCEPTING {
@@ -82,17 +82,21 @@ func (stringInstance StringInstance) ParseToStateStatus(dfa DFA) StateStatus{
 	for _, symbol := range stringInstance.value {
 		count++
 
-		if dfa.states[currentStateID].transitions[dfa.GetSymbolID(symbol)] != -1 {
-			currentStateID = dfa.states[currentStateID].transitions[dfa.GetSymbolID(symbol)]
+		if dfa.states[currentStateID].transitions[dfa.SymbolID(symbol)] != -1 {
+			currentStateID = dfa.states[currentStateID].transitions[dfa.SymbolID(symbol)]
 			// last symbol in string check
 			if count == stringInstance.length{
-				return dfa.states[currentStateID].stateStatus
+				if dfa.states[currentStateID].stateStatus == UNKNOWN{
+					return REJECTING
+				}else{
+					return ACCEPTING
+				}
 			}
 		}else{
-			return UNKNOWN
+			return REJECTING
 		}
 	}
-	return UNKNOWN
+	return REJECTING
 }
 
 func (stringInstance StringInstance) ParseToState(dfa DFA) (bool, int){
@@ -102,8 +106,8 @@ func (stringInstance StringInstance) ParseToState(dfa DFA) (bool, int){
 	for _, symbol := range stringInstance.value {
 		count++
 
-		if dfa.states[currentStateID].transitions[dfa.GetSymbolID(symbol)] != -1 {
-			currentStateID = dfa.states[currentStateID].transitions[dfa.GetSymbolID(symbol)]
+		if dfa.states[currentStateID].transitions[dfa.SymbolID(symbol)] != -1 {
+			currentStateID = dfa.states[currentStateID].transitions[dfa.SymbolID(symbol)]
 			// last symbol in string check
 			if count == stringInstance.length{
 				return true, currentStateID
@@ -113,6 +117,22 @@ func (stringInstance StringInstance) ParseToState(dfa DFA) (bool, int){
 		}
 	}
 	return false, -1
+}
+
+func BinaryStringToStringInstance(dfa DFA, binaryString string) StringInstance{
+	stringInstance := StringInstance{length: uint(len(binaryString))}
+
+	for _, value := range binaryString{
+		symbolID, err := strconv.Atoi(string(value))
+		if err != nil || (symbolID != 0 && symbolID != 1){
+			panic("Not a binary string")
+		}
+		stringInstance.value = append(stringInstance.value, dfa.Symbol(symbolID))
+	}
+
+	stringInstance.status = stringInstance.ParseToStateStatus(dfa)
+
+	return stringInstance
 }
 
 func GetDatasetFromAbbadingoFile(fileName string) Dataset {
@@ -164,7 +184,7 @@ func (dataset Dataset) ConsistentWithDFA(dfa DFA) bool{
 	return consistent
 }
 
-func (dataset Dataset) GetAcceptingStringInstances() Dataset{
+func (dataset Dataset) AcceptingStringInstances() Dataset{
 	var acceptingInstances Dataset
 
 	for _, stringInstance := range dataset {
@@ -176,7 +196,7 @@ func (dataset Dataset) GetAcceptingStringInstances() Dataset{
 	return acceptingInstances
 }
 
-func (dataset Dataset) GetRejectingStringInstances() Dataset{
+func (dataset Dataset) RejectingStringInstances() Dataset{
 	var rejectingInstances Dataset
 
 	for _, stringInstance := range dataset {
@@ -186,4 +206,28 @@ func (dataset Dataset) GetRejectingStringInstances() Dataset{
 	}
 
 	return rejectingInstances
+}
+
+func (dataset Dataset) AcceptingStringInstancesCount() int{
+	count := 0
+
+	for _, stringInstance := range dataset {
+		if stringInstance.status == ACCEPTING {
+			count++
+		}
+	}
+
+	return count
+}
+
+func (dataset Dataset) RejectingStringInstancesCount() int{
+	count := 0
+
+	for _, stringInstance := range dataset {
+		if stringInstance.status == REJECTING {
+			count++
+		}
+	}
+
+	return count
 }

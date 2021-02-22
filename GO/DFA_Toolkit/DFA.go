@@ -47,8 +47,17 @@ func (dfa *DFA) RemoveState(stateID int) {
 	}
 }
 
-func (dfa DFA) GetSymbolID(symbol rune) int{
+func (dfa DFA) SymbolID(symbol rune) int{
 	return dfa.symbolMap[symbol]
+}
+
+func (dfa DFA) Symbol(symbolID int) rune{
+	for symbol := range dfa.symbolMap{
+		if dfa.symbolMap[symbol] == symbolID{
+			return symbol
+		}
+	}
+	return -1
 }
 
 func (dfa *DFA) AddSymbol(symbol rune){
@@ -380,7 +389,7 @@ func GetPTAFromDataset(dataset Dataset, APTA bool) DFA {
 				alphabet[symbol] = true
 			}
 
-			symbolID := dfa.GetSymbolID(symbol)
+			symbolID := dfa.SymbolID(symbol)
 
 			if dfa.states[currentStateID].transitions[symbolID] != -1 {
 				currentStateID = dfa.states[currentStateID].transitions[symbolID]
