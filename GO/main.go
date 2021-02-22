@@ -13,7 +13,7 @@ func main() {
 	for i := 0; i < iterations; i++ {
 		start := time.Now()
 
-		//listOfStrings := DFA_Toolkit.GetListOfStringInstancesFromFile("dataset4/train.a")
+		//listOfStrings := DFA_Toolkit.GetListOfStringInstancesFromFile("AbbadingoDatasets/dataset4/train.a")
 		//APTA := DFA_Toolkit.GetPTAFromListOfStringInstances(listOfStrings, true)
 		//APTA.Describe(false)
 		//
