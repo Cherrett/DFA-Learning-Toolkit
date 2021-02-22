@@ -7,8 +7,8 @@ import (
 )
 
 func AbbadingoDFA(numberOfStates int, exact bool) DFA{
-	dfaSize := (5.0 * numberOfStates) / 4.0
-	dfaDepth := uint((2.0 * math.Log2(float64(numberOfStates))) - 2.0)
+	dfaSize := int(math.Round((5.0 * float64(numberOfStates)) / 4.0))
+	dfaDepth := uint(math.Round((2.0 * math.Log2(float64(numberOfStates))) - 2.0))
 	// random seed
 	rand.Seed(time.Now().UnixNano())
 	for{
@@ -29,11 +29,11 @@ func AbbadingoDFA(numberOfStates int, exact bool) DFA{
 		}
 		dfa.startingState = rand.Intn(len(dfa.states))
 
-		dfa.Minimise()
+		dfa = dfa.Minimise()
 
 		if dfa.Depth() == dfaDepth{
 			if exact{
-				if len(dfa.states) == dfaSize{
+				if len(dfa.states) == numberOfStates{
 					return dfa
 				}
 			}else{

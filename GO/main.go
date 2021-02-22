@@ -26,7 +26,7 @@ func main() {
 		//	DFA_Toolkit.GetRejectingStringInstances(listOfStrings))
 		//
 		//result.Describe(true)
-		AbbadingoDFA := DFA_Toolkit.AbbadingoDFA(5, true)
+		AbbadingoDFA := DFA_Toolkit.AbbadingoDFA(25, true)
 		AbbadingoDFA.Describe(false)
 		fmt.Println("DFA Depth:", AbbadingoDFA.Depth())
 
