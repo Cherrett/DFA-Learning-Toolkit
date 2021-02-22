@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func Test1(t *testing.T) {
+func TestAbbadingoDFAFromFile(t *testing.T) {
 	dataset := GetDatasetFromAbbadingoFile("../AbbadingoDatasets/dataset4/train.a")
 	if len(dataset) != 60000{
 		t.Errorf("Dataset4 length = %d, want 60000", len(dataset))
@@ -25,7 +25,7 @@ func Test1(t *testing.T) {
 	}
 }
 
-func Test2(t *testing.T) {
+func TestAbbadingoDFAGeneration(t *testing.T) {
 	// random seed
 	rand.Seed(time.Now().UnixNano())
 	numberOfStates := 500

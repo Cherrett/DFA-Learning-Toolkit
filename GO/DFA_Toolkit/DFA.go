@@ -208,19 +208,28 @@ func (dfa DFA) LeavesCount() int{
 }
 
 func (dfa DFA) LoopsCount() int{
-	count := 0
+	var visitedStatesCount = make(map[int]int)
 
-	for stateIndex := range dfa.states {
-		transitionsCount := 0
-		for symbolID := 0; symbolID < len(dfa.symbolMap); symbolID++ {
-			if dfa.states[stateIndex].transitions[symbolID] != -1 {
-				transitionsCount++
+	for stateID := range dfa.states{
+		for symbolID := range dfa.states[stateID].transitions{
+			if dfa.states[stateID].transitions[symbolID] != -1 {
+				if _, ok := visitedStatesCount[stateID]; ok {
+					visitedStatesCount[stateID]++
+				}else{
+					visitedStatesCount[stateID] = 1
+				}
 			}
 		}
-		if transitionsCount == 0{
-			count++
+	}
+
+	count := 0
+
+	for visitedStateCount := range visitedStatesCount{
+		if visitedStateCount > 1{
+			count += visitedStateCount - 1
 		}
 	}
+
 	return count
 }
 

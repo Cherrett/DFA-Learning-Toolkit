@@ -13,9 +13,10 @@ func main() {
 	for i := 0; i < iterations; i++ {
 		start := time.Now()
 
-		AbbadingoDFA := DFA_Toolkit.AbbadingoDFA(5, false)
+		AbbadingoDFA := DFA_Toolkit.AbbadingoDFA(500, true)
 		AbbadingoDFA.Describe(false)
 		fmt.Println("DFA Depth:", AbbadingoDFA.Depth())
+		fmt.Println("DFA Loops:", AbbadingoDFA.LoopsCount())
 
 		timings = append(timings, time.Since(start).Milliseconds())
 	}
