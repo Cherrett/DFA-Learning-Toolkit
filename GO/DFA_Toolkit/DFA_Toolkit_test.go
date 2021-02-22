@@ -57,4 +57,13 @@ func TestAbbadingoDatasetGeneration(t *testing.T){
 	if !trainingDatasetConsistentWithDFA || !testingDatasetConsistentWithDFA{
 		t.Errorf("Expected both training and testing dataset to be consistent with AbbadingoDFA")
 	}
+
+	APTA := GetPTAFromDataset(trainingDataset, true)
+	APTA.Describe(false)
+
+	trainingDatasetConsistentWithAPTA := trainingDataset.ConsistentWithDFA(APTA)
+
+	if !trainingDatasetConsistentWithAPTA{
+		t.Errorf("Expected training dataset to be consistent with APTA")
+	}
 }
