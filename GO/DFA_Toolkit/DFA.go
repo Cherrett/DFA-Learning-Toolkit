@@ -63,23 +63,6 @@ func (dfa *DFA) AddSymbols(symbols []rune){
 	}
 }
 
-func (dfa *DFA) RemoveSymbol(symbol rune){
-	// TODO: CONTINUE THIS FUNCTION
-	//symbolID := dfa.symbolMap[symbol]
-	// remove symbol from symbolMap
-	//delete(dfa.symbolMap, symbol)
-	// update transitions to account for removed symbol
-	//for stateIndex := range dfa.states {
-	//	for symbol := 0; symbol < len(dfa.symbolMap); symbol++ {
-	//		if dfa.states[stateIndex].transitions[symbol] == stateID {
-	//			dfa.states[stateIndex].transitions[symbol] = -1
-	//		} else if dfa.states[stateIndex].transitions[symbol] > stateID {
-	//			dfa.states[stateIndex].transitions[symbol]--
-	//		}
-	//	}
-	//}
-}
-
 func (dfa *DFA) AddTransition(symbolID int, fromStateID int, toStateID int) {
 	// error checking
 	if fromStateID > len(dfa.states)-1 || fromStateID < 0 {
