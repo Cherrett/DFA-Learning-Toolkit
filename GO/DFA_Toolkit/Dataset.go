@@ -1,12 +1,8 @@
 package DFA_Toolkit
 
 import (
-	"bufio"
-	"fmt"
-	"os"
 	"sort"
 	"strconv"
-	"strings"
 	"sync"
 )
 
@@ -17,37 +13,6 @@ type StringInstance struct {
 }
 
 type Dataset []StringInstance
-
-func NewStringInstanceFromAbbadingoFile(text string, delimiter string) StringInstance {
-	stringInstance := StringInstance{}
-	splitString := strings.Split(text, delimiter)
-
-	switch splitString[0] {
-	case "0":
-		stringInstance.status = REJECTING
-		break
-	case "1":
-		stringInstance.status = ACCEPTING
-		break
-	case "-1":
-		stringInstance.status = UNKNOWN
-		break
-	default:
-		panic(fmt.Sprintf("Unknown string status - %s", splitString[0]))
-	}
-
-	i, err := strconv.Atoi(splitString[1])
-
-	if err == nil {
-		stringInstance.length = uint(i)
-	} else {
-		panic(fmt.Sprintf("Invalid string length - %s", splitString[1]))
-	}
-
-	stringInstance.value = []rune(strings.Join(splitString[2:], ""))
-
-	return stringInstance
-}
 
 func (stringInstance StringInstance) ConsistentWithDFA(dfa DFA) bool{
 	currentState := dfa.states[dfa.startingState]
@@ -133,29 +98,6 @@ func BinaryStringToStringInstance(dfa DFA, binaryString string) StringInstance{
 	stringInstance.status = stringInstance.ParseToStateStatus(dfa)
 
 	return stringInstance
-}
-
-func GetDatasetFromAbbadingoFile(fileName string) Dataset {
-	dataset := Dataset{}
-
-	file, err := os.Open(fileName)
-
-	if err == nil {
-		defer file.Close()
-
-		scanner := bufio.NewScanner(file)
-		scanner.Scan() // ignore first line
-		for scanner.Scan() {
-			dataset = append(dataset, NewStringInstanceFromAbbadingoFile(scanner.Text(), " "))
-		}
-
-		if err := scanner.Err(); err != nil {
-			panic(err)
-		}
-	} else {
-		panic("Invalid file name")
-	}
-	return dataset
 }
 
 func (dataset Dataset) SortDatasetByLength() Dataset{
