@@ -259,9 +259,17 @@ func (dfa DFA) IsTree() bool{
 	return true
 }
 
+// Returns the DFA's Depth which is defined as the maximum over all nodes x of
+// the length of the shortest path from the root to x
 func (dfa DFA) Depth() uint {
+	// if the DFA is a tree, calculate the depth using a recursive function
+	// which calculates the height of each node by assigning the maximum height
+	// of its subtrees
 	if dfa.IsTree(){
 		return uint(dfa.DepthUtilTree(dfa.startingState))
+		// if the DFA is not a tree, calculate the depth using Breadth First Traversal
+		// while keeping track of the traversed nodes to avoid revisiting the same nodes
+		// more than once in case of loops
 	}else{
 		var maxValue uint
 		var stateMap = make(map[int]uint)
@@ -279,6 +287,8 @@ func (dfa DFA) Depth() uint {
 	}
 }
 
+// A recursive function which calculates the height of each node by assigning
+// the maximum height of its subtrees. Used only if the DFA is a tree.
 func (dfa DFA) DepthUtilTree(stateID int) int{
 	if stateID == -1{
 		return -1
@@ -299,6 +309,9 @@ func (dfa DFA) DepthUtilTree(stateID int) int{
 	return maxValue + 1
 }
 
+// A function which calculates the DFA's depth using Breadth First Traversal
+// while keeping track of the traversed nodes to avoid revisiting the same nodes
+// more than once in case of loops
 func (dfa DFA) DepthUtilNonTree(targetStateID int) uint{
 	visitedStates := map[int]bool{dfa.startingState: true}
 	queue := [][]int{{dfa.startingState, 0}}
