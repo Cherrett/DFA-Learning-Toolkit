@@ -264,6 +264,18 @@ func (dfa DFA) IsTree() bool{
 	return true
 }
 
+func (dfa DFA) IsComplete() bool{
+	for stateID := range dfa.states{
+		for symbolID := 0; symbolID < len(dfa.symbolMap); symbolID++{
+			if dfa.states[stateID].transitions[symbolID] < 0{
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
 // Returns the DFA's Depth which is defined as the maximum over all nodes x of
 // the length of the shortest path from the root to x
 func (dfa *DFA) Depth() int {
