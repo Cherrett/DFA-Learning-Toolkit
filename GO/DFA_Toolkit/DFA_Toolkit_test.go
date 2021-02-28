@@ -37,8 +37,8 @@ func TestAbbadingoDFAGeneration(t *testing.T) {
 	if len(AbbadingoDFA.states) != numberOfStates{
 		t.Errorf("AbbadingoDFA number of states = %d, want %d", len(AbbadingoDFA.states), numberOfStates)
 	}
-	if AbbadingoDFA.Depth() != uint(math.Round((2.0 * math.Log2(float64(numberOfStates))) - 2.0)){
-		t.Errorf("AbbadingoDFA depth = %d, want %d", AbbadingoDFA.Depth(), uint(math.Round((2.0 * math.Log2(float64(numberOfStates))) - 2.0)))
+	if AbbadingoDFA.Depth() != int(math.Round((2.0 * math.Log2(float64(numberOfStates))) - 2.0)){
+		t.Errorf("AbbadingoDFA depth = %d, want %d", AbbadingoDFA.Depth(), int(math.Round((2.0 * math.Log2(float64(numberOfStates))) - 2.0)))
 	}
 }
 

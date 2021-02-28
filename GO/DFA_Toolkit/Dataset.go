@@ -15,7 +15,7 @@ type StringInstance struct {
 type Dataset []StringInstance
 
 func (stringInstance StringInstance) ConsistentWithDFA(dfa DFA) bool{
-	currentState := dfa.states[dfa.startingState]
+	currentState := dfa.states[dfa.startingStateID]
 	var count uint = 0
 	for _, symbol := range stringInstance.value{
 		count++
@@ -41,7 +41,7 @@ func (stringInstance StringInstance) ConsistentWithDFA(dfa DFA) bool{
 }
 
 func (stringInstance StringInstance) ParseToStateStatus(dfa DFA) StateStatus{
-	currentStateID := dfa.startingState
+	currentStateID := dfa.startingStateID
 	count := uint(0)
 
 	for _, symbol := range stringInstance.value {
@@ -65,7 +65,7 @@ func (stringInstance StringInstance) ParseToStateStatus(dfa DFA) StateStatus{
 }
 
 func (stringInstance StringInstance) ParseToState(dfa DFA) (bool, int){
-	currentStateID := dfa.startingState
+	currentStateID := dfa.startingStateID
 	count := uint(0)
 
 	for _, symbol := range stringInstance.value {

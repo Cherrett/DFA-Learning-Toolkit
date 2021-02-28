@@ -1,18 +1,23 @@
 package DFA_Toolkit
 
 import (
+	"DFA_Toolkit/DFA_Toolkit/util"
 	"fmt"
 	"reflect"
 )
 
 type DFA struct {
-	states        []State
-	startingState int
-	symbolMap     map[rune]int
+	states          []State			// List of states within the DFA.
+	startingStateID int 			// The ID of the starting state of the DFA.
+	symbolMap       map[rune]int	// A map of each symbol within the DFA to its ID.
+
+	depth int // The depth of the DFA.
+	computedDepthAndOrder bool // Whether the Depth and Order were calculated DFA
 }
 
 func NewDFA() DFA {
-	return DFA{states: make([]State, 0), startingState: -1, symbolMap: make(map[rune]int)}
+	return DFA{states: make([]State, 0), startingStateID: -1,
+		symbolMap: make(map[rune]int), depth: -1, computedDepthAndOrder:false}
 }
 
 func (dfa *DFA) AddState(stateStatus StateStatus) int {
@@ -20,13 +25,13 @@ func (dfa *DFA) AddState(stateStatus StateStatus) int {
 	for i := range transitions {
 		transitions[i] = -1
 	}
-	dfa.states = append(dfa.states, State{stateStatus, transitions})
+	dfa.states = append(dfa.states, State{stateStatus, transitions, -1, -1})
 	return len(dfa.states) - 1
 }
 
 func (dfa *DFA) RemoveState(stateID int) {
 	// panic if stateID to be removed is the starting state
-	if dfa.startingState == stateID {
+	if dfa.startingStateID == stateID {
 		panic("Cannot remove starting state")
 	}
 	// remove state from slice of states
@@ -42,8 +47,8 @@ func (dfa *DFA) RemoveState(stateID int) {
 		}
 	}
 	// update starting state
-	if dfa.startingState > stateID{
-		dfa.startingState--
+	if dfa.startingStateID > stateID{
+		dfa.startingStateID--
 	}
 }
 
@@ -261,81 +266,45 @@ func (dfa DFA) IsTree() bool{
 
 // Returns the DFA's Depth which is defined as the maximum over all nodes x of
 // the length of the shortest path from the root to x
-func (dfa DFA) Depth() uint {
-	// if the DFA is a tree, calculate the depth using a recursive function
-	// which calculates the height of each node by assigning the maximum height
-	// of its subtrees
-	if dfa.IsTree(){
-		return uint(dfa.DepthUtilTree(dfa.startingState))
-		// if the DFA is not a tree, calculate the depth using Breadth First Traversal
-		// while keeping track of the traversed nodes to avoid revisiting the same nodes
-		// more than once in case of loops
-	}else{
-		var maxValue uint
-		var stateMap = make(map[int]uint)
-
-		for stateID := range dfa.states{
-			stateMap[stateID] = dfa.DepthUtilNonTree(stateID)
-		}
-
-		for _, v := range stateMap {
-			if v > maxValue {
-				maxValue = v
-			}
-		}
-		return maxValue
+func (dfa *DFA) Depth() int {
+	if !dfa.computedDepthAndOrder{
+		dfa.CalculateDepthAndOrder()
 	}
+	return dfa.depth
 }
 
-// A recursive function which calculates the height of each node by assigning
-// the maximum height of its subtrees. Used only if the DFA is a tree.
-func (dfa DFA) DepthUtilTree(stateID int) int{
-	if stateID == -1{
-		return -1
-	}
-	var depths []int
-	maxValue := -1
+func (dfa *DFA) CalculateDepthAndOrder(){
+	dfa.IsValid()
 
-	for _, symbolID := range dfa.symbolMap{
-		depths = append(depths, dfa.DepthUtilTree(dfa.states[stateID].transitions[symbolID]))
+	dfa.depth = -1
+
+	for i := range dfa.states{
+		dfa.states[i].depth = -1
 	}
 
-	for _, depth := range depths {
-		if depth > maxValue {
-			maxValue = depth
-		}
-	}
+	dfa.states[dfa.startingStateID].depth = 0
 
-	return maxValue + 1
-}
-
-// A function which calculates the DFA's depth using Breadth First Traversal
-// while keeping track of the traversed nodes to avoid revisiting the same nodes
-// more than once in case of loops
-func (dfa DFA) DepthUtilNonTree(targetStateID int) uint{
-	visitedStates := map[int]bool{dfa.startingState: true}
-	queue := [][]int{{dfa.startingState, 0}}
+	currentOrder := 0
+	queue := []int{dfa.startingStateID}
 
 	for len(queue) > 0{
-		stateID := queue[0][0]
-		depth := queue[0][1]
+		stateID := queue[0]
 		queue = append(queue[:0], queue[1:]...)
 
-		if stateID == targetStateID{
-			return uint(depth)
-		}
+		dfa.depth = util.Max(dfa.states[stateID].depth, dfa.depth)
+		dfa.states[stateID].order = currentOrder
+		currentOrder++
 
-		for symbolID := range dfa.states[stateID].transitions {
-			if dfa.states[stateID].transitions[symbolID] != -1 && dfa.states[stateID].transitions[symbolID] != stateID {
-				if !visitedStates[dfa.states[stateID].transitions[symbolID]] {
-					queue = append(queue, []int{dfa.states[stateID].transitions[symbolID], depth +1})
-					visitedStates[dfa.states[stateID].transitions[symbolID]] = true
+		for symbolID := 0; symbolID < len(dfa.symbolMap); symbolID++ {
+			if childStateID := dfa.states[stateID].transitions[symbolID]; childStateID != -1 && childStateID != stateID{
+				if dfa.states[childStateID].depth == -1{
+					dfa.states[childStateID].depth = dfa.states[stateID].depth + 1
+					queue = append(queue, childStateID)
 				}
 			}
 		}
 	}
-
-	return 0
+	dfa.computedDepthAndOrder = true
 }
 
 func (dfa DFA) Describe(detail bool) {
@@ -345,7 +314,7 @@ func (dfa DFA) Describe(detail bool) {
 		for symbol, symbolID := range dfa.symbolMap{
 			fmt.Println(symbolID,"-",string(symbol))
 		}
-		fmt.Println("Starting State:", dfa.startingState)
+		fmt.Println("Starting State:", dfa.startingStateID)
 		fmt.Println("States:")
 		for k, v := range dfa.states {
 			switch v.stateStatus {
@@ -386,13 +355,13 @@ func GetPTAFromDataset(dataset Dataset, APTA bool) DFA {
 		currentStateID = dfa.AddState(UNKNOWN)
 	}
 
-	dfa.startingState = currentStateID
+	dfa.startingStateID = currentStateID
 
 	for _, stringInstance := range dataset {
 		if !APTA && stringInstance.status != ACCEPTING {
 			continue
 		}
-		currentStateID = dfa.startingState
+		currentStateID = dfa.startingStateID
 		count = 0
 		for _, symbol := range stringInstance.value {
 			count++
@@ -453,8 +422,8 @@ func (dfa DFA) AccuracyOfDFA(dataset Dataset) float32 {
 }
 
 func (dfa DFA) UnreachableStates() []int {
-	reachableStates := map[int]bool{dfa.startingState: true}
-	currentStates := map[int]bool{dfa.startingState: true}
+	reachableStates := map[int]bool{dfa.startingStateID: true}
+	currentStates := map[int]bool{dfa.startingStateID: true}
 
 	for len(currentStates) != 0 {
 		nextStates := map[int]bool{}
@@ -617,8 +586,8 @@ func (dfa DFA) Minimise() DFA{
 	for blockIndex := range currentPartition{
 		found := false
 		for stateID := range currentPartition[blockIndex] {
-			if stateID == dfa.startingState{
-				resultantDFA.startingState = blockIndex
+			if stateID == dfa.startingStateID {
+				resultantDFA.startingStateID = blockIndex
 				found = true
 				break
 			}
@@ -670,7 +639,7 @@ func (dfa DFA) Minimise() DFA{
 }
 
 func (dfa DFA) Clone() DFA{
-	return DFA{states: dfa.states, startingState: dfa.startingState, symbolMap: dfa.symbolMap}
+	return DFA{states: dfa.states, startingStateID: dfa.startingStateID, symbolMap: dfa.symbolMap}
 }
 
 func (dfa DFA) Equal(dfa2 DFA) bool{
@@ -688,4 +657,17 @@ func (dfa DFA) Equal(dfa2 DFA) bool{
 
 func (dfa DFA) SameAs(dfa2 DFA) bool {
 	return reflect.DeepEqual(dfa, dfa2)
+}
+
+func (dfa DFA) IsValid() bool{
+	if dfa.startingStateID < 0 || dfa.startingStateID >= len(dfa.states){
+		panic("Invalid starting state.")
+	}else if len(dfa.symbolMap) < 1{
+		panic("DFA does not contain any symbols.")
+	}else if len(dfa.states) < 1{
+		panic("DFA does not contain any states.")
+	}else if len(dfa.UnreachableStates()) > 0{
+		panic("Unreachable State exist within DFA.")
+	}
+	return true
 }

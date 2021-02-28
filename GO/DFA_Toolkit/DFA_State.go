@@ -11,6 +11,9 @@ const (
 type State struct {
 	stateStatus StateStatus
 	transitions []int
+
+	depth int
+	order int
 }
 
 func (state State) IsAccepting() bool{

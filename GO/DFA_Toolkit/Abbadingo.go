@@ -68,7 +68,7 @@ func NewStringInstanceFromAbbadingoFile(text string, delimiter string) StringIns
 
 func AbbadingoDFA(numberOfStates int, exact bool) DFA{
 	dfaSize := int(math.Round((5.0 * float64(numberOfStates)) / 4.0))
-	dfaDepth := uint(math.Round((2.0 * math.Log2(float64(numberOfStates))) - 2.0))
+	dfaDepth := int(math.Round((2.0 * math.Log2(float64(numberOfStates))) - 2.0))
 	// random seed
 	rand.Seed(time.Now().UnixNano())
 	for{
@@ -87,7 +87,7 @@ func AbbadingoDFA(numberOfStates int, exact bool) DFA{
 			dfa.AddTransition(dfa.SymbolID('a'), stateID, rand.Intn(len(dfa.states)))
 			dfa.AddTransition(dfa.SymbolID('b'), stateID, rand.Intn(len(dfa.states)))
 		}
-		dfa.startingState = rand.Intn(len(dfa.states))
+		dfa.startingStateID = rand.Intn(len(dfa.states))
 
 		dfa = dfa.Minimise()
 		currentDFADepth := dfa.Depth()
