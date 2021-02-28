@@ -8,7 +8,7 @@ import (
 
 func main() {
 	var timings []int64
-	iterations := 1
+	iterations := 5
 
 	for i := 0; i < iterations; i++ {
 		start := time.Now()
@@ -29,6 +29,10 @@ func main() {
 
 		trainingDataset.WriteToAbbadingoFile("AbbadingoDatasets/customDataset1/training.a")
 		testingDataset.WriteToAbbadingoFile("AbbadingoDatasets/customDataset1/testing.a")
+
+		APTA := DFA_Toolkit.GetPTAFromDataset(trainingDataset, true)
+		fmt.Println("APTA Depth:", APTA.Depth())
+		fmt.Println("APTA Loops:", APTA.LoopsCount())
 
 		timings = append(timings, time.Since(start).Milliseconds())
 	}

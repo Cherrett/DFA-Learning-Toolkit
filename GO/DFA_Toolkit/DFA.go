@@ -228,24 +228,18 @@ func (dfa DFA) LoopsCount() int{
 	for stateID := range dfa.states{
 		for symbolID := range dfa.states[stateID].transitions{
 			if dfa.states[stateID].transitions[symbolID] != -1 {
-				if _, ok := visitedStatesCount[stateID]; ok {
-					visitedStatesCount[stateID]++
-				}else{
-					visitedStatesCount[stateID] = 1
+				if dfa.states[dfa.states[stateID].transitions[symbolID]].depth < dfa.states[stateID].depth{
+					if _, ok := visitedStatesCount[stateID]; ok {
+						visitedStatesCount[stateID]++
+					}else{
+						visitedStatesCount[stateID] = 1
+					}
 				}
 			}
 		}
 	}
 
-	count := 0
-
-	for visitedStateCount := range visitedStatesCount{
-		if visitedStateCount > 1{
-			count += visitedStateCount - 1
-		}
-	}
-
-	return count
+	return util.SumMap(visitedStatesCount, false)
 }
 
 func (dfa DFA) IsTree() bool{
