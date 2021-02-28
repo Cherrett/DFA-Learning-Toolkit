@@ -15,7 +15,7 @@ func main() {
 
 		AbbadingoDFA := DFA_Toolkit.AbbadingoDFA(20, true)
 		AbbadingoDFA.Describe(false)
-		fmt.Println("DFA Depth:", AbbadingoDFA.Depth())
+		fmt.Println("DFA Depth:", AbbadingoDFA.GetDepth())
 		fmt.Println("DFA Loops:", AbbadingoDFA.LoopsCount())
 
 		trainingDataset, testingDataset := DFA_Toolkit.AbbadingoDataset(AbbadingoDFA, 50, 0.2)
@@ -31,7 +31,7 @@ func main() {
 		testingDataset.WriteToAbbadingoFile("AbbadingoDatasets/customDataset1/testing.a")
 
 		APTA := DFA_Toolkit.GetPTAFromDataset(trainingDataset, true)
-		fmt.Println("APTA Depth:", APTA.Depth())
+		fmt.Println("APTA Depth:", APTA.GetDepth())
 		fmt.Println("APTA Loops:", APTA.LoopsCount())
 
 		timings = append(timings, time.Since(start).Milliseconds())

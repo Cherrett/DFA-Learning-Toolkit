@@ -9,25 +9,25 @@ const (
 )
 
 type State struct {
-	stateStatus StateStatus
-	transitions []int
+	StateStatus StateStatus
+	Transitions []int
 
-	depth int
-	order int
+	Depth int
+	Order int
 }
 
 func (state State) IsAccepting() bool{
-	return state.stateStatus == ACCEPTING
+	return state.StateStatus == ACCEPTING
 }
 
 func (state State) IsRejecting() bool{
-	return state.stateStatus == REJECTING
+	return state.StateStatus == REJECTING
 }
 
 func (state State) IsUnknown() bool{
-	return state.stateStatus == UNKNOWN
+	return state.StateStatus == UNKNOWN
 }
 
 func (state *State) UpdateStateStatus(stateStatus StateStatus){
-	state.stateStatus = stateStatus
+	state.StateStatus = stateStatus
 }

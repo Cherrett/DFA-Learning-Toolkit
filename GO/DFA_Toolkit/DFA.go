@@ -7,58 +7,58 @@ import (
 )
 
 type DFA struct {
-	states          []State			// List of states within the DFA.
-	startingStateID int 			// The ID of the starting state of the DFA.
-	symbolMap       map[rune]int	// A map of each symbol within the DFA to its ID.
+	States          []State      // List of states within the DFA.
+	StartingStateID int          // The ID of the starting state of the DFA.
+	SymbolMap       map[rune]int // A map of each symbol within the DFA to its ID.
 
-	depth int // The depth of the DFA.
-	computedDepthAndOrder bool // Whether the Depth and Order were calculated DFA
+	Depth                 int  // The depth of the DFA.
+	ComputedDepthAndOrder bool // Whether the Depth and Order were calculated DFA
 }
 
 func NewDFA() DFA {
-	return DFA{states: make([]State, 0), startingStateID: -1,
-		symbolMap: make(map[rune]int), depth: -1, computedDepthAndOrder:false}
+	return DFA{States: make([]State, 0), StartingStateID: -1,
+		SymbolMap: make(map[rune]int), Depth: -1, ComputedDepthAndOrder:false}
 }
 
 func (dfa *DFA) AddState(stateStatus StateStatus) int {
-	transitions := make([]int, len(dfa.symbolMap))
+	transitions := make([]int, len(dfa.SymbolMap))
 	for i := range transitions {
 		transitions[i] = -1
 	}
-	dfa.states = append(dfa.states, State{stateStatus, transitions, -1, -1})
-	return len(dfa.states) - 1
+	dfa.States = append(dfa.States, State{stateStatus, transitions, -1, -1})
+	return len(dfa.States) - 1
 }
 
 func (dfa *DFA) RemoveState(stateID int) {
 	// panic if stateID to be removed is the starting state
-	if dfa.startingStateID == stateID {
+	if dfa.StartingStateID == stateID {
 		panic("Cannot remove starting state")
 	}
 	// remove state from slice of states
-	dfa.states = append(dfa.states[:stateID], dfa.states[stateID+1:]...)
+	dfa.States = append(dfa.States[:stateID], dfa.States[stateID+1:]...)
 	// update transitions to account for new stateIDs and for removed state
-	for stateIndex := range dfa.states {
-		for symbolID := 0; symbolID < len(dfa.symbolMap); symbolID++ {
-			if dfa.states[stateIndex].transitions[symbolID] == stateID {
-				dfa.states[stateIndex].transitions[symbolID] = -1
-			} else if dfa.states[stateIndex].transitions[symbolID] > stateID {
-				dfa.states[stateIndex].transitions[symbolID]--
+	for stateIndex := range dfa.States {
+		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
+			if dfa.States[stateIndex].Transitions[symbolID] == stateID {
+				dfa.States[stateIndex].Transitions[symbolID] = -1
+			} else if dfa.States[stateIndex].Transitions[symbolID] > stateID {
+				dfa.States[stateIndex].Transitions[symbolID]--
 			}
 		}
 	}
 	// update starting state
-	if dfa.startingStateID > stateID{
-		dfa.startingStateID--
+	if dfa.StartingStateID > stateID{
+		dfa.StartingStateID--
 	}
 }
 
 func (dfa DFA) SymbolID(symbol rune) int{
-	return dfa.symbolMap[symbol]
+	return dfa.SymbolMap[symbol]
 }
 
 func (dfa DFA) Symbol(symbolID int) rune{
-	for symbol := range dfa.symbolMap{
-		if dfa.symbolMap[symbol] == symbolID{
+	for symbol := range dfa.SymbolMap {
+		if dfa.SymbolMap[symbol] == symbolID{
 			return symbol
 		}
 	}
@@ -66,9 +66,9 @@ func (dfa DFA) Symbol(symbolID int) rune{
 }
 
 func (dfa *DFA) AddSymbol(symbol rune){
-	dfa.symbolMap[symbol] = len(dfa.symbolMap)
-	for stateIndex := range dfa.states {
-		dfa.states[stateIndex].transitions = append(dfa.states[stateIndex].transitions, -1)
+	dfa.SymbolMap[symbol] = len(dfa.SymbolMap)
+	for stateIndex := range dfa.States {
+		dfa.States[stateIndex].Transitions = append(dfa.States[stateIndex].Transitions, -1)
 	}
 }
 
@@ -80,32 +80,32 @@ func (dfa *DFA) AddSymbols(symbols []rune){
 
 func (dfa *DFA) AddTransition(symbolID int, fromStateID int, toStateID int) {
 	// error checking
-	if fromStateID > len(dfa.states)-1 || fromStateID < 0 {
+	if fromStateID > len(dfa.States)-1 || fromStateID < 0 {
 		panic("fromStateID is out of range")
-	} else if toStateID > len(dfa.states)-1 || toStateID < 0 {
+	} else if toStateID > len(dfa.States)-1 || toStateID < 0 {
 		panic("toStateID is out of range")
-	} else if symbolID > len(dfa.symbolMap)-1 || symbolID < 0 {
+	} else if symbolID > len(dfa.SymbolMap)-1 || symbolID < 0 {
 		panic("symbolID is out of range")
 	}
 	// add transition to fromState's transitions
-	dfa.states[fromStateID].transitions[symbolID] = toStateID
+	dfa.States[fromStateID].Transitions[symbolID] = toStateID
 }
 
 func (dfa *DFA) RemoveTransition(symbolID int, fromStateID int) {
 	// error checking
-	if fromStateID > len(dfa.states)-1 || fromStateID < 0 {
+	if fromStateID > len(dfa.States)-1 || fromStateID < 0 {
 		panic("fromStateID is out of range")
-	} else if symbolID > len(dfa.symbolMap)-1 || symbolID < 0 {
+	} else if symbolID > len(dfa.SymbolMap)-1 || symbolID < 0 {
 		panic("symbolID is out of range")
 	}
 	// remove transition to fromState's transitions
-	dfa.states[fromStateID].transitions[symbolID] = -1
+	dfa.States[fromStateID].Transitions[symbolID] = -1
 }
 
 func (dfa DFA) AllStates() []int {
 	var allStates []int
 
-	for stateID := range dfa.states {
+	for stateID := range dfa.States {
 		allStates = append(allStates, stateID)
 	}
 	return allStates
@@ -114,8 +114,8 @@ func (dfa DFA) AllStates() []int {
 func (dfa DFA) AcceptingStates() []int {
 	var acceptingStates []int
 
-	for stateID := range dfa.states {
-		if dfa.states[stateID].stateStatus == ACCEPTING {
+	for stateID := range dfa.States {
+		if dfa.States[stateID].StateStatus == ACCEPTING {
 			acceptingStates = append(acceptingStates, stateID)
 		}
 	}
@@ -125,8 +125,8 @@ func (dfa DFA) AcceptingStates() []int {
 func (dfa DFA) RejectingStates() []int {
 	var acceptingStates []int
 
-	for stateID := range dfa.states {
-		if dfa.states[stateID].stateStatus == REJECTING {
+	for stateID := range dfa.States {
+		if dfa.States[stateID].StateStatus == REJECTING {
 			acceptingStates = append(acceptingStates, stateID)
 		}
 	}
@@ -136,8 +136,8 @@ func (dfa DFA) RejectingStates() []int {
 func (dfa DFA) UnknownStates() []int {
 	var acceptingStates []int
 
-	for stateID := range dfa.states {
-		if dfa.states[stateID].stateStatus == UNKNOWN {
+	for stateID := range dfa.States {
+		if dfa.States[stateID].StateStatus == UNKNOWN {
 			acceptingStates = append(acceptingStates, stateID)
 		}
 	}
@@ -145,14 +145,14 @@ func (dfa DFA) UnknownStates() []int {
 }
 
 func (dfa DFA) AllStatesCount() int {
-	return len(dfa.states)
+	return len(dfa.States)
 }
 
 func (dfa DFA) AcceptingStatesCount() int {
 	count := 0
 
-	for stateID := range dfa.states {
-		if dfa.states[stateID].stateStatus == ACCEPTING {
+	for stateID := range dfa.States {
+		if dfa.States[stateID].StateStatus == ACCEPTING {
 			count++
 		}
 	}
@@ -162,8 +162,8 @@ func (dfa DFA) AcceptingStatesCount() int {
 func (dfa DFA) RejectingStatesCount() int {
 	count := 0
 
-	for stateID := range dfa.states {
-		if dfa.states[stateID].stateStatus == REJECTING {
+	for stateID := range dfa.States {
+		if dfa.States[stateID].StateStatus == REJECTING {
 			count++
 		}
 	}
@@ -173,8 +173,8 @@ func (dfa DFA) RejectingStatesCount() int {
 func (dfa DFA) UnknownStatesCount() int {
 	count := 0
 
-	for stateID := range dfa.states {
-		if dfa.states[stateID].stateStatus == UNKNOWN {
+	for stateID := range dfa.States {
+		if dfa.States[stateID].StateStatus == UNKNOWN {
 			count++
 		}
 	}
@@ -184,9 +184,9 @@ func (dfa DFA) UnknownStatesCount() int {
 func (dfa DFA) TransitionsCount() int{
 	count := 0
 
-	for stateIndex := range dfa.states {
-		for symbol := 0; symbol < len(dfa.symbolMap); symbol++ {
-			if dfa.states[stateIndex].transitions[symbol] != -1 {
+	for stateIndex := range dfa.States {
+		for symbol := 0; symbol < len(dfa.SymbolMap); symbol++ {
+			if dfa.States[stateIndex].Transitions[symbol] != -1 {
 				count++
 			}
 		}
@@ -197,8 +197,8 @@ func (dfa DFA) TransitionsCount() int{
 func (dfa DFA) TransitionsCountForSymbol(symbol int) int{
 	count := 0
 
-	for stateIndex := range dfa.states {
-		if dfa.states[stateIndex].transitions[symbol] != -1 {
+	for stateIndex := range dfa.States {
+		if dfa.States[stateIndex].Transitions[symbol] != -1 {
 			count++
 		}
 	}
@@ -208,10 +208,10 @@ func (dfa DFA) TransitionsCountForSymbol(symbol int) int{
 func (dfa DFA) LeavesCount() int{
 	count := 0
 
-	for stateIndex := range dfa.states {
+	for stateIndex := range dfa.States {
 		transitionsCount := 0
-		for symbolID := 0; symbolID < len(dfa.symbolMap); symbolID++ {
-			if dfa.states[stateIndex].transitions[symbolID] != -1 {
+		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
+			if dfa.States[stateIndex].Transitions[symbolID] != -1 {
 				transitionsCount++
 			}
 		}
@@ -225,10 +225,10 @@ func (dfa DFA) LeavesCount() int{
 func (dfa DFA) LoopsCount() int{
 	var visitedStatesCount = make(map[int]int)
 
-	for stateID := range dfa.states{
-		for symbolID := range dfa.states[stateID].transitions{
-			if dfa.states[stateID].transitions[symbolID] != -1 {
-				if dfa.states[dfa.states[stateID].transitions[symbolID]].depth < dfa.states[stateID].depth{
+	for stateID := range dfa.States {
+		for symbolID := range dfa.States[stateID].Transitions {
+			if dfa.States[stateID].Transitions[symbolID] != -1 {
+				if dfa.States[dfa.States[stateID].Transitions[symbolID]].Depth < dfa.States[stateID].Depth {
 					if _, ok := visitedStatesCount[stateID]; ok {
 						visitedStatesCount[stateID]++
 					}else{
@@ -245,12 +245,12 @@ func (dfa DFA) LoopsCount() int{
 func (dfa DFA) IsTree() bool{
 	var visitedStates = make(map[int]bool)
 
-	for stateID := range dfa.states{
-		for symbolID := range dfa.states[stateID].transitions{
-			if dfa.states[stateID].transitions[symbolID] != -1 && visitedStates[dfa.states[stateID].transitions[symbolID]]{
+	for stateID := range dfa.States {
+		for symbolID := range dfa.States[stateID].Transitions {
+			if dfa.States[stateID].Transitions[symbolID] != -1 && visitedStates[dfa.States[stateID].Transitions[symbolID]]{
 				return false
 			}else{
-				visitedStates[dfa.states[stateID].transitions[symbolID]] = true
+				visitedStates[dfa.States[stateID].Transitions[symbolID]] = true
 			}
 		}
 	}
@@ -259,9 +259,9 @@ func (dfa DFA) IsTree() bool{
 }
 
 func (dfa DFA) IsComplete() bool{
-	for stateID := range dfa.states{
-		for symbolID := 0; symbolID < len(dfa.symbolMap); symbolID++{
-			if dfa.states[stateID].transitions[symbolID] < 0{
+	for stateID := range dfa.States {
+		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++{
+			if dfa.States[stateID].Transitions[symbolID] < 0{
 				return false
 			}
 		}
@@ -272,58 +272,58 @@ func (dfa DFA) IsComplete() bool{
 
 // Returns the DFA's Depth which is defined as the maximum over all nodes x of
 // the length of the shortest path from the root to x
-func (dfa *DFA) Depth() int {
-	if !dfa.computedDepthAndOrder{
+func (dfa *DFA) GetDepth() int {
+	if !dfa.ComputedDepthAndOrder {
 		dfa.CalculateDepthAndOrder()
 	}
-	return dfa.depth
+	return dfa.Depth
 }
 
 func (dfa *DFA) CalculateDepthAndOrder(){
 	dfa.IsValid()
 
-	dfa.depth = -1
+	dfa.Depth = -1
 
-	for i := range dfa.states{
-		dfa.states[i].depth = -1
+	for i := range dfa.States {
+		dfa.States[i].Depth = -1
 	}
 
-	dfa.states[dfa.startingStateID].depth = 0
+	dfa.States[dfa.StartingStateID].Depth = 0
 
 	currentOrder := 0
-	queue := []int{dfa.startingStateID}
+	queue := []int{dfa.StartingStateID}
 
 	for len(queue) > 0{
 		stateID := queue[0]
 		queue = append(queue[:0], queue[1:]...)
 
-		dfa.depth = util.Max(dfa.states[stateID].depth, dfa.depth)
-		dfa.states[stateID].order = currentOrder
+		dfa.Depth = util.Max(dfa.States[stateID].Depth, dfa.Depth)
+		dfa.States[stateID].Order = currentOrder
 		currentOrder++
 
-		for symbolID := 0; symbolID < len(dfa.symbolMap); symbolID++ {
-			if childStateID := dfa.states[stateID].transitions[symbolID]; childStateID != -1 && childStateID != stateID{
-				if dfa.states[childStateID].depth == -1{
-					dfa.states[childStateID].depth = dfa.states[stateID].depth + 1
+		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
+			if childStateID := dfa.States[stateID].Transitions[symbolID]; childStateID != -1 && childStateID != stateID{
+				if dfa.States[childStateID].Depth == -1{
+					dfa.States[childStateID].Depth = dfa.States[stateID].Depth + 1
 					queue = append(queue, childStateID)
 				}
 			}
 		}
 	}
-	dfa.computedDepthAndOrder = true
+	dfa.ComputedDepthAndOrder = true
 }
 
 func (dfa DFA) Describe(detail bool) {
-	fmt.Println("This DFA has", len(dfa.states), "states and", len(dfa.symbolMap), "alphabet")
+	fmt.Println("This DFA has", len(dfa.States), "states and", len(dfa.SymbolMap), "alphabet")
 	if detail {
 		fmt.Println("Alphabet:")
-		for symbol, symbolID := range dfa.symbolMap{
+		for symbol, symbolID := range dfa.SymbolMap {
 			fmt.Println(symbolID,"-",string(symbol))
 		}
-		fmt.Println("Starting State:", dfa.startingStateID)
+		fmt.Println("Starting State:", dfa.StartingStateID)
 		fmt.Println("States:")
-		for k, v := range dfa.states {
-			switch v.stateStatus {
+		for k, v := range dfa.States {
+			switch v.StateStatus {
 			case ACCEPTING:
 				fmt.Println(k, "ACCEPTING")
 				break
@@ -336,8 +336,8 @@ func (dfa DFA) Describe(detail bool) {
 			}
 		}
 		fmt.Println("Transitions:")
-		for fromStateID, fromState := range dfa.states {
-			for symbolID, toStateID := range fromState.transitions {
+		for fromStateID, fromState := range dfa.States {
+			for symbolID, toStateID := range fromState.Transitions {
 				fmt.Println(fromStateID, "--", symbolID, "->", toStateID)
 			}
 		}
@@ -361,13 +361,13 @@ func GetPTAFromDataset(dataset Dataset, APTA bool) DFA {
 		currentStateID = dfa.AddState(UNKNOWN)
 	}
 
-	dfa.startingStateID = currentStateID
+	dfa.StartingStateID = currentStateID
 
 	for _, stringInstance := range dataset {
 		if !APTA && stringInstance.status != ACCEPTING {
 			continue
 		}
-		currentStateID = dfa.startingStateID
+		currentStateID = dfa.StartingStateID
 		count = 0
 		for _, symbol := range stringInstance.value {
 			count++
@@ -379,21 +379,21 @@ func GetPTAFromDataset(dataset Dataset, APTA bool) DFA {
 
 			symbolID := dfa.SymbolID(symbol)
 
-			if dfa.states[currentStateID].transitions[symbolID] != -1 {
-				currentStateID = dfa.states[currentStateID].transitions[symbolID]
+			if dfa.States[currentStateID].Transitions[symbolID] != -1 {
+				currentStateID = dfa.States[currentStateID].Transitions[symbolID]
 				// last symbol in string check
 				if count == stringInstance.length {
 					if stringInstance.status == ACCEPTING {
-						if dfa.states[currentStateID].stateStatus == REJECTING {
+						if dfa.States[currentStateID].StateStatus == REJECTING {
 							panic("State already set to rejecting, cannot set to accepting")
 						} else {
-							dfa.states[currentStateID].UpdateStateStatus(ACCEPTING)
+							dfa.States[currentStateID].UpdateStateStatus(ACCEPTING)
 						}
 					} else {
-						if dfa.states[currentStateID].stateStatus == ACCEPTING {
+						if dfa.States[currentStateID].StateStatus == ACCEPTING {
 							panic("State already set to accepting, cannot set to rejecting")
 						} else {
-							dfa.states[currentStateID].UpdateStateStatus(REJECTING)
+							dfa.States[currentStateID].UpdateStateStatus(REJECTING)
 						}
 					}
 				}
@@ -408,7 +408,7 @@ func GetPTAFromDataset(dataset Dataset, APTA bool) DFA {
 				} else {
 					newStateID = dfa.AddState(UNKNOWN)
 				}
-				dfa.states[currentStateID].transitions[symbolID] = newStateID
+				dfa.States[currentStateID].Transitions[symbolID] = newStateID
 				currentStateID = newStateID
 			}
 		}
@@ -428,15 +428,15 @@ func (dfa DFA) AccuracyOfDFA(dataset Dataset) float32 {
 }
 
 func (dfa DFA) UnreachableStates() []int {
-	reachableStates := map[int]bool{dfa.startingStateID: true}
-	currentStates := map[int]bool{dfa.startingStateID: true}
+	reachableStates := map[int]bool{dfa.StartingStateID: true}
+	currentStates := map[int]bool{dfa.StartingStateID: true}
 
 	for len(currentStates) != 0 {
 		nextStates := map[int]bool{}
 		for stateID := range currentStates {
-			for symbolID := 0; symbolID < len(dfa.symbolMap); symbolID++ {
-				if dfa.states[stateID].transitions[symbolID] != -1{
-					nextStates[dfa.states[stateID].transitions[symbolID]] = true
+			for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
+				if dfa.States[stateID].Transitions[symbolID] != -1{
+					nextStates[dfa.States[stateID].Transitions[symbolID]] = true
 				}
 			}
 		}
@@ -457,7 +457,7 @@ func (dfa DFA) UnreachableStates() []int {
 	}
 
 	var unReachableStates []int
-	for stateID := range dfa.states {
+	for stateID := range dfa.States {
 		if !reachableStates[stateID] {
 			unReachableStates = append(unReachableStates, stateID)
 		}
@@ -484,10 +484,10 @@ func (dfa *DFA) Mark() (map[StateIDPair]bool, map[StateIDPair]bool) {
 	allPairs := map[StateIDPair]bool{}
 
 	dfa.RemoveUnreachableStates()
-	for stateID := range dfa.states {
-		for stateID2 := stateID + 1; stateID2 < len(dfa.states); stateID2++ {
+	for stateID := range dfa.States {
+		for stateID2 := stateID + 1; stateID2 < len(dfa.States); stateID2++ {
 			allPairs[StateIDPair{stateID, stateID2}] = true
-			if dfa.states[stateID].stateStatus != dfa.states[stateID2].stateStatus{
+			if dfa.States[stateID].StateStatus != dfa.States[stateID2].StateStatus {
 				distinguishablePairs[StateIDPair{stateID, stateID2}] = true
 			}
 		}
@@ -497,16 +497,16 @@ func (dfa *DFA) Mark() (map[StateIDPair]bool, map[StateIDPair]bool) {
 	for oldCount != len(distinguishablePairs) {
 		oldCount = len(distinguishablePairs)
 
-		for stateID := range dfa.states {
-			for stateID2 := stateID + 1; stateID2 < len(dfa.states); stateID2++ {
+		for stateID := range dfa.States {
+			for stateID2 := stateID + 1; stateID2 < len(dfa.States); stateID2++ {
 				if distinguishablePairs[StateIDPair{stateID, stateID2}] {
 					continue
 				} else {
-					for symbolID := 0; symbolID < len(dfa.symbolMap); symbolID++ {
-						if dfa.states[stateID].transitions[symbolID] != -1 {
-							if dfa.states[stateID2].transitions[symbolID] != -1 {
-								if distinguishablePairs[StateIDPair{dfa.states[stateID].transitions[symbolID], dfa.states[stateID2].transitions[symbolID]}] ||
-									distinguishablePairs[StateIDPair{dfa.states[stateID2].transitions[symbolID], dfa.states[stateID].transitions[symbolID]}] {
+					for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
+						if dfa.States[stateID].Transitions[symbolID] != -1 {
+							if dfa.States[stateID2].Transitions[symbolID] != -1 {
+								if distinguishablePairs[StateIDPair{dfa.States[stateID].Transitions[symbolID], dfa.States[stateID2].Transitions[symbolID]}] ||
+									distinguishablePairs[StateIDPair{dfa.States[stateID2].Transitions[symbolID], dfa.States[stateID].Transitions[symbolID]}] {
 									distinguishablePairs[StateIDPair{stateID, stateID2}] = true
 								}
 							}
@@ -537,7 +537,7 @@ func (dfa DFA) Minimise() DFA{
 
 	// Partition states into blocks
 	var currentPartition []map[int]bool
-	for stateID := range dfa.states{
+	for stateID := range dfa.States {
 		exists := false
 		for _, block := range currentPartition{
 			if block[stateID]{
@@ -576,13 +576,13 @@ func (dfa DFA) Minimise() DFA{
 			}
 		}
 	}
-	resultantDFA := DFA{symbolMap: dfa.symbolMap}
+	resultantDFA := DFA{SymbolMap: dfa.SymbolMap}
 
 	// Create a new state for each block
 	for blockIndex := range currentPartition{
 		var stateStatus StateStatus = UNKNOWN
 		for stateID := range currentPartition[blockIndex] {
-			stateStatus = dfa.states[stateID].stateStatus
+			stateStatus = dfa.States[stateID].StateStatus
 			break
 		}
 		resultantDFA.AddState(stateStatus)
@@ -592,8 +592,8 @@ func (dfa DFA) Minimise() DFA{
 	for blockIndex := range currentPartition{
 		found := false
 		for stateID := range currentPartition[blockIndex] {
-			if stateID == dfa.startingStateID {
-				resultantDFA.startingStateID = blockIndex
+			if stateID == dfa.StartingStateID {
+				resultantDFA.StartingStateID = blockIndex
 				found = true
 				break
 			}
@@ -604,7 +604,7 @@ func (dfa DFA) Minimise() DFA{
 	}
 
 	// Transitions
-	for stateID := range dfa.states{
+	for stateID := range dfa.States {
 		stateBlockIndex := 0
 		found := false
 		for blockIndex := range currentPartition{
@@ -620,13 +620,13 @@ func (dfa DFA) Minimise() DFA{
 			}
 		}
 
-		for symbolID := range dfa.states[stateID].transitions{
+		for symbolID := range dfa.States[stateID].Transitions {
 			resultantStateBlockIndex := 0
-			if resultantDFA.states[stateBlockIndex].transitions[symbolID] == -1 && dfa.states[stateID].transitions[symbolID] != -1{
+			if resultantDFA.States[stateBlockIndex].Transitions[symbolID] == -1 && dfa.States[stateID].Transitions[symbolID] != -1{
 				found := false
 				for blockIndex := range currentPartition{
 					for stateID2 := range currentPartition[blockIndex] {
-						if dfa.states[stateID].transitions[symbolID] == stateID2{
+						if dfa.States[stateID].Transitions[symbolID] == stateID2{
 							resultantStateBlockIndex = blockIndex
 							found = true
 							break
@@ -636,7 +636,7 @@ func (dfa DFA) Minimise() DFA{
 						break
 					}
 				}
-				resultantDFA.states[stateBlockIndex].transitions[symbolID] = resultantStateBlockIndex
+				resultantDFA.States[stateBlockIndex].Transitions[symbolID] = resultantStateBlockIndex
 			}
 		}
 	}
@@ -645,14 +645,14 @@ func (dfa DFA) Minimise() DFA{
 }
 
 func (dfa DFA) Clone() DFA{
-	return DFA{states: dfa.states, startingStateID: dfa.startingStateID, symbolMap: dfa.symbolMap}
+	return DFA{States: dfa.States, StartingStateID: dfa.StartingStateID, SymbolMap: dfa.SymbolMap}
 }
 
 func (dfa DFA) Equal(dfa2 DFA) bool{
 	// need to confirm
-	for stateID := range dfa.states{
-		for symbolID := range dfa.states[stateID].transitions{
-			if dfa.states[stateID].transitions[symbolID] != dfa2.states[stateID].transitions[symbolID]{
+	for stateID := range dfa.States {
+		for symbolID := range dfa.States[stateID].Transitions {
+			if dfa.States[stateID].Transitions[symbolID] != dfa2.States[stateID].Transitions[symbolID]{
 				return false
 			}
 		}
@@ -666,11 +666,11 @@ func (dfa DFA) SameAs(dfa2 DFA) bool {
 }
 
 func (dfa DFA) IsValid() bool{
-	if dfa.startingStateID < 0 || dfa.startingStateID >= len(dfa.states){
+	if dfa.StartingStateID < 0 || dfa.StartingStateID >= len(dfa.States){
 		panic("Invalid starting state.")
-	}else if len(dfa.symbolMap) < 1{
+	}else if len(dfa.SymbolMap) < 1{
 		panic("DFA does not contain any symbols.")
-	}else if len(dfa.states) < 1{
+	}else if len(dfa.States) < 1{
 		panic("DFA does not contain any states.")
 	}else if len(dfa.UnreachableStates()) > 0{
 		panic("Unreachable State exist within DFA.")

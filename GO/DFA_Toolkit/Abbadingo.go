@@ -83,18 +83,18 @@ func AbbadingoDFA(numberOfStates int, exact bool) DFA{
 			}
 		}
 
-		for stateID := range dfa.states{
-			dfa.AddTransition(dfa.SymbolID('a'), stateID, rand.Intn(len(dfa.states)))
-			dfa.AddTransition(dfa.SymbolID('b'), stateID, rand.Intn(len(dfa.states)))
+		for stateID := range dfa.States {
+			dfa.AddTransition(dfa.SymbolID('a'), stateID, rand.Intn(len(dfa.States)))
+			dfa.AddTransition(dfa.SymbolID('b'), stateID, rand.Intn(len(dfa.States)))
 		}
-		dfa.startingStateID = rand.Intn(len(dfa.states))
+		dfa.StartingStateID = rand.Intn(len(dfa.States))
 
 		dfa = dfa.Minimise()
-		currentDFADepth := dfa.Depth()
+		currentDFADepth := dfa.GetDepth()
 
 		if currentDFADepth == dfaDepth{
 			if exact{
-				if len(dfa.states) == numberOfStates{
+				if len(dfa.States) == numberOfStates{
 					return dfa
 				}
 			}else{
@@ -107,7 +107,7 @@ func AbbadingoDFA(numberOfStates int, exact bool) DFA{
 func AbbadingoDataset(dfa DFA, percentageFromSamplePool float64, testingRatio float64) (Dataset, Dataset){
 	trainingDataset := Dataset{}
 	testingDataset := Dataset{}
-	maxLength := math.Round((2.0 * math.Log2(float64(len(dfa.states)))) + 3.0)
+	maxLength := math.Round((2.0 * math.Log2(float64(len(dfa.States)))) + 3.0)
 	maxDecimal := math.Pow(2, maxLength + 1) - 1
 	totalSetSize := math.Round((percentageFromSamplePool / 100) * maxDecimal)
 	trainingSetSize := int(math.Round((1 - testingRatio) * totalSetSize))

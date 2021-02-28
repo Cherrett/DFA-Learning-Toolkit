@@ -15,20 +15,20 @@ type StringInstance struct {
 type Dataset []StringInstance
 
 func (stringInstance StringInstance) ConsistentWithDFA(dfa DFA) bool{
-	currentState := dfa.states[dfa.startingStateID]
+	currentState := dfa.States[dfa.StartingStateID]
 	var count uint = 0
 	for _, symbol := range stringInstance.value{
 		count++
-		if currentState.transitions[dfa.SymbolID(symbol)] != -1 {
-			currentState = dfa.states[currentState.transitions[dfa.SymbolID(symbol)]]
+		if currentState.Transitions[dfa.SymbolID(symbol)] != -1 {
+			currentState = dfa.States[currentState.Transitions[dfa.SymbolID(symbol)]]
 			// last symbol in string check
 			if count == stringInstance.length {
 				if stringInstance.status == ACCEPTING {
-					if currentState.stateStatus == REJECTING {
+					if currentState.StateStatus == REJECTING {
 						return false
 					}
 				}else {
-					if currentState.stateStatus == ACCEPTING {
+					if currentState.StateStatus == ACCEPTING {
 						return false
 					}
 				}
@@ -41,17 +41,17 @@ func (stringInstance StringInstance) ConsistentWithDFA(dfa DFA) bool{
 }
 
 func (stringInstance StringInstance) ParseToStateStatus(dfa DFA) StateStatus{
-	currentStateID := dfa.startingStateID
+	currentStateID := dfa.StartingStateID
 	count := uint(0)
 
 	for _, symbol := range stringInstance.value {
 		count++
 
-		if dfa.states[currentStateID].transitions[dfa.SymbolID(symbol)] != -1 {
-			currentStateID = dfa.states[currentStateID].transitions[dfa.SymbolID(symbol)]
+		if dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)] != -1 {
+			currentStateID = dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)]
 			// last symbol in string check
 			if count == stringInstance.length{
-				if dfa.states[currentStateID].stateStatus == UNKNOWN{
+				if dfa.States[currentStateID].StateStatus == UNKNOWN{
 					return REJECTING
 				}else{
 					return ACCEPTING
@@ -65,14 +65,14 @@ func (stringInstance StringInstance) ParseToStateStatus(dfa DFA) StateStatus{
 }
 
 func (stringInstance StringInstance) ParseToState(dfa DFA) (bool, int){
-	currentStateID := dfa.startingStateID
+	currentStateID := dfa.StartingStateID
 	count := uint(0)
 
 	for _, symbol := range stringInstance.value {
 		count++
 
-		if dfa.states[currentStateID].transitions[dfa.SymbolID(symbol)] != -1 {
-			currentStateID = dfa.states[currentStateID].transitions[dfa.SymbolID(symbol)]
+		if dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)] != -1 {
+			currentStateID = dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)]
 			// last symbol in string check
 			if count == stringInstance.length{
 				return true, currentStateID
