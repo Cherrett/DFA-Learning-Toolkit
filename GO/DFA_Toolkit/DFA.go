@@ -649,14 +649,15 @@ func (dfa DFA) Clone() DFA{
 }
 
 func (dfa DFA) Equal(dfa2 DFA) bool{
-	// need to confirm
-	for stateID := range dfa.States {
-		for symbolID := range dfa.States[stateID].Transitions {
-			if dfa.States[stateID].Transitions[symbolID] != dfa2.States[stateID].Transitions[symbolID]{
-				return false
-			}
-		}
+	dfa = dfa.Minimise()
+	dfa2 = dfa2.Minimise()
+
+	if (len(dfa.States) != len(dfa2.States)) ||
+		(len(dfa.SymbolMap) != len(dfa2.SymbolMap) ||
+			len(dfa.AcceptingStates()) != len(dfa2.AcceptingStates())) {
+		return false
 	}
+	// TO DO: check implementation
 
 	return true
 }
