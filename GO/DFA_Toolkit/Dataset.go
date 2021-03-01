@@ -14,6 +14,80 @@ type StringInstance struct {
 
 type Dataset []StringInstance
 
+func (dataset Dataset) GetPTA(APTA bool) DFA {
+	dataset = dataset.SortDatasetByLength()
+	alphabet := make(map[rune]bool)
+	var count uint
+	var currentStateID, newStateID int
+	dfa := NewDFA()
+
+	if dataset[0].length == 0 {
+		if dataset[0].status == ACCEPTING {
+			currentStateID = dfa.AddState(ACCEPTING)
+		} else if APTA{
+			currentStateID = dfa.AddState(REJECTING)
+		}else{
+			currentStateID = dfa.AddState(UNKNOWN)
+		}
+	} else {
+		currentStateID = dfa.AddState(UNKNOWN)
+	}
+
+	dfa.StartingStateID = currentStateID
+
+	for _, stringInstance := range dataset {
+		if !APTA && stringInstance.status != ACCEPTING {
+			continue
+		}
+		currentStateID = dfa.StartingStateID
+		count = 0
+		for _, symbol := range stringInstance.value {
+			count++
+			// new alphabet check
+			if !alphabet[symbol] {
+				dfa.AddSymbol(symbol)
+				alphabet[symbol] = true
+			}
+
+			symbolID := dfa.SymbolID(symbol)
+
+			if dfa.States[currentStateID].Transitions[symbolID] != -1 {
+				currentStateID = dfa.States[currentStateID].Transitions[symbolID]
+				// last symbol in string check
+				if count == stringInstance.length {
+					if stringInstance.status == ACCEPTING {
+						if dfa.States[currentStateID].StateStatus == REJECTING {
+							panic("State already set to rejecting, cannot set to accepting")
+						} else {
+							dfa.States[currentStateID].UpdateStateStatus(ACCEPTING)
+						}
+					} else {
+						if dfa.States[currentStateID].StateStatus == ACCEPTING {
+							panic("State already set to accepting, cannot set to rejecting")
+						} else {
+							dfa.States[currentStateID].UpdateStateStatus(REJECTING)
+						}
+					}
+				}
+			} else {
+				// last symbol in string check
+				if count == stringInstance.length {
+					if stringInstance.status == ACCEPTING {
+						newStateID = dfa.AddState(ACCEPTING)
+					} else {
+						newStateID = dfa.AddState(REJECTING)
+					}
+				} else {
+					newStateID = dfa.AddState(UNKNOWN)
+				}
+				dfa.States[currentStateID].Transitions[symbolID] = newStateID
+				currentStateID = newStateID
+			}
+		}
+	}
+	return dfa
+}
+
 func (stringInstance StringInstance) ConsistentWithDFA(dfa DFA) bool{
 	currentState := dfa.States[dfa.StartingStateID]
 	var count uint = 0

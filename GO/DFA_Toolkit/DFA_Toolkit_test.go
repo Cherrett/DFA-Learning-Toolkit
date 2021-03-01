@@ -13,7 +13,7 @@ func TestAbbadingoDFAFromFile(t *testing.T) {
 		t.Errorf("Dataset4 length = %d, want 60000", len(dataset))
 	}
 
-	APTA := GetPTAFromDataset(dataset, true)
+	APTA := dataset.GetPTA(true)
 	if len(APTA.SymbolMap) != 2{
 		t.Errorf("APTA number of symbols = %d, want 2", len(APTA.SymbolMap))
 	}
@@ -58,7 +58,7 @@ func TestAbbadingoDatasetGeneration(t *testing.T){
 		t.Errorf("Expected both training and testing dataset to be consistent with AbbadingoDFA")
 	}
 
-	APTA := GetPTAFromDataset(trainingDataset, true)
+	APTA := trainingDataset.GetPTA(true)
 	APTA.Describe(false)
 
 	trainingDatasetConsistentWithAPTA := trainingDataset.ConsistentWithDFA(APTA)

@@ -8,7 +8,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
 )
 
 func GetDatasetFromAbbadingoFile(fileName string) Dataset {
@@ -69,8 +68,7 @@ func NewStringInstanceFromAbbadingoFile(text string, delimiter string) StringIns
 func AbbadingoDFA(numberOfStates int, exact bool) DFA{
 	dfaSize := int(math.Round((5.0 * float64(numberOfStates)) / 4.0))
 	dfaDepth := int(math.Round((2.0 * math.Log2(float64(numberOfStates))) - 2.0))
-	// random seed
-	rand.Seed(time.Now().UnixNano())
+
 	for{
 		dfa := NewDFA()
 		dfa.AddSymbols([]rune{'a', 'b'})
@@ -112,8 +110,6 @@ func AbbadingoDataset(dfa DFA, percentageFromSamplePool float64, testingRatio fl
 	totalSetSize := math.Round((percentageFromSamplePool / 100) * maxDecimal)
 	trainingSetSize := int(math.Round((1 - testingRatio) * totalSetSize))
 
-	// random seed
-	rand.Seed(time.Now().UnixNano())
 	// map to avoid duplicate values
 	valueMap := map[int]bool{}
 
