@@ -1,4 +1,3 @@
-//https://github.com/theodesp/unionfind
 package DFA_Toolkit
 
 type StatePartition struct {
@@ -6,14 +5,9 @@ type StatePartition struct {
 	size []int
 }
 
-// NewStatePartition returns an initialized list of size
+// Returns an initialized State Partition
 func NewStatePartition(size int) *StatePartition {
-	return new(StatePartition).init(size)
-}
-
-// Constructor initializes root and size arrays
-func (statePartition *StatePartition) init(size int) *StatePartition {
-	statePartition = new(StatePartition)
+	statePartition := new(StatePartition)
 	statePartition.root = make([]int, size)
 	statePartition.size = make([]int, size)
 
@@ -28,8 +22,8 @@ func (statePartition *StatePartition) init(size int) *StatePartition {
 // Union connects p and q by finding their roots and comparing their respective
 // size arrays to keep the tree flat
 func (statePartition *StatePartition) union(p int, q int) {
-	qRoot := statePartition.Root(q)
-	pRoot := statePartition.Root(p)
+	qRoot := statePartition.Find(q)
+	pRoot := statePartition.Find(p)
 
 	if statePartition.size[qRoot] < statePartition.size[pRoot] {
 		statePartition.root[qRoot] = statePartition.root[pRoot]
@@ -40,10 +34,10 @@ func (statePartition *StatePartition) union(p int, q int) {
 	}
 }
 
-// Root or Find traverses each parent element while compressing the
+// Find traverses each parent element while compressing the
 // levels to find the root element of p
 // If we attempt to access an element outside the array it returns -1
-func (statePartition *StatePartition) Root(p int) int {
+func (statePartition *StatePartition) Find(p int) int {
 	if p > len(statePartition.root)-1 {
 		return -1
 	}
@@ -56,20 +50,17 @@ func (statePartition *StatePartition) Root(p int) int {
 	return p
 }
 
-// Root or Find
-func (statePartition *StatePartition) Find(p int) int {
-	return statePartition.Root(p)
-}
-
 // Check if items p,q are connected
 func (statePartition *StatePartition) Connected(p int, q int) bool {
-	return statePartition.Root(p) == statePartition.Root(q)
+	return statePartition.Find(p) == statePartition.Find(q)
 }
 
+// Convert a DFA to a State Partition
 func (dfa DFA) ToStatePartition() *StatePartition {
 	return NewStatePartition(len(dfa.States))
 }
 
+// Convert a State Partition to a DFA
 func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA){
 	newMappings := map[int]int{}
 
@@ -119,6 +110,8 @@ func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA){
 	return true, resultantDFA
 }
 
+// Recursively merge states to merge state1 and state2, returns false
+// if the merge results in an NFA, or true if merge was successful
 func (statePartition StatePartition) MergeStates(dfa DFA, state1 int, state2 int) (bool, StatePartition){
 	state1Block := statePartition.Find(state1)
 	state2Block := statePartition.Find(state2)
