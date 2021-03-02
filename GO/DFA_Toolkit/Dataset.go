@@ -247,3 +247,11 @@ func (dataset Dataset) RejectingStringInstancesCount() int{
 
 	return count
 }
+
+func (dataset Dataset) AcceptingStringInstancesRatio() float64{
+	return float64(dataset.AcceptingStringInstancesCount()) / float64(len(dataset))
+}
+
+func (dataset Dataset) RejectingStringInstancesRatio() float64{
+	return float64(dataset.RejectingStringInstancesCount()) / float64(len(dataset))
+}

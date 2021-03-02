@@ -3,6 +3,7 @@ package DFA_Toolkit
 type StatePartition struct {
 	root []int
 	size []int
+	changed []int
 }
 
 // Returns an initialized State Partition
@@ -10,6 +11,7 @@ func NewStatePartition(size int) *StatePartition {
 	statePartition := new(StatePartition)
 	statePartition.root = make([]int, size)
 	statePartition.size = make([]int, size)
+	statePartition.changed = []int{}
 
 	for i := 0; i < size; i++ {
 		statePartition.root[i] = i
@@ -21,17 +23,24 @@ func NewStatePartition(size int) *StatePartition {
 
 // Union connects p and q by finding their roots and comparing their respective
 // size arrays to keep the tree flat
-func (statePartition *StatePartition) union(p int, q int) {
-	qRoot := statePartition.Find(q)
-	pRoot := statePartition.Find(p)
+func (statePartition *StatePartition) union(stateID1 int, stateID2 int) {
+	stateID2Root := statePartition.Find(stateID2)
+	stateID1Root := statePartition.Find(stateID1)
 
-	if statePartition.size[qRoot] < statePartition.size[pRoot] {
-		statePartition.root[qRoot] = statePartition.root[pRoot]
-		statePartition.size[pRoot] += statePartition.size[qRoot]
-	} else {
-		statePartition.root[pRoot] = statePartition.root[qRoot]
-		statePartition.size[qRoot] += statePartition.size[pRoot]
+	if stateID1Root == stateID2Root{
+		return
 	}
+
+	if statePartition.size[stateID2Root] < statePartition.size[stateID1Root] {
+		statePartition.root[stateID2Root] = statePartition.root[stateID1Root]
+		statePartition.size[stateID1Root] += statePartition.size[stateID2Root]
+	} else {
+		statePartition.root[stateID1Root] = statePartition.root[stateID2Root]
+		statePartition.size[stateID2Root] += statePartition.size[stateID1Root]
+	}
+
+	statePartition.changed = append(statePartition.changed, stateID1)
+	statePartition.changed = append(statePartition.changed, stateID2)
 }
 
 // Find traverses each parent element while compressing the
@@ -51,9 +60,17 @@ func (statePartition *StatePartition) Find(p int) int {
 }
 
 // Check if items p,q are connected
-func (statePartition *StatePartition) Connected(p int, q int) bool {
-	return statePartition.Find(p) == statePartition.Find(q)
+func (statePartition *StatePartition) Connected(stateID1 int, stateID2 int) bool {
+	return statePartition.Find(stateID1) == statePartition.Find(stateID2)
 }
+
+//func (statePartition StatePartition) GetSet(setID int) []int{
+//	var set []int
+//	root := setID
+//	for set
+//
+//	return set
+//}
 
 // Convert a DFA to a State Partition
 func (dfa DFA) ToStatePartition() *StatePartition {
@@ -112,12 +129,12 @@ func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA){
 
 // Recursively merge states to merge state1 and state2, returns false
 // if the merge results in an NFA, or true if merge was successful
-func (statePartition StatePartition) MergeStates(dfa DFA, state1 int, state2 int) (bool, StatePartition){
+func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 int) bool{
 	state1Block := statePartition.Find(state1)
 	state2Block := statePartition.Find(state2)
 	// return same state partition if states are already in the same block
 	if state1Block == state2Block{
-		return true, statePartition
+		return true
 	}
 
 	var statesToBeMerged [][]int
@@ -129,20 +146,21 @@ func (statePartition StatePartition) MergeStates(dfa DFA, state1 int, state2 int
 	}
 
 	for stateID := range dfa.States{
-		if statePartition.Find(stateID) == state1Block{
+		stateBlockID := statePartition.Find(stateID)
+		if stateBlockID == state1Block{
 			if block1Status == UNKNOWN{
 				block1Status = dfa.States[stateID].StateStatus
 			}else if (block1Status == ACCEPTING && dfa.States[stateID].StateStatus == REJECTING) ||
 				(block1Status == REJECTING && dfa.States[stateID].StateStatus == ACCEPTING){
 				// not deterministic
-				return false, statePartition
+				return false
 			}
 			for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
 				if transitions[symbolID] > -1 && dfa.States[stateID].Transitions[symbolID] > -1{
-					if transitions[symbolID] != statePartition.Find(dfa.States[stateID].Transitions[symbolID]){
+					resultantStateBlockID := statePartition.Find(dfa.States[stateID].Transitions[symbolID])
+					if transitions[symbolID] != resultantStateBlockID{
 						// not deterministic so merge
-						statesToBeMerged = append(statesToBeMerged, []int{transitions[symbolID],
-							statePartition.Find(dfa.States[stateID].Transitions[symbolID])})
+						statesToBeMerged = append(statesToBeMerged, []int{transitions[symbolID], resultantStateBlockID})
 					}
 				}else{
 					if dfa.States[stateID].Transitions[symbolID] > -1{
@@ -150,19 +168,19 @@ func (statePartition StatePartition) MergeStates(dfa DFA, state1 int, state2 int
 					}
 				}
 			}
-		}else if statePartition.Find(stateID) == state2Block{
+		}else if stateBlockID == state2Block{
 			if block2Status == UNKNOWN{
 				block2Status = dfa.States[stateID].StateStatus
 			}else if (block2Status == ACCEPTING && dfa.States[stateID].StateStatus == REJECTING) ||
 				(block2Status == REJECTING && dfa.States[stateID].StateStatus == ACCEPTING){
-				return false, statePartition
+				return false
 			}
 			for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
 				if transitions[symbolID] > -1 && dfa.States[stateID].Transitions[symbolID] > -1{
-					if transitions[symbolID] != statePartition.Find(dfa.States[stateID].Transitions[symbolID]){
+					resultantStateBlockID := statePartition.Find(dfa.States[stateID].Transitions[symbolID])
+					if transitions[symbolID] != resultantStateBlockID{
 						// not deterministic so merge
-						statesToBeMerged = append(statesToBeMerged, []int{transitions[symbolID],
-							statePartition.Find(dfa.States[stateID].Transitions[symbolID])})
+						statesToBeMerged = append(statesToBeMerged, []int{transitions[symbolID], resultantStateBlockID})
 					}
 				}else{
 					if dfa.States[stateID].Transitions[symbolID] > -1{
@@ -177,14 +195,26 @@ func (statePartition StatePartition) MergeStates(dfa DFA, state1 int, state2 int
 	statePartition.union(state1, state2)
 
 	// merge conflicting states
-	mergedOK := false
 	for pairID := range statesToBeMerged{
-		mergedOK, statePartition = statePartition.MergeStates(dfa, statesToBeMerged[pairID][0], statesToBeMerged[pairID][1])
-
-		if !mergedOK {
-			return false, statePartition
+		if !statePartition.MergeStates(dfa, statesToBeMerged[pairID][0], statesToBeMerged[pairID][1]) {
+			return false
 		}
 	}
 
-	return true, statePartition
+	return true
+}
+
+func (statePartition StatePartition) Copy() *StatePartition{
+	copiedStatePartition := NewStatePartition(len(statePartition.size))
+	copiedStatePartition.size = append(copiedStatePartition.size, statePartition.size...)
+	copiedStatePartition.root = append(copiedStatePartition.root, statePartition.root...)
+	return copiedStatePartition
+}
+
+func (statePartition *StatePartition) RollbackChanges(originalStatePartition *StatePartition){
+	for _, stateID := range statePartition.changed{
+		statePartition.root[stateID] = originalStatePartition.root[stateID]
+		statePartition.size[stateID] = originalStatePartition.size[stateID]
+	}
+	statePartition.changed = []int{}
 }

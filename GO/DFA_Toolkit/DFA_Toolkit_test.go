@@ -67,3 +67,7 @@ func TestAbbadingoDatasetGeneration(t *testing.T){
 		t.Errorf("Expected training dataset to be consistent with APTA")
 	}
 }
+
+func TestTemporary(t *testing.T){
+	BenchmarkDetMerge()
+}
