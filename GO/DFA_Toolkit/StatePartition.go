@@ -149,38 +149,55 @@ func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 in
 		return true
 	}
 
-	//
+	// store block status, set as unknown by default
 	var blockStatus StateStatus = UNKNOWN
-	//var block2Status StateStatus = UNKNOWN
+
+	// store the block transitions and set to -1 by default
 	transitions := make([]int, len(dfa.SymbolMap))
 	for i := range transitions {
 		transitions[i] = -1
 	}
 
-	// merge state within state partition
+	// merge states within state partition
 	mergedStateBlock := statePartition.union(state1, state2)
 
+	// iterate over each state within the block containing the merged states
 	for _, stateID := range statePartition.ReturnSet(mergedStateBlock){
+		// store the current state status
 		currentStateStatus := dfa.States[stateID].StateStatus
+		// if the block status is unknown and the current state status
+		// is not unknown, set the block status to the current state status
 		if blockStatus == UNKNOWN && currentStateStatus != UNKNOWN{
 			blockStatus = currentStateStatus
+		// else check if the block status and the current state status are
+		// non deterministic (one is accepting and one is rejecting)
 		}else if (blockStatus == ACCEPTING && currentStateStatus == REJECTING) ||
 			(blockStatus == REJECTING && currentStateStatus == ACCEPTING){
-			// not deterministic
+			// return false since merge is non-deterministic
 			return false
 		}
+		// iterate over each symbol within DFA
 		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
+			// store resultant state from state transition of current state
 			currentResultantStateID := dfa.States[stateID].Transitions[symbolID]
-			resultantStateID := transitions[symbolID]
-			if resultantStateID > -1 && currentResultantStateID > -1{
-				resultantStateBlockID := statePartition.Find(currentResultantStateID)
-				if resultantStateID != resultantStateBlockID{
+			// store resultant block from state transition of current block
+			resultantBlockID := transitions[symbolID]
+			// if both resultant block and current resultant state are bigger than
+			// -1 (valid transition)
+			if resultantBlockID > -1 && currentResultantStateID > -1{
+				// get block which contains current current resultant state
+				currentResultantBlockID := statePartition.Find(currentResultantStateID)
+				// if the resultant block is not equal to the current resultant block,
+				// it means that we have non-determinism
+				if resultantBlockID != currentResultantBlockID {
 					// not deterministic so merge, if states cannot be merged, return false
-					if !statePartition.MergeStates(dfa, resultantStateID, resultantStateBlockID) {
+					if !statePartition.MergeStates(dfa, resultantBlockID, currentResultantBlockID) {
 						return false
 					}
 				}
 			}else{
+				// if the current resultant state is initialized, set to block transition
+				// for the current symbol being iterated
 				if currentResultantStateID > -1{
 					transitions[symbolID] = statePartition.Find(currentResultantStateID)
 				}
@@ -188,6 +205,7 @@ func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 in
 		}
 	}
 
+	// return true if this is reached (deterministic)
 	return true
 }
 
