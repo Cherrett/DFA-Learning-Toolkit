@@ -585,7 +585,38 @@ func (dfa DFA) Equal(dfa2 DFA) bool{
 			len(dfa.AcceptingStates()) != len(dfa2.AcceptingStates())) {
 		return false
 	}
-	// TO DO: check implementation
+	//perform breadth first search to compare DFAs
+	queue1 := []int{dfa.StartingStateID}
+	queue2 := []int{dfa2.StartingStateID}
+
+	for len(queue1) > 0{
+		stateID1 := queue1[0]
+		stateID2 := queue2[0]
+		queue1 = append(queue1[:0], queue1[1:]...)
+		queue2 = append(queue2[:0], queue2[1:]...)
+
+		dfa.States[stateID1].Order = 0
+		dfa2.States[stateID2].Order = 0
+
+		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
+			childStateID1 := dfa.States[stateID1].Transitions[symbolID]
+			childStateID2 := dfa2.States[stateID2].Transitions[symbolID]
+			if (childStateID1 == -1 && childStateID2 != -1) ||
+				(childStateID1 != -1 && childStateID2 == -1) ||
+				(childStateID1 == childStateID1 && childStateID2 != childStateID2) ||
+				(childStateID1 != childStateID1 && childStateID2 == childStateID2){
+				return false
+			}
+			if childStateID1 != -1 && childStateID1 != stateID1 {
+				if dfa.States[childStateID1].Depth == -1{
+					dfa.States[childStateID1].Depth = dfa.States[stateID1].Depth + 1
+					dfa2.States[childStateID2].Depth = dfa2.States[stateID2].Depth + 1
+					queue1 = append(queue1, childStateID1)
+					queue2 = append(queue2, childStateID2)
+				}
+			}
+		}
+	}
 
 	return true
 }

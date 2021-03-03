@@ -68,6 +68,38 @@ func TestAbbadingoDatasetGeneration(t *testing.T){
 	}
 }
 
-func TestTemporary(t *testing.T){
-	BenchmarkDetMerge()
+func TestStateMergingAndDFAEquivalence(t *testing.T){
+	dataset := GetDatasetFromAbbadingoFile("../AbbadingoDatasets/dataset1/train.a")
+	APTA := dataset.GetPTA(false)
+
+	statePartition := APTA.ToStatePartition()
+	statePartitionCopy := statePartition.Copy()
+
+	if !statePartitionCopy.MergeStates(APTA, 2, 4){
+		t.Errorf("Merge should be valid.")
+	}
+	valid1, mergedDFA1 := statePartitionCopy.ToDFA(APTA)
+	if !valid1{
+		t.Errorf("State Partition should be valid.")
+	}
+	statePartitionCopy.RollbackChanges(statePartition)
+
+	if !statePartitionCopy.MergeStates(APTA, 3, 5){
+		t.Errorf("Merge should be valid.")
+	}
+	if !statePartitionCopy.MergeStates(APTA, 2, 4){
+		t.Errorf("Merge should be valid.")
+	}
+	valid2, mergedDFA2 := statePartitionCopy.ToDFA(APTA)
+	if !valid2{
+		t.Errorf("State Partition should be valid.")
+	}
+
+	if !mergedDFA1.Equal(mergedDFA2){
+		t.Errorf("Merged DFAs should be equal.")
+	}
 }
+
+//func TestTemporary(t *testing.T){
+//	BenchmarkDetMerge()
+//}

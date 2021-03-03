@@ -11,6 +11,8 @@ func main() {
 	// random seed
 	rand.Seed(time.Now().UnixNano())
 
+	//DFA_Toolkit.BenchmarkDetMerge()
+
 	var timings []int64
 	iterations := 1
 
@@ -42,18 +44,17 @@ func main() {
 
 		APTA.Describe(true)
 
-		test := APTA.ToStatePartition()
+		statePartition := APTA.ToStatePartition()
 
-		test.Union(2, 4)
-		test.Union(3, 5)
-
-		valid, temp := test.ToDFA(APTA)
+		valid := statePartition.MergeStates(APTA, 2, 4)
+		fmt.Println(valid)
+		valid, mergedDFA := statePartition.ToDFA(APTA)
 
 		if !valid{
 			fmt.Printf("Error!")
 		}else{
 			fmt.Printf("\nMerged DFA Below\n")
-			temp.Describe(true)
+			mergedDFA.Describe(true)
 		}
 
 		timings = append(timings, time.Since(start).Milliseconds())
