@@ -8,6 +8,7 @@ import (
 )
 
 func TestAbbadingoDFAFromFile(t *testing.T) {
+	t.Parallel()
 	dataset := GetDatasetFromAbbadingoFile("../AbbadingoDatasets/dataset4/train.a")
 	if len(dataset) != 60000{
 		t.Errorf("Dataset4 length = %d, want 60000", len(dataset))
@@ -26,6 +27,7 @@ func TestAbbadingoDFAFromFile(t *testing.T) {
 }
 
 func TestAbbadingoDFAGeneration(t *testing.T) {
+	t.Parallel()
 	// random seed
 	rand.Seed(time.Now().UnixNano())
 	numberOfStates := rand.Intn(499) + 1
@@ -43,6 +45,7 @@ func TestAbbadingoDFAGeneration(t *testing.T) {
 }
 
 func TestAbbadingoDatasetGeneration(t *testing.T){
+	t.Parallel()
 	// random seed
 	rand.Seed(time.Now().UnixNano())
 	numberOfStates := rand.Intn(99) + 1
@@ -69,6 +72,7 @@ func TestAbbadingoDatasetGeneration(t *testing.T){
 }
 
 func TestStateMergingAndDFAEquivalence(t *testing.T){
+	t.Parallel()
 	dataset := GetDatasetFromAbbadingoFile("../AbbadingoDatasets/dataset1/train.a")
 	APTA := dataset.GetPTA(false)
 
