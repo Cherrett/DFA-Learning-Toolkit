@@ -26,28 +26,32 @@ func NewStatePartition(size int) *StatePartition {
 
 // Union connects p and q by finding their roots and comparing their respective
 // size arrays to keep the tree flat
-func (statePartition *StatePartition) union(stateID1 int, stateID2 int) {
+func (statePartition *StatePartition) union(stateID1 int, stateID2 int) int{
 	stateID1Root := statePartition.Find(stateID1)
 	stateID2Root := statePartition.Find(stateID2)
-	statePartition.changed = append(statePartition.changed, stateID1)
-	statePartition.changed = append(statePartition.changed, stateID2)
 
 	if stateID1Root != stateID2Root{
-		statePartition.linkBlocks(stateID1Root, stateID2Root)
+		statePartition.changed = append(statePartition.changed, stateID1)
+		statePartition.changed = append(statePartition.changed, stateID2)
+		return statePartition.linkBlocks(stateID1Root, stateID2Root)
+	}else{
+		return stateID1Root
 	}
 }
 
-func (statePartition *StatePartition) linkBlocks(blockID1 int, blockID2 int){
+func (statePartition *StatePartition) linkBlocks(blockID1 int, blockID2 int) int{
 	statePartition.link[blockID1], statePartition.link[blockID2] =
 	 	statePartition.link[blockID2], statePartition.link[blockID1]
 
 	if statePartition.size[blockID1] > statePartition.size[blockID2] {
 		statePartition.root[blockID2] = blockID1
+		return blockID1
 	}else{
 		statePartition.root[blockID1] = blockID2
 		if statePartition.size[blockID1] == statePartition.size[blockID2]{
 			statePartition.size[blockID2]++
 		}
+		return blockID2
 	}
 }
 
@@ -140,73 +144,47 @@ func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA){
 // Recursively merge states to merge state1 and state2, returns false
 // if the merge results in an NFA, or true if merge was successful
 func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 int) bool{
-	state1Block := statePartition.Find(state1)
-	state2Block := statePartition.Find(state2)
 	// return same state partition if states are already in the same block
-	if state1Block == state2Block{
+	if statePartition.Find(state1) == statePartition.Find(state2){
 		return true
 	}
 
-	var statesToBeMerged [][]int
-	var block1Status StateStatus = UNKNOWN
-	var block2Status StateStatus = UNKNOWN
+	//
+	var blockStatus StateStatus = UNKNOWN
+	//var block2Status StateStatus = UNKNOWN
 	transitions := make([]int, len(dfa.SymbolMap))
 	for i := range transitions {
 		transitions[i] = -1
 	}
 
-	for _, stateID := range statePartition.ReturnSet(state1Block){
-		if block1Status == UNKNOWN{
-			block1Status = dfa.States[stateID].StateStatus
-		}else if (block1Status == ACCEPTING && dfa.States[stateID].StateStatus == REJECTING) ||
-			(block1Status == REJECTING && dfa.States[stateID].StateStatus == ACCEPTING){
+	// merge state within state partition
+	mergedStateBlock := statePartition.union(state1, state2)
+
+	for _, stateID := range statePartition.ReturnSet(mergedStateBlock){
+		currentStateStatus := dfa.States[stateID].StateStatus
+		if blockStatus == UNKNOWN && currentStateStatus != UNKNOWN{
+			blockStatus = currentStateStatus
+		}else if (blockStatus == ACCEPTING && currentStateStatus == REJECTING) ||
+			(blockStatus == REJECTING && currentStateStatus == ACCEPTING){
 			// not deterministic
 			return false
 		}
 		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
-			if transitions[symbolID] > -1 && dfa.States[stateID].Transitions[symbolID] > -1{
-				resultantStateBlockID := statePartition.Find(dfa.States[stateID].Transitions[symbolID])
-				if transitions[symbolID] != resultantStateBlockID{
-					// not deterministic so merge
-					statesToBeMerged = append(statesToBeMerged, []int{transitions[symbolID], resultantStateBlockID})
+			currentResultantStateID := dfa.States[stateID].Transitions[symbolID]
+			resultantStateID := transitions[symbolID]
+			if resultantStateID > -1 && currentResultantStateID > -1{
+				resultantStateBlockID := statePartition.Find(currentResultantStateID)
+				if resultantStateID != resultantStateBlockID{
+					// not deterministic so merge, if states cannot be merged, return false
+					if !statePartition.MergeStates(dfa, resultantStateID, resultantStateBlockID) {
+						return false
+					}
 				}
 			}else{
-				if dfa.States[stateID].Transitions[symbolID] > -1{
-					transitions[symbolID] = statePartition.Find(dfa.States[stateID].Transitions[symbolID])
+				if currentResultantStateID > -1{
+					transitions[symbolID] = statePartition.Find(currentResultantStateID)
 				}
 			}
-		}
-	}
-
-	for _, stateID := range statePartition.ReturnSet(state2Block){
-		if block2Status == UNKNOWN{
-			block2Status = dfa.States[stateID].StateStatus
-		}else if (block2Status == ACCEPTING && dfa.States[stateID].StateStatus == REJECTING) ||
-			(block2Status == REJECTING && dfa.States[stateID].StateStatus == ACCEPTING){
-			return false
-		}
-		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
-			if transitions[symbolID] > -1 && dfa.States[stateID].Transitions[symbolID] > -1{
-				resultantStateBlockID := statePartition.Find(dfa.States[stateID].Transitions[symbolID])
-				if transitions[symbolID] != resultantStateBlockID{
-					// not deterministic so merge
-					statesToBeMerged = append(statesToBeMerged, []int{transitions[symbolID], resultantStateBlockID})
-				}
-			}else{
-				if dfa.States[stateID].Transitions[symbolID] > -1{
-					transitions[symbolID] = statePartition.Find(dfa.States[stateID].Transitions[symbolID])
-				}
-			}
-		}
-	}
-
-	// merge state within state partition
-	statePartition.union(state1, state2)
-
-	// merge conflicting states
-	for pairID := range statesToBeMerged{
-		if !statePartition.MergeStates(dfa, statesToBeMerged[pairID][0], statesToBeMerged[pairID][1]) {
-			return false
 		}
 	}
 
