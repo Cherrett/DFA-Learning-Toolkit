@@ -10,10 +10,10 @@ import (
 func BenchmarkDetMerge() {
 	// These are target DFA sizes we will test.
 	//dfaSizes := []int{32, 64, 128}
-	dfaSizes := []int{32, 64}
+	dfaSizes := []int{32, 64, 128}
 	// These are the training set sizes we will test.
 	//trainingSetSizes := []int{607, 1521, 4382}
-	trainingSetSizes := []int{607, 1521}
+	trainingSetSizes := []int{607, 1521, 4382}
 
 	// Benchmark over the problem instances.
 	for i := range dfaSizes {
@@ -54,13 +54,7 @@ func BenchmarkDetMerge() {
 				if snapshot.MergeStates(apta, i, j){
 					validMerges++
 				}
-				//snapshot = part.Copy()
 
-				//for k := range part.root{
-				//	if part.size[k] != 1{
-				//		print()
-				//	}
-				//}
 				snapshot.RollbackChanges(part)
 			}
 		}
