@@ -6,80 +6,113 @@ import (
 	"reflect"
 )
 
+// DFA struct which represents a DFA.
 type DFA struct {
-	States          []State      // List of states within the DFA.
+	States          []State      // Slice of states within the DFA where the index is the State ID.
 	StartingStateID int          // The ID of the starting state of the DFA.
 	SymbolMap       map[rune]int // A map of each symbol within the DFA to its ID.
 
 	Depth                 int  // The depth of the DFA.
-	ComputedDepthAndOrder bool // Whether the Depth and Order were calculated DFA
+	ComputedDepthAndOrder bool // Whether the Depth and Order were calculated DFA.
 }
 
+// Initializes a new empty DFA.
 func NewDFA() DFA {
 	return DFA{States: make([]State, 0), StartingStateID: -1,
 		SymbolMap: make(map[rune]int), Depth: -1, ComputedDepthAndOrder:false}
 }
 
+// Adds a new state to the DFA with the corresponding State Status.
+// Returns the new state's ID (index).
 func (dfa *DFA) AddState(stateStatus StateStatus) int {
+	// Create empty transition table with default values of -1 for each symbol within the DFA.
 	transitions := make([]int, len(dfa.SymbolMap))
 	for i := range transitions {
 		transitions[i] = -1
 	}
+	// Initialize and add the new state to the slice of states within the DFA.
 	dfa.States = append(dfa.States, State{stateStatus, transitions, -1, -1})
+	// Return the ID of the newly created state.
 	return len(dfa.States) - 1
 }
 
+// Removes a state from DFA with the corresponding State ID.
 func (dfa *DFA) RemoveState(stateID int) {
-	// panic if stateID to be removed is the starting state
+	// Panic if the state to be removed is the starting state.
 	if dfa.StartingStateID == stateID {
 		panic("Cannot remove starting state")
+	// Panic if state ID is out of range.
+	}else if stateID > len(dfa.States)-1 || stateID < 0{
+		panic("stateID is out of range")
 	}
-	// remove state from slice of states
+	// Remove state from slice of states.
 	dfa.States = append(dfa.States[:stateID], dfa.States[stateID+1:]...)
-	// update transitions to account for new stateIDs and for removed state
-	for stateIndex := range dfa.States {
+	// Update transitions to account for changed State IDs and for removed state.
+	// Iterate over each state within the DFA.
+	for currentStateID := range dfa.States {
+		// Iterate over each symbol within the DFA.
 		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
-			if dfa.States[stateIndex].Transitions[symbolID] == stateID {
-				dfa.States[stateIndex].Transitions[symbolID] = -1
-			} else if dfa.States[stateIndex].Transitions[symbolID] > stateID {
-				dfa.States[stateIndex].Transitions[symbolID]--
+			// Store the ID of the resultant state.
+			resultantStateID := dfa.States[currentStateID].Transitions[symbolID]
+			// If the ID of the resultant state is equal to the ID of the removed state, set resultant state to -1 (undefined).
+			if resultantStateID == stateID {
+				dfa.States[currentStateID].Transitions[symbolID] = -1
+			// Else, if the ID of the resultant state is bigger then the ID of the removed state, decrement starting state.
+			} else if resultantStateID > stateID {
+				dfa.States[currentStateID].Transitions[symbolID]--
 			}
 		}
 	}
-	// update starting state
+	// If the ID of the starting state is bigger then the ID of the removed state, decrement starting state.
 	if dfa.StartingStateID > stateID{
 		dfa.StartingStateID--
 	}
 }
 
+// Returns the symbol ID for the given symbol.
 func (dfa DFA) SymbolID(symbol rune) int{
 	return dfa.SymbolMap[symbol]
 }
 
+// Returns the symbol for the given symbol ID.
 func (dfa DFA) Symbol(symbolID int) rune{
+	// Iterate over each symbol within the DFA.
 	for symbol := range dfa.SymbolMap {
+		// If symbol ID is equal to the current symbol, return it's ID.
 		if dfa.SymbolMap[symbol] == symbolID{
 			return symbol
 		}
 	}
+	// Return -1 if symbol ID is not found.
 	return -1
 }
 
+// Adds a new symbol to the DFA.
 func (dfa *DFA) AddSymbol(symbol rune){
+	// Panic if symbol already exists.
+	if _, ok := dfa.SymbolMap[symbol]; ok {
+		panic("Symbol already exists.")
+	}
+
+	// Add symbol to symbol map within the DFA.
 	dfa.SymbolMap[symbol] = len(dfa.SymbolMap)
+	// Iterate over each state within the DFA and add an empty (-1) transition for the newly added state.
 	for stateIndex := range dfa.States {
 		dfa.States[stateIndex].Transitions = append(dfa.States[stateIndex].Transitions, -1)
 	}
 }
 
+// Adds multiple new symbols to the DFA.
 func (dfa *DFA) AddSymbols(symbols []rune){
+	// Iteratively add each symbol within slice to the DFA.
 	for _, symbol := range symbols{
 		dfa.AddSymbol(symbol)
 	}
 }
 
+// Adds a new transition for a given symbol from one state to another.
 func (dfa *DFA) AddTransition(symbolID int, fromStateID int, toStateID int) {
-	// error checking
+	// Panic if either state IDs are out of range.
 	if fromStateID > len(dfa.States)-1 || fromStateID < 0 {
 		panic("fromStateID is out of range")
 	} else if toStateID > len(dfa.States)-1 || toStateID < 0 {
@@ -87,21 +120,23 @@ func (dfa *DFA) AddTransition(symbolID int, fromStateID int, toStateID int) {
 	} else if symbolID > len(dfa.SymbolMap)-1 || symbolID < 0 {
 		panic("symbolID is out of range")
 	}
-	// add transition to fromState's transitions
+	// Add transition to fromState's transitions.
 	dfa.States[fromStateID].Transitions[symbolID] = toStateID
 }
 
+// Removes a transition for a given symbol from one state to another.
 func (dfa *DFA) RemoveTransition(symbolID int, fromStateID int) {
-	// error checking
+	// Panic if either state IDs are out of range.
 	if fromStateID > len(dfa.States)-1 || fromStateID < 0 {
 		panic("fromStateID is out of range")
 	} else if symbolID > len(dfa.SymbolMap)-1 || symbolID < 0 {
 		panic("symbolID is out of range")
 	}
-	// remove transition to fromState's transitions
+	// Remove transition from fromState's transitions by assigning -1 to the transitions map.
 	dfa.States[fromStateID].Transitions[symbolID] = -1
 }
 
+// Returns all state IDs within DFA.
 func (dfa DFA) AllStates() []int {
 	var allStates []int
 
@@ -111,6 +146,7 @@ func (dfa DFA) AllStates() []int {
 	return allStates
 }
 
+// Returns state IDs of accepting states within DFA.
 func (dfa DFA) AcceptingStates() []int {
 	var acceptingStates []int
 
@@ -122,6 +158,7 @@ func (dfa DFA) AcceptingStates() []int {
 	return acceptingStates
 }
 
+// Returns state IDs of rejecting states within DFA.
 func (dfa DFA) RejectingStates() []int {
 	var acceptingStates []int
 
@@ -133,6 +170,7 @@ func (dfa DFA) RejectingStates() []int {
 	return acceptingStates
 }
 
+// Returns state IDs of unknown states within DFA.
 func (dfa DFA) UnknownStates() []int {
 	var acceptingStates []int
 
@@ -144,10 +182,12 @@ func (dfa DFA) UnknownStates() []int {
 	return acceptingStates
 }
 
+// Returns the number of all states within DFA.
 func (dfa DFA) AllStatesCount() int {
 	return len(dfa.States)
 }
 
+// Returns the number of accepting states within DFA.
 func (dfa DFA) AcceptingStatesCount() int {
 	count := 0
 
@@ -159,6 +199,7 @@ func (dfa DFA) AcceptingStatesCount() int {
 	return count
 }
 
+// Returns the number of rejecting states within DFA.
 func (dfa DFA) RejectingStatesCount() int {
 	count := 0
 
@@ -170,6 +211,7 @@ func (dfa DFA) RejectingStatesCount() int {
 	return count
 }
 
+// Returns the number of unknown states within DFA.
 func (dfa DFA) UnknownStatesCount() int {
 	count := 0
 
@@ -181,6 +223,7 @@ func (dfa DFA) UnknownStatesCount() int {
 	return count
 }
 
+// Returns the number of transitions within DFA.
 func (dfa DFA) TransitionsCount() int{
 	count := 0
 
@@ -194,6 +237,7 @@ func (dfa DFA) TransitionsCount() int{
 	return count
 }
 
+// Returns the number of transitions for a given symbol within DFA.
 func (dfa DFA) TransitionsCountForSymbol(symbol int) int{
 	count := 0
 
@@ -205,6 +249,7 @@ func (dfa DFA) TransitionsCountForSymbol(symbol int) int{
 	return count
 }
 
+// Returns the number of leaves within DFA.
 func (dfa DFA) LeavesCount() int{
 	count := 0
 
@@ -222,6 +267,7 @@ func (dfa DFA) LeavesCount() int{
 	return count
 }
 
+// Returns the number of loops within DFA.
 func (dfa DFA) LoopsCount() int{
 	var visitedStatesCount = make(map[int]int)
 
@@ -242,6 +288,7 @@ func (dfa DFA) LoopsCount() int{
 	return util.SumMap(visitedStatesCount, false)
 }
 
+// Returns true if DFA is a tree, false is returned otherwise.
 func (dfa DFA) IsTree() bool{
 	var visitedStates = make(map[int]bool)
 
@@ -258,6 +305,7 @@ func (dfa DFA) IsTree() bool{
 	return true
 }
 
+// Returns true if DFA is complete, false is returned otherwise.
 func (dfa DFA) IsComplete() bool{
 	for stateID := range dfa.States {
 		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++{
@@ -271,7 +319,7 @@ func (dfa DFA) IsComplete() bool{
 }
 
 // Returns the DFA's Depth which is defined as the maximum over all nodes x of
-// the length of the shortest path from the root to x
+// the length of the shortest path from the root to x.
 func (dfa *DFA) GetDepth() int {
 	if !dfa.ComputedDepthAndOrder {
 		dfa.CalculateDepthAndOrder()
@@ -399,177 +447,6 @@ func (dfa *DFA) RemoveUnreachableStates() {
 	for index, stateID := range unreachableStates {
 		dfa.RemoveState(stateID-index)
 	}
-}
-
-type StateIDPair struct {
-	state1 int
-	state2 int
-}
-
-func (dfa *DFA) Mark() (map[StateIDPair]bool, map[StateIDPair]bool) {
-	distinguishablePairs := map[StateIDPair]bool{}
-	indistinguishablePairs := map[StateIDPair]bool{}
-	allPairs := map[StateIDPair]bool{}
-
-	dfa.RemoveUnreachableStates()
-	for stateID := range dfa.States {
-		for stateID2 := stateID + 1; stateID2 < len(dfa.States); stateID2++ {
-			allPairs[StateIDPair{stateID, stateID2}] = true
-			if dfa.States[stateID].StateStatus != dfa.States[stateID2].StateStatus {
-				distinguishablePairs[StateIDPair{stateID, stateID2}] = true
-			}
-		}
-	}
-
-	oldCount := 0
-	for oldCount != len(distinguishablePairs) {
-		oldCount = len(distinguishablePairs)
-
-		for stateID := range dfa.States {
-			for stateID2 := stateID + 1; stateID2 < len(dfa.States); stateID2++ {
-				if distinguishablePairs[StateIDPair{stateID, stateID2}] {
-					continue
-				} else {
-					for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
-						if dfa.States[stateID].Transitions[symbolID] != -1 {
-							if dfa.States[stateID2].Transitions[symbolID] != -1 {
-								if distinguishablePairs[StateIDPair{dfa.States[stateID].Transitions[symbolID], dfa.States[stateID2].Transitions[symbolID]}] ||
-									distinguishablePairs[StateIDPair{dfa.States[stateID2].Transitions[symbolID], dfa.States[stateID].Transitions[symbolID]}] {
-									distinguishablePairs[StateIDPair{stateID, stateID2}] = true
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	var distinguishablePairsList [][]int
-	for stateIDPair := range distinguishablePairs {
-		distinguishablePairsList = append(distinguishablePairsList, []int{stateIDPair.state1, stateIDPair.state2})
-	}
-
-	for pair := range allPairs{
-		if !distinguishablePairs[StateIDPair{pair.state1, pair.state2}]{
-			indistinguishablePairs[StateIDPair{pair.state1, pair.state2}] = true
-		}
-	}
-
-	return distinguishablePairs, indistinguishablePairs
-}
-
-func (dfa DFA) Minimise() DFA{
-	// get distinguishable and indistinguishable state pairs using Mark function
-	_, indistinguishablePairs := dfa.Mark()
-
-	// Partition states into blocks
-	var currentPartition []map[int]bool
-	for stateID := range dfa.States {
-		exists := false
-		for _, block := range currentPartition{
-			if block[stateID]{
-				exists = true
-			}
-		}
-		if !exists{
-			indistinguishable := false
-			for indistinguishablePair := range indistinguishablePairs{
-				if indistinguishablePair.state1 == stateID{
-					for blockIndex, block := range currentPartition{
-						if block[indistinguishablePair.state2]{
-							currentPartition[blockIndex][stateID] = true
-							indistinguishable = true
-							break
-						}
-					}
-					if indistinguishable{
-						break
-					}
-				}else if indistinguishablePair.state2 == stateID{
-					for blockIndex, block := range currentPartition{
-						if block[indistinguishablePair.state1]{
-							currentPartition[blockIndex][stateID] = true
-							indistinguishable = true
-							break
-						}
-					}
-					if indistinguishable{
-						break
-					}
-				}
-			}
-			if !indistinguishable{
-				currentPartition = append(currentPartition, map[int]bool{stateID: true})
-			}
-		}
-	}
-	resultantDFA := DFA{SymbolMap: dfa.SymbolMap}
-
-	// Create a new state for each block
-	for blockIndex := range currentPartition{
-		var stateStatus StateStatus = UNKNOWN
-		for stateID := range currentPartition[blockIndex] {
-			stateStatus = dfa.States[stateID].StateStatus
-			break
-		}
-		resultantDFA.AddState(stateStatus)
-	}
-
-	// Initial State
-	for blockIndex := range currentPartition{
-		found := false
-		for stateID := range currentPartition[blockIndex] {
-			if stateID == dfa.StartingStateID {
-				resultantDFA.StartingStateID = blockIndex
-				found = true
-				break
-			}
-		}
-		if found{
-			break
-		}
-	}
-
-	// Transitions
-	for stateID := range dfa.States {
-		stateBlockIndex := 0
-		found := false
-		for blockIndex := range currentPartition{
-			for stateID2 := range currentPartition[blockIndex] {
-				if stateID == stateID2{
-					stateBlockIndex = blockIndex
-					found = true
-					break
-				}
-			}
-			if found{
-				break
-			}
-		}
-
-		for symbolID := range dfa.States[stateID].Transitions {
-			resultantStateBlockIndex := 0
-			if resultantDFA.States[stateBlockIndex].Transitions[symbolID] == -1 && dfa.States[stateID].Transitions[symbolID] != -1{
-				found := false
-				for blockIndex := range currentPartition{
-					for stateID2 := range currentPartition[blockIndex] {
-						if dfa.States[stateID].Transitions[symbolID] == stateID2{
-							resultantStateBlockIndex = blockIndex
-							found = true
-							break
-						}
-					}
-					if found{
-						break
-					}
-				}
-				resultantDFA.States[stateBlockIndex].Transitions[symbolID] = resultantStateBlockIndex
-			}
-		}
-	}
-
-	return resultantDFA
 }
 
 func (dfa DFA) Clone() DFA{

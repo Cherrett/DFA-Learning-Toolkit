@@ -10,10 +10,10 @@ import (
 func BenchmarkDetMerge() {
 	// These are target DFA sizes we will test.
 	//dfaSizes := []int{32, 64, 128}
-	dfaSizes := []int{32, 64, 128}
+	dfaSizes := []int{32, 64}
 	// These are the training set sizes we will test.
 	//trainingSetSizes := []int{607, 1521, 4382}
-	trainingSetSizes := []int{607, 1521, 4382}
+	trainingSetSizes := []int{607, 1521}
 
 	// Benchmark over the problem instances.
 	for i := range dfaSizes {

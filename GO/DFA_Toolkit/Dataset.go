@@ -59,13 +59,13 @@ func (dataset Dataset) GetPTA(APTA bool) DFA {
 						if dfa.States[currentStateID].StateStatus == REJECTING {
 							panic("State already set to rejecting, cannot set to accepting")
 						} else {
-							dfa.States[currentStateID].UpdateStateStatus(ACCEPTING)
+							dfa.States[currentStateID].StateStatus = ACCEPTING
 						}
 					} else {
 						if dfa.States[currentStateID].StateStatus == ACCEPTING {
 							panic("State already set to accepting, cannot set to rejecting")
 						} else {
-							dfa.States[currentStateID].UpdateStateStatus(REJECTING)
+							dfa.States[currentStateID].StateStatus = REJECTING
 						}
 					}
 				}

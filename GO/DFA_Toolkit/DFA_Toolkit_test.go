@@ -62,7 +62,6 @@ func TestAbbadingoDatasetGeneration(t *testing.T){
 	}
 
 	APTA := trainingDataset.GetPTA(true)
-	APTA.Describe(false)
 
 	trainingDatasetConsistentWithAPTA := trainingDataset.ConsistentWithDFA(APTA)
 
