@@ -1,20 +1,24 @@
 package DFA_Toolkit
 
+// StatePartition struct which represents a State Partition.
 type StatePartition struct {
-	root []int
-	size []int
-	link []int
-	changed []int
+	root []int		// Parent block of each state.
+	size []int		// Size (score) of each block.
+	link []int		// Index of next state within the block.
+	changed []int	// Slice of changed states/blocks.
 }
 
-// Returns an initialized State Partition
+// Returns an initialized State Partition.
 func NewStatePartition(size int) *StatePartition {
+	// Initialize new State Partition struct.
 	statePartition := new(StatePartition)
+	// Initialize empty slices.
 	statePartition.root = make([]int, size)
 	statePartition.size = make([]int, size)
 	statePartition.link = make([]int, size)
 	statePartition.changed = []int{}
 
+	// Set root and link as element, and size (score) as 1.
 	for i := 0; i < size; i++ {
 		statePartition.root[i] = i
 		statePartition.size[i] = 1
@@ -24,16 +28,22 @@ func NewStatePartition(size int) *StatePartition {
 	return statePartition
 }
 
-// Union connects p and q by finding their roots and comparing their respective
-// size arrays to keep the tree flat
+// Connects two states by finding their roots and comparing their respective
+// size (score) values to keep the tree flat. Returns the parent element.
 func (statePartition *StatePartition) union(stateID1 int, stateID2 int) int{
+	// Get root (block index) of both states.
 	stateID1Root := statePartition.Find(stateID1)
 	stateID2Root := statePartition.Find(stateID2)
 
+	// If their root is not equal, the states are merged (union) using
+	// linkBlocks function.
 	if stateID1Root != stateID2Root{
+		// Add State IDs joined to changed struct.
 		statePartition.changed = append(statePartition.changed, stateID1)
 		statePartition.changed = append(statePartition.changed, stateID2)
 		return statePartition.linkBlocks(stateID1Root, stateID2Root)
+	// If their root is equal, the states are already within
+	// the same block so the root for state 1 is returned.
 	}else{
 		return stateID1Root
 	}
@@ -56,7 +66,7 @@ func (statePartition *StatePartition) linkBlocks(blockID1 int, blockID2 int) int
 }
 
 // Find traverses each parent element while compressing the
-// levels to find the root element of p
+// levels to find the root element of the stateID
 // If we attempt to access an element outside the array it returns -1
 func (statePartition *StatePartition) Find(stateID int) int {
 	if stateID > len(statePartition.root)-1 {
@@ -81,17 +91,18 @@ func (statePartition StatePartition) ReturnSet(blockID int) []int{
 	return blockElements
 }
 
-// Check if items p,q are connected
-func (statePartition *StatePartition) Connected(stateID1 int, stateID2 int) bool {
+// Checks if states are within the same block
+func (statePartition *StatePartition) WithinSameBlock(stateID1 int, stateID2 int) bool {
 	return statePartition.Find(stateID1) == statePartition.Find(stateID2)
 }
 
-// Convert a DFA to a State Partition
+// Converts a DFA to a State Partition
 func (dfa DFA) ToStatePartition() *StatePartition {
+	// Return
 	return NewStatePartition(len(dfa.States))
 }
 
-// Convert a State Partition to a DFA
+// Converts a State Partition to a DFA
 func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA){
 	newMappings := map[int]int{}
 
@@ -141,7 +152,7 @@ func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA){
 	return true, resultantDFA
 }
 
-// Recursively merge states to merge state1 and state2, returns false
+// Recursively merges states to merge state1 and state2, returns false
 // if the merge results in an NFA, or true if merge was successful
 func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 int) bool{
 	// return same state partition if states are already in the same block
