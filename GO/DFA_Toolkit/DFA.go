@@ -187,6 +187,18 @@ func (dfa DFA) AllStatesCount() int {
 	return len(dfa.States)
 }
 
+// Returns the number of labelled states (accepting or rejecting) within DFA.
+func (dfa DFA) LabelledStatesCount() int {
+	count := 0
+
+	for stateID := range dfa.States {
+		if dfa.States[stateID].StateStatus == ACCEPTING || dfa.States[stateID].StateStatus == REJECTING {
+			count++
+		}
+	}
+	return count
+}
+
 // Returns the number of accepting states within DFA.
 func (dfa DFA) AcceptingStatesCount() int {
 	count := 0
@@ -514,3 +526,81 @@ func (dfa DFA) IsValid() bool{
 	}
 	return true
 }
+
+//func (dfa *DFA) MergeStates(state1 int, state2 int) bool{
+//	state1Status := dfa.States[state1].StateStatus
+//	state2Status := dfa.States[state2].StateStatus
+//	var newStateStatus StateStatus = UNKNOWN
+//	if (state1Status == ACCEPTING && state2Status == REJECTING) || (state1Status == REJECTING && state2Status == ACCEPTING){
+//		return false
+//	}else if state1Status != UNKNOWN{
+//		newStateStatus = state1Status
+//	}else if state2Status != UNKNOWN {
+//		newStateStatus = state2Status
+//	}
+//
+//	for i := 0; i < len(dfa.SymbolMap); i++{
+//		state1transition := dfa.States[state1].Transitions[i]
+//		state2transition := dfa.States[state2].Transitions[i]
+//		if state1transition == -1 && state2transition != -1{
+//			dfa.States[state1].Transitions[i] = state2transition
+//		}else if (state2transition == -1 && state1transition != -1) || (state1transition == state1 && state2transition == state2){
+//			dfa.States[state1].Transitions[i] = state1transition
+//		}else if state1transition != state2transition{
+//			if !dfa.MergeStates(state1transition, state2transition){
+//				return false
+//			}
+//			dfa.States[state1].Transitions[i] = state1transition
+//		}
+//	}
+//
+//	// update new state status
+//	dfa.States[state1].StateStatus = newStateStatus
+//
+//	// replace state2 with state1 (merged state)
+//	dfa.ReplaceState(state2, state1)
+//
+//	return true
+//}
+
+// Replaces a state from DFA with the corresponding State ID.
+//func (dfa *DFA) ReplaceState(stateID int, newStateID int) {
+//	// If the state to be replaced is the starting state, replace it.
+//	if dfa.StartingStateID == stateID {
+//		if newStateID > stateID{
+//			dfa.StartingStateID = newStateID - 1
+//		}else{
+//			dfa.StartingStateID = newStateID
+//		}
+//	// Panic if state ID is out of range.
+//	}else if stateID > len(dfa.States)-1 || stateID < 0 || newStateID > len(dfa.States)-1 || newStateID < 0{
+//		panic("stateID is out of range")
+//	}
+//	// Remove state from slice of states.
+//	dfa.States = append(dfa.States[:stateID], dfa.States[stateID+1:]...)
+//
+//	if newStateID > stateID{
+//		newStateID --
+//	}
+//
+//	// Update transitions to account for changed State IDs and for removed state.
+//	// Iterate over each state within the DFA.
+//	for currentStateID := range dfa.States {
+//		// Iterate over each symbol within the DFA.
+//		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
+//			// Store the ID of the resultant state.
+//			resultantStateID := dfa.States[currentStateID].Transitions[symbolID]
+//			// If the ID of the resultant state is equal to the ID of the removed state, set resultant state to new state.
+//			if resultantStateID == stateID {
+//				dfa.States[currentStateID].Transitions[symbolID] = newStateID
+//				// Else, if the ID of the resultant state is bigger then the ID of the removed state, decrement starting state.
+//			} else if resultantStateID > stateID {
+//				dfa.States[currentStateID].Transitions[symbolID]--
+//			}
+//		}
+//	}
+//	// If the ID of the starting state is bigger then the ID of the removed state, decrement starting state.
+//	if dfa.StartingStateID != newStateID && dfa.StartingStateID > stateID{
+//		dfa.StartingStateID--
+//	}
+//}

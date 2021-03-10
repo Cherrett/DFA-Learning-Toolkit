@@ -53,6 +53,9 @@ func BenchmarkDetMerge() {
 				totalMerges++
 				if snapshot.MergeStates(apta, i, j){
 					validMerges++
+					//snapshot.LabelledBlocksCount(apta)
+					//snapshot.BlocksCount()
+					//print(temp, temp2)
 				}
 
 				snapshot.RollbackChanges(part)

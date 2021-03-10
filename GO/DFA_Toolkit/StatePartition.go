@@ -6,62 +6,79 @@ type StatePartition struct {
 	size []int		// Size (score) of each block.
 	link []int		// Index of next state within the block.
 	changed []int	// Slice of changed states/blocks.
+
+	isCopy bool
+
+	//temp
+	labelledStates []int
 }
 
 // Returns an initialized State Partition.
-func NewStatePartition(size int) *StatePartition {
+func NewStatePartition(dfa DFA) *StatePartition {
 	// Initialize new State Partition struct.
 	statePartition := new(StatePartition)
+	statePartition.isCopy = false
 	// Initialize empty slices.
-	statePartition.root = make([]int, size)
-	statePartition.size = make([]int, size)
-	statePartition.link = make([]int, size)
-	statePartition.changed = []int{}
-
+	statePartition.root = make([]int, len(dfa.States))
+	statePartition.size = make([]int, len(dfa.States))
+	statePartition.link = make([]int, len(dfa.States))
+	statePartition.labelledStates = make([]int, len(dfa.States))
 	// Set root and link as element, and size (score) as 1.
-	for i := 0; i < size; i++ {
+	for i := 0; i < len(dfa.States); i++ {
 		statePartition.root[i] = i
 		statePartition.size[i] = 1
 		statePartition.link[i] = i
+		if dfa.States[i].StateStatus == ACCEPTING || dfa.States[i].StateStatus == REJECTING{
+			statePartition.labelledStates[i] = 1
+		}else{
+			statePartition.labelledStates[i] = 0
+		}
 	}
 
 	return statePartition
 }
 
 // Connects two states by finding their roots and comparing their respective
-// size (score) values to keep the tree flat. Returns the parent element.
-func (statePartition *StatePartition) union(stateID1 int, stateID2 int) int{
+// size (score) values to keep the tree flat.
+func (statePartition *StatePartition) union(stateID1 int, stateID2 int, state1Status StateStatus, state2Status StateStatus){
+	if (state1Status == ACCEPTING && state2Status == REJECTING) || (state1Status == REJECTING && state2Status == ACCEPTING){
+		panic("Invalid merge.")
+	}
+
 	// Get root (block index) of both states.
 	stateID1Root := statePartition.Find(stateID1)
 	stateID2Root := statePartition.Find(stateID2)
 
-	// If their root is not equal, the states are merged (union) using
-	// linkBlocks function.
+	// If their root is not equal, the states are merged (union) using the
+	// linkBlocks function. If their root is equal, the states are already
+	// within the same block so the merge is not done.
 	if stateID1Root != stateID2Root{
-		// Add State IDs joined to changed struct.
-		statePartition.changed = append(statePartition.changed, stateID1)
-		statePartition.changed = append(statePartition.changed, stateID2)
-		return statePartition.linkBlocks(stateID1Root, stateID2Root)
-	// If their root is equal, the states are already within
-	// the same block so the root for state 1 is returned.
-	}else{
-		return stateID1Root
+		// Add State IDs joined to changed struct so merge can be undone.
+		if statePartition.isCopy{
+			statePartition.changed = append(statePartition.changed, stateID1)
+			statePartition.changed = append(statePartition.changed, stateID2)
+		}
+		statePartition.linkBlocks(stateID1Root, stateID2Root, state1Status, state2Status)
 	}
 }
 
-func (statePartition *StatePartition) linkBlocks(blockID1 int, blockID2 int) int{
+func (statePartition *StatePartition) linkBlocks(blockID1 int, blockID2 int, state1Status StateStatus, state2Status StateStatus){
 	statePartition.link[blockID1], statePartition.link[blockID2] =
 	 	statePartition.link[blockID2], statePartition.link[blockID1]
 
 	if statePartition.size[blockID1] > statePartition.size[blockID2] {
 		statePartition.root[blockID2] = blockID1
-		return blockID1
+		if state2Status == ACCEPTING || state2Status == REJECTING{
+			statePartition.labelledStates[blockID1]++
+		}
 	}else{
 		statePartition.root[blockID1] = blockID2
 		if statePartition.size[blockID1] == statePartition.size[blockID2]{
 			statePartition.size[blockID2]++
 		}
-		return blockID2
+		if state1Status == ACCEPTING || state1Status == REJECTING{
+			statePartition.labelledStates[blockID2]++
+		}
 	}
 }
 
@@ -70,7 +87,7 @@ func (statePartition *StatePartition) linkBlocks(blockID1 int, blockID2 int) int
 // If we attempt to access an element outside the array it returns -1
 func (statePartition *StatePartition) Find(stateID int) int {
 	if stateID > len(statePartition.root)-1 {
-		return -1
+		panic("StateID out of range.")
 	}
 
 	for statePartition.root[stateID] != stateID {
@@ -81,12 +98,15 @@ func (statePartition *StatePartition) Find(stateID int) int {
 	return stateID
 }
 
-func (statePartition StatePartition) ReturnSet(blockID int) []int{
-	blockElements := []int{blockID}
-	root := blockID
-	for statePartition.link[blockID] != root{
-		blockID = statePartition.link[blockID]
-		blockElements = append(blockElements, blockID)
+func (statePartition StatePartition) ReturnSet(stateID int) []int{
+	blockElements := []int{stateID}
+	root := stateID
+	for statePartition.link[stateID] != root{
+		stateID = statePartition.link[stateID]
+		blockElements = append(blockElements, stateID)
+		if len(blockElements) > len(statePartition.root){
+			panic("Error in state linking.")
+		}
 	}
 	return blockElements
 }
@@ -99,7 +119,7 @@ func (statePartition *StatePartition) WithinSameBlock(stateID1 int, stateID2 int
 // Converts a DFA to a State Partition
 func (dfa DFA) ToStatePartition() *StatePartition {
 	// Return
-	return NewStatePartition(len(dfa.States))
+	return NewStatePartition(dfa)
 }
 
 // Converts a State Partition to a DFA
@@ -159,6 +179,11 @@ func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 in
 	if statePartition.Find(state1) == statePartition.Find(state2){
 		return true
 	}
+	state1Status := dfa.States[state1].StateStatus
+	state2Status := dfa.States[state2].StateStatus
+	if (state1Status == ACCEPTING && state2Status == REJECTING) || (state1Status == REJECTING && state2Status == ACCEPTING){
+		return false
+	}
 
 	// store block status, set as unknown by default
 	var blockStatus StateStatus = UNKNOWN
@@ -170,10 +195,10 @@ func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 in
 	}
 
 	// merge states within state partition
-	mergedStateBlock := statePartition.union(state1, state2)
+	statePartition.union(state1, state2, state1Status, state2Status)
 
 	// iterate over each state within the block containing the merged states
-	for _, stateID := range statePartition.ReturnSet(mergedStateBlock){
+	for _, stateID := range statePartition.ReturnSet(state1){
 		// store the current state status
 		currentStateStatus := dfa.States[stateID].StateStatus
 		// if the block status is unknown and the current state status
@@ -221,17 +246,44 @@ func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 in
 }
 
 func (statePartition StatePartition) Copy() *StatePartition{
-	copiedStatePartition := NewStatePartition(len(statePartition.size))
-	copiedStatePartition.size = append(copiedStatePartition.size, statePartition.size...)
+	// Initialize new State Partition struct.
+	copiedStatePartition := new(StatePartition)
+	copiedStatePartition.isCopy = true
+	copiedStatePartition.root = []int{}
+	copiedStatePartition.size = []int{}
+	copiedStatePartition.link = []int{}
+	copiedStatePartition.changed = []int{}
+	copiedStatePartition.labelledStates = []int{}
 	copiedStatePartition.root = append(copiedStatePartition.root, statePartition.root...)
+	copiedStatePartition.size = append(copiedStatePartition.size, statePartition.size...)
+	copiedStatePartition.link = append(copiedStatePartition.link, statePartition.link...)
+	copiedStatePartition.labelledStates = append(copiedStatePartition.labelledStates, statePartition.labelledStates...)
 	return copiedStatePartition
 }
 
 func (statePartition *StatePartition) RollbackChanges(originalStatePartition *StatePartition){
-	for _, stateID := range statePartition.changed{
-		statePartition.root[stateID] = originalStatePartition.root[stateID]
-		statePartition.size[stateID] = originalStatePartition.size[stateID]
-		statePartition.link[stateID] = originalStatePartition.link[stateID]
+	if statePartition.isCopy{
+		for _, stateID := range statePartition.changed{
+			statePartition.root[stateID] = originalStatePartition.root[stateID]
+			statePartition.size[stateID] = originalStatePartition.size[stateID]
+			statePartition.link[stateID] = originalStatePartition.link[stateID]
+			statePartition.labelledStates[stateID] = originalStatePartition.labelledStates[stateID]
+		}
+		statePartition.changed = []int{}
+	}else{
+		return
 	}
-	statePartition.changed = []int{}
+}
+
+func (statePartition StatePartition) EDSMScore() int{
+	sum := 0
+
+	for blockID := range statePartition.labelledStates{
+		labelledStates := statePartition.labelledStates[blockID]
+		if labelledStates > 1{
+			sum += labelledStates - 1
+		}
+	}
+
+	return sum
 }
