@@ -103,8 +103,14 @@ func TestStateMergingAndDFAEquivalence(t *testing.T){
 	}
 }
 
-func TestTemporary(t *testing.T){
+func TestBenchmarkDetMerge(t *testing.T){
 	// random seed
 	//rand.Seed(time.Now().UnixNano())
 	BenchmarkDetMerge()
+}
+
+func TestBenchmarkEDSM(t *testing.T){
+	// random seed
+	//rand.Seed(time.Now().UnixNano())
+	BenchmarkEDSM(128)
 }

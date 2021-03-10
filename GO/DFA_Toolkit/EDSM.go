@@ -12,7 +12,7 @@ type StatePairScore struct {
 	score int
 }
 
-// Greedy Version of Evidence Driven State-Merging
+// GreedyEDSM is a greedy version of Evidence Driven State-Merging
 func GreedyEDSM(dataset Dataset) DFA{
 	// Construct an APTA from dataset.
 	APTA := dataset.GetPTA(true)
@@ -72,7 +72,6 @@ func GreedyEDSM(dataset Dataset) DFA{
 		// Remove previous state pairs' score
 		detMerges = nil
 
-		start = time.Now()
 		totalMerges = 0
 
 		// Get all valid merges and compute their score.
@@ -91,8 +90,6 @@ func GreedyEDSM(dataset Dataset) DFA{
 				snapshot.RollbackChanges(partition)
 			}
 		}
-		totalTime := (time.Now()).Sub(start).Seconds()
-		fmt.Printf("Merges per second: %.2f\n", float64(totalMerges)/totalTime)
 	}
 
 	// Convert the state partition to a DFA.

@@ -404,14 +404,22 @@ func (dfa DFA) Describe(detail bool) {
 	}
 }
 
-func (dfa DFA) AccuracyOfDFA(dataset Dataset) float32 {
+// Returns the DFA's Accuracy with respect to a dataset.
+func (dfa DFA) Accuracy(dataset Dataset) float32 {
+	// Correct classifications count.
 	correctClassifications := float32(0)
 
+	// Iterate over each string instance within dataset.
 	for _, stringInstance := range dataset {
+		// If the status of the string instance is equal to its state status
+		// within the DFA, increment correct classifications count.
 		if stringInstance.status == stringInstance.ParseToStateStatus(dfa) {
 			correctClassifications++
 		}
 	}
+
+	// Return the number of correct classifications divided by the length of
+	// the dataset.
 	return correctClassifications / float32(len(dataset))
 }
 
