@@ -2,6 +2,7 @@ package DFA_Toolkit
 
 import (
 	"fmt"
+	"math/rand"
 	"sort"
 	"time"
 )
@@ -10,6 +11,38 @@ type StatePairScore struct {
 	state1 int
 	state2 int
 	score int
+}
+
+// HighestScoringMerge returns the highest scoring state pair. If more than
+// one state pair have the highest score, one is chosen randomly.
+func HighestScoringMerge(statePairScore []StatePairScore) StatePairScore{
+	// Declare slice to store the highest scoring state pairs.
+	highestScorePairs := []StatePairScore{}
+	// Sort the state pairs by score.
+	sort.Slice(statePairScore, func(i, j int) bool {
+		return statePairScore[i].score > statePairScore[j].score
+	})
+	// Declare the highest score from the first element within slice (since slice is sorted).
+	highestScore := statePairScore[0].score
+
+	// Iterate over each state pair.
+	for i := range statePairScore{
+		// If the score of the state pair is equal to the highest score, add it to the highest scoring state pairs.
+		if statePairScore[i].score == highestScore{
+			highestScorePairs = append(highestScorePairs, statePairScore[i])
+		// Else, break out of loop (since slice is sorted, score cannot be bigger in other pairs).
+		}else{
+			break
+		}
+	}
+
+	// If only one highest scoring state pair exists, return it.
+	if len(highestScorePairs) == 1{
+		return highestScorePairs[0]
+	// Else, return a random state pair from highest scoring pairs.
+	}else{
+		return highestScorePairs[rand.Intn(len(highestScorePairs))]
+	}
 }
 
 // GreedyEDSM is a greedy version of Evidence Driven State-Merging
@@ -49,12 +82,11 @@ func GreedyEDSM(dataset Dataset) DFA{
 
 	// Loop until no more deterministic merges are available.
 	for len(detMerges) != 0{
-		// Sort the deterministic merges by score.
-		sort.Slice(detMerges, func(i, j int) bool {
-			return detMerges[i].score > detMerges[j].score
-		})
+
+		highestScoringStatePair := HighestScoringMerge(detMerges)
+
 		// Merge the state pairs with the highest score.
-		partition.MergeStates(newDFA, detMerges[0].state1, detMerges[0].state2)
+		partition.MergeStates(newDFA, highestScoringStatePair.state1, highestScoringStatePair.state2)
 
 		// Convert the state partition to a DFA.
 		valid := false
