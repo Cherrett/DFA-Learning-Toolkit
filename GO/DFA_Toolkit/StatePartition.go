@@ -69,7 +69,8 @@ func (statePartition *StatePartition) linkBlocks(blockID1 int, blockID2 int, sta
 	if statePartition.size[blockID1] > statePartition.size[blockID2] {
 		statePartition.root[blockID2] = blockID1
 		if state2Status == ACCEPTING || state2Status == REJECTING{
-			statePartition.labelledStates[blockID1]++
+			statePartition.labelledStates[blockID1] += statePartition.labelledStates[blockID2]
+			statePartition.labelledStates[blockID2] = 0
 		}
 	}else{
 		statePartition.root[blockID1] = blockID2
@@ -77,7 +78,8 @@ func (statePartition *StatePartition) linkBlocks(blockID1 int, blockID2 int, sta
 			statePartition.size[blockID2]++
 		}
 		if state1Status == ACCEPTING || state1Status == REJECTING{
-			statePartition.labelledStates[blockID2]++
+			statePartition.labelledStates[blockID2] += statePartition.labelledStates[blockID1]
+			statePartition.labelledStates[blockID1] = 0
 		}
 	}
 }
@@ -135,18 +137,20 @@ func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA){
 	}
 
 	for stateID := range dfa.States {
-		if newStateID, ok := newMappings[statePartition.Find(stateID)]; ok {
+		currentBlockID := statePartition.Find(stateID)
+		currentStateStatus := dfa.States[stateID].StateStatus
+		if newStateID, ok := newMappings[currentBlockID]; ok {
 			if (resultantDFA.States[newStateID].StateStatus == ACCEPTING &&
-				dfa.States[stateID].StateStatus == REJECTING) ||
+				currentStateStatus == REJECTING) ||
 				(resultantDFA.States[newStateID].StateStatus == REJECTING &&
-					dfa.States[stateID].StateStatus == ACCEPTING){
+					currentStateStatus == ACCEPTING){
 				// not deterministic
 				return false, DFA{}
-			}else{
-				resultantDFA.States[newStateID].StateStatus = dfa.States[stateID].StateStatus
+			}else if resultantDFA.States[newStateID].StateStatus == UNKNOWN && currentStateStatus != UNKNOWN{
+				resultantDFA.States[newStateID].StateStatus = currentStateStatus
 			}
 		}else{
-			newMappings[statePartition.Find(stateID)] = resultantDFA.AddState(dfa.States[stateID].StateStatus)
+			newMappings[currentBlockID] = resultantDFA.AddState(dfa.States[stateID].StateStatus)
 		}
 	}
 
@@ -175,8 +179,8 @@ func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA){
 // Recursively merges states to merge state1 and state2, returns false
 // if the merge results in an NFA, or true if merge was successful
 func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 int) bool{
-	// return same state partition if states are already in the same block
-	if statePartition.Find(state1) == statePartition.Find(state2){
+	// return true if states are already in the same block
+	if statePartition.WithinSameBlock(state1, state2){
 		return true
 	}
 	state1Status := dfa.States[state1].StateStatus

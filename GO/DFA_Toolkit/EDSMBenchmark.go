@@ -26,6 +26,6 @@ func BenchmarkEDSM(n int) {
 
 		fmt.Printf("BENCHMARK %d/%d. Duration: %.2fs. Resultant DFA: %d states, Accuracy: %.2f\n", i+1, n, time.Since(start).Seconds(), len(resultantDFA.States), accuracy)
 	}
-	overallAccuracy := float64(n) / float64(winners)
+	overallAccuracy := float64(winners) / float64(n)
 	fmt.Printf("Overall Accuracy: %.2f%%\n", overallAccuracy)
 }
