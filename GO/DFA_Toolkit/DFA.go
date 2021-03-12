@@ -405,9 +405,9 @@ func (dfa DFA) Describe(detail bool) {
 }
 
 // Returns the DFA's Accuracy with respect to a dataset.
-func (dfa DFA) Accuracy(dataset Dataset) float32 {
+func (dfa DFA) Accuracy(dataset Dataset) float64 {
 	// Correct classifications count.
-	correctClassifications := float32(0)
+	correctClassifications := float64(0)
 
 	// Iterate over each string instance within dataset.
 	for _, stringInstance := range dataset {
@@ -420,7 +420,7 @@ func (dfa DFA) Accuracy(dataset Dataset) float32 {
 
 	// Return the number of correct classifications divided by the length of
 	// the dataset.
-	return correctClassifications / float32(len(dataset))
+	return correctClassifications / float64(len(dataset))
 }
 
 func (dfa DFA) UnreachableStates() []int {

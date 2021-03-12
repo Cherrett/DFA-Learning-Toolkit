@@ -15,21 +15,22 @@ type StatePairScore struct {
 
 // HighestScoringMerge returns the highest scoring state pair. If more than
 // one state pair have the highest score, one is chosen randomly.
-func HighestScoringMerge(statePairScore []StatePairScore) StatePairScore{
+func HighestScoringMerge(statePairScores []StatePairScore) StatePairScore{
 	// Declare slice to store the highest scoring state pairs.
 	highestScorePairs := []StatePairScore{}
 	// Sort the state pairs by score.
-	sort.Slice(statePairScore, func(i, j int) bool {
-		return statePairScore[i].score > statePairScore[j].score
+	sort.Slice(statePairScores, func(i, j int) bool {
+		return statePairScores[i].score > statePairScores[j].score
 	})
+	
 	// Declare the highest score from the first element within slice (since slice is sorted).
-	highestScore := statePairScore[0].score
+	highestScore := statePairScores[0].score
 
 	// Iterate over each state pair.
-	for i := range statePairScore{
+	for i := range statePairScores {
 		// If the score of the state pair is equal to the highest score, add it to the highest scoring state pairs.
-		if statePairScore[i].score == highestScore{
-			highestScorePairs = append(highestScorePairs, statePairScore[i])
+		if statePairScores[i].score == highestScore{
+			highestScorePairs = append(highestScorePairs, statePairScores[i])
 		// Else, break out of loop (since slice is sorted, score cannot be bigger in other pairs).
 		}else{
 			break
@@ -47,6 +48,7 @@ func HighestScoringMerge(statePairScore []StatePairScore) StatePairScore{
 
 // GreedyEDSM is a greedy version of Evidence Driven State-Merging
 func GreedyEDSM(dataset Dataset) DFA{
+	LengthOfDataset := len(dataset)
 	// Construct an APTA from dataset.
 	APTA := dataset.GetPTA(true)
 	// Convert APTA to StatePartition for state merging.
@@ -67,7 +69,7 @@ func GreedyEDSM(dataset Dataset) DFA{
 				detMerges = append(detMerges, StatePairScore{
 					state1: i,
 					state2: j,
-					score: snapshot.EDSMScore(),
+					score: LengthOfDataset - snapshot.EDSMScore(),
 				})
 			}
 			// Undo merges.
@@ -115,7 +117,7 @@ func GreedyEDSM(dataset Dataset) DFA{
 					detMerges = append(detMerges, StatePairScore{
 						state1: i,
 						state2: j,
-						score: snapshot.EDSMScore(),
+						score: LengthOfDataset - snapshot.EDSMScore(),
 					})
 				}
 				// Undo merges.

@@ -10,7 +10,8 @@ type StatePartition struct {
 	isCopy bool
 
 	//temp
-	labelledStates []int
+	labelledStatesCount int
+	statesLabelled []bool
 }
 
 // Returns an initialized State Partition.
@@ -19,19 +20,21 @@ func NewStatePartition(dfa DFA) *StatePartition {
 	statePartition := new(StatePartition)
 	statePartition.isCopy = false
 	// Initialize empty slices.
+	statePartition.labelledStatesCount = 0
 	statePartition.root = make([]int, len(dfa.States))
 	statePartition.size = make([]int, len(dfa.States))
 	statePartition.link = make([]int, len(dfa.States))
-	statePartition.labelledStates = make([]int, len(dfa.States))
+	statePartition.statesLabelled = make([]bool, len(dfa.States))
 	// Set root and link as element, and size (score) as 1.
 	for i := 0; i < len(dfa.States); i++ {
 		statePartition.root[i] = i
 		statePartition.size[i] = 1
 		statePartition.link[i] = i
 		if dfa.States[i].StateStatus == ACCEPTING || dfa.States[i].StateStatus == REJECTING{
-			statePartition.labelledStates[i] = 1
+			statePartition.statesLabelled[i] = true
+			statePartition.labelledStatesCount++
 		}else{
-			statePartition.labelledStates[i] = 0
+			statePartition.statesLabelled[i] = false
 		}
 	}
 
@@ -40,11 +43,7 @@ func NewStatePartition(dfa DFA) *StatePartition {
 
 // Connects two states by finding their roots and comparing their respective
 // size (score) values to keep the tree flat.
-func (statePartition *StatePartition) union(stateID1 int, stateID2 int, state1Status StateStatus, state2Status StateStatus){
-	if (state1Status == ACCEPTING && state2Status == REJECTING) || (state1Status == REJECTING && state2Status == ACCEPTING){
-		panic("Invalid merge.")
-	}
-
+func (statePartition *StatePartition) union(stateID1 int, stateID2 int){
 	// Get root (block index) of both states.
 	stateID1Root := statePartition.Find(stateID1)
 	stateID2Root := statePartition.Find(stateID2)
@@ -58,28 +57,28 @@ func (statePartition *StatePartition) union(stateID1 int, stateID2 int, state1St
 			statePartition.changed = append(statePartition.changed, stateID1)
 			statePartition.changed = append(statePartition.changed, stateID2)
 		}
-		statePartition.linkBlocks(stateID1Root, stateID2Root, state1Status, state2Status)
+		statePartition.linkBlocks(stateID1Root, stateID2Root)
 	}
 }
 
-func (statePartition *StatePartition) linkBlocks(blockID1 int, blockID2 int, state1Status StateStatus, state2Status StateStatus){
+func (statePartition *StatePartition) linkBlocks(blockID1 int, blockID2 int){
 	statePartition.link[blockID1], statePartition.link[blockID2] =
 	 	statePartition.link[blockID2], statePartition.link[blockID1]
 
 	if statePartition.size[blockID1] > statePartition.size[blockID2] {
 		statePartition.root[blockID2] = blockID1
-		if state2Status == ACCEPTING || state2Status == REJECTING{
-			statePartition.labelledStates[blockID1] += statePartition.labelledStates[blockID2]
-			statePartition.labelledStates[blockID2] = 0
+		if statePartition.statesLabelled[blockID2]{
+			statePartition.labelledStatesCount--
+			statePartition.statesLabelled[blockID1] = true
 		}
 	}else{
 		statePartition.root[blockID1] = blockID2
 		if statePartition.size[blockID1] == statePartition.size[blockID2]{
 			statePartition.size[blockID2]++
 		}
-		if state1Status == ACCEPTING || state1Status == REJECTING{
-			statePartition.labelledStates[blockID2] += statePartition.labelledStates[blockID1]
-			statePartition.labelledStates[blockID1] = 0
+		if statePartition.statesLabelled[blockID1]{
+			statePartition.labelledStatesCount--
+			statePartition.statesLabelled[blockID2] = true
 		}
 	}
 }
@@ -200,7 +199,7 @@ func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 in
 	}
 
 	// merge states within state partition
-	statePartition.union(state1, state2, state1Status, state2Status)
+	statePartition.union(state1, state2)
 
 	// iterate over each state within the block containing the merged states
 	for _, stateID := range statePartition.ReturnSet(state1){
@@ -254,25 +253,27 @@ func (statePartition StatePartition) Copy() *StatePartition{
 	// Initialize new State Partition struct.
 	copiedStatePartition := new(StatePartition)
 	copiedStatePartition.isCopy = true
+	copiedStatePartition.labelledStatesCount = statePartition.labelledStatesCount
 	copiedStatePartition.root = []int{}
 	copiedStatePartition.size = []int{}
 	copiedStatePartition.link = []int{}
 	copiedStatePartition.changed = []int{}
-	copiedStatePartition.labelledStates = []int{}
+	copiedStatePartition.statesLabelled = []bool{}
 	copiedStatePartition.root = append(copiedStatePartition.root, statePartition.root...)
 	copiedStatePartition.size = append(copiedStatePartition.size, statePartition.size...)
 	copiedStatePartition.link = append(copiedStatePartition.link, statePartition.link...)
-	copiedStatePartition.labelledStates = append(copiedStatePartition.labelledStates, statePartition.labelledStates...)
+	copiedStatePartition.statesLabelled = append(copiedStatePartition.statesLabelled, statePartition.statesLabelled...)
 	return copiedStatePartition
 }
 
 func (statePartition *StatePartition) RollbackChanges(originalStatePartition *StatePartition){
 	if statePartition.isCopy{
+		statePartition.labelledStatesCount = originalStatePartition.labelledStatesCount
 		for _, stateID := range statePartition.changed{
 			statePartition.root[stateID] = originalStatePartition.root[stateID]
 			statePartition.size[stateID] = originalStatePartition.size[stateID]
 			statePartition.link[stateID] = originalStatePartition.link[stateID]
-			statePartition.labelledStates[stateID] = originalStatePartition.labelledStates[stateID]
+			statePartition.statesLabelled[stateID] = originalStatePartition.statesLabelled[stateID]
 		}
 		statePartition.changed = []int{}
 	}else{
@@ -281,14 +282,5 @@ func (statePartition *StatePartition) RollbackChanges(originalStatePartition *St
 }
 
 func (statePartition StatePartition) EDSMScore() int{
-	sum := 0
-
-	for blockID := range statePartition.labelledStates{
-		labelledStates := statePartition.labelledStates[blockID]
-		if labelledStates > 1{
-			sum += labelledStates - 1
-		}
-	}
-
-	return sum
+	return statePartition.labelledStatesCount
 }
