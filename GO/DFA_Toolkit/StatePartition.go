@@ -160,9 +160,10 @@ func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA){
 	// update new transitions via mappings
 	for stateID := range dfa.States{
 		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
-			if dfa.States[stateID].Transitions[symbolID] > -1{
+			oldResultantStateID := dfa.States[stateID].Transitions[symbolID]
+			if oldResultantStateID > -1{
 				newStateID := newMappings[statePartition.Find(stateID)]
-				resultantStateID := newMappings[statePartition.Find(dfa.States[stateID].Transitions[symbolID])]
+				resultantStateID := newMappings[statePartition.Find(oldResultantStateID)]
 				if resultantDFA.States[newStateID].Transitions[symbolID] > -1 &&
 					resultantDFA.States[newStateID].Transitions[symbolID] != resultantStateID{
 					// not deterministic
