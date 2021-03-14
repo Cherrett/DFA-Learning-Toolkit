@@ -1,6 +1,7 @@
 package DFA_Toolkit
 
 import (
+	"DFA_Toolkit/DFA_Toolkit/util"
 	"math"
 	"math/rand"
 	"testing"
@@ -100,6 +101,65 @@ func TestStateMergingAndDFAEquivalence(t *testing.T){
 
 	if !mergedDFA1.Equal(mergedDFA2){
 		t.Errorf("Merged DFAs should be equal.")
+	}
+}
+
+func TestVisualisation(t *testing.T){
+	t.Parallel()
+	// Training set.
+	training := GetDatasetFromAbbadingoFile("../AbbadingoDatasets/test.txt")
+
+	test := training.GetPTA(true)
+
+	// Visualisation Examples
+	examplesFilenames := []string{"../Visualisation/test_leftright", "../Visualisation/test_leftright_ordered",
+		"../Visualisation/test_topdown", "../Visualisation/test_topdown_ordered"}
+	examplesRankByOrder := []bool{false, true, false, true}
+	examplesTopDown := []bool{false, false, true, true}
+
+	// To DOT scenario
+	for exampleIndex := range examplesFilenames {
+		filePath := examplesFilenames[exampleIndex]+".dot"
+		test.ToDOT(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
+		if !util.FileExists(filePath) {
+			t.Errorf("DFA toDOT failed, %s file not found.", filePath)
+		}
+	}
+
+	// To PNG scenario
+	for exampleIndex := range examplesFilenames {
+		filePath := examplesFilenames[exampleIndex]+".png"
+		test.ToPNG(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
+		if !util.FileExists(filePath) {
+			t.Errorf("DFA toPNG failed, %s file not found.", filePath)
+		}
+	}
+
+	// To JPG scenario
+	for exampleIndex := range examplesFilenames {
+		filePath := examplesFilenames[exampleIndex]+".jpg"
+		test.ToJPG(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
+		if !util.FileExists(filePath) {
+			t.Errorf("DFA toJPG failed, %s file not found.", filePath)
+		}
+	}
+
+	// To PDF scenario
+	for exampleIndex := range examplesFilenames {
+		filePath := examplesFilenames[exampleIndex]+".pdf"
+		test.ToPDF(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
+		if !util.FileExists(filePath) {
+			t.Errorf("DFA toPDF failed, %s file not found.", filePath)
+		}
+	}
+
+	// To SVG scenario
+	for exampleIndex := range examplesFilenames {
+		filePath := examplesFilenames[exampleIndex]+".svg"
+		test.ToSVG(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
+		if !util.FileExists(filePath) {
+			t.Errorf("DFA toSVG failed, %s file not found.", filePath)
+		}
 	}
 }
 

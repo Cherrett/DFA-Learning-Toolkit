@@ -1,5 +1,7 @@
 package util
 
+import "os"
+
 // Max returns the larger of x or y
 func Max(x, y int) int {
 	if x < y {
@@ -47,4 +49,13 @@ func SumMap(currentMap map[int]int, key bool) int{
 	}
 
 	return count
+}
+
+// FileExists checks if a given
+func FileExists(filePath string) bool {
+	info, err := os.Stat(filePath)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
 }
