@@ -125,7 +125,7 @@ func (stringInstance StringInstance) ParseToStateStatus(dfa DFA) StateStatus{
 			currentStateID = dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)]
 			// last symbol in string check
 			if count == stringInstance.length{
-				if dfa.States[currentStateID].StateStatus == UNKNOWN{
+				if dfa.States[currentStateID].StateStatus == UNKNOWN || dfa.States[currentStateID].StateStatus == REJECTING{
 					return REJECTING
 				}else{
 					return ACCEPTING
