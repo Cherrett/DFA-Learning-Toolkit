@@ -78,8 +78,8 @@ func (statePartition *StatePartition) union(blockID1 int, blockID2 int){
 }
 
 // Find traverses each parent element while compressing the
-// levels to find the root element of the stateID
-// If we attempt to access an element outside the array it returns -1
+// levels to find the root element of the stateID.
+// If we attempt to access an element outside the array it returns -1.
 func (statePartition *StatePartition) Find(stateID int) int {
 	//if stateID > len(statePartition.root)-1 {
 	//	panic("StateID out of range.")
@@ -106,18 +106,18 @@ func (statePartition StatePartition) ReturnSet(stateID int) []int{
 	return blockElements
 }
 
-// Checks if states are within the same block
+// Checks if states are within the same block.
 func (statePartition *StatePartition) WithinSameBlock(stateID1 int, stateID2 int) bool {
 	return statePartition.Find(stateID1) == statePartition.Find(stateID2)
 }
 
-// Converts a DFA to a State Partition
+// Converts a DFA to a State Partition.
 func (dfa DFA) ToStatePartition() *StatePartition {
 	// Return
 	return NewStatePartition(dfa)
 }
 
-// Converts a State Partition to a DFA
+// Converts a State Partition to a DFA.
 func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA){
 	newMappings := map[int]int{}
 
@@ -238,16 +238,17 @@ func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 in
 	return true
 }
 
-func (statePartition StatePartition) Copy() *StatePartition{
+func (statePartition StatePartition) Copy() StatePartition{
 	// Initialize new State Partition struct.
-	copiedStatePartition := new(StatePartition)
-	copiedStatePartition.isCopy = true
-	copiedStatePartition.labelledStatesCount = statePartition.labelledStatesCount
-	copiedStatePartition.root = make([]int, len(statePartition.root))
-	copiedStatePartition.size = make([]int, len(statePartition.size))
-	copiedStatePartition.link = make([]int, len(statePartition.link))
-	copiedStatePartition.blockStatus = make([]StateStatus, len(statePartition.blockStatus))
-	copiedStatePartition.changed = []int{}
+	copiedStatePartition := StatePartition{
+		root:                make([]int, len(statePartition.root)),
+		size:                make([]int, len(statePartition.size)),
+		link:                make([]int, len(statePartition.link)),
+		changed:             []int{},
+		isCopy:              true,
+		labelledStatesCount: statePartition.labelledStatesCount,
+		blockStatus:         make([]StateStatus, len(statePartition.blockStatus)),
+	}
 
 	copy(copiedStatePartition.root, statePartition.root)
 	copy(copiedStatePartition.size, statePartition.size)
@@ -272,6 +273,6 @@ func (statePartition *StatePartition) RollbackChanges(originalStatePartition *St
 	}
 }
 
-func (statePartition StatePartition) EDSMScore() int{
+func (statePartition StatePartition) NumberOfLabelledBlocks() int{
 	return statePartition.labelledStatesCount
 }

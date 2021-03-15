@@ -12,6 +12,7 @@ func BenchmarkEDSM(n int) {
 	totalAccuracies := util.NewMinMaxAvg()
 	totalNumberOfStates := util.NewMinMaxAvg()
 	for i := 0; i < n; i++ {
+		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
 		start := time.Now()
 
 		// Create a target DFA.
@@ -20,7 +21,7 @@ func BenchmarkEDSM(n int) {
 		// Training set.
 		training, testing := AbbadingoDatasetExact(target, 607, 1800)
 
-		resultantDFA := GreedyEDSM(training)
+		resultantDFA := GreedyEDSM(training, false)
 		accuracy := resultantDFA.Accuracy(testing)
 
 		totalAccuracies.Add(accuracy)
@@ -30,9 +31,10 @@ func BenchmarkEDSM(n int) {
 			winners++
 		}
 
-		fmt.Printf("BENCHMARK %d/%d. Duration: %.2fs.\n", i+1, n, time.Since(start).Seconds())
+		fmt.Printf("Duration: %.2fs\n\n", time.Since(start).Seconds())
 	}
-	fmt.Printf("Percentage of 0.99+ Accuracy: %.2f%%\n", float64(winners) / float64(n))
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", float64(winners) / float64(n))
 	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", totalAccuracies.Min(), totalAccuracies.Max(), totalAccuracies.Avg())
 	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", totalNumberOfStates.Min(), totalNumberOfStates.Max(), totalNumberOfStates.Avg())
+	fmt.Print("-----------------------------------------------------------------------------\n\n")
 }
