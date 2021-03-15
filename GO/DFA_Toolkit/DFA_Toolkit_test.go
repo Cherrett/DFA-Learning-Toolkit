@@ -2,11 +2,14 @@ package DFA_Toolkit
 
 import (
 	"DFA_Toolkit/DFA_Toolkit/util"
+	"fmt"
 	"math"
 	"math/rand"
 	"testing"
 	"time"
 )
+
+// -------------------- BASIC TESTS --------------------
 
 func TestAbbadingoDFAFromFile(t *testing.T) {
 	t.Parallel()
@@ -29,7 +32,7 @@ func TestAbbadingoDFAFromFile(t *testing.T) {
 
 func TestAbbadingoDFAGeneration(t *testing.T) {
 	t.Parallel()
-	// random seed
+	// Random Seed.
 	rand.Seed(time.Now().UnixNano())
 	numberOfStates := rand.Intn(499) + 1
 
@@ -163,14 +166,116 @@ func TestVisualisation(t *testing.T){
 	}
 }
 
+// -------------------- BENCHMARKS --------------------
+
+// TestBenchmarkDetMerge benchmarks the performance of the MergeStates() function.
 func TestBenchmarkDetMerge(t *testing.T){
-	// random seed
+	// Random Seed.
 	rand.Seed(time.Now().UnixNano())
-	BenchmarkDetMerge()
+
+	// These are target DFA sizes we will test.
+	//dfaSizes := []int{32, 64, 128}
+	dfaSizes := []int{32, 64, 128}
+	// These are the training set sizes we will test.
+	//trainingSetSizes := []int{607, 1521, 4382}
+	trainingSetSizes := []int{607, 1521, 4382}
+
+	// Benchmark over the problem instances.
+	for i := range dfaSizes {
+		targetSize := dfaSizes[i]
+		trainingSetSize := trainingSetSizes[i]
+
+		// Create a target DFA.
+		target := AbbadingoDFA(targetSize, true)
+
+		// Training set.
+		training, _ := AbbadingoDatasetExact(target, trainingSetSize, 0)
+
+		fmt.Printf("-------------------------------------------------------------\n")
+		fmt.Printf("-------------------------------------------------------------\n")
+		fmt.Printf("BENCHMARK %d (Target: %d states, Training: %d strings\n", i+1, targetSize, len(training))
+		fmt.Printf("-------------------------------------------------------------\n")
+		fmt.Printf("-------------------------------------------------------------\n")
+
+		// Info about training set.
+		fmt.Printf("Training proportion +ve: %.2f%%\n", training.AcceptingStringInstancesRatio()*100.0)
+		fmt.Printf("Training proportion -ve: %.2f%%\n", training.RejectingStringInstancesRatio()*100.0)
+
+		// Create APTA.
+		apta := training.GetPTA(true)
+		//apta := training.APTA(target.AlphabetSize)
+		fmt.Printf("APTA size: %d\n", len(apta.States))
+
+		// Perform all the merges.
+		part := apta.ToStatePartition()
+		snapshot := part.Copy()
+		totalMerges := 0
+		validMerges := 0
+		start := time.Now()
+
+		for i := 0; i < len(apta.States); i++ {
+			for j := i + 1; j < len(apta.States); j++ {
+				totalMerges++
+				if snapshot.MergeStates(apta, i, j){
+					validMerges++
+					//snapshot.LabelledBlocksCount(apta)
+					//snapshot.BlocksCount()
+					//print(temp, temp2)
+				}
+
+				snapshot.RollbackChanges(part)
+			}
+		}
+
+		totalTime := (time.Now()).Sub(start).Seconds()
+		fmt.Printf("Total merges: %d\n", totalMerges)
+		fmt.Printf("Valid merges: %d\n", validMerges)
+		fmt.Printf("Time: %.2fs\n", totalTime)
+		fmt.Printf("Merges per second: %.2f\n", float64(totalMerges)/totalTime)
+	}
 }
 
+// TestBenchmarkEDSM benchmarks the performance of the GreedyEDSM() function.
 func TestBenchmarkEDSM(t *testing.T){
-	// random seed
+	// Random Seed.
 	rand.Seed(time.Now().UnixNano())
-	BenchmarkEDSM(128)
+
+	// Number of iterations.
+	n := 128
+
+	winners := 0
+	totalAccuracies := util.NewMinMaxAvg()
+	totalNumberOfStates := util.NewMinMaxAvg()
+	for i := 0; i < n; i++ {
+		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
+		start := time.Now()
+
+		// Create a target DFA.
+		target := AbbadingoDFA(32, true)
+
+		// Training testing sets.
+		trainingSet, testingSet := AbbadingoDatasetExact(target, 607, 1800)
+
+		resultantDFA := GreedyEDSM(trainingSet, false)
+		accuracy := resultantDFA.Accuracy(testingSet)
+
+		totalAccuracies.Add(accuracy)
+		totalNumberOfStates.Add(float64(resultantDFA.AllStatesCount()))
+
+		if accuracy >= 0.99{
+			winners++
+		}
+
+		fmt.Printf("Duration: %.2fs\n\n", time.Since(start).Seconds())
+	}
+
+	successfulPercentage := float64(winners) / float64(n)
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentage)
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", totalAccuracies.Min(), totalAccuracies.Max(), totalAccuracies.Avg())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", totalNumberOfStates.Min(), totalNumberOfStates.Max(), totalNumberOfStates.Avg())
+	fmt.Print("-----------------------------------------------------------------------------\n\n")
+
+	if successfulPercentage < 0.10 || successfulPercentage > 0.15{
+		t.Error("The percentage of successful DFAs is less than 0.10 or bigger than 0.15.")
+	}
 }
