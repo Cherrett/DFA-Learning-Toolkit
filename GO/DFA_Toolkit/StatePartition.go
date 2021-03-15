@@ -2,16 +2,14 @@ package DFA_Toolkit
 
 // StatePartition struct which represents a State Partition.
 type StatePartition struct {
-	root []int		// Parent block of each state.
-	size []int		// Size (score) of each block.
-	link []int		// Index of next state within the block.
-	changed []int	// Slice of changed states/blocks.
+	root []int					// Parent block of each state.
+	size []int					// Size (score) of each block.
+	link []int					// Index of next state within the block.
+	changed []int				// Slice of changed states/blocks.
 
-	isCopy bool
-
-	//temp
-	labelledStatesCount int
-	blockStatus []StateStatus
+	isCopy bool					// Copied flag for reverting merges.
+	labelledStatesCount int		// Number of labelled states within partition.
+	blockStatus []StateStatus	// Status of each block.
 }
 
 // Returns an initialized State Partition.
@@ -25,7 +23,8 @@ func NewStatePartition(dfa DFA) *StatePartition {
 	statePartition.size = make([]int, len(dfa.States))
 	statePartition.link = make([]int, len(dfa.States))
 	statePartition.blockStatus = make([]StateStatus, len(dfa.States))
-	// Set root and link as element, and size (score) as 1.
+	// Set root and link as element, and size (score) as 1. Set block status
+	// to state status and increment number of labelled states accordingly.
 	for i := 0; i < len(dfa.States); i++ {
 		statePartition.root[i] = i
 		statePartition.size[i] = 1
@@ -36,26 +35,19 @@ func NewStatePartition(dfa DFA) *StatePartition {
 		}
 	}
 
+	// Return initialized partition.
 	return statePartition
 }
 
-// Connects two states by finding their roots and comparing their respective
+// Connects two blocks by comparing their respective
 // size (score) values to keep the tree flat.
-func (statePartition *StatePartition) union(stateID1Root int, stateID2Root int){
-	// If their root is not equal, the states are merged (union) using the
-	// linkBlocks function. If their root is equal, the states are already
-	// within the same block so the merge is not done.
-	if stateID1Root != stateID2Root{
-		// Add State IDs joined to changed struct so merge can be undone.
-		if statePartition.isCopy{
-			statePartition.changed = append(statePartition.changed, stateID1Root)
-			statePartition.changed = append(statePartition.changed, stateID2Root)
-		}
-		statePartition.linkBlocks(stateID1Root, stateID2Root)
+func (statePartition *StatePartition) union(blockID1 int, blockID2 int){
+	// Add State IDs joined to changed struct so merge can be undone.
+	if statePartition.isCopy{
+		statePartition.changed = append(statePartition.changed, blockID1)
+		statePartition.changed = append(statePartition.changed, blockID2)
 	}
-}
 
-func (statePartition *StatePartition) linkBlocks(blockID1 int, blockID2 int){
 	statePartition.link[blockID1], statePartition.link[blockID2] =
 	 	statePartition.link[blockID2], statePartition.link[blockID1]
 
@@ -170,43 +162,42 @@ func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA){
 // Recursively merges states to merge state1 and state2, returns false
 // if the merge results in an NFA, or true if merge was successful
 func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 int) bool{
-	state1Block := 0
-	state2Block := 0
-
+	// If parent blocks (root) are the same as state ID, skip finding the root.
+	// Else, find the parent block (root) using Find.
 	if statePartition.root[state1] != state1{
-		state1Block = statePartition.Find(state1)
-	}else{
-		state1Block = state1
+		state1 = statePartition.Find(state1)
 	}
-
 	if statePartition.root[state2] != state2{
-		state2Block = statePartition.Find(state2)
-	}else{
-		state2Block = state2
+		state2 = statePartition.Find(state2)
 	}
 
-	// return true if states are already in the same block
-	if state1Block == state2Block{
+	// Return true if states are already in the same block
+	// since merge is not required.
+	if state1 == state2 {
 		return true
 	}
 
-	state1Status := statePartition.blockStatus[state1Block]
-	state2Status := statePartition.blockStatus[state2Block]
+	// Get status of each block.
+	state1Status := statePartition.blockStatus[state1]
+	state2Status := statePartition.blockStatus[state2]
+	// If statuses are contradicting, return false since this results
+	// in a non-deterministic DFA so merge cannot be done.
 	if (state1Status == ACCEPTING && state2Status == REJECTING) || (state1Status == REJECTING && state2Status == ACCEPTING){
 		return false
 	}
 
-	// store the block transitions and set to -1 by default
+	// Store the block transitions and set to -1 by default.
 	transitions := make([]int, len(dfa.SymbolMap))
 	for i := range transitions {
 		transitions[i] = -1
 	}
 
-	block1Set := statePartition.ReturnSet(state1Block)
-	block2Set := statePartition.ReturnSet(state2Block)
+	// Get the states within each block.
+	block1Set := statePartition.ReturnSet(state1)
+	block2Set := statePartition.ReturnSet(state2)
 
-	// merge states within state partition
-	statePartition.union(state1Block, state2Block)
+	// Merge states within state partition.
+	statePartition.union(state1, state2)
 
 	// iterate over each state within the block containing the merged states
 	for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
