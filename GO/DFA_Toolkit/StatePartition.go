@@ -8,7 +8,9 @@ type StatePartition struct {
 	changed []int				// Slice of changed states/blocks.
 
 	isCopy bool					// Copied flag for reverting merges.
-	labelledStatesCount int		// Number of labelled states within partition.
+	//labelledStatesCount int		// Number of labelled states within partition.
+	acceptingBlocksCount int	// Number of accepting blocks (states) within partition.
+	rejectingBlocksCount int	// Number of rejecting blocks (states) within partition.
 	blockStatus []StateStatus	// Status of each block.
 }
 
@@ -18,7 +20,8 @@ func NewStatePartition(dfa DFA) *StatePartition {
 	statePartition := new(StatePartition)
 	statePartition.isCopy = false
 	// Initialize empty slices.
-	statePartition.labelledStatesCount = 0
+	statePartition.acceptingBlocksCount = 0
+	statePartition.rejectingBlocksCount = 0
 	statePartition.root = make([]int, len(dfa.States))
 	statePartition.size = make([]int, len(dfa.States))
 	statePartition.link = make([]int, len(dfa.States))
@@ -30,8 +33,10 @@ func NewStatePartition(dfa DFA) *StatePartition {
 		statePartition.size[i] = 1
 		statePartition.link[i] = i
 		statePartition.blockStatus[i] = dfa.States[i].StateStatus
-		if statePartition.blockStatus[i] == ACCEPTING || statePartition.blockStatus[i] == REJECTING{
-			statePartition.labelledStatesCount++
+		if statePartition.blockStatus[i] == ACCEPTING{
+			statePartition.acceptingBlocksCount++
+		}else if statePartition.blockStatus[i] == REJECTING{
+			statePartition.rejectingBlocksCount++
 		}
 	}
 
@@ -49,7 +54,7 @@ func (statePartition *StatePartition) union(blockID1 int, blockID2 int){
 	}
 
 	statePartition.link[blockID1], statePartition.link[blockID2] =
-	 	statePartition.link[blockID2], statePartition.link[blockID1]
+		statePartition.link[blockID2], statePartition.link[blockID1]
 
 	block1Status := statePartition.blockStatus[blockID1]
 	block2Status := statePartition.blockStatus[blockID2]
@@ -60,9 +65,10 @@ func (statePartition *StatePartition) union(blockID1 int, blockID2 int){
 
 		if block1Status == UNKNOWN && block2Status != UNKNOWN{
 			statePartition.blockStatus[blockID1] = block2Status
-		}else if (block1Status == ACCEPTING || block1Status == REJECTING) &&
-			(block2Status == ACCEPTING || block2Status == REJECTING){
-			statePartition.labelledStatesCount--
+		}else if block1Status == ACCEPTING && block2Status == ACCEPTING{
+			statePartition.acceptingBlocksCount--
+		}else if block1Status == REJECTING && block2Status == REJECTING{
+			statePartition.rejectingBlocksCount--
 		}
 	}else{
 		statePartition.root[blockID1] = blockID2
@@ -70,9 +76,10 @@ func (statePartition *StatePartition) union(blockID1 int, blockID2 int){
 
 		if block2Status == UNKNOWN && block1Status != UNKNOWN{
 			statePartition.blockStatus[blockID2] = block1Status
-		}else if (block1Status == ACCEPTING || block1Status == REJECTING) &&
-			(block2Status == ACCEPTING || block2Status == REJECTING){
-			statePartition.labelledStatesCount--
+		}else if block1Status == ACCEPTING && block2Status == ACCEPTING{
+			statePartition.acceptingBlocksCount--
+		}else if block1Status == REJECTING && block2Status == REJECTING{
+			statePartition.rejectingBlocksCount--
 		}
 	}
 }
@@ -246,7 +253,8 @@ func (statePartition StatePartition) Copy() StatePartition{
 		link:                make([]int, len(statePartition.link)),
 		changed:             []int{},
 		isCopy:              true,
-		labelledStatesCount: statePartition.labelledStatesCount,
+		acceptingBlocksCount: statePartition.acceptingBlocksCount,
+		rejectingBlocksCount: statePartition.rejectingBlocksCount,
 		blockStatus:         make([]StateStatus, len(statePartition.blockStatus)),
 	}
 
@@ -260,7 +268,8 @@ func (statePartition StatePartition) Copy() StatePartition{
 
 func (statePartition *StatePartition) RollbackChanges(originalStatePartition *StatePartition){
 	if statePartition.isCopy{
-		statePartition.labelledStatesCount = originalStatePartition.labelledStatesCount
+		statePartition.acceptingBlocksCount = originalStatePartition.acceptingBlocksCount
+		statePartition.rejectingBlocksCount = originalStatePartition.rejectingBlocksCount
 		for _, stateID := range statePartition.changed{
 			statePartition.root[stateID] = originalStatePartition.root[stateID]
 			statePartition.size[stateID] = originalStatePartition.size[stateID]
@@ -274,5 +283,5 @@ func (statePartition *StatePartition) RollbackChanges(originalStatePartition *St
 }
 
 func (statePartition StatePartition) NumberOfLabelledBlocks() int{
-	return statePartition.labelledStatesCount
+	return statePartition.acceptingBlocksCount + statePartition.rejectingBlocksCount
 }
