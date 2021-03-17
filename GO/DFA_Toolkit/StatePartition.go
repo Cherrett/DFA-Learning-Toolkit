@@ -166,8 +166,8 @@ func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA){
 	return true, resultantDFA
 }
 
-// Recursively merges states to merge state1 and state2, returns false
-// if the merge results in an NFA, or true if merge was successful
+// Recursively merges states to merge state1 and state2. Returns false if merge
+// results in a non-deterministic automaton. Returns true if merge was successful.
 func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 int) bool{
 	// If parent blocks (root) are the same as state ID, skip finding the root.
 	// Else, find the parent block (root) using Find.
@@ -188,13 +188,15 @@ func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 in
 	state1Status := statePartition.blockStatus[state1]
 	state2Status := statePartition.blockStatus[state2]
 	// If statuses are contradicting, return false since this results
-	// in a non-deterministic DFA so merge cannot be done.
+	// in a non-deterministic automaton so merge cannot be done.
 	if (state1Status == ACCEPTING && state2Status == REJECTING) || (state1Status == REJECTING && state2Status == ACCEPTING){
 		return false
 	}
 
-	// Store the block transitions and set to -1 by default.
+	// Initialize a slice which will be used to evaluate the validity of
+	// the transitions for the merged blocks.
 	transitions := make([]int, len(dfa.SymbolMap))
+	// Set all values to -1 by default.
 	for i := range transitions {
 		transitions[i] = -1
 	}
@@ -206,33 +208,44 @@ func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 in
 	// Merge states within state partition.
 	statePartition.union(state1, state2)
 
-	// iterate over each state within the block containing the merged states
+	// Iterate over each symbol within DFA.
 	for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
+		// Iterate over each state within first block.
 		for _, stateID := range block1Set{
-			// store resultant state from state transition of current state
+			// Store resultant state from state transition of current state.
 			currentResultantStateID := dfa.States[stateID].Transitions[symbolID]
 
+			// If resultant state ID is bigger than -1 (valid transition), get
+			// the block containing state and store in transitions. The loop is
+			// then broken since the transition for the current symbol was found.
 			if currentResultantStateID > -1{
-				// store resultant block from state transition of current block
+				// Set resultant state to state transition for current symbol.
 				transitions[symbolID] = currentResultantStateID
+				// Break loop since the transition for the current symbol is found.
 				break
 			}
 		}
 	}
 
-	// iterate over each symbol within DFA
+	// Iterate over each symbol within DFA.
 	for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
+		// If no transitions exist from block for the given symbol, skip
+		// current loop iteration.
 		if transitions[symbolID] == -1{
 			continue
 		}
-		// iterate over each state within the block containing the merged states
+		// Iterate over each state within second block.
 		for _, stateID := range block2Set{
-			// store resultant state from state transition of current state
+			// Store resultant state from state transition of current state.
 			currentResultantStateID := dfa.States[stateID].Transitions[symbolID]
+			// If resultant state ID is bigger than -1 (valid transition), get the
+			// block containing state and compare it to the transitions found above.
+			// If they are not equal, merge blocks to eliminate non-determinism.
 			if currentResultantStateID > -1{
-				currentResultantBlockID := statePartition.Find(currentResultantStateID)
-				if currentResultantBlockID != statePartition.Find(transitions[symbolID]){
-					// not deterministic so merge, if states cannot be merged, return false
+				// If resultant block is not equal to the block containing the state within transitions
+				// found above, merge the two states to eliminate non-determinism.
+				if statePartition.Find(currentResultantStateID) != statePartition.Find(transitions[symbolID]){
+					// Not deterministic so merge, if states cannot be merged, return false.
 					if !statePartition.MergeStates(dfa, transitions[symbolID], currentResultantStateID) {
 						return false
 					}
@@ -241,10 +254,11 @@ func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 in
 		}
 	}
 
-	// return true if this is reached (deterministic)
+	// Return true if this is reached (deterministic).
 	return true
 }
 
+// Copies the state partition.
 func (statePartition StatePartition) Copy() StatePartition{
 	// Initialize new State Partition struct.
 	copiedStatePartition := StatePartition{
@@ -258,30 +272,39 @@ func (statePartition StatePartition) Copy() StatePartition{
 		blockStatus:         make([]StateStatus, len(statePartition.blockStatus)),
 	}
 
+	// Copy root, size, link and blockStatus slices.
 	copy(copiedStatePartition.root, statePartition.root)
 	copy(copiedStatePartition.size, statePartition.size)
 	copy(copiedStatePartition.link, statePartition.link)
 	copy(copiedStatePartition.blockStatus, statePartition.blockStatus)
 
+	// Return copied state partition.
 	return copiedStatePartition
 }
 
+// Reverts any changes made within state partition given the original state partition.
 func (statePartition *StatePartition) RollbackChanges(originalStatePartition *StatePartition){
+	// If the state partition is a copy, copy values of changed blocks from original
+	// state partition. Else, do nothing.
 	if statePartition.isCopy{
+		// Set accepting and rejecting blocks count values to the original values.
 		statePartition.acceptingBlocksCount = originalStatePartition.acceptingBlocksCount
 		statePartition.rejectingBlocksCount = originalStatePartition.rejectingBlocksCount
+		// Iterate over each altered block (state).
 		for _, stateID := range statePartition.changed{
+			// Update root, size, link and blockStatus values.
 			statePartition.root[stateID] = originalStatePartition.root[stateID]
 			statePartition.size[stateID] = originalStatePartition.size[stateID]
 			statePartition.link[stateID] = originalStatePartition.link[stateID]
 			statePartition.blockStatus[stateID] = originalStatePartition.blockStatus[stateID]
 		}
+		// Empty the changed blocks slice.
 		statePartition.changed = []int{}
-	}else{
-		return
 	}
 }
 
+// Returns the number of labelled blocks (states) within state partition.
 func (statePartition StatePartition) NumberOfLabelledBlocks() int{
+	// Return the sum of the accepting and rejecting blocks count.
 	return statePartition.acceptingBlocksCount + statePartition.rejectingBlocksCount
 }
