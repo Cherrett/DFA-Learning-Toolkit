@@ -235,13 +235,15 @@ func TestBenchmarkDetMerge(t *testing.T){
 	}
 }
 
-// TestBenchmarkEDSM benchmarks the performance of the GreedyEDSM() function.
-func TestBenchmarkEDSM(t *testing.T){
+// TestBenchmarkGreedyEDSM benchmarks the performance of the GreedyEDSM() function.
+func TestBenchmarkGreedyEDSM(t *testing.T){
 	// Random Seed.
 	rand.Seed(time.Now().UnixNano())
 
 	// Number of iterations.
 	n := 128
+	// Target size.
+	targetSize := 32
 
 	winners := 0
 	totalAccuracies := util.NewMinMaxAvg()
@@ -251,7 +253,7 @@ func TestBenchmarkEDSM(t *testing.T){
 		start := time.Now()
 
 		// Create a target DFA.
-		target := AbbadingoDFA(32, true)
+		target := AbbadingoDFA(targetSize, true)
 
 		// Training testing sets.
 		trainingSet, testingSet := AbbadingoDatasetExact(target, 607, 1800)
@@ -276,6 +278,53 @@ func TestBenchmarkEDSM(t *testing.T){
 	fmt.Print("-----------------------------------------------------------------------------\n\n")
 
 	if successfulPercentage < 0.10 || successfulPercentage > 0.15{
+		t.Error("The percentage of successful DFAs is less than 0.10 or bigger than 0.15.")
+	}
+}
+
+// TestBenchmarkWindowedEDSM benchmarks the performance of the WindowedEDSM() function.
+func TestBenchmarkWindowedEDSM(t *testing.T){
+	// Random Seed.
+	rand.Seed(time.Now().UnixNano())
+
+	// Number of iterations.
+	n := 128
+	// Target size.
+	targetSize := 32
+
+	winners := 0
+	totalAccuracies := util.NewMinMaxAvg()
+	totalNumberOfStates := util.NewMinMaxAvg()
+	for i := 0; i < n; i++ {
+		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
+		start := time.Now()
+
+		// Create a target DFA.
+		target := AbbadingoDFA(targetSize, true)
+
+		// Training testing sets.
+		trainingSet, testingSet := AbbadingoDatasetExact(target, 607, 1800)
+
+		resultantDFA := WindowedEDSM(trainingSet, targetSize*2, 2.0, false)
+		accuracy := resultantDFA.Accuracy(testingSet)
+
+		totalAccuracies.Add(accuracy)
+		totalNumberOfStates.Add(float64(resultantDFA.AllStatesCount()))
+
+		if accuracy >= 0.99{
+			winners++
+		}
+
+		fmt.Printf("Duration: %.2fs\n\n", time.Since(start).Seconds())
+	}
+
+	successfulPercentage := float64(winners) / float64(n)
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentage)
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", totalAccuracies.Min(), totalAccuracies.Max(), totalAccuracies.Avg())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", totalNumberOfStates.Min(), totalNumberOfStates.Max(), totalNumberOfStates.Avg())
+	fmt.Print("-----------------------------------------------------------------------------\n\n")
+
+	if successfulPercentage < 0.09 || successfulPercentage > 0.15{
 		t.Error("The percentage of successful DFAs is less than 0.10 or bigger than 0.15.")
 	}
 }

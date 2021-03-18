@@ -1,7 +1,9 @@
 package DFA_Toolkit
 
 import (
+	"DFA_Toolkit/DFA_Toolkit/util"
 	"fmt"
+	"math"
 	"math/rand"
 	"sort"
 	"time"
@@ -55,13 +57,9 @@ func HighestScoringMerge(statePairScores []StatePairScore, randomFromBest bool) 
 	}
 }
 
-// Traverses a path within lattice of automaton given a DFA (generally an APTA) and a
-// scoring function. Returns the resultant DFA when no more valid merges are possible.
-func GreedyPath(dfa DFA, scoringFunction ScoringFunction, randomFromBest bool) DFA{
-	// Convert DFA (APTA) to StatePartition for state merging.
-	partition := dfa.ToStatePartition()
-	// Copy the state partition for undoing merging.
-	snapshot := partition.Copy()
+// Deterministically merges all possible state pairs.
+// Returns the resultant DFA when no more valid merges are possible.
+func GreedyMerge(dfa DFA, scoringFunction ScoringFunction, randomFromBest bool) DFA{
 	// Slice of state pairs with score.
 	var detMerges []StatePairScore
 	start := time.Now()
@@ -69,6 +67,10 @@ func GreedyPath(dfa DFA, scoringFunction ScoringFunction, randomFromBest bool) D
 
 	// Loop until no more deterministic merges are available.
 	for{
+		// Convert DFA to StatePartition for state merging.
+		partition := dfa.ToStatePartition()
+		// Copy the state partition for undoing merging.
+		snapshot := partition.Copy()
 		// Get all valid merges and compute their score.
 		for i := 0; i < len(dfa.States); i++ {
 			for j := i + 1; j < len(dfa.States); j++ {
@@ -102,76 +104,105 @@ func GreedyPath(dfa DFA, scoringFunction ScoringFunction, randomFromBest bool) D
 				panic("Invalid merged DFA.")
 			}
 
-			// Convert new DFA to StatePartition for state merging.
-			partition = dfa.ToStatePartition()
-			// Copy the state partition for undoing merging.
-			snapshot = partition.Copy()
 			// Remove previous state pairs' score.
 			detMerges = nil
 		}else{
-			totalTime := (time.Now()).Sub(start).Seconds()
-			fmt.Printf("Merges per second: %.2f\n", float64(totalMerges)/totalTime)
-
-			// Return the final resultant DFA.
-			return dfa
+			break
 		}
 	}
 
-	//// Loop until no more deterministic merges are available.
-	//for len(detMerges) != 0{
-	//
-	//	highestScoringStatePair := HighestScoringMerge(detMerges)
-	//
-	//	// Merge the state pairs with the highest score.
-	//	partition.MergeStates(newDFA, highestScoringStatePair.state1, highestScoringStatePair.state2)
-	//
-	//	// Convert the state partition to a DFA.
-	//	valid := false
-	//	valid, newDFA = partition.ToDFA(newDFA)
-	//
-	//	// Panic if state partition to DFA conversion was unsuccessful.
-	//	if !valid{
-	//		panic("Invalid merged DFA.")
-	//	}
-	//
-	//	// Convert new DFA to StatePartition for state merging.
-	//	partition = newDFA.ToStatePartition()
-	//	// Copy the state partition for undoing merging.
-	//	snapshot = partition.Copy()
-	//	// Remove previous state pairs' score
-	//	detMerges = nil
-	//
-	//	totalMerges = 0
-	//
-	//	// Get all valid merges and compute their score.
-	//	for i := 0; i < len(newDFA.States); i++ {
-	//		for j := i + 1; j < len(newDFA.States); j++ {
-	//			totalMerges ++
-	//			// If states are mergeable, calculate score and add to detMerges.
-	//			if snapshot.MergeStates(newDFA, i, j){
-	//				detMerges = append(detMerges, StatePairScore{
-	//					state1: i,
-	//					state2: j,
-	//					score: scoringFunction(snapshot),
-	//				})
-	//			}
-	//			// Undo merges.
-	//			snapshot.RollbackChanges(partition)
-	//		}
-	//	}
-	//}
-	//
-	//totalTime := (time.Now()).Sub(start).Seconds()
-	//fmt.Printf("Merges per second: %.2f\n", float64(totalMerges)/totalTime)
-	//
-	//// Convert the state partition to a DFA.
-	//valid, resultantDFA := partition.ToDFA(newDFA)
-	//
-	//// Panic if state partition to DFA conversion was unsuccessful.
-	//if !valid{
-	//	panic("EDSM resultant DFA contains invalid merges.")
-	//}
-	//
-	//// Return the final resultant DFA.
-	//return resultantDFA
+	totalTime := (time.Now()).Sub(start).Seconds()
+	fmt.Printf("Merges per second: %.2f\n", float64(totalMerges)/totalTime)
+
+	// Return the final resultant DFA.
+	return dfa
+}
+
+// Deterministically merges state pairs within a given window.
+// Returns the resultant DFA when no more valid merges are possible.
+func WindowedMerge(dfa DFA, windowSize int, windowGrow float64, scoringFunction ScoringFunction, randomFromBest bool) DFA{
+	start := time.Now()
+	totalMerges := 0
+	// Slice of state pairs with score.
+	var detMerges []StatePairScore
+	// Store ordered states within DFA.
+	orderedStates := dfa.OrderedStates()
+	for{
+		// Window values.
+		windowMin := 0
+		windowMax := util.Min(windowSize, len(dfa.States))
+
+		// Convert DFA to StatePartition for state merging.
+		partition := dfa.ToStatePartition()
+		// Copy the state partition for undoing merging.
+		snapshot := partition.Copy()
+
+		// Loop until no more deterministic merges are available within all possible windows.
+		for {
+			// Get all valid merges within window and compute their score.
+			for i := 0; i < windowMax; i++ {
+				for j := windowMin; j < windowMax; j++ {
+					if i < j {
+						totalMerges++
+						// If states are mergeable, calculate score and add to detMerges.
+						if snapshot.MergeStates(dfa, orderedStates[i], orderedStates[j]) {
+							detMerges = append(detMerges, StatePairScore{
+								state1: orderedStates[i],
+								state2: orderedStates[j],
+								score:  scoringFunction(snapshot),
+							})
+						}
+						// Undo merges.
+						snapshot.RollbackChanges(partition)
+					}
+				}
+			}
+
+			// Check if any deterministic merges were found.
+			if len(detMerges) > 0 {
+				break
+			// No more possible merges were found so increase window size.
+			} else {
+				windowMin += windowSize
+				windowSize = int(math.Round(float64(windowSize) * windowGrow))
+				windowMax = util.Min(windowMax+windowSize, len(dfa.States))
+
+				// If the window size is out of bounds, break loop and return the
+				// most recent DFA found.
+				if windowMin >= len(dfa.States) {
+					break
+				}
+			}
+		}
+
+		if len(detMerges) > 0{
+			highestScoringStatePair := HighestScoringMerge(detMerges, randomFromBest)
+
+			// Merge the state pairs with the highest score.
+			partition.MergeStates(dfa, highestScoringStatePair.state1, highestScoringStatePair.state2)
+
+			// Convert the state partition to a DFA.
+			valid := false
+			valid, dfa = partition.ToDFA(dfa)
+
+			// Panic if state partition to DFA conversion was unsuccessful.
+			if !valid {
+				panic("Invalid merged DFA.")
+			}
+
+			// Update ordered states within new DFA.
+			orderedStates = dfa.OrderedStates()
+
+			// Remove previous state pairs' score.
+			detMerges = nil
+		}else{
+			break
+		}
+	}
+
+	totalTime := (time.Now()).Sub(start).Seconds()
+	fmt.Printf("Merges per second: %.2f\n", float64(totalMerges)/totalTime)
+
+	// Return the final resultant DFA.
+	return dfa
 }

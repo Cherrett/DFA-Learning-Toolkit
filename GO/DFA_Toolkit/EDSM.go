@@ -12,7 +12,24 @@ func GreedyEDSM(dataset Dataset, randomFromBest bool) DFA{
 		return LengthOfDataset - partition.NumberOfLabelledBlocks()
 	}
 
-	// Call GreedyPath function using APTA and EDSM scoring function
+	// Call GreedyMerge function using APTA and EDSM scoring function
 	// declared above. Return resultant DFA.
-	return GreedyPath(APTA, EDSM, randomFromBest)
+	return GreedyMerge(APTA, EDSM, randomFromBest)
+}
+
+// WindowedEDSM is a windowed version of Evidence Driven State-Merging.
+func WindowedEDSM(dataset Dataset, windowSize int, windowGrow float64, randomFromBest bool) DFA{
+	// Store length of dataset.
+	LengthOfDataset := len(dataset)
+	// Construct an APTA from dataset.
+	APTA := dataset.GetPTA(true)
+
+	// EDSM scoring function.
+	EDSM := func (partition StatePartition) int {
+		return LengthOfDataset - partition.NumberOfLabelledBlocks()
+	}
+
+	// Call WindowedMerge function using APTA and EDSM scoring function
+	// declared above. Return resultant DFA.
+	return WindowedMerge(APTA, windowSize, windowGrow, EDSM, randomFromBest)
 }

@@ -377,6 +377,18 @@ func (dfa *DFA) CalculateDepthAndOrder(){
 	dfa.ComputedDepthAndOrder = true
 }
 
+// Returns the state IDs in order,
+func (dfa DFA) OrderedStates() []int{
+	dfa.GetDepth()
+	orderedStates := make([]int, len(dfa.States))
+
+	for stateID := range dfa.States{
+		orderedStates[dfa.States[stateID].Order] = stateID
+	}
+
+	return orderedStates
+}
+
 func (dfa DFA) Describe(detail bool) {
 	fmt.Println("This DFA has", len(dfa.States), "states and", len(dfa.SymbolMap), "alphabet")
 	if detail {
