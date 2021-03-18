@@ -417,7 +417,7 @@ func (dfa DFA) Accuracy(dataset Dataset) float64 {
 	for _, stringInstance := range dataset {
 		// If the status of the string instance is equal to its state status
 		// within the DFA, increment correct classifications count.
-		if stringInstance.status == stringInstance.ParseToStateStatus(dfa) {
+		if stringInstance.Status == stringInstance.ParseToStateStatus(dfa) {
 			correctClassifications++
 		}
 	}
