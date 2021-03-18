@@ -2,7 +2,11 @@ package DFA_Toolkit
 
 import (
 	"DFA_Toolkit/DFA_Toolkit/util"
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
+	"os"
 	"reflect"
 )
 
@@ -533,6 +537,45 @@ func (dfa DFA) IsValid() bool{
 		panic("Unreachable State exist within DFA.")
 	}
 	return true
+}
+
+func (dfa DFA) ToJSON(filePath string) bool{
+	file, err := os.Create(filePath)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+	defer file.Close()
+	resultantJSON, err := json.MarshalIndent(dfa, "", "\t")
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	_, err = io.Copy(file,  bytes.NewReader(resultantJSON))
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	return true
+}
+
+func DFAFromJSON(filePath string) (DFA, bool){
+	file, err := os.Open(filePath)
+	if err != nil {
+		return DFA{}, false
+	}
+	defer file.Close()
+
+	resultantDFA := DFA{}
+	err = json.NewDecoder(file).Decode(&resultantDFA)
+
+	if err != nil {
+		return DFA{}, false
+	}
+
+	return resultantDFA, true
 }
 
 //func (dfa *DFA) MergeStates(state1 int, state2 int) bool{
