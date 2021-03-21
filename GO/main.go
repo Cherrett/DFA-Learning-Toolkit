@@ -1,31 +1,62 @@
 package main
 
 import (
-	"./DFA_Toolkit"
+	"DFA_Toolkit/DFA_Toolkit"
 	"fmt"
+	"math/rand"
 	"time"
 )
 
 func main() {
+	// random seed
+	rand.Seed(time.Now().UnixNano())
+
+	//DFA_Toolkit.BenchmarkDetMerge()
+
 	var timings []int64
-	iterations := 5
+	iterations := 1
 
 	for i := 0; i < iterations; i++ {
 		start := time.Now()
 
-		listOfStrings := DFA_Toolkit.GetListOfStringInstancesFromFile("dataset1/train.a")
-		//APTA := DFA_Toolkit.GetPTAFromListOfStringInstances(listOfStrings, true)
-		//APTA.Describe(false)
+		//AbbadingoDFA := DFA_Toolkit.AbbadingoDFA(20, true)
+		//AbbadingoDFA.Describe(false)
+		//fmt.Println("DFA Depth:", AbbadingoDFA.GetDepth())
+		//fmt.Println("DFA Loops:", AbbadingoDFA.LoopsCount())
+		//
+		//trainingDataset, testingDataset := DFA_Toolkit.AbbadingoDataset(AbbadingoDFA, 50, 0.2)
+		//
+		//trainingDatasetConsistentWithDFA := trainingDataset.ConsistentWithDFA(AbbadingoDFA)
+		//testingDatasetConsistentWithDFA := testingDataset.ConsistentWithDFA(AbbadingoDFA)
+		//
+		//if trainingDatasetConsistentWithDFA && testingDatasetConsistentWithDFA{
+		//	fmt.Println("Both Consistent with AbbadingoDFA")
+		//}
+		//
+		//trainingDataset.WriteToAbbadingoFile("AbbadingoDatasets/customDataset1/training.a")
+		//testingDataset.WriteToAbbadingoFile("AbbadingoDatasets/customDataset1/testing.a")
 
-		//fmt.Println("DFA Depth:", APTA.Depth())
+		dataset := DFA_Toolkit.GetDatasetFromAbbadingoFile("./AbbadingoDatasets/dataset1/train.a")
 
-		//APTA.AddState(DFA_Toolkit.UNKNOWN)
-		//fmt.Println(DFA_Toolkit.ListOfStringInstancesConsistentWithDFA(listOfStrings, APTA))
+		APTA := dataset.GetPTA(false)
+		fmt.Println("APTA Depth:", APTA.GetDepth())
+		fmt.Println("APTA Loops:", APTA.LoopsCount())
 
-		result := DFA_Toolkit.RPNI(DFA_Toolkit.GetAcceptingStringInstances(listOfStrings),
-			DFA_Toolkit.GetRejectingStringInstances(listOfStrings))
+		APTA.Describe(true)
 
-		result.Describe(true)
+		statePartition := APTA.ToStatePartition()
+
+		valid := statePartition.MergeStates(APTA, 2, 4)
+		fmt.Println(valid)
+		valid, mergedDFA := statePartition.ToDFA(APTA)
+
+		if !valid{
+			fmt.Printf("Error!")
+		}else{
+			fmt.Printf("\nMerged DFA Below\n")
+			mergedDFA.Describe(true)
+		}
+
 		timings = append(timings, time.Since(start).Milliseconds())
 	}
 	var sum int64
