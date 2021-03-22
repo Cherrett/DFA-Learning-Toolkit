@@ -369,3 +369,9 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 .vscode/settings.json
+GO/AbbadingoDatasets/test.json
+GO/AbbadingoDatasets/test.txt
+GO/DFA_Toolkit/test/DFA_Toolkit_test2.go
+GO/DFA_Toolkit/test/EDSMTest.go
+GO/DFA_Toolkit/test/MergePathTest.go
+GO/DFA_Toolkit/test/StatePartitionTest.go
