@@ -8,8 +8,8 @@ func GreedyEDSM(dataset Dataset, randomFromBest bool) DFA{
 	APTA := dataset.GetPTA(true)
 
 	// EDSM scoring function.
-	EDSM := func (partition StatePartition) int {
-		return LengthOfDataset - partition.NumberOfLabelledBlocks()
+	EDSM := func (stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition, dfa DFA) int {
+		return LengthOfDataset - partitionAfter.NumberOfLabelledBlocks()
 	}
 
 	// Call GreedySearch function using APTA and EDSM scoring function
@@ -25,8 +25,8 @@ func WindowedEDSM(dataset Dataset, windowSize int, windowGrow float64, randomFro
 	APTA := dataset.GetPTA(true)
 
 	// EDSM scoring function.
-	EDSM := func (partition StatePartition) int {
-		return LengthOfDataset - partition.NumberOfLabelledBlocks()
+	EDSM := func (stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition, dfa DFA) int {
+		return LengthOfDataset - partitionAfter.NumberOfLabelledBlocks()
 	}
 
 	// Call WindowedSearch function using APTA and EDSM scoring function
@@ -42,8 +42,9 @@ func BlueFringeEDSM(dataset Dataset, randomFromBest bool) DFA{
 	APTA := dataset.GetPTA(true)
 
 	// EDSM scoring function.
-	EDSM := func (partition StatePartition) int {
-		return LengthOfDataset - partition.NumberOfLabelledBlocks()
+	EDSM := func (stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition, dfa DFA) int {
+		//return (100 * (partitionBefore.NumberOfLabelledBlocks() - partitionAfter.NumberOfLabelledBlocks())) + 99 - dfa.States[stateID2].Depth()
+		return LengthOfDataset - partitionAfter.NumberOfLabelledBlocks()
 	}
 
 	// Call WindowedSearch function using APTA and EDSM scoring function

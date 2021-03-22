@@ -174,10 +174,8 @@ func TestBenchmarkDetMerge(t *testing.T){
 	rand.Seed(time.Now().UnixNano())
 
 	// These are target DFA sizes we will test.
-	//dfaSizes := []int{32, 64, 128}
 	dfaSizes := []int{32, 64, 128}
 	// These are the training set sizes we will test.
-	//trainingSetSizes := []int{607, 1521, 4382}
 	trainingSetSizes := []int{607, 1521, 4382}
 
 	// Benchmark over the problem instances.
@@ -352,7 +350,7 @@ func TestBenchmarkBlueFringeEDSM(t *testing.T){
 		// Training testing sets.
 		trainingSet, testingSet := AbbadingoDatasetExact(target, 607, 1800)
 
-		resultantDFA := BlueFringeEDSM(trainingSet, false)
+		resultantDFA := BlueFringeEDSM(trainingSet, true)
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		totalAccuracies.Add(accuracy)
