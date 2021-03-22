@@ -40,13 +40,13 @@ func NewStringInstanceFromAbbadingoFile(text string, delimiter string) StringIns
 
 	switch splitString[0] {
 	case "0":
-		stringInstance.status = REJECTING
+		stringInstance.Status = REJECTING
 		break
 	case "1":
-		stringInstance.status = ACCEPTING
+		stringInstance.Status = ACCEPTING
 		break
 	case "-1":
-		stringInstance.status = UNKNOWN
+		stringInstance.Status = UNKNOWN
 		break
 	default:
 		panic(fmt.Sprintf("Unknown string status - %s", splitString[0]))
@@ -55,12 +55,12 @@ func NewStringInstanceFromAbbadingoFile(text string, delimiter string) StringIns
 	i, err := strconv.Atoi(splitString[1])
 
 	if err == nil {
-		stringInstance.length = uint(i)
+		stringInstance.Length = uint(i)
 	} else {
 		panic(fmt.Sprintf("Invalid string length - %s", splitString[1]))
 	}
 
-	stringInstance.value = []rune(strings.Join(splitString[2:], ""))
+	stringInstance.Value = []rune(strings.Join(splitString[2:], ""))
 
 	return stringInstance
 }
@@ -192,8 +192,8 @@ func (dataset Dataset) WriteToAbbadingoFile(filePath string){
 	_, _ = writer.WriteString(strconv.Itoa(len(dataset)) + " 2\n")
 
 	for _, stringInstance := range sortedDataset{
-		outputString := strconv.Itoa(int(stringInstance.status))+" "+strconv.Itoa(int(stringInstance.length))+" "
-		for _, symbol := range stringInstance.value{
+		outputString := strconv.Itoa(int(stringInstance.Status))+" "+strconv.Itoa(int(stringInstance.Length))+" "
+		for _, symbol := range stringInstance.Value {
 			if symbol == 'a'{
 				outputString += "0 "
 			}else{

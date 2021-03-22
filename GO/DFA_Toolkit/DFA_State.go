@@ -12,11 +12,11 @@ const (
 
 // State struct which represents a State within a DFA.
 type State struct {
-	StateStatus StateStatus // State Status (Rejecting, Accepting, or Unknown)
-	Transitions []int		// Transition Table where each element corresponds to a transition for each symbol ID.
-
-	Depth int				// Depth of State within DFA
-	Order int				// Order of State within DFA
+	StateStatus StateStatus // State Status (Rejecting, Accepting, or Unknown).
+	Transitions []int       // Transition Table where each element corresponds to a transition for each symbol ID.
+	depth       int         // Depth of State within DFA.
+	order       int         // Order of State within DFA.
+	dfa         *DFA        // Pointer to DFA containing state.
 }
 
 // Returns true if state status is accepting, otherwise returns false.
@@ -32,4 +32,27 @@ func (state State) IsRejecting() bool{
 // Returns true if state status is unknown, otherwise returns false.
 func (state State) IsUnknown() bool{
 	return state.StateStatus == UNKNOWN
+}
+
+// Returns the state's depth within DFA.
+func (state *State) Depth() int{
+	if state.depth == -1{
+		state.dfa.CalculateDepthAndOrder()
+	}
+
+	return state.depth
+}
+
+// Returns the state's order within DFA.
+func (state *State) Order() int{
+	if state.order == -1{
+		state.dfa.CalculateDepthAndOrder()
+	}
+
+	return state.order
+}
+
+// Returns a pointer to the DFA which contains this State.
+func (state State) DFA() *DFA{
+	return state.dfa
 }

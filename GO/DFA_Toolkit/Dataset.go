@@ -1,15 +1,20 @@
 package DFA_Toolkit
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"os"
 	"sort"
 	"strconv"
 	"sync"
 )
 
 type StringInstance struct {
-	value []rune
-	status StateStatus
-	length uint
+	Value  []rune
+	Status StateStatus
+	Length uint
 }
 
 type Dataset []StringInstance
@@ -21,8 +26,8 @@ func (dataset Dataset) GetPTA(APTA bool) DFA {
 	var currentStateID, newStateID int
 	dfa := NewDFA()
 
-	if dataset[0].length == 0 {
-		if dataset[0].status == ACCEPTING {
+	if dataset[0].Length == 0 {
+		if dataset[0].Status == ACCEPTING {
 			currentStateID = dfa.AddState(ACCEPTING)
 		} else if APTA{
 			currentStateID = dfa.AddState(REJECTING)
@@ -36,12 +41,12 @@ func (dataset Dataset) GetPTA(APTA bool) DFA {
 	dfa.StartingStateID = currentStateID
 
 	for _, stringInstance := range dataset {
-		if !APTA && stringInstance.status != ACCEPTING {
+		if !APTA && stringInstance.Status != ACCEPTING {
 			continue
 		}
 		currentStateID = dfa.StartingStateID
 		count = 0
-		for _, symbol := range stringInstance.value {
+		for _, symbol := range stringInstance.Value {
 			count++
 			// new alphabet check
 			if !alphabet[symbol] {
@@ -54,8 +59,8 @@ func (dataset Dataset) GetPTA(APTA bool) DFA {
 			if dfa.States[currentStateID].Transitions[symbolID] != -1 {
 				currentStateID = dfa.States[currentStateID].Transitions[symbolID]
 				// last symbol in string check
-				if count == stringInstance.length {
-					if stringInstance.status == ACCEPTING {
+				if count == stringInstance.Length {
+					if stringInstance.Status == ACCEPTING {
 						if dfa.States[currentStateID].StateStatus == REJECTING {
 							panic("State already set to rejecting, cannot set to accepting")
 						} else {
@@ -71,8 +76,8 @@ func (dataset Dataset) GetPTA(APTA bool) DFA {
 				}
 			} else {
 				// last symbol in string check
-				if count == stringInstance.length {
-					if stringInstance.status == ACCEPTING {
+				if count == stringInstance.Length {
+					if stringInstance.Status == ACCEPTING {
 						newStateID = dfa.AddState(ACCEPTING)
 					} else {
 						newStateID = dfa.AddState(REJECTING)
@@ -91,13 +96,13 @@ func (dataset Dataset) GetPTA(APTA bool) DFA {
 func (stringInstance StringInstance) ConsistentWithDFA(dfa DFA) bool{
 	currentState := dfa.States[dfa.StartingStateID]
 	var count uint = 0
-	for _, symbol := range stringInstance.value{
+	for _, symbol := range stringInstance.Value {
 		count++
 		if currentState.Transitions[dfa.SymbolID(symbol)] != -1 {
 			currentState = dfa.States[currentState.Transitions[dfa.SymbolID(symbol)]]
 			// last symbol in string check
-			if count == stringInstance.length {
-				if stringInstance.status == ACCEPTING {
+			if count == stringInstance.Length {
+				if stringInstance.Status == ACCEPTING {
 					if currentState.StateStatus == REJECTING {
 						return false
 					}
@@ -108,7 +113,7 @@ func (stringInstance StringInstance) ConsistentWithDFA(dfa DFA) bool{
 				}
 			}
 		}else{
-			return !(stringInstance.status == ACCEPTING)
+			return !(stringInstance.Status == ACCEPTING)
 		}
 	}
 	return true
@@ -118,14 +123,14 @@ func (stringInstance StringInstance) ParseToStateStatus(dfa DFA) StateStatus{
 	currentStateID := dfa.StartingStateID
 	count := uint(0)
 
-	for _, symbol := range stringInstance.value {
+	for _, symbol := range stringInstance.Value {
 		count++
 
 		if dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)] != -1 {
 			currentStateID = dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)]
 			// last symbol in string check
-			if count == stringInstance.length{
-				if dfa.States[currentStateID].StateStatus == UNKNOWN{
+			if count == stringInstance.Length {
+				if dfa.States[currentStateID].StateStatus == UNKNOWN || dfa.States[currentStateID].StateStatus == REJECTING{
 					return REJECTING
 				}else{
 					return ACCEPTING
@@ -142,13 +147,13 @@ func (stringInstance StringInstance) ParseToState(dfa DFA) (bool, int){
 	currentStateID := dfa.StartingStateID
 	count := uint(0)
 
-	for _, symbol := range stringInstance.value {
+	for _, symbol := range stringInstance.Value {
 		count++
 
 		if dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)] != -1 {
 			currentStateID = dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)]
 			// last symbol in string check
-			if count == stringInstance.length{
+			if count == stringInstance.Length {
 				return true, currentStateID
 			}
 		}else{
@@ -159,17 +164,17 @@ func (stringInstance StringInstance) ParseToState(dfa DFA) (bool, int){
 }
 
 func BinaryStringToStringInstance(dfa DFA, binaryString string) StringInstance{
-	stringInstance := StringInstance{length: uint(len(binaryString))}
+	stringInstance := StringInstance{Length: uint(len(binaryString))}
 
 	for _, value := range binaryString{
 		symbolID, err := strconv.Atoi(string(value))
 		if err != nil || (symbolID != 0 && symbolID != 1){
 			panic("Not a binary string")
 		}
-		stringInstance.value = append(stringInstance.value, dfa.Symbol(symbolID))
+		stringInstance.Value = append(stringInstance.Value, dfa.Symbol(symbolID))
 	}
 
-	stringInstance.status = stringInstance.ParseToStateStatus(dfa)
+	stringInstance.Status = stringInstance.ParseToStateStatus(dfa)
 
 	return stringInstance
 }
@@ -177,7 +182,7 @@ func BinaryStringToStringInstance(dfa DFA, binaryString string) StringInstance{
 func (dataset Dataset) SortDatasetByLength() Dataset{
 	// sort all string instances by length
 	sort.Slice(dataset[:], func(i, j int) bool {
-		return dataset[i].length < dataset[j].length
+		return dataset[i].Length < dataset[j].Length
 	})
 	return dataset
 }
@@ -204,7 +209,7 @@ func (dataset Dataset) AcceptingStringInstances() Dataset{
 	var acceptingInstances Dataset
 
 	for _, stringInstance := range dataset {
-		if stringInstance.status == ACCEPTING {
+		if stringInstance.Status == ACCEPTING {
 			acceptingInstances = append(acceptingInstances, stringInstance)
 		}
 	}
@@ -216,7 +221,7 @@ func (dataset Dataset) RejectingStringInstances() Dataset{
 	var rejectingInstances Dataset
 
 	for _, stringInstance := range dataset {
-		if stringInstance.status == REJECTING {
+		if stringInstance.Status == REJECTING {
 			rejectingInstances = append(rejectingInstances, stringInstance)
 		}
 	}
@@ -228,7 +233,7 @@ func (dataset Dataset) AcceptingStringInstancesCount() int{
 	count := 0
 
 	for _, stringInstance := range dataset {
-		if stringInstance.status == ACCEPTING {
+		if stringInstance.Status == ACCEPTING {
 			count++
 		}
 	}
@@ -240,7 +245,7 @@ func (dataset Dataset) RejectingStringInstancesCount() int{
 	count := 0
 
 	for _, stringInstance := range dataset {
-		if stringInstance.status == REJECTING {
+		if stringInstance.Status == REJECTING {
 			count++
 		}
 	}
@@ -254,4 +259,44 @@ func (dataset Dataset) AcceptingStringInstancesRatio() float64{
 
 func (dataset Dataset) RejectingStringInstancesRatio() float64{
 	return float64(dataset.RejectingStringInstancesCount()) / float64(len(dataset))
+}
+
+func (dataset Dataset) ToJSON(filePath string) bool{
+	dataset.SortDatasetByLength()
+	file, err := os.Create(filePath)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+	defer file.Close()
+	resultantJSON, err := json.MarshalIndent(dataset, "", "\t")
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	_, err = io.Copy(file,  bytes.NewReader(resultantJSON))
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	return true
+}
+
+func DatasetFromJSON(filePath string) (Dataset, bool){
+	file, err := os.Open(filePath)
+	if err != nil {
+		return Dataset{}, false
+	}
+	defer file.Close()
+
+	resultantDataset := Dataset{}
+	err = json.NewDecoder(file).Decode(&resultantDataset)
+
+	if err != nil {
+		return Dataset{}, false
+	}
+
+	return resultantDataset, true
 }

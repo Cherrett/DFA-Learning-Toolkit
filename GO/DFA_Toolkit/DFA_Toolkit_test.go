@@ -1,11 +1,15 @@
 package DFA_Toolkit
 
 import (
+	"DFA_Toolkit/DFA_Toolkit/util"
+	"fmt"
 	"math"
 	"math/rand"
 	"testing"
 	"time"
 )
+
+// -------------------- BASIC TESTS --------------------
 
 func TestAbbadingoDFAFromFile(t *testing.T) {
 	t.Parallel()
@@ -28,7 +32,7 @@ func TestAbbadingoDFAFromFile(t *testing.T) {
 
 func TestAbbadingoDFAGeneration(t *testing.T) {
 	t.Parallel()
-	// random seed
+	// Random Seed.
 	rand.Seed(time.Now().UnixNano())
 	numberOfStates := rand.Intn(499) + 1
 
@@ -103,8 +107,269 @@ func TestStateMergingAndDFAEquivalence(t *testing.T){
 	}
 }
 
-func TestTemporary(t *testing.T){
-	// random seed
-	//rand.Seed(time.Now().UnixNano())
-	BenchmarkDetMerge()
+func TestVisualisation(t *testing.T){
+	t.Parallel()
+	// Training set.
+	training := GetDatasetFromAbbadingoFile("../AbbadingoDatasets/test.txt")
+
+	test := training.GetPTA(true)
+
+	// Visualisation Examples
+	examplesFilenames := []string{"../Visualisation/test_leftright", "../Visualisation/test_leftright_ordered",
+		"../Visualisation/test_topdown", "../Visualisation/test_topdown_ordered"}
+	examplesRankByOrder := []bool{false, true, false, true}
+	examplesTopDown := []bool{false, false, true, true}
+
+	// To DOT scenario
+	for exampleIndex := range examplesFilenames {
+		filePath := examplesFilenames[exampleIndex]+".dot"
+		test.ToDOT(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
+		if !util.FileExists(filePath) {
+			t.Errorf("DFA toDOT failed, %s file not found.", filePath)
+		}
+	}
+
+	// To PNG scenario
+	for exampleIndex := range examplesFilenames {
+		filePath := examplesFilenames[exampleIndex]+".png"
+		test.ToPNG(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
+		if !util.FileExists(filePath) {
+			t.Errorf("DFA toPNG failed, %s file not found.", filePath)
+		}
+	}
+
+	// To JPG scenario
+	for exampleIndex := range examplesFilenames {
+		filePath := examplesFilenames[exampleIndex]+".jpg"
+		test.ToJPG(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
+		if !util.FileExists(filePath) {
+			t.Errorf("DFA toJPG failed, %s file not found.", filePath)
+		}
+	}
+
+	// To PDF scenario
+	for exampleIndex := range examplesFilenames {
+		filePath := examplesFilenames[exampleIndex]+".pdf"
+		test.ToPDF(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
+		if !util.FileExists(filePath) {
+			t.Errorf("DFA toPDF failed, %s file not found.", filePath)
+		}
+	}
+
+	// To SVG scenario
+	for exampleIndex := range examplesFilenames {
+		filePath := examplesFilenames[exampleIndex]+".svg"
+		test.ToSVG(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
+		if !util.FileExists(filePath) {
+			t.Errorf("DFA toSVG failed, %s file not found.", filePath)
+		}
+	}
+}
+
+// -------------------- BENCHMARKS --------------------
+
+// TestBenchmarkDetMerge benchmarks the performance of the MergeStates() function.
+func TestBenchmarkDetMerge(t *testing.T){
+	// Random Seed.
+	rand.Seed(time.Now().UnixNano())
+
+	// These are target DFA sizes we will test.
+	dfaSizes := []int{32, 64, 128}
+	// These are the training set sizes we will test.
+	trainingSetSizes := []int{607, 1521, 4382}
+
+	// Benchmark over the problem instances.
+	for i := range dfaSizes {
+		targetSize := dfaSizes[i]
+		trainingSetSize := trainingSetSizes[i]
+
+		// Create a target DFA.
+		target := AbbadingoDFA(targetSize, true)
+
+		// Training set.
+		training, _ := AbbadingoDatasetExact(target, trainingSetSize, 0)
+
+		fmt.Printf("-------------------------------------------------------------\n")
+		fmt.Printf("-------------------------------------------------------------\n")
+		fmt.Printf("BENCHMARK %d (Target: %d states, Training: %d strings\n", i+1, targetSize, len(training))
+		fmt.Printf("-------------------------------------------------------------\n")
+		fmt.Printf("-------------------------------------------------------------\n")
+
+		// Info about training set.
+		fmt.Printf("Training proportion +ve: %.2f%%\n", training.AcceptingStringInstancesRatio()*100.0)
+		fmt.Printf("Training proportion -ve: %.2f%%\n", training.RejectingStringInstancesRatio()*100.0)
+
+		// Create APTA.
+		apta := training.GetPTA(true)
+		//apta := training.APTA(target.AlphabetSize)
+		fmt.Printf("APTA size: %d\n", len(apta.States))
+
+		// Perform all the merges.
+		part := apta.ToStatePartition()
+		snapshot := part.Copy()
+		totalMerges := 0
+		validMerges := 0
+		start := time.Now()
+
+		for i := 0; i < len(apta.States); i++ {
+			for j := i + 1; j < len(apta.States); j++ {
+				totalMerges++
+				if snapshot.MergeStates(apta, i, j){
+					validMerges++
+					//snapshot.LabelledBlocksCount(apta)
+					//snapshot.BlocksCount()
+					//print(temp, temp2)
+				}
+
+				snapshot.RollbackChanges(part)
+			}
+		}
+
+		totalTime := (time.Now()).Sub(start).Seconds()
+		fmt.Printf("Total merges: %d\n", totalMerges)
+		fmt.Printf("Valid merges: %d\n", validMerges)
+		fmt.Printf("Time: %.2fs\n", totalTime)
+		fmt.Printf("Merges per second: %.2f\n", float64(totalMerges)/totalTime)
+	}
+}
+
+// TestBenchmarkGreedyEDSM benchmarks the performance of the GreedyEDSM() function.
+func TestBenchmarkGreedyEDSM(t *testing.T){
+	// Random Seed.
+	rand.Seed(time.Now().UnixNano())
+
+	// Number of iterations.
+	n := 128
+	// Target size.
+	targetSize := 32
+
+	winners := 0
+	totalAccuracies := util.NewMinMaxAvg()
+	totalNumberOfStates := util.NewMinMaxAvg()
+	for i := 0; i < n; i++ {
+		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
+		start := time.Now()
+
+		// Create a target DFA.
+		target := AbbadingoDFA(targetSize, true)
+
+		// Training testing sets.
+		trainingSet, testingSet := AbbadingoDatasetExact(target, 607, 1800)
+
+		resultantDFA := GreedyEDSM(trainingSet, false)
+		accuracy := resultantDFA.Accuracy(testingSet)
+
+		totalAccuracies.Add(accuracy)
+		totalNumberOfStates.Add(float64(resultantDFA.AllStatesCount()))
+
+		if accuracy >= 0.99{
+			winners++
+		}
+
+		fmt.Printf("Duration: %.2fs\n\n", time.Since(start).Seconds())
+	}
+
+	successfulPercentage := float64(winners) / float64(n)
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentage)
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", totalAccuracies.Min(), totalAccuracies.Max(), totalAccuracies.Avg())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", totalNumberOfStates.Min(), totalNumberOfStates.Max(), totalNumberOfStates.Avg())
+	fmt.Print("-----------------------------------------------------------------------------\n\n")
+
+	if successfulPercentage < 0.10 || successfulPercentage > 0.15{
+		t.Error("The percentage of successful DFAs is less than 0.10 or bigger than 0.15.")
+	}
+}
+
+// TestBenchmarkWindowedEDSM benchmarks the performance of the WindowedEDSM() function.
+func TestBenchmarkWindowedEDSM(t *testing.T){
+	// Random Seed.
+	rand.Seed(time.Now().UnixNano())
+
+	// Number of iterations.
+	n := 128
+	// Target size.
+	targetSize := 32
+
+	winners := 0
+	totalAccuracies := util.NewMinMaxAvg()
+	totalNumberOfStates := util.NewMinMaxAvg()
+	for i := 0; i < n; i++ {
+		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
+		start := time.Now()
+
+		// Create a target DFA.
+		target := AbbadingoDFA(targetSize, true)
+
+		// Training testing sets.
+		trainingSet, testingSet := AbbadingoDatasetExact(target, 607, 1800)
+
+		resultantDFA := WindowedEDSM(trainingSet, targetSize*2, 2.0, false)
+		accuracy := resultantDFA.Accuracy(testingSet)
+
+		totalAccuracies.Add(accuracy)
+		totalNumberOfStates.Add(float64(resultantDFA.AllStatesCount()))
+
+		if accuracy >= 0.99{
+			winners++
+		}
+
+		fmt.Printf("Duration: %.2fs\n\n", time.Since(start).Seconds())
+	}
+
+	successfulPercentage := float64(winners) / float64(n)
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentage)
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", totalAccuracies.Min(), totalAccuracies.Max(), totalAccuracies.Avg())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", totalNumberOfStates.Min(), totalNumberOfStates.Max(), totalNumberOfStates.Avg())
+	fmt.Print("-----------------------------------------------------------------------------\n\n")
+
+	if successfulPercentage < 0.09 || successfulPercentage > 0.15{
+		t.Error("The percentage of successful DFAs is less than 0.10 or bigger than 0.15.")
+	}
+}
+
+// TestBenchmarkBlueFringeEDSM benchmarks the performance of the BlueFringeEDSM() function.
+func TestBenchmarkBlueFringeEDSM(t *testing.T){
+	// Random Seed.
+	rand.Seed(time.Now().UnixNano())
+
+	// Number of iterations.
+	n := 128
+	// Target size.
+	targetSize := 32
+
+	winners := 0
+	totalAccuracies := util.NewMinMaxAvg()
+	totalNumberOfStates := util.NewMinMaxAvg()
+	for i := 0; i < n; i++ {
+		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
+		start := time.Now()
+
+		// Create a target DFA.
+		target := AbbadingoDFA(targetSize, true)
+
+		// Training testing sets.
+		trainingSet, testingSet := AbbadingoDatasetExact(target, 607, 1800)
+
+		resultantDFA := BlueFringeEDSM(trainingSet, true)
+		accuracy := resultantDFA.Accuracy(testingSet)
+
+		totalAccuracies.Add(accuracy)
+		totalNumberOfStates.Add(float64(resultantDFA.AllStatesCount()))
+
+		if accuracy >= 0.99{
+			winners++
+		}
+
+		fmt.Printf("Duration: %.2fs\n\n", time.Since(start).Seconds())
+	}
+
+	successfulPercentage := float64(winners) / float64(n)
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentage)
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", totalAccuracies.Min(), totalAccuracies.Max(), totalAccuracies.Avg())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", totalNumberOfStates.Min(), totalNumberOfStates.Max(), totalNumberOfStates.Avg())
+	fmt.Print("-----------------------------------------------------------------------------\n\n")
+
+	if successfulPercentage < 0.09 || successfulPercentage > 0.15{
+		t.Error("The percentage of successful DFAs is less than 0.10 or bigger than 0.15.")
+	}
 }

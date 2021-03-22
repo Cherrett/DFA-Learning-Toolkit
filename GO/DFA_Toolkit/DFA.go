@@ -2,18 +2,21 @@ package DFA_Toolkit
 
 import (
 	"DFA_Toolkit/DFA_Toolkit/util"
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
+	"os"
 	"reflect"
 )
 
 // DFA struct which represents a DFA.
 type DFA struct {
-	States          []State      // Slice of states within the DFA where the index is the State ID.
-	StartingStateID int          // The ID of the starting state of the DFA.
-	SymbolMap       map[rune]int // A map of each symbol within the DFA to its ID.
-
-	Depth                 int  // The depth of the DFA.
-	ComputedDepthAndOrder bool // Whether the Depth and Order were calculated DFA.
+	States                []State      // Slice of states within the DFA where the index is the State ID.
+	StartingStateID 	  int          // The ID of the starting state of the DFA.
+	SymbolMap       	  map[rune]int // A map of each symbol within the DFA to its ID.
+	Depth                 int  	       // The depth of the DFA.
+	ComputedDepthAndOrder bool 	       // Whether the Depth and Order were calculated.
 }
 
 // Initializes a new empty DFA.
@@ -31,7 +34,7 @@ func (dfa *DFA) AddState(stateStatus StateStatus) int {
 		transitions[i] = -1
 	}
 	// Initialize and add the new state to the slice of states within the DFA.
-	dfa.States = append(dfa.States, State{stateStatus, transitions, -1, -1})
+	dfa.States = append(dfa.States, State{stateStatus, transitions, -1, -1, dfa})
 	// Return the ID of the newly created state.
 	return len(dfa.States) - 1
 }
@@ -187,6 +190,18 @@ func (dfa DFA) AllStatesCount() int {
 	return len(dfa.States)
 }
 
+// Returns the number of labelled states (accepting or rejecting) within DFA.
+func (dfa DFA) LabelledStatesCount() int {
+	count := 0
+
+	for stateID := range dfa.States {
+		if dfa.States[stateID].StateStatus == ACCEPTING || dfa.States[stateID].StateStatus == REJECTING {
+			count++
+		}
+	}
+	return count
+}
+
 // Returns the number of accepting states within DFA.
 func (dfa DFA) AcceptingStatesCount() int {
 	count := 0
@@ -274,7 +289,7 @@ func (dfa DFA) LoopsCount() int{
 	for stateID := range dfa.States {
 		for symbolID := range dfa.States[stateID].Transitions {
 			if dfa.States[stateID].Transitions[symbolID] != -1 {
-				if dfa.States[dfa.States[stateID].Transitions[symbolID]].Depth < dfa.States[stateID].Depth {
+				if dfa.States[dfa.States[stateID].Transitions[symbolID]].depth < dfa.States[stateID].depth {
 					if _, ok := visitedStatesCount[stateID]; ok {
 						visitedStatesCount[stateID]++
 					}else{
@@ -333,10 +348,10 @@ func (dfa *DFA) CalculateDepthAndOrder(){
 	dfa.Depth = -1
 
 	for i := range dfa.States {
-		dfa.States[i].Depth = -1
+		dfa.States[i].depth = -1
 	}
 
-	dfa.States[dfa.StartingStateID].Depth = 0
+	dfa.States[dfa.StartingStateID].depth = 0
 
 	currentOrder := 0
 	queue := []int{dfa.StartingStateID}
@@ -345,20 +360,32 @@ func (dfa *DFA) CalculateDepthAndOrder(){
 		stateID := queue[0]
 		queue = append(queue[:0], queue[1:]...)
 
-		dfa.Depth = util.Max(dfa.States[stateID].Depth, dfa.Depth)
-		dfa.States[stateID].Order = currentOrder
+		dfa.Depth = util.Max(dfa.States[stateID].depth, dfa.Depth)
+		dfa.States[stateID].order = currentOrder
 		currentOrder++
 
 		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
 			if childStateID := dfa.States[stateID].Transitions[symbolID]; childStateID != -1 && childStateID != stateID{
-				if dfa.States[childStateID].Depth == -1{
-					dfa.States[childStateID].Depth = dfa.States[stateID].Depth + 1
+				if dfa.States[childStateID].depth == -1{
+					dfa.States[childStateID].depth = dfa.States[stateID].depth + 1
 					queue = append(queue, childStateID)
 				}
 			}
 		}
 	}
 	dfa.ComputedDepthAndOrder = true
+}
+
+// Returns the state IDs in order,
+func (dfa DFA) OrderedStates() []int{
+	dfa.GetDepth()
+	orderedStates := make([]int, len(dfa.States))
+
+	for stateID := range dfa.States{
+		orderedStates[dfa.States[stateID].order] = stateID
+	}
+
+	return orderedStates
 }
 
 func (dfa DFA) Describe(detail bool) {
@@ -392,15 +419,23 @@ func (dfa DFA) Describe(detail bool) {
 	}
 }
 
-func (dfa DFA) AccuracyOfDFA(dataset Dataset) float32 {
-	correctClassifications := float32(0)
+// Returns the DFA's Accuracy with respect to a dataset.
+func (dfa DFA) Accuracy(dataset Dataset) float64 {
+	// Correct classifications count.
+	correctClassifications := float64(0)
 
+	// Iterate over each string instance within dataset.
 	for _, stringInstance := range dataset {
-		if stringInstance.status == stringInstance.ParseToStateStatus(dfa) {
+		// If the status of the string instance is equal to its state status
+		// within the DFA, increment correct classifications count.
+		if stringInstance.Status == stringInstance.ParseToStateStatus(dfa) {
 			correctClassifications++
 		}
 	}
-	return correctClassifications / float32(len(dataset))
+
+	// Return the number of correct classifications divided by the length of
+	// the dataset.
+	return correctClassifications / float64(len(dataset))
 }
 
 func (dfa DFA) UnreachableStates() []int {
@@ -449,6 +484,11 @@ func (dfa *DFA) RemoveUnreachableStates() {
 	}
 }
 
+// Returns a pointer to the starting state within the DFA.
+func (dfa DFA) StartingState() *State{
+	return &dfa.States[dfa.StartingStateID]
+}
+
 func (dfa DFA) Clone() DFA{
 	return DFA{States: dfa.States, StartingStateID: dfa.StartingStateID, SymbolMap: dfa.SymbolMap}
 }
@@ -472,8 +512,8 @@ func (dfa DFA) Equal(dfa2 DFA) bool{
 		queue1 = append(queue1[:0], queue1[1:]...)
 		queue2 = append(queue2[:0], queue2[1:]...)
 
-		dfa.States[stateID1].Order = 0
-		dfa2.States[stateID2].Order = 0
+		dfa.States[stateID1].order = 0
+		dfa2.States[stateID2].order = 0
 
 		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
 			childStateID1 := dfa.States[stateID1].Transitions[symbolID]
@@ -485,9 +525,9 @@ func (dfa DFA) Equal(dfa2 DFA) bool{
 				return false
 			}
 			if childStateID1 != -1 && childStateID1 != stateID1 {
-				if dfa.States[childStateID1].Depth == -1{
-					dfa.States[childStateID1].Depth = dfa.States[stateID1].Depth + 1
-					dfa2.States[childStateID2].Depth = dfa2.States[stateID2].Depth + 1
+				if dfa.States[childStateID1].depth == -1{
+					dfa.States[childStateID1].depth = dfa.States[stateID1].depth + 1
+					dfa2.States[childStateID2].depth = dfa2.States[stateID2].depth + 1
 					queue1 = append(queue1, childStateID1)
 					queue2 = append(queue2, childStateID2)
 				}
@@ -513,4 +553,43 @@ func (dfa DFA) IsValid() bool{
 		panic("Unreachable State exist within DFA.")
 	}
 	return true
+}
+
+func (dfa DFA) ToJSON(filePath string) bool{
+	file, err := os.Create(filePath)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+	defer file.Close()
+	resultantJSON, err := json.MarshalIndent(dfa, "", "\t")
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	_, err = io.Copy(file,  bytes.NewReader(resultantJSON))
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	return true
+}
+
+func DFAFromJSON(filePath string) (DFA, bool){
+	file, err := os.Open(filePath)
+	if err != nil {
+		return DFA{}, false
+	}
+	defer file.Close()
+
+	resultantDFA := DFA{}
+	err = json.NewDecoder(file).Decode(&resultantDFA)
+
+	if err != nil {
+		return DFA{}, false
+	}
+
+	return resultantDFA, true
 }

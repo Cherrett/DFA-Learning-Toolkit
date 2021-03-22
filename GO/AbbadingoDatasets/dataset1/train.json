@@ -1,0 +1,57 @@
+[
+	{
+		"Value": [],
+		"Status": 0,
+		"Length": 0
+	},
+	{
+		"Value": [
+			98
+		],
+		"Status": 1,
+		"Length": 1
+	},
+	{
+		"Value": [
+			97
+		],
+		"Status": 0,
+		"Length": 1
+	},
+	{
+		"Value": [
+			97,
+			97
+		],
+		"Status": 1,
+		"Length": 2
+	},
+	{
+		"Value": [
+			97,
+			97,
+			97
+		],
+		"Status": 0,
+		"Length": 3
+	},
+	{
+		"Value": [
+			98,
+			97,
+			97
+		],
+		"Status": 0,
+		"Length": 3
+	},
+	{
+		"Value": [
+			97,
+			97,
+			97,
+			97
+		],
+		"Status": 1,
+		"Length": 4
+	}
+]
