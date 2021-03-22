@@ -15,17 +15,20 @@ type StatePartition struct {
 }
 
 // Returns an initialized State Partition.
-func NewStatePartition(dfa DFA) *StatePartition {
-	// Initialize new State Partition struct.
-	statePartition := new(StatePartition)
-	statePartition.isCopy = false
-	// Initialize empty slices.
-	statePartition.acceptingBlocksCount = 0
-	statePartition.rejectingBlocksCount = 0
-	statePartition.root = make([]int, len(dfa.States))
-	statePartition.size = make([]int, len(dfa.States))
-	statePartition.link = make([]int, len(dfa.States))
-	statePartition.blockStatus = make([]StateStatus, len(dfa.States))
+func NewStatePartition(dfa DFA) StatePartition {
+	// Initialize new State Partition struct and
+	// initialize empty slices.
+	statePartition := StatePartition{
+		root:                 make([]int, len(dfa.States)),
+		size:                 make([]int, len(dfa.States)),
+		link:                 make([]int, len(dfa.States)),
+		changed:              nil,
+		isCopy:               false,
+		acceptingBlocksCount: 0,
+		rejectingBlocksCount: 0,
+		blockStatus:          make([]StateStatus, len(dfa.States)),
+	}
+
 	// Set root and link as element, and size (score) as 1. Set block status
 	// to state status and increment number of labelled states accordingly.
 	for i := 0; i < len(dfa.States); i++ {
@@ -119,8 +122,8 @@ func (statePartition *StatePartition) WithinSameBlock(stateID1 int, stateID2 int
 }
 
 // Converts a DFA to a State Partition.
-func (dfa DFA) ToStatePartition() *StatePartition {
-	// Return
+func (dfa DFA) ToStatePartition() StatePartition {
+	// Return NewStatePartition.
 	return NewStatePartition(dfa)
 }
 
@@ -283,7 +286,7 @@ func (statePartition StatePartition) Copy() StatePartition{
 }
 
 // Reverts any changes made within state partition given the original state partition.
-func (statePartition *StatePartition) RollbackChanges(originalStatePartition *StatePartition){
+func (statePartition *StatePartition) RollbackChanges(originalStatePartition StatePartition){
 	// If the state partition is a copy, copy values of changed blocks from original
 	// state partition. Else, do nothing.
 	if statePartition.isCopy{

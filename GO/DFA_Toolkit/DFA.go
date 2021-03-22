@@ -12,12 +12,11 @@ import (
 
 // DFA struct which represents a DFA.
 type DFA struct {
-	States          []State      // Slice of states within the DFA where the index is the State ID.
-	StartingStateID int          // The ID of the starting state of the DFA.
-	SymbolMap       map[rune]int // A map of each symbol within the DFA to its ID.
-
-	Depth                 int  // The depth of the DFA.
-	ComputedDepthAndOrder bool // Whether the Depth and Order were calculated DFA.
+	States                []State      // Slice of states within the DFA where the index is the State ID.
+	StartingStateID 	  int          // The ID of the starting state of the DFA.
+	SymbolMap       	  map[rune]int // A map of each symbol within the DFA to its ID.
+	Depth                 int  	       // The depth of the DFA.
+	ComputedDepthAndOrder bool 	       // Whether the Depth and Order were calculated.
 }
 
 // Initializes a new empty DFA.
@@ -35,7 +34,7 @@ func (dfa *DFA) AddState(stateStatus StateStatus) int {
 		transitions[i] = -1
 	}
 	// Initialize and add the new state to the slice of states within the DFA.
-	dfa.States = append(dfa.States, State{stateStatus, transitions, -1, -1})
+	dfa.States = append(dfa.States, State{stateStatus, transitions, -1, -1, dfa})
 	// Return the ID of the newly created state.
 	return len(dfa.States) - 1
 }
@@ -290,7 +289,7 @@ func (dfa DFA) LoopsCount() int{
 	for stateID := range dfa.States {
 		for symbolID := range dfa.States[stateID].Transitions {
 			if dfa.States[stateID].Transitions[symbolID] != -1 {
-				if dfa.States[dfa.States[stateID].Transitions[symbolID]].Depth < dfa.States[stateID].Depth {
+				if dfa.States[dfa.States[stateID].Transitions[symbolID]].depth < dfa.States[stateID].depth {
 					if _, ok := visitedStatesCount[stateID]; ok {
 						visitedStatesCount[stateID]++
 					}else{
@@ -349,10 +348,10 @@ func (dfa *DFA) CalculateDepthAndOrder(){
 	dfa.Depth = -1
 
 	for i := range dfa.States {
-		dfa.States[i].Depth = -1
+		dfa.States[i].depth = -1
 	}
 
-	dfa.States[dfa.StartingStateID].Depth = 0
+	dfa.States[dfa.StartingStateID].depth = 0
 
 	currentOrder := 0
 	queue := []int{dfa.StartingStateID}
@@ -361,14 +360,14 @@ func (dfa *DFA) CalculateDepthAndOrder(){
 		stateID := queue[0]
 		queue = append(queue[:0], queue[1:]...)
 
-		dfa.Depth = util.Max(dfa.States[stateID].Depth, dfa.Depth)
-		dfa.States[stateID].Order = currentOrder
+		dfa.Depth = util.Max(dfa.States[stateID].depth, dfa.Depth)
+		dfa.States[stateID].order = currentOrder
 		currentOrder++
 
 		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
 			if childStateID := dfa.States[stateID].Transitions[symbolID]; childStateID != -1 && childStateID != stateID{
-				if dfa.States[childStateID].Depth == -1{
-					dfa.States[childStateID].Depth = dfa.States[stateID].Depth + 1
+				if dfa.States[childStateID].depth == -1{
+					dfa.States[childStateID].depth = dfa.States[stateID].depth + 1
 					queue = append(queue, childStateID)
 				}
 			}
@@ -383,7 +382,7 @@ func (dfa DFA) OrderedStates() []int{
 	orderedStates := make([]int, len(dfa.States))
 
 	for stateID := range dfa.States{
-		orderedStates[dfa.States[stateID].Order] = stateID
+		orderedStates[dfa.States[stateID].order] = stateID
 	}
 
 	return orderedStates
@@ -485,6 +484,11 @@ func (dfa *DFA) RemoveUnreachableStates() {
 	}
 }
 
+// Returns a pointer to the starting state within the DFA.
+func (dfa DFA) StartingState() *State{
+	return &dfa.States[dfa.StartingStateID]
+}
+
 func (dfa DFA) Clone() DFA{
 	return DFA{States: dfa.States, StartingStateID: dfa.StartingStateID, SymbolMap: dfa.SymbolMap}
 }
@@ -508,8 +512,8 @@ func (dfa DFA) Equal(dfa2 DFA) bool{
 		queue1 = append(queue1[:0], queue1[1:]...)
 		queue2 = append(queue2[:0], queue2[1:]...)
 
-		dfa.States[stateID1].Order = 0
-		dfa2.States[stateID2].Order = 0
+		dfa.States[stateID1].order = 0
+		dfa2.States[stateID2].order = 0
 
 		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
 			childStateID1 := dfa.States[stateID1].Transitions[symbolID]
@@ -521,9 +525,9 @@ func (dfa DFA) Equal(dfa2 DFA) bool{
 				return false
 			}
 			if childStateID1 != -1 && childStateID1 != stateID1 {
-				if dfa.States[childStateID1].Depth == -1{
-					dfa.States[childStateID1].Depth = dfa.States[stateID1].Depth + 1
-					dfa2.States[childStateID2].Depth = dfa2.States[stateID2].Depth + 1
+				if dfa.States[childStateID1].depth == -1{
+					dfa.States[childStateID1].depth = dfa.States[stateID1].depth + 1
+					dfa2.States[childStateID2].depth = dfa2.States[stateID2].depth + 1
 					queue1 = append(queue1, childStateID1)
 					queue2 = append(queue2, childStateID2)
 				}
@@ -589,81 +593,3 @@ func DFAFromJSON(filePath string) (DFA, bool){
 
 	return resultantDFA, true
 }
-
-//func (dfa *DFA) MergeStates(state1 int, state2 int) bool{
-//	state1Status := dfa.States[state1].StateStatus
-//	state2Status := dfa.States[state2].StateStatus
-//	var newStateStatus StateStatus = UNKNOWN
-//	if (state1Status == ACCEPTING && state2Status == REJECTING) || (state1Status == REJECTING && state2Status == ACCEPTING){
-//		return false
-//	}else if state1Status != UNKNOWN{
-//		newStateStatus = state1Status
-//	}else if state2Status != UNKNOWN {
-//		newStateStatus = state2Status
-//	}
-//
-//	for i := 0; i < len(dfa.SymbolMap); i++{
-//		state1transition := dfa.States[state1].Transitions[i]
-//		state2transition := dfa.States[state2].Transitions[i]
-//		if state1transition == -1 && state2transition != -1{
-//			dfa.States[state1].Transitions[i] = state2transition
-//		}else if (state2transition == -1 && state1transition != -1) || (state1transition == state1 && state2transition == state2){
-//			dfa.States[state1].Transitions[i] = state1transition
-//		}else if state1transition != state2transition{
-//			if !dfa.MergeStates(state1transition, state2transition){
-//				return false
-//			}
-//			dfa.States[state1].Transitions[i] = state1transition
-//		}
-//	}
-//
-//	// update new state status
-//	dfa.States[state1].StateStatus = newStateStatus
-//
-//	// replace state2 with state1 (merged state)
-//	dfa.ReplaceState(state2, state1)
-//
-//	return true
-//}
-
-// Replaces a state from DFA with the corresponding State ID.
-//func (dfa *DFA) ReplaceState(stateID int, newStateID int) {
-//	// If the state to be replaced is the starting state, replace it.
-//	if dfa.StartingStateID == stateID {
-//		if newStateID > stateID{
-//			dfa.StartingStateID = newStateID - 1
-//		}else{
-//			dfa.StartingStateID = newStateID
-//		}
-//	// Panic if state ID is out of range.
-//	}else if stateID > len(dfa.States)-1 || stateID < 0 || newStateID > len(dfa.States)-1 || newStateID < 0{
-//		panic("stateID is out of range")
-//	}
-//	// Remove state from slice of states.
-//	dfa.States = append(dfa.States[:stateID], dfa.States[stateID+1:]...)
-//
-//	if newStateID > stateID{
-//		newStateID --
-//	}
-//
-//	// Update transitions to account for changed State IDs and for removed state.
-//	// Iterate over each state within the DFA.
-//	for currentStateID := range dfa.States {
-//		// Iterate over each symbol within the DFA.
-//		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
-//			// Store the ID of the resultant state.
-//			resultantStateID := dfa.States[currentStateID].Transitions[symbolID]
-//			// If the ID of the resultant state is equal to the ID of the removed state, set resultant state to new state.
-//			if resultantStateID == stateID {
-//				dfa.States[currentStateID].Transitions[symbolID] = newStateID
-//				// Else, if the ID of the resultant state is bigger then the ID of the removed state, decrement starting state.
-//			} else if resultantStateID > stateID {
-//				dfa.States[currentStateID].Transitions[symbolID]--
-//			}
-//		}
-//	}
-//	// If the ID of the starting state is bigger then the ID of the removed state, decrement starting state.
-//	if dfa.StartingStateID != newStateID && dfa.StartingStateID > stateID{
-//		dfa.StartingStateID--
-//	}
-//}
