@@ -396,43 +396,74 @@ func (dataset Dataset) RejectingStringInstancesRatio() float64 {
 
 // ToJSON saves the dataset to a JSON file given a file path.
 func (dataset Dataset) ToJSON(filePath string) bool {
+	// Sort the dataset by length.
 	dataset.SortDatasetByLength()
+
+	// Create file given a path/name.
 	file, err := os.Create(filePath)
+
+	// If file was not created successfully,
+	// print error and return false.
 	if err != nil {
 		fmt.Println(err)
 		return false
 	}
+
+	// Close file at end of function.
 	defer file.Close()
+
+	// Convert dataset to JSON.
 	resultantJSON, err := json.MarshalIndent(dataset, "", "\t")
+
+	// If dataset was not converted successfully,
+	// print error and return false.
 	if err != nil {
 		fmt.Println(err)
 		return false
 	}
 
+	// Copy JSON to file created.
 	_, err = io.Copy(file, bytes.NewReader(resultantJSON))
+
+	// If JSON was not copied successfully,
+	// print error and return false.
 	if err != nil {
 		fmt.Println(err)
 		return false
 	}
 
+	// Return true if reached.
 	return true
 }
 
 // DatasetFromJSON returns a dataset read from a JSON file
-// given a file path. The
+// given a file path. The boolean value returned is set to
+// true if Dataset was read successfully.
 func DatasetFromJSON(filePath string) (Dataset, bool) {
+	// Open file from given a path/name.
 	file, err := os.Open(filePath)
+
+	// If file was not opened successfully,
+	// return empty dataset and false.
 	if err != nil {
 		return Dataset{}, false
 	}
+
+	// Close file at end of function.
 	defer file.Close()
 
+	// Initialize empty Dataset.
 	resultantDataset := Dataset{}
+
+	// Convert JSON to Dataset.
 	err = json.NewDecoder(file).Decode(&resultantDataset)
 
+	// If JSON was not converted successfully,
+	// return empty dataset and false.
 	if err != nil {
 		return Dataset{}, false
 	}
 
+	// Return populated Dataset and true if reached.
 	return resultantDataset, true
 }

@@ -9,7 +9,11 @@ import (
 
 func (dfa DFA) ToDOT(filePath string, rankByOrder bool, topDown bool) {
 	if rankByOrder {
-		dfa.GetDepth()
+		// If depth and order for DFA is not computed,
+		// call CalculateDepthAndOrder.
+		if !dfa.ComputedDepthAndOrder {
+			dfa.CalculateDepthAndOrder()
+		}
 	}
 
 	file, err := os.Create(filePath)
