@@ -57,7 +57,7 @@ func HighestScoringMerge(statePairScores []StatePairScore, randomFromBest bool) 
 	}
 }
 
-// Deterministically merges all possible state pairs.
+// GreedySearch deterministically merges all possible state pairs.
 // Returns the resultant DFA when no more valid merges are possible.
 func GreedySearch(dfa DFA, scoringFunction ScoringFunction, randomFromBest bool) DFA{
 	// Slice of state pairs with score.
@@ -118,7 +118,7 @@ func GreedySearch(dfa DFA, scoringFunction ScoringFunction, randomFromBest bool)
 	return dfa
 }
 
-// Deterministically merges state pairs within a given window.
+// WindowedSearch deterministically merges state pairs within a given window.
 // Returns the resultant DFA when no more valid merges are possible.
 func WindowedSearch(dfa DFA, windowSize int, windowGrow float64, scoringFunction ScoringFunction, randomFromBest bool) DFA{
 	start := time.Now()
@@ -210,7 +210,7 @@ func WindowedSearch(dfa DFA, windowSize int, windowGrow float64, scoringFunction
 	return dfa
 }
 
-// Deterministically merges possible state pairs within red-blue sets.
+// BlueFringeSearch deterministically merges possible state pairs within red-blue sets.
 // Returns the resultant DFA when no more valid merges are possible.
 func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction, randomFromBest bool) DFA{
 	start := time.Now()

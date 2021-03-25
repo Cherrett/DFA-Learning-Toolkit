@@ -71,13 +71,17 @@ func FileExists(filePath string) bool {
 	return !info.IsDir()
 }
 
+// MinMaxAvg struct is used to keep track of
+// minimum, maximum and average values given
+// a number of values.
 type MinMaxAvg struct {
-	min float64		// Minimum of elements.
-	max float64		// Maximum of elements.
-	sum float64		// Sum of elements.
-	count uint		// Number of elements.
+	min float64		// Minimum of values.
+	max float64		// Maximum of values.
+	sum float64		// Sum of values.
+	count uint		// Number of values.
 }
 
+// NewMinMaxAvg returns an empty MinMaxAvg struct.
 func NewMinMaxAvg() MinMaxAvg{
 	return MinMaxAvg{
 		min:   math.Inf(1),
@@ -87,25 +91,40 @@ func NewMinMaxAvg() MinMaxAvg{
 	}
 }
 
-func (minMaxAvg *MinMaxAvg) Add(element float64){
-	if element < minMaxAvg.min{
-		minMaxAvg.min = element
+// Add adds an element to the MinMaxAvg struct.
+func (minMaxAvg *MinMaxAvg) Add(value float64){
+	// If value is smaller than the minimum value,
+	// set minimum value within struct to value.
+	if value < minMaxAvg.min{
+		minMaxAvg.min = value
 	}
-	if element > minMaxAvg.max{
-		minMaxAvg.max = element
+
+	// If value is larger than the maximum value,
+	// set maximum value within struct to value.
+	if value > minMaxAvg.max{
+		minMaxAvg.max = value
 	}
-	minMaxAvg.sum += element
+
+	// Add value to sum.
+	minMaxAvg.sum += value
+
+	// Increment counter.
 	minMaxAvg.count++
 }
 
+// Add returns the minimum value within the MinMaxAvg struct.
 func (minMaxAvg MinMaxAvg) Min() float64{
 	return minMaxAvg.min
 }
 
+// Add returns the maximum value within the MinMaxAvg struct.
 func (minMaxAvg MinMaxAvg) Max() float64{
 	return minMaxAvg.max
 }
 
+// Add returns the average value within the MinMaxAvg struct.
 func (minMaxAvg MinMaxAvg) Avg() float64{
+	// Get average by dividing the sum of elements
+	// by the number of elements within struct.
 	return minMaxAvg.sum / float64(minMaxAvg.count)
 }
