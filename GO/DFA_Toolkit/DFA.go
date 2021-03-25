@@ -493,7 +493,8 @@ func (dfa DFA) Accuracy(dataset Dataset) float64 {
 	return correctClassifications / float64(len(dataset))
 }
 
-// UnreachableStates returns the state IDs of unreachable states.
+// UnreachableStates returns the state IDs of unreachable states. Extracted from:
+// P. Linz, An Introduction to Formal Languages and Automata. Jones & Bartlett Publishers, 2011.
 func (dfa DFA) UnreachableStates() []int {
 	// Map of reachable states made up of starting state.
 	reachableStates := map[int]bool{dfa.StartingStateID: true}
@@ -598,7 +599,8 @@ func (dfa DFA) Equal(dfa2 DFA) bool{
 			childStateID1 := dfa1.States[stateID1].Transitions[symbolID]
 			childStateID2 := dfa2.States[stateID2].Transitions[symbolID]
 			if (childStateID1 == -1 && childStateID2 != -1) ||
-				(childStateID1 != -1 && childStateID2 == -1){
+				(childStateID1 != -1 && childStateID2 == -1) ||
+				(dfa.States[childStateID1].StateStatus != dfa2.States[childStateID2].StateStatus){
 				// If a transition exists for one DFA but does not exist
 				// for another DFA, return false.
 				return false
