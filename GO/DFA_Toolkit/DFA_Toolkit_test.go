@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"sync"
 	"testing"
 	"time"
 )
@@ -379,7 +380,7 @@ func TestBenchmarkEDSM(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 
 	// Number of iterations.
-	n := 128
+	n := 256
 	// Target size.
 	targetSize := 32
 
@@ -395,9 +396,36 @@ func TestBenchmarkEDSM(t *testing.T) {
 		// Training testing sets.
 		trainingSet, testingSet := AbbadingoDatasetExact(target, 607, 1800)
 
-		resultantDFAGreedy := GreedyEDSM(trainingSet, false)
-		resultantDFAWindowed := WindowedEDSM(trainingSet, targetSize*2, 2.0, false)
-		resultantDFABlueFringe := BlueFringeEDSM(trainingSet, false)
+		// Create wait group
+		var wg sync.WaitGroup
+		// Add 3 EDSM types to wait group.
+		wg.Add(3)
+
+		var resultantDFAGreedy DFA
+		var resultantDFAWindowed DFA
+		var resultantDFABlueFringe DFA
+
+		go func(){
+			// Decrement 1 from wait group.
+			defer wg.Done()
+			resultantDFAGreedy = GreedyEDSM(trainingSet, false)
+		}()
+
+		go func(){
+			// Decrement 1 from wait group.
+			defer wg.Done()
+			resultantDFAWindowed = WindowedEDSM(trainingSet, targetSize*2, 2.0, false)
+		}()
+
+		go func(){
+			// Decrement 1 from wait group.
+			defer wg.Done()
+			resultantDFABlueFringe = BlueFringeEDSM(trainingSet, false)
+		}()
+
+		// Wait for all go routines within wait
+		// group to finish executing.
+		wg.Wait()
 
 		accuracyGreedy := resultantDFAGreedy.Accuracy(testingSet)
 		accuracyWindowed := resultantDFAWindowed.Accuracy(testingSet)
