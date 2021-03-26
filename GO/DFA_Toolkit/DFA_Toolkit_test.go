@@ -26,8 +26,8 @@ func TestAbbadingoDFAFromFile(t *testing.T) {
 	if len(APTA.States) != 322067{
 		t.Errorf("APTA number of states = %d, want 322067", len(APTA.States))
 	}
-	if APTA.GetDepth() != 21{
-		t.Errorf("APTA depth = %d, want 21", APTA.GetDepth())
+	if APTA.Depth() != 21{
+		t.Errorf("APTA depth = %d, want 21", APTA.Depth())
 	}
 }
 
@@ -44,8 +44,8 @@ func TestAbbadingoDFAGeneration(t *testing.T) {
 	if len(AbbadingoDFA.States) != numberOfStates{
 		t.Errorf("AbbadingoDFA number of states = %d, want %d", len(AbbadingoDFA.States), numberOfStates)
 	}
-	if AbbadingoDFA.GetDepth() != int(math.Round((2.0 * math.Log2(float64(numberOfStates))) - 2.0)){
-		t.Errorf("AbbadingoDFA depth = %d, want %d", AbbadingoDFA.GetDepth(), int(math.Round((2.0 * math.Log2(float64(numberOfStates))) - 2.0)))
+	if AbbadingoDFA.Depth() != int(math.Round((2.0 * math.Log2(float64(numberOfStates))) - 2.0)){
+		t.Errorf("AbbadingoDFA depth = %d, want %d", AbbadingoDFA.Depth(), int(math.Round((2.0 * math.Log2(float64(numberOfStates))) - 2.0)))
 	}
 }
 
