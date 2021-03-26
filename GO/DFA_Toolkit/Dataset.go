@@ -278,7 +278,7 @@ func BinaryStringToStringInstance(dfa DFA, binaryString string) StringInstance {
 func (dataset Dataset) SortDatasetByLength() Dataset {
 	// Sort all string instances by length in ascending order.
 	sort.Slice(dataset[:], func(i, j int) bool {
-		return dataset[i].Length() < dataset[j].Length()
+		return len(dataset[i].Value) < len(dataset[j].Value)
 	})
 
 	// Return sorted dataset.
