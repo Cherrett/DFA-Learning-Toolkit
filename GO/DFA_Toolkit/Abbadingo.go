@@ -110,8 +110,8 @@ func AbbadingoDFA(numberOfStates int, exact bool) DFA {
 		// Minimise DFA created.
 		dfa = dfa.Minimise()
 
-		// Get Depth of DFA created.
-		currentDFADepth := dfa.GetDepth()
+		// Get depth of DFA created.
+		currentDFADepth := dfa.Depth()
 
 		// If depth of created DFA is not equal to the required
 		// depth, restart the process of creating a random DFA.

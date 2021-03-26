@@ -24,7 +24,7 @@ func (dfa DFA) ToDOT(filePath string, rankByOrder bool, topDown bool) {
 	if rankByOrder {
 		// If depth and order for DFA are not computed,
 		// call CalculateDepthAndOrder.
-		if !dfa.ComputedDepthAndOrder {
+		if !dfa.computedDepthAndOrder {
 			dfa.CalculateDepthAndOrder()
 		}
 	}

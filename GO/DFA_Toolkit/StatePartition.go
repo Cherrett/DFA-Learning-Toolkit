@@ -135,8 +135,8 @@ func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA){
 		States:                nil,
 		StartingStateID:       -1,
 		SymbolMap:             dfa.SymbolMap,
-		Depth:                 -1,
-		ComputedDepthAndOrder: false,
+		depth:                 -1,
+		computedDepthAndOrder: false,
 	}
 
 	for stateID := range dfa.States {

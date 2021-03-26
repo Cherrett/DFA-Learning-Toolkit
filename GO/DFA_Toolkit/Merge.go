@@ -216,8 +216,8 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction, randomFromBest b
 	start := time.Now()
 	totalMerges := 0
 
-	// Get DFA's Depth for calculating scores.
-	// dfa.GetDepth()
+	// Get DFA's depth for calculating scores.
+	// dfa.Depth()
 
 	// Slice of state pairs with score.
 	var detMerges []StatePairScore
@@ -331,7 +331,7 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction, randomFromBest b
 			}
 
 			// Get DFA's depth for calculating score.
-			//dfa.GetDepth()
+			//dfa.Depth()
 
 			// Remove previous state pairs' score.
 			detMerges = nil
