@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"sync"
 	"testing"
 	"time"
 )
@@ -25,8 +26,8 @@ func TestAbbadingoDFAFromFile(t *testing.T) {
 	if len(APTA.States) != 322067{
 		t.Errorf("APTA number of states = %d, want 322067", len(APTA.States))
 	}
-	if APTA.GetDepth() != 21{
-		t.Errorf("APTA depth = %d, want 21", APTA.GetDepth())
+	if APTA.Depth() != 21{
+		t.Errorf("APTA depth = %d, want 21", APTA.Depth())
 	}
 }
 
@@ -43,8 +44,8 @@ func TestAbbadingoDFAGeneration(t *testing.T) {
 	if len(AbbadingoDFA.States) != numberOfStates{
 		t.Errorf("AbbadingoDFA number of states = %d, want %d", len(AbbadingoDFA.States), numberOfStates)
 	}
-	if AbbadingoDFA.GetDepth() != int(math.Round((2.0 * math.Log2(float64(numberOfStates))) - 2.0)){
-		t.Errorf("AbbadingoDFA depth = %d, want %d", AbbadingoDFA.GetDepth(), int(math.Round((2.0 * math.Log2(float64(numberOfStates))) - 2.0)))
+	if AbbadingoDFA.Depth() != int(math.Round((2.0 * math.Log2(float64(numberOfStates))) - 2.0)){
+		t.Errorf("AbbadingoDFA depth = %d, want %d", AbbadingoDFA.Depth(), int(math.Round((2.0 * math.Log2(float64(numberOfStates))) - 2.0)))
 	}
 }
 
@@ -233,7 +234,7 @@ func TestBenchmarkDetMerge(t *testing.T){
 	}
 }
 
-// TestBenchmarkGreedyEDSM benchmarks the performance of the GreedyEDSM() function.
+// TestBenchmarkGreedyEDSM benchmarks the performance of the GreedyEDSMFromDataset() function.
 func TestBenchmarkGreedyEDSM(t *testing.T){
 	// Random Seed.
 	rand.Seed(time.Now().UnixNano())
@@ -256,7 +257,7 @@ func TestBenchmarkGreedyEDSM(t *testing.T){
 		// Training testing sets.
 		trainingSet, testingSet := AbbadingoDatasetExact(target, 607, 1800)
 
-		resultantDFA := GreedyEDSM(trainingSet, false)
+		resultantDFA := GreedyEDSMFromDataset(trainingSet, false)
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		totalAccuracies.Add(accuracy)
@@ -280,7 +281,7 @@ func TestBenchmarkGreedyEDSM(t *testing.T){
 	}
 }
 
-// TestBenchmarkWindowedEDSM benchmarks the performance of the WindowedEDSM() function.
+// TestBenchmarkWindowedEDSM benchmarks the performance of the WindowedEDSMFromDataset() function.
 func TestBenchmarkWindowedEDSM(t *testing.T){
 	// Random Seed.
 	rand.Seed(time.Now().UnixNano())
@@ -303,7 +304,7 @@ func TestBenchmarkWindowedEDSM(t *testing.T){
 		// Training testing sets.
 		trainingSet, testingSet := AbbadingoDatasetExact(target, 607, 1800)
 
-		resultantDFA := WindowedEDSM(trainingSet, targetSize*2, 2.0, false)
+		resultantDFA := WindowedEDSMFromDataset(trainingSet, targetSize*2, 2.0, false)
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		totalAccuracies.Add(accuracy)
@@ -327,7 +328,7 @@ func TestBenchmarkWindowedEDSM(t *testing.T){
 	}
 }
 
-// TestBenchmarkBlueFringeEDSM benchmarks the performance of the BlueFringeEDSM() function.
+// TestBenchmarkBlueFringeEDSM benchmarks the performance of the BlueFringeEDSMFromDataset() function.
 func TestBenchmarkBlueFringeEDSM(t *testing.T){
 	// Random Seed.
 	rand.Seed(time.Now().UnixNano())
@@ -350,7 +351,7 @@ func TestBenchmarkBlueFringeEDSM(t *testing.T){
 		// Training testing sets.
 		trainingSet, testingSet := AbbadingoDatasetExact(target, 607, 1800)
 
-		resultantDFA := BlueFringeEDSM(trainingSet, true)
+		resultantDFA := BlueFringeEDSMFromDataset(trainingSet, true)
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		totalAccuracies.Add(accuracy)
@@ -395,9 +396,39 @@ func TestBenchmarkEDSM(t *testing.T) {
 		// Training testing sets.
 		trainingSet, testingSet := AbbadingoDatasetExact(target, 607, 1800)
 
-		resultantDFAGreedy := GreedyEDSM(trainingSet, false)
-		resultantDFAWindowed := WindowedEDSM(trainingSet, targetSize*2, 2.0, false)
-		resultantDFABlueFringe := BlueFringeEDSM(trainingSet, false)
+		// Construct an APTA from training dataset.
+		APTA := trainingSet.GetPTA(true)
+
+		// Create wait group
+		var wg sync.WaitGroup
+		// Add 3 EDSM types to wait group.
+		wg.Add(3)
+
+		var resultantDFAGreedy DFA
+		var resultantDFAWindowed DFA
+		var resultantDFABlueFringe DFA
+
+		go func(){
+			// Decrement 1 from wait group.
+			defer wg.Done()
+			resultantDFAGreedy = GreedyEDSM(APTA, false)
+		}()
+
+		go func(){
+			// Decrement 1 from wait group.
+			defer wg.Done()
+			resultantDFAWindowed = WindowedEDSM(APTA, targetSize*2, 2.0, false)
+		}()
+
+		go func(){
+			// Decrement 1 from wait group.
+			defer wg.Done()
+			resultantDFABlueFringe = BlueFringeEDSM(APTA, false)
+		}()
+
+		// Wait for all go routines within wait
+		// group to finish executing.
+		wg.Wait()
 
 		accuracyGreedy := resultantDFAGreedy.Accuracy(testingSet)
 		accuracyWindowed := resultantDFAWindowed.Accuracy(testingSet)

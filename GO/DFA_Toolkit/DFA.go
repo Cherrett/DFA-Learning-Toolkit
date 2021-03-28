@@ -13,16 +13,16 @@ import (
 // DFA struct which represents a DFA.
 type DFA struct {
 	States                []State      // Slice of states within the DFA where the index is the State ID.
-	StartingStateID 	  int          // The ID of the starting state of the DFA.
-	SymbolMap       	  map[rune]int // A map of each symbol within the DFA to its ID.
-	Depth                 int  	       // The depth of the DFA.
-	ComputedDepthAndOrder bool 	       // Whether the Depth and Order were calculated.
+	StartingStateID       int          // The ID of the starting state of the DFA.
+	SymbolMap             map[rune]int // A map of each symbol within the DFA to its ID.
+	depth                 int          // The depth of the DFA.
+	computedDepthAndOrder bool         // Whether the depth and Order were calculated.
 }
 
 // NewDFA initializes a new empty DFA.
 func NewDFA() DFA {
 	return DFA{States: make([]State, 0), StartingStateID: -1,
-		SymbolMap: make(map[rune]int), Depth: -1, ComputedDepthAndOrder:false}
+		SymbolMap: make(map[rune]int), depth: -1, computedDepthAndOrder:false}
 }
 
 // AddState adds a new state to the DFA with the corresponding State Status.
@@ -338,20 +338,20 @@ func (dfa DFA) IsComplete() bool{
 	return true
 }
 
-// GetDepth returns the DFA's Depth which is defined as the maximum over all nodes x of
+// Depth returns the DFA's depth which is defined as the maximum over all nodes x of
 // the length of the shortest path from the root to x.
-func (dfa *DFA) GetDepth() int {
+func (dfa *DFA) Depth() int {
 	// If depth and order for DFA is not computed,
 	// call CalculateDepthAndOrder.
-	if !dfa.ComputedDepthAndOrder {
+	if !dfa.computedDepthAndOrder {
 		dfa.CalculateDepthAndOrder()
 	}
 
 	// Return DFA's depth.
-	return dfa.Depth
+	return dfa.depth
 }
 
-// CalculateDepthAndOrder computes the Depth and Order for each state within DFA.
+// CalculateDepthAndOrder computes the depth and Order for each state within DFA.
 // This is done by traversing the DFA in a breadth-first order.
 func (dfa *DFA) CalculateDepthAndOrder(){
 	// Checks if DFA is valid.
@@ -359,7 +359,7 @@ func (dfa *DFA) CalculateDepthAndOrder(){
 	dfa.IsValid()
 
 	// Set depth of DFA to -1.
-	dfa.Depth = -1
+	dfa.depth = -1
 
 	// Iterate over each state within DFA and
 	// set depth and order to -1.
@@ -385,7 +385,7 @@ func (dfa *DFA) CalculateDepthAndOrder(){
 
 		// If the depth of the current state is bigger than the depth of the
 		// DFA, set the depth of the DFa to the the depth of the current state.
-		dfa.Depth = util.Max(dfa.States[stateID].depth, dfa.Depth)
+		dfa.depth = util.Max(dfa.States[stateID].depth, dfa.depth)
 		// Set the order of the current state.
 		dfa.States[stateID].order = currentOrder
 		// Increment current state order.
@@ -407,14 +407,14 @@ func (dfa *DFA) CalculateDepthAndOrder(){
 	}
 
 	// Set the computed depth and order flag to true.
-	dfa.ComputedDepthAndOrder = true
+	dfa.computedDepthAndOrder = true
 }
 
 // OrderedStates returns the state IDs in order.
 func (dfa DFA) OrderedStates() []int{
 	// If depth and order for DFA is not computed,
 	// call CalculateDepthAndOrder.
-	if !dfa.ComputedDepthAndOrder {
+	if !dfa.computedDepthAndOrder {
 		dfa.CalculateDepthAndOrder()
 	}
 
