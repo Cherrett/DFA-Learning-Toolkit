@@ -229,8 +229,9 @@ func (statePartition *StatePartitionV2) MergeStates(dfa DFA, state1 int, state2 
 			currentResultantStateID := dfa.States[stateID].Transitions[symbolID]
 
 			// If resultant state ID is bigger than -1 (valid transition), get
-			// the block containing state and store in transitions. The loop is
-			// then broken since the transition for the current symbol was found.
+			// the block containing state and store in transitionResult. The
+			// states within the second block are then iterated and checked
+			// for non-deterministic properties.
 			if currentResultantStateID > -1{
 				// Set resultant state to state transition for current symbol.
 				transitionResult := currentResultantStateID
@@ -240,10 +241,10 @@ func (statePartition *StatePartitionV2) MergeStates(dfa DFA, state1 int, state2 
 					// Store resultant state from state transition of current state.
 					currentResultantStateID = dfa.States[stateID2].Transitions[symbolID]
 					// If resultant state ID is bigger than -1 (valid transition), get the
-					// block containing state and compare it to the transitions found above.
+					// block containing state and compare it to the transition found above.
 					// If they are not equal, merge blocks to eliminate non-determinism.
 					if currentResultantStateID > -1{
-						// If resultant block is not equal to the block containing the state within transitions
+						// If resultant block is not equal to the block containing the state within transition
 						// found above, merge the two states to eliminate non-determinism.
 						if statePartition.Find(currentResultantStateID) != statePartition.Find(transitionResult){
 							// Not deterministic so merge, if states cannot be merged, return false.
@@ -253,6 +254,8 @@ func (statePartition *StatePartitionV2) MergeStates(dfa DFA, state1 int, state2 
 						}
 					}
 				}
+
+				// The loop is broken since the transition for the current symbol was found.
 				break
 			}
 		}
