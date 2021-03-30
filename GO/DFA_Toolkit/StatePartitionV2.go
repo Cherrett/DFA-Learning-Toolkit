@@ -1,9 +1,11 @@
 package DFA_Toolkit
 
 type Node struct{
-	root int					// Parent block of each state.
-	size int					// Size (score) of each block.
+	root int					// Parent block of state.
+	size int					// Size (score) of block.
 	link int					// Index of next state within the block.
+	status StateStatus			// Status of block.
+	changed bool
 }
 
 // StatePartition struct which represents a State Partition.
@@ -16,7 +18,6 @@ type StatePartitionV2 struct {
 	acceptingBlocksCount int	// Number of accepting blocks (states) within partition.
 	rejectingBlocksCount int	// Number of rejecting blocks (states) within partition.
 	changedBlocks int
-	blockStatus []StateStatus	// Status of each block.
 }
 
 // Returns an initialized State Partition.
@@ -30,7 +31,6 @@ func NewStatePartitionV2(dfa DFA) StatePartitionV2 {
 		acceptingBlocksCount: 0,
 		rejectingBlocksCount: 0,
 		changedBlocks:		  0,
-		blockStatus:          make([]StateStatus, len(dfa.States)),
 	}
 
 	// Set root and link as element, and size (score) as 1. Set block status
@@ -39,11 +39,12 @@ func NewStatePartitionV2(dfa DFA) StatePartitionV2 {
 		statePartition.nodes[i].root = i
 		statePartition.nodes[i].size = 1
 		statePartition.nodes[i].link = i
-		statePartition.blockStatus[i] = dfa.States[i].StateStatus
+		statePartition.nodes[i].status = dfa.States[i].StateStatus
+		statePartition.nodes[i].changed = false
 		statePartition.changed[i] = -1
-		if statePartition.blockStatus[i] == ACCEPTING{
+		if statePartition.nodes[i].status == ACCEPTING{
 			statePartition.acceptingBlocksCount++
-		}else if statePartition.blockStatus[i] == REJECTING{
+		}else if statePartition.nodes[i].status == REJECTING{
 			statePartition.rejectingBlocksCount++
 		}
 	}
@@ -53,11 +54,14 @@ func NewStatePartitionV2(dfa DFA) StatePartitionV2 {
 }
 
 func (statePartition *StatePartitionV2) modifiedBlock(blockID int){
-	statePartition.changed[statePartition.changedBlocks] = blockID
-	statePartition.changedBlocks++
+	if !statePartition.nodes[blockID].changed{
+		statePartition.changed[statePartition.changedBlocks] = blockID
+		statePartition.changedBlocks++
+		statePartition.nodes[blockID].changed = true
 
-	if statePartition.changedBlocks == len(statePartition.changed){
-		panic("Test")
+		if statePartition.changedBlocks == len(statePartition.changed){
+			panic("Test")
+		}
 	}
 }
 
@@ -73,15 +77,15 @@ func (statePartition *StatePartitionV2) union(blockID1 int, blockID2 int){
 	statePartition.nodes[blockID1].link, statePartition.nodes[blockID2].link =
 		statePartition.nodes[blockID2].link, statePartition.nodes[blockID1].link
 
-	block1Status := statePartition.blockStatus[blockID1]
-	block2Status := statePartition.blockStatus[blockID2]
+	block1Status := statePartition.nodes[blockID1].status
+	block2Status := statePartition.nodes[blockID2].status
 
 	if statePartition.nodes[blockID1].size > statePartition.nodes[blockID2].size {
 		statePartition.nodes[blockID2].root = blockID1
 		statePartition.nodes[blockID1].size ++
 
 		if block1Status == UNKNOWN && block2Status != UNKNOWN{
-			statePartition.blockStatus[blockID1] = block2Status
+			statePartition.nodes[blockID1].status = block2Status
 		}else if block1Status == ACCEPTING && block2Status == ACCEPTING{
 			statePartition.acceptingBlocksCount--
 		}else if block1Status == REJECTING && block2Status == REJECTING{
@@ -92,7 +96,7 @@ func (statePartition *StatePartitionV2) union(blockID1 int, blockID2 int){
 		statePartition.nodes[blockID2].size ++
 
 		if block2Status == UNKNOWN && block1Status != UNKNOWN{
-			statePartition.blockStatus[blockID2] = block1Status
+			statePartition.nodes[blockID2].status = block1Status
 		}else if block1Status == ACCEPTING && block2Status == ACCEPTING{
 			statePartition.acceptingBlocksCount--
 		}else if block1Status == REJECTING && block2Status == REJECTING{
@@ -156,7 +160,7 @@ func (statePartition StatePartitionV2) ToDFA(dfa DFA) (bool, DFA){
 	for stateID := range dfa.States {
 		currentBlockID := statePartition.Find(stateID)
 		if _, ok := newMappings[currentBlockID]; !ok {
-			newMappings[currentBlockID] = resultantDFA.AddState(statePartition.blockStatus[currentBlockID])
+			newMappings[currentBlockID] = resultantDFA.AddState(statePartition.nodes[currentBlockID].status)
 		}
 	}
 
@@ -202,20 +206,12 @@ func (statePartition *StatePartitionV2) MergeStates(dfa DFA, state1 int, state2 
 	}
 
 	// Get status of each block.
-	state1Status := statePartition.blockStatus[state1]
-	state2Status := statePartition.blockStatus[state2]
+	state1Status := statePartition.nodes[state1].status
+	state2Status := statePartition.nodes[state2].status
 	// If statuses are contradicting, return false since this results
 	// in a non-deterministic automaton so merge cannot be done.
 	if (state1Status == ACCEPTING && state2Status == REJECTING) || (state1Status == REJECTING && state2Status == ACCEPTING){
 		return false
-	}
-
-	// Initialize a slice which will be used to evaluate the validity of
-	// the transitions for the merged blocks.
-	transitions := make([]int, len(dfa.SymbolMap))
-	// Set all values to -1 by default.
-	for i := range transitions {
-		transitions[i] = -1
 	}
 
 	// Get the states within each block.
@@ -237,36 +233,27 @@ func (statePartition *StatePartitionV2) MergeStates(dfa DFA, state1 int, state2 
 			// then broken since the transition for the current symbol was found.
 			if currentResultantStateID > -1{
 				// Set resultant state to state transition for current symbol.
-				transitions[symbolID] = currentResultantStateID
-				// Break loop since the transition for the current symbol is found.
-				break
-			}
-		}
-	}
+				transitionResult := currentResultantStateID
 
-	// Iterate over each symbol within DFA.
-	for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
-		// If no transitions exist from block for the given symbol, skip
-		// current loop iteration.
-		if transitions[symbolID] == -1{
-			continue
-		}
-		// Iterate over each state within second block.
-		for _, stateID := range block2Set{
-			// Store resultant state from state transition of current state.
-			currentResultantStateID := dfa.States[stateID].Transitions[symbolID]
-			// If resultant state ID is bigger than -1 (valid transition), get the
-			// block containing state and compare it to the transitions found above.
-			// If they are not equal, merge blocks to eliminate non-determinism.
-			if currentResultantStateID > -1{
-				// If resultant block is not equal to the block containing the state within transitions
-				// found above, merge the two states to eliminate non-determinism.
-				if statePartition.Find(currentResultantStateID) != statePartition.Find(transitions[symbolID]){
-					// Not deterministic so merge, if states cannot be merged, return false.
-					if !statePartition.MergeStates(dfa, transitions[symbolID], currentResultantStateID) {
-						return false
+				// Iterate over each state within second block.
+				for _, stateID2 := range block2Set{
+					// Store resultant state from state transition of current state.
+					currentResultantStateID = dfa.States[stateID2].Transitions[symbolID]
+					// If resultant state ID is bigger than -1 (valid transition), get the
+					// block containing state and compare it to the transitions found above.
+					// If they are not equal, merge blocks to eliminate non-determinism.
+					if currentResultantStateID > -1{
+						// If resultant block is not equal to the block containing the state within transitions
+						// found above, merge the two states to eliminate non-determinism.
+						if statePartition.Find(currentResultantStateID) != statePartition.Find(transitionResult){
+							// Not deterministic so merge, if states cannot be merged, return false.
+							if !statePartition.MergeStates(dfa, transitionResult, currentResultantStateID) {
+								return false
+							}
+						}
 					}
 				}
+				break
 			}
 		}
 	}
@@ -285,12 +272,10 @@ func (statePartition StatePartitionV2) Copy() StatePartitionV2{
 		acceptingBlocksCount: statePartition.acceptingBlocksCount,
 		rejectingBlocksCount: statePartition.rejectingBlocksCount,
 		changedBlocks:        0,
-		blockStatus:          make([]StateStatus, len(statePartition.blockStatus)),
 	}
 
 	// Copy root, size, link and blockStatus slices.
 	copy(copiedStatePartition.nodes, statePartition.nodes)
-	copy(copiedStatePartition.blockStatus, statePartition.blockStatus)
 	copy(copiedStatePartition.changed, statePartition.changed)
 
 	// Return copied state partition.
@@ -305,12 +290,12 @@ func (statePartition *StatePartitionV2) RollbackChanges(originalStatePartition S
 		// Set accepting and rejecting blocks count values to the original values.
 		statePartition.acceptingBlocksCount = originalStatePartition.acceptingBlocksCount
 		statePartition.rejectingBlocksCount = originalStatePartition.rejectingBlocksCount
+
 		// Iterate over each altered block (state).
 		for i := 0; i < statePartition.changedBlocks; i++ {
 			// Update root, size, link and blockStatus values.
 			stateID := statePartition.changed[i]
 			statePartition.nodes[stateID] = originalStatePartition.nodes[stateID]
-			statePartition.blockStatus[stateID] = originalStatePartition.blockStatus[stateID]
 			statePartition.changed[i] = -1
 		}
 		// Empty the changed blocks slice.
