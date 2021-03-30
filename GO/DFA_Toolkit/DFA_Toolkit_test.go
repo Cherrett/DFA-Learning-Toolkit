@@ -172,12 +172,12 @@ func TestVisualisation(t *testing.T){
 // TestBenchmarkDetMerge benchmarks the performance of the MergeStates() function.
 func TestBenchmarkDetMerge(t *testing.T){
 	// Random Seed.
-	rand.Seed(time.Now().UnixNano())
+	// rand.Seed(time.Now().UnixNano())
 
 	// These are target DFA sizes we will test.
-	dfaSizes := []int{32, 64, 128}
+	dfaSizes := []int{16, 32, 64, 128}
 	// These are the training set sizes we will test.
-	trainingSetSizes := []int{607, 1521, 4382}
+	trainingSetSizes := []int{230, 607, 1521, 4382}
 
 	// Benchmark over the problem instances.
 	for i := range dfaSizes {
@@ -284,7 +284,7 @@ func TestBenchmarkGreedyEDSM(t *testing.T){
 // TestBenchmarkWindowedEDSM benchmarks the performance of the WindowedEDSMFromDataset() function.
 func TestBenchmarkWindowedEDSM(t *testing.T){
 	// Random Seed.
-	rand.Seed(time.Now().UnixNano())
+	// rand.Seed(time.Now().UnixNano())
 
 	// Number of iterations.
 	n := 128
@@ -494,15 +494,15 @@ func TestBenchmarkEDSM(t *testing.T) {
 	}
 }
 
-// TestBenchmarkDetMerge benchmarks the performance of the MergeStates() function using StatePartitionV2.
+// TestBenchmarkDetMergeV2 benchmarks the performance of the MergeStates() function using StatePartitionV2.
 func TestBenchmarkDetMergeV2(t *testing.T){
 	// Random Seed.
-	rand.Seed(time.Now().UnixNano())
+	// rand.Seed(time.Now().UnixNano())
 
 	// These are target DFA sizes we will test.
-	dfaSizes := []int{32, 64, 128}
+	dfaSizes := []int{16, 32, 64, 128}
 	// These are the training set sizes we will test.
-	trainingSetSizes := []int{607, 1521, 4382}
+	trainingSetSizes := []int{230, 607, 1521, 4382}
 
 	// Benchmark over the problem instances.
 	for i := range dfaSizes {
