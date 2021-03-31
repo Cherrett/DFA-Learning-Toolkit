@@ -370,8 +370,8 @@ func TestBenchmarkBlueFringeEDSM(t *testing.T){
 	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", totalNumberOfStates.Min(), totalNumberOfStates.Max(), totalNumberOfStates.Avg())
 	fmt.Print("-----------------------------------------------------------------------------\n\n")
 
-	if successfulPercentage < 0.09 || successfulPercentage > 0.15{
-		t.Error("The percentage of successful DFAs is less than 0.09 or bigger than 0.15.")
+	if successfulPercentage < 0.07 || successfulPercentage > 0.15{
+		t.Error("The percentage of successful DFAs is less than 0.07 or bigger than 0.15.")
 	}
 }
 
@@ -489,7 +489,7 @@ func TestBenchmarkEDSM(t *testing.T) {
 		t.Error("The percentage of successful DFAs for Windowed EDSM is less than 0.09 or bigger than 0.15.")
 	}
 
-	if successfulPercentageBlueFringe < 0.09 || successfulPercentageBlueFringe > 0.15{
-		t.Error("The percentage of successful DFAs for Blue-Fringe EDSM is less than 0.09 or bigger than 0.15.")
+	if successfulPercentageBlueFringe < 0.07 || successfulPercentageBlueFringe > 0.15{
+		t.Error("The percentage of successful DFAs for Blue-Fringe EDSM is less than 0.07 or bigger than 0.15.")
 	}
 }
