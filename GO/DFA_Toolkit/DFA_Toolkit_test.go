@@ -175,9 +175,9 @@ func TestBenchmarkDetMerge(t *testing.T){
 	rand.Seed(time.Now().UnixNano())
 
 	// These are target DFA sizes we will test.
-	dfaSizes := []int{32, 64, 128}
+	dfaSizes := []int{16, 32, 64, 128}
 	// These are the training set sizes we will test.
-	trainingSetSizes := []int{607, 1521, 4382}
+	trainingSetSizes := []int{230, 607, 1521, 4382}
 
 	// Benchmark over the problem instances.
 	for i := range dfaSizes {
@@ -284,7 +284,7 @@ func TestBenchmarkGreedyEDSM(t *testing.T){
 // TestBenchmarkWindowedEDSM benchmarks the performance of the WindowedEDSMFromDataset() function.
 func TestBenchmarkWindowedEDSM(t *testing.T){
 	// Random Seed.
-	rand.Seed(time.Now().UnixNano())
+	// rand.Seed(time.Now().UnixNano())
 
 	// Number of iterations.
 	n := 128
@@ -370,8 +370,8 @@ func TestBenchmarkBlueFringeEDSM(t *testing.T){
 	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", totalNumberOfStates.Min(), totalNumberOfStates.Max(), totalNumberOfStates.Avg())
 	fmt.Print("-----------------------------------------------------------------------------\n\n")
 
-	if successfulPercentage < 0.09 || successfulPercentage > 0.15{
-		t.Error("The percentage of successful DFAs is less than 0.09 or bigger than 0.15.")
+	if successfulPercentage < 0.07 || successfulPercentage > 0.15{
+		t.Error("The percentage of successful DFAs is less than 0.07 or bigger than 0.15.")
 	}
 }
 
@@ -489,7 +489,7 @@ func TestBenchmarkEDSM(t *testing.T) {
 		t.Error("The percentage of successful DFAs for Windowed EDSM is less than 0.09 or bigger than 0.15.")
 	}
 
-	if successfulPercentageBlueFringe < 0.09 || successfulPercentageBlueFringe > 0.15{
-		t.Error("The percentage of successful DFAs for Blue-Fringe EDSM is less than 0.09 or bigger than 0.15.")
+	if successfulPercentageBlueFringe < 0.07 || successfulPercentageBlueFringe > 0.15{
+		t.Error("The percentage of successful DFAs for Blue-Fringe EDSM is less than 0.07 or bigger than 0.15.")
 	}
 }
