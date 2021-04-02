@@ -37,10 +37,8 @@ jobs:
       
     # Run vet & lint on the code
     - name: Run vet & lint
-      run: |
-        cd GO
-        go vet .
+      run: cd GO && go vet .
     
     # Run testing on the code
     - name: Run testing
-      run: cd test && go test -v
+      run: cd GO/test && go test -v
