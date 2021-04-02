@@ -1,171 +1,14 @@
-package DFA_Toolkit
+package test
 
 import (
+	"DFA_Toolkit/DFA_Toolkit"
 	"DFA_Toolkit/DFA_Toolkit/util"
 	"fmt"
-	"math"
 	"math/rand"
 	"sync"
 	"testing"
 	"time"
 )
-
-// -------------------- BASIC TESTS --------------------
-
-func TestAbbadingoDFAFromFile(t *testing.T) {
-	t.Parallel()
-	dataset := GetDatasetFromAbbadingoFile("../AbbadingoDatasets/dataset4/train.a")
-	if len(dataset) != 60000{
-		t.Errorf("Dataset4 length = %d, want 60000", len(dataset))
-	}
-
-	APTA := dataset.GetPTA(true)
-	if len(APTA.SymbolMap) != 2{
-		t.Errorf("APTA number of symbols = %d, want 2", len(APTA.SymbolMap))
-	}
-	if len(APTA.States) != 322067{
-		t.Errorf("APTA number of states = %d, want 322067", len(APTA.States))
-	}
-	if APTA.Depth() != 21{
-		t.Errorf("APTA depth = %d, want 21", APTA.Depth())
-	}
-}
-
-func TestAbbadingoDFAGeneration(t *testing.T) {
-	t.Parallel()
-	// Random Seed.
-	rand.Seed(time.Now().UnixNano())
-	numberOfStates := rand.Intn(499) + 1
-
-	AbbadingoDFA := AbbadingoDFA(numberOfStates, true)
-	if len(AbbadingoDFA.SymbolMap) != 2{
-		t.Errorf("AbbadingoDFA number of symbols = %d, want 2", len(AbbadingoDFA.SymbolMap))
-	}
-	if len(AbbadingoDFA.States) != numberOfStates{
-		t.Errorf("AbbadingoDFA number of states = %d, want %d", len(AbbadingoDFA.States), numberOfStates)
-	}
-	if AbbadingoDFA.Depth() != int(math.Round((2.0 * math.Log2(float64(numberOfStates))) - 2.0)){
-		t.Errorf("AbbadingoDFA depth = %d, want %d", AbbadingoDFA.Depth(), int(math.Round((2.0 * math.Log2(float64(numberOfStates))) - 2.0)))
-	}
-}
-
-func TestAbbadingoDatasetGeneration(t *testing.T){
-	t.Parallel()
-	// random seed
-	rand.Seed(time.Now().UnixNano())
-	numberOfStates := rand.Intn(99) + 1
-
-	AbbadingoDFA := AbbadingoDFA(numberOfStates, false)
-
-	trainingDataset, testingDataset := AbbadingoDataset(AbbadingoDFA, 35, 0.25)
-
-	trainingDatasetConsistentWithDFA := trainingDataset.ConsistentWithDFA(AbbadingoDFA)
-	testingDatasetConsistentWithDFA := testingDataset.ConsistentWithDFA(AbbadingoDFA)
-
-	if !trainingDatasetConsistentWithDFA || !testingDatasetConsistentWithDFA{
-		t.Errorf("Expected both training and testing dataset to be consistent with AbbadingoDFA")
-	}
-
-	APTA := trainingDataset.GetPTA(true)
-
-	trainingDatasetConsistentWithAPTA := trainingDataset.ConsistentWithDFA(APTA)
-
-	if !trainingDatasetConsistentWithAPTA{
-		t.Errorf("Expected training dataset to be consistent with APTA")
-	}
-}
-
-func TestStateMergingAndDFAEquivalence(t *testing.T){
-	t.Parallel()
-	dataset := GetDatasetFromAbbadingoFile("../AbbadingoDatasets/dataset1/train.a")
-	APTA := dataset.GetPTA(false)
-
-	statePartition := APTA.ToStatePartition()
-	statePartitionCopy := statePartition.Copy()
-
-	if !statePartitionCopy.MergeStates(APTA, 2, 4){
-		t.Errorf("Merge should be valid.")
-	}
-	valid1, mergedDFA1 := statePartitionCopy.ToDFA(APTA)
-	if !valid1{
-		t.Errorf("State Partition should be valid.")
-	}
-	statePartitionCopy.RollbackChanges(statePartition)
-
-	if !statePartitionCopy.MergeStates(APTA, 3, 5){
-		t.Errorf("Merge should be valid.")
-	}
-	if !statePartitionCopy.MergeStates(APTA, 2, 4){
-		t.Errorf("Merge should be valid.")
-	}
-	valid2, mergedDFA2 := statePartitionCopy.ToDFA(APTA)
-	if !valid2{
-		t.Errorf("State Partition should be valid.")
-	}
-
-	if !mergedDFA1.Equal(mergedDFA2){
-		t.Errorf("Merged DFAs should be equal.")
-	}
-}
-
-func TestVisualisation(t *testing.T){
-	t.Parallel()
-	// Training set.
-	training := GetDatasetFromAbbadingoFile("../AbbadingoDatasets/test.txt")
-
-	test := training.GetPTA(true)
-
-	// Visualisation Examples
-	examplesFilenames := []string{"../Visualisation/test_leftright", "../Visualisation/test_leftright_ordered",
-		"../Visualisation/test_topdown", "../Visualisation/test_topdown_ordered"}
-	examplesRankByOrder := []bool{false, true, false, true}
-	examplesTopDown := []bool{false, false, true, true}
-
-	// To DOT scenario
-	for exampleIndex := range examplesFilenames {
-		filePath := examplesFilenames[exampleIndex]+".dot"
-		test.ToDOT(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
-		if !util.FileExists(filePath) {
-			t.Errorf("DFA toDOT failed, %s file not found.", filePath)
-		}
-	}
-
-	// To PNG scenario
-	for exampleIndex := range examplesFilenames {
-		filePath := examplesFilenames[exampleIndex]+".png"
-		test.ToPNG(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
-		if !util.FileExists(filePath) {
-			t.Errorf("DFA toPNG failed, %s file not found.", filePath)
-		}
-	}
-
-	// To JPG scenario
-	for exampleIndex := range examplesFilenames {
-		filePath := examplesFilenames[exampleIndex]+".jpg"
-		test.ToJPG(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
-		if !util.FileExists(filePath) {
-			t.Errorf("DFA toJPG failed, %s file not found.", filePath)
-		}
-	}
-
-	// To PDF scenario
-	for exampleIndex := range examplesFilenames {
-		filePath := examplesFilenames[exampleIndex]+".pdf"
-		test.ToPDF(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
-		if !util.FileExists(filePath) {
-			t.Errorf("DFA toPDF failed, %s file not found.", filePath)
-		}
-	}
-
-	// To SVG scenario
-	for exampleIndex := range examplesFilenames {
-		filePath := examplesFilenames[exampleIndex]+".svg"
-		test.ToSVG(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
-		if !util.FileExists(filePath) {
-			t.Errorf("DFA toSVG failed, %s file not found.", filePath)
-		}
-	}
-}
 
 // -------------------- BENCHMARKS --------------------
 
@@ -185,10 +28,10 @@ func TestBenchmarkDetMerge(t *testing.T){
 		trainingSetSize := trainingSetSizes[i]
 
 		// Create a target DFA.
-		target := AbbadingoDFA(targetSize, true)
+		target := DFA_Toolkit.AbbadingoDFA(targetSize, true)
 
 		// Training set.
-		training, _ := AbbadingoDatasetExact(target, trainingSetSize, 0)
+		training, _ := DFA_Toolkit.AbbadingoDatasetExact(target, trainingSetSize, 0)
 
 		fmt.Printf("-------------------------------------------------------------\n")
 		fmt.Printf("-------------------------------------------------------------\n")
@@ -252,12 +95,12 @@ func TestBenchmarkGreedyEDSM(t *testing.T){
 		start := time.Now()
 
 		// Create a target DFA.
-		target := AbbadingoDFA(targetSize, true)
+		target := DFA_Toolkit.AbbadingoDFA(targetSize, true)
 
 		// Training testing sets.
-		trainingSet, testingSet := AbbadingoDatasetExact(target, 607, 1800)
+		trainingSet, testingSet := DFA_Toolkit.AbbadingoDatasetExact(target, 607, 1800)
 
-		resultantDFA := GreedyEDSMFromDataset(trainingSet)
+		resultantDFA := DFA_Toolkit.GreedyEDSMFromDataset(trainingSet)
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		totalAccuracies.Add(accuracy)
@@ -299,12 +142,12 @@ func TestBenchmarkWindowedEDSM(t *testing.T){
 		start := time.Now()
 
 		// Create a target DFA.
-		target := AbbadingoDFA(targetSize, true)
+		target := DFA_Toolkit.AbbadingoDFA(targetSize, true)
 
 		// Training testing sets.
-		trainingSet, testingSet := AbbadingoDatasetExact(target, 607, 1800)
+		trainingSet, testingSet := DFA_Toolkit.AbbadingoDatasetExact(target, 607, 1800)
 
-		resultantDFA := WindowedEDSMFromDataset(trainingSet, targetSize*2, 2.0)
+		resultantDFA := DFA_Toolkit.WindowedEDSMFromDataset(trainingSet, targetSize*2, 2.0)
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		totalAccuracies.Add(accuracy)
@@ -346,12 +189,12 @@ func TestBenchmarkBlueFringeEDSM(t *testing.T){
 		start := time.Now()
 
 		// Create a target DFA.
-		target := AbbadingoDFA(targetSize, true)
+		target := DFA_Toolkit.AbbadingoDFA(targetSize, true)
 
 		// Training testing sets.
-		trainingSet, testingSet := AbbadingoDatasetExact(target, 607, 1800)
+		trainingSet, testingSet := DFA_Toolkit.AbbadingoDatasetExact(target, 607, 1800)
 
-		resultantDFA := BlueFringeEDSMFromDataset(trainingSet)
+		resultantDFA := DFA_Toolkit.BlueFringeEDSMFromDataset(trainingSet)
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		totalAccuracies.Add(accuracy)
@@ -391,10 +234,10 @@ func TestBenchmarkEDSM(t *testing.T) {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
 
 		// Create a target DFA.
-		target := AbbadingoDFA(targetSize, true)
+		target := DFA_Toolkit.AbbadingoDFA(targetSize, true)
 
 		// Training testing sets.
-		trainingSet, testingSet := AbbadingoDatasetExact(target, 607, 1800)
+		trainingSet, testingSet := DFA_Toolkit.AbbadingoDatasetExact(target, 607, 1800)
 
 		// Construct an APTA from training dataset.
 		APTA := trainingSet.GetPTA(true)
@@ -404,26 +247,26 @@ func TestBenchmarkEDSM(t *testing.T) {
 		// Add 3 EDSM types to wait group.
 		wg.Add(3)
 
-		var resultantDFAGreedy DFA
-		var resultantDFAWindowed DFA
-		var resultantDFABlueFringe DFA
+		var resultantDFAGreedy DFA_Toolkit.DFA
+		var resultantDFAWindowed DFA_Toolkit.DFA
+		var resultantDFABlueFringe DFA_Toolkit.DFA
 
 		go func(){
 			// Decrement 1 from wait group.
 			defer wg.Done()
-			resultantDFAGreedy = GreedyEDSM(APTA)
+			resultantDFAGreedy = DFA_Toolkit.GreedyEDSM(APTA)
 		}()
 
 		go func(){
 			// Decrement 1 from wait group.
 			defer wg.Done()
-			resultantDFAWindowed = WindowedEDSM(APTA, targetSize*2, 2.0)
+			resultantDFAWindowed = DFA_Toolkit.WindowedEDSM(APTA, targetSize*2, 2.0)
 		}()
 
 		go func(){
 			// Decrement 1 from wait group.
 			defer wg.Done()
-			resultantDFABlueFringe = BlueFringeEDSM(APTA)
+			resultantDFABlueFringe = DFA_Toolkit.BlueFringeEDSM(APTA)
 		}()
 
 		// Wait for all go routines within wait
