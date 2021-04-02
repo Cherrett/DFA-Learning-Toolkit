@@ -1,4 +1,4 @@
-package DFA_Toolkit
+package dfatoolkit
 
 import (
 	"DFA_Toolkit/DFA_Toolkit/util"
@@ -316,9 +316,8 @@ func (dfa DFA) IsTree() bool{
 		for symbolID := range dfa.States[stateID].Transitions {
 			if dfa.States[stateID].Transitions[symbolID] != -1 && visitedStates[dfa.States[stateID].Transitions[symbolID]]{
 				return false
-			}else{
-				visitedStates[dfa.States[stateID].Transitions[symbolID]] = true
 			}
+			visitedStates[dfa.States[stateID].Transitions[symbolID]] = true
 		}
 	}
 

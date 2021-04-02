@@ -17,12 +17,19 @@ jobs:
     
     - name: Setup Go
       uses: actions/setup-go@v2
+      with:
+        go-version: '1.16.3' # The Go version to download (if necessary) and use.
     
     - name: Install dependencies
       run: go version
       
-    - name: Run vet
-      run: cd GO && go vet .
+    - name: Run build
+      run: cd GO/DFA_Tooklit && go build . 
+      
+    - name: Run vet & lint
+      run: |
+        cd GO/DFA_Tooklit && go vet .
+        cd GO/DFA_Tooklit && golint .
     
     - name: Run testing
       run: cd GO/DFA_Toolkit/test && go test -v

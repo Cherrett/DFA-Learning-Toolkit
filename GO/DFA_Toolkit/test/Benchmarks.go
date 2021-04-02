@@ -28,10 +28,10 @@ func TestBenchmarkDetMerge(t *testing.T){
 		trainingSetSize := trainingSetSizes[i]
 
 		// Create a target DFA.
-		target := DFA_Toolkit.AbbadingoDFA(targetSize, true)
+		target := dfatoolkit.AbbadingoDFA(targetSize, true)
 
 		// Training set.
-		training, _ := DFA_Toolkit.AbbadingoDatasetExact(target, trainingSetSize, 0)
+		training, _ := dfatoolkit.AbbadingoDatasetExact(target, trainingSetSize, 0)
 
 		fmt.Printf("-------------------------------------------------------------\n")
 		fmt.Printf("-------------------------------------------------------------\n")
@@ -95,12 +95,12 @@ func TestBenchmarkGreedyEDSM(t *testing.T){
 		start := time.Now()
 
 		// Create a target DFA.
-		target := DFA_Toolkit.AbbadingoDFA(targetSize, true)
+		target := dfatoolkit.AbbadingoDFA(targetSize, true)
 
 		// Training testing sets.
-		trainingSet, testingSet := DFA_Toolkit.AbbadingoDatasetExact(target, 607, 1800)
+		trainingSet, testingSet := dfatoolkit.AbbadingoDatasetExact(target, 607, 1800)
 
-		resultantDFA := DFA_Toolkit.GreedyEDSMFromDataset(trainingSet)
+		resultantDFA := dfatoolkit.GreedyEDSMFromDataset(trainingSet)
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		totalAccuracies.Add(accuracy)
@@ -142,12 +142,12 @@ func TestBenchmarkWindowedEDSM(t *testing.T){
 		start := time.Now()
 
 		// Create a target DFA.
-		target := DFA_Toolkit.AbbadingoDFA(targetSize, true)
+		target := dfatoolkit.AbbadingoDFA(targetSize, true)
 
 		// Training testing sets.
-		trainingSet, testingSet := DFA_Toolkit.AbbadingoDatasetExact(target, 607, 1800)
+		trainingSet, testingSet := dfatoolkit.AbbadingoDatasetExact(target, 607, 1800)
 
-		resultantDFA := DFA_Toolkit.WindowedEDSMFromDataset(trainingSet, targetSize*2, 2.0)
+		resultantDFA := dfatoolkit.WindowedEDSMFromDataset(trainingSet, targetSize*2, 2.0)
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		totalAccuracies.Add(accuracy)
@@ -189,12 +189,12 @@ func TestBenchmarkBlueFringeEDSM(t *testing.T){
 		start := time.Now()
 
 		// Create a target DFA.
-		target := DFA_Toolkit.AbbadingoDFA(targetSize, true)
+		target := dfatoolkit.AbbadingoDFA(targetSize, true)
 
 		// Training testing sets.
-		trainingSet, testingSet := DFA_Toolkit.AbbadingoDatasetExact(target, 607, 1800)
+		trainingSet, testingSet := dfatoolkit.AbbadingoDatasetExact(target, 607, 1800)
 
-		resultantDFA := DFA_Toolkit.BlueFringeEDSMFromDataset(trainingSet)
+		resultantDFA := dfatoolkit.BlueFringeEDSMFromDataset(trainingSet)
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		totalAccuracies.Add(accuracy)
@@ -234,10 +234,10 @@ func TestBenchmarkEDSM(t *testing.T) {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
 
 		// Create a target DFA.
-		target := DFA_Toolkit.AbbadingoDFA(targetSize, true)
+		target := dfatoolkit.AbbadingoDFA(targetSize, true)
 
 		// Training testing sets.
-		trainingSet, testingSet := DFA_Toolkit.AbbadingoDatasetExact(target, 607, 1800)
+		trainingSet, testingSet := dfatoolkit.AbbadingoDatasetExact(target, 607, 1800)
 
 		// Construct an APTA from training dataset.
 		APTA := trainingSet.GetPTA(true)
@@ -247,26 +247,26 @@ func TestBenchmarkEDSM(t *testing.T) {
 		// Add 3 EDSM types to wait group.
 		wg.Add(3)
 
-		var resultantDFAGreedy DFA_Toolkit.DFA
-		var resultantDFAWindowed DFA_Toolkit.DFA
-		var resultantDFABlueFringe DFA_Toolkit.DFA
+		var resultantDFAGreedy dfatoolkit.DFA
+		var resultantDFAWindowed dfatoolkit.DFA
+		var resultantDFABlueFringe dfatoolkit.DFA
 
 		go func(){
 			// Decrement 1 from wait group.
 			defer wg.Done()
-			resultantDFAGreedy = DFA_Toolkit.GreedyEDSM(APTA)
+			resultantDFAGreedy = dfatoolkit.GreedyEDSM(APTA)
 		}()
 
 		go func(){
 			// Decrement 1 from wait group.
 			defer wg.Done()
-			resultantDFAWindowed = DFA_Toolkit.WindowedEDSM(APTA, targetSize*2, 2.0)
+			resultantDFAWindowed = dfatoolkit.WindowedEDSM(APTA, targetSize*2, 2.0)
 		}()
 
 		go func(){
 			// Decrement 1 from wait group.
 			defer wg.Done()
-			resultantDFABlueFringe = DFA_Toolkit.BlueFringeEDSM(APTA)
+			resultantDFABlueFringe = dfatoolkit.BlueFringeEDSM(APTA)
 		}()
 
 		// Wait for all go routines within wait

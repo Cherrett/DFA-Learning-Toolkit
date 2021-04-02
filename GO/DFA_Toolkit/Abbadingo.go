@@ -1,4 +1,4 @@
-package DFA_Toolkit
+package dfatoolkit
 
 import (
 	"bufio"
@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-// Returns a Dataset from an Abbadingo File.
+// GetDatasetFromAbbadingoFile returns a Dataset from an Abbadingo File.
 func GetDatasetFromAbbadingoFile(fileName string) Dataset {
 	// Initialize new Dataset.
 	dataset := Dataset{}
@@ -40,7 +40,7 @@ func GetDatasetFromAbbadingoFile(fileName string) Dataset {
 	return dataset
 }
 
-// Returns a StringInstance from a line within an Abbadingo File.
+// NewStringInstanceFromAbbadingoFile returns a StringInstance from a line within an Abbadingo File.
 func NewStringInstanceFromAbbadingoFile(text string, delimiter string) StringInstance {
 	// Initialize new StringInstance.
 	stringInstance := StringInstance{}
@@ -70,7 +70,7 @@ func NewStringInstanceFromAbbadingoFile(text string, delimiter string) StringIns
 	return stringInstance
 }
 
-// Returns a random DFA in Abbadingo format given a number of states. If exact
+// AbbadingoDFA returns a random DFA in Abbadingo format given a number of states. If exact
 // is set to true, the resultant DFA will have the exact number of states requested.
 func AbbadingoDFA(numberOfStates int, exact bool) DFA {
 	// The size of the DFA to be created.
@@ -134,7 +134,7 @@ func AbbadingoDFA(numberOfStates int, exact bool) DFA {
 	}
 }
 
-// Returns an Abbadingo training and testing Dataset given a DFA and a ratio for each.
+// AbbadingoDataset returns an Abbadingo training and testing Dataset given a DFA and a ratio for each.
 func AbbadingoDataset(dfa DFA, percentageFromSamplePool float64, testingRatio float64) (Dataset, Dataset) {
 	// Calculate the length of the longest string.
 	maxLength := math.Round((2.0 * math.Log2(float64(len(dfa.States)))) + 3.0)
@@ -150,7 +150,7 @@ func AbbadingoDataset(dfa DFA, percentageFromSamplePool float64, testingRatio fl
 	return AbbadingoDatasetExact(dfa, trainingSetSize, int(totalSetSize)-trainingSetSize)
 }
 
-// Returns an Abbadingo training and testing Dataset given a DFA and a set size for each.
+// AbbadingoDatasetExact returns an Abbadingo training and testing Dataset given a DFA and a set size for each.
 func AbbadingoDatasetExact(dfa DFA, trainingSetSize int, testingSetSize int) (Dataset, Dataset) {
 	// Initialize training dataset.
 	trainingDataset := Dataset{}
@@ -197,7 +197,7 @@ func AbbadingoDatasetExact(dfa DFA, trainingSetSize int, testingSetSize int) (Da
 	return trainingDataset, testingDataset
 }
 
-// Writes a given Dataset to file in Abbadingo format.
+// WriteToAbbadingoFile writes a given Dataset to file in Abbadingo format.
 func (dataset Dataset) WriteToAbbadingoFile(filePath string) {
 	// Sort the dataset by length.
 	sortedDataset := dataset.SortDatasetByLength()

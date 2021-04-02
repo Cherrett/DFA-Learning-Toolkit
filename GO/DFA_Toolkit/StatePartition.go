@@ -1,4 +1,4 @@
-package DFA_Toolkit
+package dfatoolkit
 
 // Block struct which represents a block within a partition.
 type Block struct {
@@ -212,9 +212,8 @@ func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA) {
 					resultantDFA.States[newStateID].Transitions[symbolID] != resultantStateID {
 					// not deterministic
 					return false, DFA{}
-				} else {
-					resultantDFA.States[newStateID].Transitions[symbolID] = resultantStateID
 				}
+				resultantDFA.States[newStateID].Transitions[symbolID] = resultantStateID
 			}
 		}
 	}

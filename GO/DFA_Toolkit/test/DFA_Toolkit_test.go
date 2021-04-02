@@ -13,7 +13,7 @@ import (
 
 func TestAbbadingoDFAFromFile(t *testing.T) {
 	t.Parallel()
-	dataset := DFA_Toolkit.GetDatasetFromAbbadingoFile("../../AbbadingoDatasets/dataset4/train.a")
+	dataset := dfatoolkit.GetDatasetFromAbbadingoFile("../../AbbadingoDatasets/dataset4/train.a")
 	if len(dataset) != 60000{
 		t.Errorf("Dataset4 length = %d, want 60000", len(dataset))
 	}
@@ -36,7 +36,7 @@ func TestAbbadingoDFAGeneration(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 	numberOfStates := rand.Intn(499) + 1
 
-	AbbadingoDFA := DFA_Toolkit.AbbadingoDFA(numberOfStates, true)
+	AbbadingoDFA := dfatoolkit.AbbadingoDFA(numberOfStates, true)
 	if len(AbbadingoDFA.SymbolMap) != 2{
 		t.Errorf("AbbadingoDFA number of symbols = %d, want 2", len(AbbadingoDFA.SymbolMap))
 	}
@@ -54,9 +54,9 @@ func TestAbbadingoDatasetGeneration(t *testing.T){
 	rand.Seed(time.Now().UnixNano())
 	numberOfStates := rand.Intn(99) + 1
 
-	AbbadingoDFA := DFA_Toolkit.AbbadingoDFA(numberOfStates, false)
+	AbbadingoDFA := dfatoolkit.AbbadingoDFA(numberOfStates, false)
 
-	trainingDataset, testingDataset := DFA_Toolkit.AbbadingoDataset(AbbadingoDFA, 35, 0.25)
+	trainingDataset, testingDataset := dfatoolkit.AbbadingoDataset(AbbadingoDFA, 35, 0.25)
 
 	trainingDatasetConsistentWithDFA := trainingDataset.ConsistentWithDFA(AbbadingoDFA)
 	testingDatasetConsistentWithDFA := testingDataset.ConsistentWithDFA(AbbadingoDFA)
@@ -76,7 +76,7 @@ func TestAbbadingoDatasetGeneration(t *testing.T){
 
 func TestStateMergingAndDFAEquivalence(t *testing.T){
 	t.Parallel()
-	dataset := DFA_Toolkit.GetDatasetFromAbbadingoFile("../../AbbadingoDatasets/dataset1/train.a")
+	dataset := dfatoolkit.GetDatasetFromAbbadingoFile("../../AbbadingoDatasets/dataset1/train.a")
 	APTA := dataset.GetPTA(false)
 
 	statePartition := APTA.ToStatePartition()
@@ -111,9 +111,9 @@ func TestDatasetJSON(t *testing.T){
 	t.Parallel()
 
 	// Training set from abbadingo file.
-	training1 := DFA_Toolkit.GetDatasetFromAbbadingoFile("../../AbbadingoDatasets/dataset1/train.a")
+	training1 := dfatoolkit.GetDatasetFromAbbadingoFile("../../AbbadingoDatasets/dataset1/train.a")
 	// Training set from JSON file.
-	training2, valid := DFA_Toolkit.DatasetFromJSON("../../AbbadingoDatasets/dataset1/train.json")
+	training2, valid := dfatoolkit.DatasetFromJSON("../../AbbadingoDatasets/dataset1/train.json")
 
 	if !valid{
 		t.Errorf("Dataset was not read successfuly from JSON.")
@@ -127,7 +127,7 @@ func TestDatasetJSON(t *testing.T){
 func TestVisualisation(t *testing.T){
 	t.Parallel()
 	// Training set.
-	training := DFA_Toolkit.GetDatasetFromAbbadingoFile("../../AbbadingoDatasets/dataset1/train.a")
+	training := dfatoolkit.GetDatasetFromAbbadingoFile("../../AbbadingoDatasets/dataset1/train.a")
 
 	test := training.GetPTA(true)
 

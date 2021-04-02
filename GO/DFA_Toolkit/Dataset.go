@@ -1,4 +1,4 @@
-package DFA_Toolkit
+package dfatoolkit
 
 import (
 	"bytes"
@@ -203,10 +203,9 @@ func (stringInstance StringInstance) ParseToStateLabel(dfa DFA) StateLabel {
 				// If state is unknown or rejecting, return rejecting.
 				if dfa.States[currentStateID].Label == UNKNOWN || dfa.States[currentStateID].Label == REJECTING {
 					return REJECTING
-				// If state is accepting, return accepting.
-				} else {
-					return ACCEPTING
 				}
+				// Else, if state is accepting, return accepting.
+				return ACCEPTING
 			}
 		// Return rejecting if no transition exists.
 		} else {
@@ -397,7 +396,7 @@ func (dataset Dataset) RejectingStringInstancesRatio() float64 {
 
 // SameAs checks whether Dataset is the same as the given Dataset.
 // Both datasets are sorted before checking with DeepEqual.
-func (dataset Dataset) SameAs(dataset2 Dataset) bool 
+func (dataset Dataset) SameAs(dataset2 Dataset) bool {
 	dataset1 := dataset.SortDatasetByLength()
 	dataset2 = dataset2.SortDatasetByLength()
 	return reflect.DeepEqual(dataset1, dataset2)

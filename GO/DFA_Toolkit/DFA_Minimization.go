@@ -1,4 +1,4 @@
-package DFA_Toolkit
+package dfatoolkit
 
 // StateIDPair which represents a pair of states.
 type StateIDPair struct {

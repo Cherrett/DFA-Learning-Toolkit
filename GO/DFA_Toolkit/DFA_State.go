@@ -1,6 +1,6 @@
-package DFA_Toolkit
+package dfatoolkit
 
-// State Label type as an 8-bit unsigned integer.
+// StateLabel type as an 8-bit unsigned integer.
 type StateLabel uint8
 
 // Constants which represent the 3 possible state labels.
@@ -19,22 +19,22 @@ type State struct {
 	dfa         *DFA       // Pointer to DFA containing state.
 }
 
-// Returns true if state label is accepting, otherwise returns false.
+// IsAccepting returns true if state label is accepting, otherwise returns false.
 func (state State) IsAccepting() bool{
 	return state.Label == ACCEPTING
 }
 
-// Returns true if state label is rejecting, otherwise returns false.
+// IsRejecting returns true if state label is rejecting, otherwise returns false.
 func (state State) IsRejecting() bool{
 	return state.Label == REJECTING
 }
 
-// Returns true if state label is unknown, otherwise returns false.
+// IsUnknown returns true if state label is unknown, otherwise returns false.
 func (state State) IsUnknown() bool{
 	return state.Label == UNKNOWN
 }
 
-// Returns the state's depth within DFA.
+// Depth returns the state's depth within DFA.
 func (state *State) Depth() int{
 	if state.depth == -1{
 		state.dfa.CalculateDepthAndOrder()
@@ -43,7 +43,7 @@ func (state *State) Depth() int{
 	return state.depth
 }
 
-// Returns the state's order within DFA.
+// Order returns the state's order within DFA.
 func (state *State) Order() int{
 	if state.order == -1{
 		state.dfa.CalculateDepthAndOrder()
@@ -52,7 +52,7 @@ func (state *State) Order() int{
 	return state.order
 }
 
-// Returns a pointer to the DFA which contains this State.
+// DFA returns a pointer to the DFA which contains this State.
 func (state State) DFA() *DFA{
 	return state.dfa
 }

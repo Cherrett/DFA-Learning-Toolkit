@@ -1,11 +1,9 @@
-package DFA_Toolkit
+package dfatoolkit
 
 import (
 	"DFA_Toolkit/DFA_Toolkit/util"
 	"fmt"
 	"math"
-	"math/rand"
-	"sort"
 	"time"
 )
 
@@ -18,44 +16,6 @@ type StatePairScore struct {
 
 // ScoringFunction takes a state partition as input and returns an integer score.
 type ScoringFunction func(stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition, dfa DFA) float64
-
-// HighestScoringMerge returns the highest scoring state pair. If more than
-// one state pair have the highest score, one is chosen randomly.
-func HighestScoringMerge(statePairScores []StatePairScore, randomFromBest bool) StatePairScore{
-	// Sort the state pairs by score.
-	sort.Slice(statePairScores, func(i, j int) bool {
-		return statePairScores[i].Score > statePairScores[j].Score
-	})
-
-	if !randomFromBest{
-		return statePairScores[0]
-	}
-
-	// Declare the highest score from the first element within slice (since slice is sorted).
-	highestScore := statePairScores[0].Score
-
-	// Declare slice to store the highest scoring state pairs.
-	highestScorePairs := []StatePairScore{}
-
-	// Iterate over each state pair.
-	for i := range statePairScores {
-		// If the score of the state pair is equal to the highest score, add it to the highest scoring state pairs.
-		if statePairScores[i].Score == highestScore{
-			highestScorePairs = append(highestScorePairs, statePairScores[i])
-			// Else, break out of loop (since slice is sorted, score cannot be bigger in other pairs).
-		}else{
-			break
-		}
-	}
-
-	// If only one highest scoring state pair exists, return it.
-	if len(highestScorePairs) == 1{
-		return highestScorePairs[0]
-		// Else, return a random state pair from highest scoring pairs.
-	}else{
-		return highestScorePairs[rand.Intn(len(highestScorePairs))]
-	}
-}
 
 // GreedySearch deterministically merges all possible state pairs.
 // Returns the resultant DFA when no more valid merges are possible.
