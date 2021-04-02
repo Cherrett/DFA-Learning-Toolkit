@@ -30,8 +30,10 @@ jobs:
       
     - name: Run vet & lint
       run: |
-        go vet .
-        golint .
+        ls
+        cd GO/DFA_Toolkit && go vet .
+        cd GO/DFA_Toolkit && golint .
+        ls
     
     - name: Run testing
-      run: cd test && go test -v
+      run: cd GO/DFA_Toolkit/test && go test -v
