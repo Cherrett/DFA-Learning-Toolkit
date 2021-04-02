@@ -397,7 +397,7 @@ func (dataset Dataset) RejectingStringInstancesRatio() float64 {
 
 // SameAs checks whether Dataset is the same as the given Dataset.
 // Both datasets are sorted before checking with DeepEqual.
-func (dataset Dataset) SameAs(dataset2 Dataset) bool {
+func (dataset Dataset) SameAs(dataset2 Dataset) bool 
 	dataset1 := dataset.SortDatasetByLength()
 	dataset2 = dataset2.SortDatasetByLength()
 	return reflect.DeepEqual(dataset1, dataset2)
