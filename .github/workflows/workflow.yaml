@@ -21,15 +21,17 @@ jobs:
         go-version: '1.16.3' # The Go version to download (if necessary) and use.
     
     - name: Install dependencies
-      run: go version
+      run: |
+        go version
+        go get -u golang.org/x/lint/golint
       
     - name: Run build
-      run: cd GO/DFA_Tooklit && go build . 
+      run: cd GO/DFA_Toolkit && go build . 
       
     - name: Run vet & lint
       run: |
-        cd GO/DFA_Tooklit && go vet .
-        cd GO/DFA_Tooklit && golint .
+        cd GO/DFA_Toolkit && go vet .
+        cd GO/DFA_Toolkit && golint .
     
     - name: Run testing
       run: cd GO/DFA_Toolkit/test && go test -v
