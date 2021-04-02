@@ -41,4 +41,4 @@ jobs:
     
     # Run testing on the code
     - name: Run testing
-      run: cd GO/test && go test -v
+      run: cd GO/DFA_Toolkit/test && go test -v
