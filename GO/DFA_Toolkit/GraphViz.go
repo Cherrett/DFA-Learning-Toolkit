@@ -105,7 +105,8 @@ func (dfa DFA) ToDOT(filePath string, rankByOrder bool, topDown bool) {
 // to true, the state IDs/labels are ordered by their canonical order
 // within DFA. If topDown is set to true, the visual representation
 // will be top down. A left to right representation is used otherwise.
-func (dfa DFA) ToPNG(filePath string, rankByOrder bool, topDown bool){
+// Returns true if successful or false if an error occurs.
+func (dfa DFA) ToPNG(filePath string, rankByOrder bool, topDown bool) bool{
 	defer os.Remove("temp.dot")
 	dfa.ToDOT("temp.dot", rankByOrder, topDown)
 
@@ -115,9 +116,11 @@ func (dfa DFA) ToPNG(filePath string, rankByOrder bool, topDown bool){
 	if err != nil {
 		fmt.Println(err.Error())
 		fmt.Println("Kindly download Graphviz executable from https://graphviz.org/download/")
-	}else{
-		fmt.Printf("DFA outputted to: %s\n", filePath)
+		return false
 	}
+
+	fmt.Printf("DFA outputted to: %s\n", filePath)
+	return true
 }
 
 // ToJPG creates and saves a .jpg image to the given file path.
@@ -126,7 +129,8 @@ func (dfa DFA) ToPNG(filePath string, rankByOrder bool, topDown bool){
 // to true, the state IDs/labels are ordered by their canonical order
 // within DFA. If topDown is set to true, the visual representation
 // will be top down. A left to right representation is used otherwise.
-func (dfa DFA) ToJPG(filePath string, rankByOrder bool, topDown bool){
+// Returns true if successful or false if an error occurs.
+func (dfa DFA) ToJPG(filePath string, rankByOrder bool, topDown bool) bool{
 	defer os.Remove("temp.dot")
 	dfa.ToDOT("temp.dot", rankByOrder, topDown)
 
@@ -136,9 +140,11 @@ func (dfa DFA) ToJPG(filePath string, rankByOrder bool, topDown bool){
 	if err != nil {
 		fmt.Println(err.Error())
 		fmt.Println("Kindly download Graphviz executable from https://graphviz.org/download/")
-	}else{
-		fmt.Printf("DFA outputted to: %s\n", filePath)
+		return false
 	}
+
+	fmt.Printf("DFA outputted to: %s\n", filePath)
+	return true
 }
 
 // ToPDF creates and saves a .pdf file to the given file path.
@@ -147,7 +153,8 @@ func (dfa DFA) ToJPG(filePath string, rankByOrder bool, topDown bool){
 // to true, the state IDs/labels are ordered by their canonical order
 // within DFA. If topDown is set to true, the visual representation
 // will be top down. A left to right representation is used otherwise.
-func (dfa DFA) ToPDF(filePath string, rankByOrder bool, topDown bool){
+// Returns true if successful or false if an error occurs.
+func (dfa DFA) ToPDF(filePath string, rankByOrder bool, topDown bool) bool{
 	defer os.Remove("temp.dot")
 	dfa.ToDOT("temp.dot", rankByOrder, topDown)
 
@@ -157,9 +164,11 @@ func (dfa DFA) ToPDF(filePath string, rankByOrder bool, topDown bool){
 	if err != nil {
 		fmt.Println(err.Error())
 		fmt.Println("Kindly download Graphviz executable from https://graphviz.org/download/")
-	}else{
-		fmt.Printf("DFA outputted to: %s\n", filePath)
+		return false
 	}
+
+	fmt.Printf("DFA outputted to: %s\n", filePath)
+	return true
 }
 
 // ToSVG creates and saves a .svg file to the given file path.
@@ -168,7 +177,8 @@ func (dfa DFA) ToPDF(filePath string, rankByOrder bool, topDown bool){
 // to true, the state IDs/labels are ordered by their canonical order
 // within DFA. If topDown is set to true, the visual representation
 // will be top down. A left to right representation is used otherwise.
-func (dfa DFA) ToSVG(filePath string, rankByOrder bool, topDown bool){
+// Returns true if successful or false if an error occurs.
+func (dfa DFA) ToSVG(filePath string, rankByOrder bool, topDown bool) bool{
 	defer os.Remove("temp.dot")
 	dfa.ToDOT("temp.dot", rankByOrder, topDown)
 
@@ -178,7 +188,9 @@ func (dfa DFA) ToSVG(filePath string, rankByOrder bool, topDown bool){
 	if err != nil {
 		fmt.Println(err.Error())
 		fmt.Println("Kindly download Graphviz executable from https://graphviz.org/download/")
-	}else{
-		fmt.Printf("DFA outputted to: %s\n", filePath)
+		return false
 	}
+
+	fmt.Printf("DFA outputted to: %s\n", filePath)
+	return true
 }

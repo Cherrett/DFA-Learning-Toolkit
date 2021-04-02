@@ -149,7 +149,9 @@ func TestVisualisation(t *testing.T){
 	// To PNG scenario
 	for exampleIndex := range examplesFilenames {
 		filePath := examplesFilenames[exampleIndex]+".png"
-		test.ToPNG(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
+		if !test.ToPNG(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex]){
+			t.Errorf("GraphViz Error. Probabbly not installed properly.")
+		}
 		if !util.FileExists(filePath) {
 			t.Errorf("DFA toPNG failed, %s file not found.", filePath)
 		}
@@ -158,7 +160,9 @@ func TestVisualisation(t *testing.T){
 	// To JPG scenario
 	for exampleIndex := range examplesFilenames {
 		filePath := examplesFilenames[exampleIndex]+".jpg"
-		test.ToJPG(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
+		if !test.ToJPG(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex]){
+			t.Errorf("GraphViz Error. Probabbly not installed properly.")
+		}
 		if !util.FileExists(filePath) {
 			t.Errorf("DFA toJPG failed, %s file not found.", filePath)
 		}
@@ -167,7 +171,9 @@ func TestVisualisation(t *testing.T){
 	// To PDF scenario
 	for exampleIndex := range examplesFilenames {
 		filePath := examplesFilenames[exampleIndex]+".pdf"
-		test.ToPDF(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
+		if !test.ToPDF(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex]){
+			t.Errorf("GraphViz Error. Probabbly not installed properly.")
+		}
 		if !util.FileExists(filePath) {
 			t.Errorf("DFA toPDF failed, %s file not found.", filePath)
 		}
@@ -176,7 +182,9 @@ func TestVisualisation(t *testing.T){
 	// To SVG scenario
 	for exampleIndex := range examplesFilenames {
 		filePath := examplesFilenames[exampleIndex]+".svg"
-		test.ToSVG(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
+		if !test.ToSVG(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex]){
+			t.Errorf("GraphViz Error. Probabbly not installed properly.")
+		}
 		if !util.FileExists(filePath) {
 			t.Errorf("DFA toSVG failed, %s file not found.", filePath)
 		}
