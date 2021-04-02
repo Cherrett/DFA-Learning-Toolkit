@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"reflect"
 	"sort"
 	"strconv"
 	"sync"
@@ -392,6 +393,14 @@ func (dataset Dataset) AcceptingStringInstancesRatio() float64 {
 // instances to the accepting string instances within dataset.
 func (dataset Dataset) RejectingStringInstancesRatio() float64 {
 	return float64(dataset.RejectingStringInstancesCount()) / float64(len(dataset))
+}
+
+// SameAs checks whether Dataset is the same as the given Dataset.
+// Both datasets are sorted before checking with DeepEqual.
+func (dataset Dataset) SameAs(dataset2 Dataset) bool {
+	dataset1 := dataset.SortDatasetByLength()
+	dataset2 = dataset2.SortDatasetByLength()
+	return reflect.DeepEqual(dataset1, dataset2)
 }
 
 // ToJSON saves the dataset to a JSON file given a file path.

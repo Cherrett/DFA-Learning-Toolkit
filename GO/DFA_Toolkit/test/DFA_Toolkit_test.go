@@ -107,10 +107,27 @@ func TestStateMergingAndDFAEquivalence(t *testing.T){
 	}
 }
 
+func TestDatasetJSON(t *testing.T){
+	t.Parallel()
+
+	// Training set from abbadingo file.
+	training1 := DFA_Toolkit.GetDatasetFromAbbadingoFile("../../AbbadingoDatasets/dataset1/train.a")
+	// Training set from JSON file.
+	training2, valid := DFA_Toolkit.DatasetFromJSON("../../AbbadingoDatasets/dataset1/train.json")
+
+	if !valid{
+		t.Errorf("Dataset was not read successfuly from JSON.")
+	}
+
+	if !training1.SameAs(training2){
+		t.Errorf("Datasets read not same as each other.")
+	}
+}
+
 func TestVisualisation(t *testing.T){
 	t.Parallel()
 	// Training set.
-	training := DFA_Toolkit.GetDatasetFromAbbadingoFile("../../AbbadingoDatasets/test.txt")
+	training := DFA_Toolkit.GetDatasetFromAbbadingoFile("../../AbbadingoDatasets/dataset1/train.a")
 
 	test := training.GetPTA(true)
 
