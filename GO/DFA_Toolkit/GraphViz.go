@@ -54,22 +54,22 @@ func (dfa DFA) ToDOT(filePath string, rankByOrder bool, topDown bool) {
 	}
 
 	// Iterate over each state and write the correct format
-	// depending on the state status.
+	// depending on the state label.
 	for stateID, state := range dfa.States{
 		// If rankByOrder is set to true, the order
 		// of the state is used as the label.
 		if rankByOrder {
-			if state.StateStatus == UNKNOWN{
+			if state.Label == UNKNOWN{
 				_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=\"q%d\" shape=\"circle\" fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"filled\" fillcolor=\"white\"];\n", stateID, state.order))
-			}else if state.StateStatus == ACCEPTING{
+			}else if state.Label == ACCEPTING{
 				_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=\"q%d\" shape=\"circle\" peripheries=2 fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"filled\" fillcolor=\"white\"];\n", stateID, state.order))
 			}else{
 				_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=\"q%d\" shape=\"circle\" fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"setlinewidth(3),filled\" fillcolor=\"white\"];\n", stateID, state.order))
 			}
 		}else{
-			if state.StateStatus == UNKNOWN{
+			if state.Label == UNKNOWN{
 				_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=\"q%d\" shape=\"circle\" fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"filled\" fillcolor=\"white\"];\n", stateID, stateID))
-			}else if state.StateStatus == ACCEPTING{
+			}else if state.Label == ACCEPTING{
 				_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=\"q%d\" shape=\"circle\" peripheries=2 fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"filled\" fillcolor=\"white\"];\n", stateID, stateID))
 			}else{
 				_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=\"q%d\" shape=\"circle\" fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"setlinewidth(3),filled\" fillcolor=\"white\"];\n", stateID, stateID))

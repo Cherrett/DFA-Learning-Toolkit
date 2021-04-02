@@ -49,7 +49,7 @@ func NewStringInstanceFromAbbadingoFile(text string, delimiter string) StringIns
 	splitString := strings.Split(text, delimiter)
 
 	// Check whether string is rejecting or accepting.
-	// Update status of StringInstance accordingly.
+	// Update label of StringInstance accordingly.
 	// Panic if a value which is not 0 or 1 is found.
 	switch splitString[0] {
 	case "0":
@@ -59,7 +59,7 @@ func NewStringInstanceFromAbbadingoFile(text string, delimiter string) StringIns
 		stringInstance.Accepting = true
 		break
 	default:
-		panic(fmt.Sprintf("Unknown string status - %s", splitString[0]))
+		panic(fmt.Sprintf("Unknown string label - %s", splitString[0]))
 	}
 
 	// Add the remaining split string values to value of StringInstance since
@@ -88,7 +88,7 @@ func AbbadingoDFA(numberOfStates int, exact bool) DFA {
 		dfa.AddSymbols([]rune{'a', 'b'})
 
 		// Create new states and assign either
-		// an accepting or unknown status.
+		// an accepting or unknown label.
 		for i := 0; i < dfaSize; i++ {
 			if rand.Intn(2) == 0 {
 				dfa.AddState(ACCEPTING)
@@ -222,7 +222,7 @@ func (dataset Dataset) WriteToAbbadingoFile(filePath string) {
 
 	// Iterate over each string instance within sorted dataset.
 	for _, stringInstance := range sortedDataset {
-		// Add string status and string length to output string.
+		// Add string label and string length to output string.
 		outputString := ""
 		if stringInstance.Accepting{
 			outputString = strconv.Itoa(1) + " " + strconv.Itoa(stringInstance.Length()) + " "

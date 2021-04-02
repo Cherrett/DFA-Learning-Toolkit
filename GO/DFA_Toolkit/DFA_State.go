@@ -1,9 +1,9 @@
 package DFA_Toolkit
 
-// State Status type as an 8-bit unsigned integer.
-type StateStatus uint8
+// State Label type as an 8-bit unsigned integer.
+type StateLabel uint8
 
-// Constants which represent the 3 possible state statuses.
+// Constants which represent the 3 possible state labels.
 const (
 	REJECTING = iota // 0
 	ACCEPTING        // 1
@@ -12,26 +12,26 @@ const (
 
 // State struct which represents a State within a DFA.
 type State struct {
-	StateStatus StateStatus // State Status (Rejecting, Accepting, or Unknown).
-	Transitions []int       // Transition Table where each element corresponds to a transition for each symbol ID.
-	depth       int         // Depth of State within DFA.
-	order       int         // Order of State within DFA.
-	dfa         *DFA        // Pointer to DFA containing state.
+	Label       StateLabel // State Label (Rejecting, Accepting, or Unknown).
+	Transitions []int      // Transition Table where each element corresponds to a transition for each symbol ID.
+	depth       int        // Depth of State within DFA.
+	order       int        // Order of State within DFA.
+	dfa         *DFA       // Pointer to DFA containing state.
 }
 
-// Returns true if state status is accepting, otherwise returns false.
+// Returns true if state label is accepting, otherwise returns false.
 func (state State) IsAccepting() bool{
-	return state.StateStatus == ACCEPTING
+	return state.Label == ACCEPTING
 }
 
-// Returns true if state status is rejecting, otherwise returns false.
+// Returns true if state label is rejecting, otherwise returns false.
 func (state State) IsRejecting() bool{
-	return state.StateStatus == REJECTING
+	return state.Label == REJECTING
 }
 
-// Returns true if state status is unknown, otherwise returns false.
+// Returns true if state label is unknown, otherwise returns false.
 func (state State) IsUnknown() bool{
-	return state.StateStatus == UNKNOWN
+	return state.Label == UNKNOWN
 }
 
 // Returns the state's depth within DFA.
