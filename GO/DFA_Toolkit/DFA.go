@@ -1,4 +1,4 @@
-package DFA_Toolkit
+package dfatoolkit
 
 import (
 	"DFA_Toolkit/DFA_Toolkit/util"
@@ -25,16 +25,16 @@ func NewDFA() DFA {
 		SymbolMap: make(map[rune]int), depth: -1, computedDepthAndOrder:false}
 }
 
-// AddState adds a new state to the DFA with the corresponding State Status.
+// AddState adds a new state to the DFA with the corresponding State Label.
 // Returns the new state's ID (index).
-func (dfa *DFA) AddState(stateStatus StateStatus) int {
+func (dfa *DFA) AddState(stateLabel StateLabel) int {
 	// Create empty transition table with default values of -1 for each symbol within the DFA.
 	transitions := make([]int, len(dfa.SymbolMap))
 	for i := range transitions {
 		transitions[i] = -1
 	}
 	// Initialize and add the new state to the slice of states within the DFA.
-	dfa.States = append(dfa.States, State{stateStatus, transitions, -1, -1, dfa})
+	dfa.States = append(dfa.States, State{stateLabel, transitions, -1, -1, dfa})
 	// Return the ID of the newly created state.
 	return len(dfa.States) - 1
 }
@@ -154,7 +154,7 @@ func (dfa DFA) AcceptingStates() []int {
 	var acceptingStates []int
 
 	for stateID := range dfa.States {
-		if dfa.States[stateID].StateStatus == ACCEPTING {
+		if dfa.States[stateID].Label == ACCEPTING {
 			acceptingStates = append(acceptingStates, stateID)
 		}
 	}
@@ -166,7 +166,7 @@ func (dfa DFA) RejectingStates() []int {
 	var acceptingStates []int
 
 	for stateID := range dfa.States {
-		if dfa.States[stateID].StateStatus == REJECTING {
+		if dfa.States[stateID].Label == REJECTING {
 			acceptingStates = append(acceptingStates, stateID)
 		}
 	}
@@ -178,7 +178,7 @@ func (dfa DFA) UnknownStates() []int {
 	var acceptingStates []int
 
 	for stateID := range dfa.States {
-		if dfa.States[stateID].StateStatus == UNKNOWN {
+		if dfa.States[stateID].Label == UNKNOWN {
 			acceptingStates = append(acceptingStates, stateID)
 		}
 	}
@@ -195,7 +195,7 @@ func (dfa DFA) LabelledStatesCount() int {
 	count := 0
 
 	for stateID := range dfa.States {
-		if dfa.States[stateID].StateStatus == ACCEPTING || dfa.States[stateID].StateStatus == REJECTING {
+		if dfa.States[stateID].Label == ACCEPTING || dfa.States[stateID].Label == REJECTING {
 			count++
 		}
 	}
@@ -207,7 +207,7 @@ func (dfa DFA) AcceptingStatesCount() int {
 	count := 0
 
 	for stateID := range dfa.States {
-		if dfa.States[stateID].StateStatus == ACCEPTING {
+		if dfa.States[stateID].Label == ACCEPTING {
 			count++
 		}
 	}
@@ -219,7 +219,7 @@ func (dfa DFA) RejectingStatesCount() int {
 	count := 0
 
 	for stateID := range dfa.States {
-		if dfa.States[stateID].StateStatus == REJECTING {
+		if dfa.States[stateID].Label == REJECTING {
 			count++
 		}
 	}
@@ -231,7 +231,7 @@ func (dfa DFA) UnknownStatesCount() int {
 	count := 0
 
 	for stateID := range dfa.States {
-		if dfa.States[stateID].StateStatus == UNKNOWN {
+		if dfa.States[stateID].Label == UNKNOWN {
 			count++
 		}
 	}
@@ -316,9 +316,8 @@ func (dfa DFA) IsTree() bool{
 		for symbolID := range dfa.States[stateID].Transitions {
 			if dfa.States[stateID].Transitions[symbolID] != -1 && visitedStates[dfa.States[stateID].Transitions[symbolID]]{
 				return false
-			}else{
-				visitedStates[dfa.States[stateID].Transitions[symbolID]] = true
 			}
+			visitedStates[dfa.States[stateID].Transitions[symbolID]] = true
 		}
 	}
 
@@ -451,7 +450,7 @@ func (dfa DFA) Describe(detail bool) {
 		// Print all states.
 		fmt.Println("States:")
 		for k, v := range dfa.States {
-			switch v.StateStatus {
+			switch v.Label {
 			case ACCEPTING:
 				fmt.Println(k, "ACCEPTING")
 				break
@@ -481,9 +480,9 @@ func (dfa DFA) Accuracy(dataset Dataset) float64 {
 
 	// Iterate over each string instance within dataset.
 	for _, stringInstance := range dataset {
-		// If the status of the string instance is equal to its state status
+		// If the label of the string instance is equal to its state label
 		// within the DFA, increment correct classifications count.
-		if stringInstance.Accepting == (stringInstance.ParseToStateStatus(dfa) == ACCEPTING) {
+		if stringInstance.Accepting == (stringInstance.ParseToStateLabel(dfa) == ACCEPTING) {
 			correctClassifications++
 		}
 	}
@@ -576,7 +575,7 @@ func (dfa DFA) Equal(dfa2 DFA) bool{
 
 	// If the number of states or the number of accepting states
 	// or the number of symbols are not equal, return false.
-	if (dfa.AllStatesCount() != dfa2.AllStatesCount()) ||
+	if (dfa1.AllStatesCount() != dfa2.AllStatesCount()) ||
 		(dfa1.SymbolsCount() != dfa2.SymbolsCount() ||
 			len(dfa1.AcceptingStates()) != len(dfa2.AcceptingStates())) {
 		return false
@@ -600,7 +599,7 @@ func (dfa DFA) Equal(dfa2 DFA) bool{
 			childStateID2 := dfa2.States[stateID2].Transitions[symbolID]
 			if (childStateID1 == -1 && childStateID2 != -1) ||
 				(childStateID1 != -1 && childStateID2 == -1) ||
-				(dfa.States[childStateID1].StateStatus != dfa2.States[childStateID2].StateStatus){
+				(childStateID1 != -1 && childStateID2 != -1 && (dfa1.States[childStateID1].Label != dfa2.States[childStateID2].Label)){
 				// If a transition exists for one DFA but does not exist
 				// for another DFA, return false.
 				return false

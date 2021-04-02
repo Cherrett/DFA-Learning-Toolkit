@@ -1,4 +1,4 @@
-package DFA_Toolkit
+package dfatoolkit
 
 import (
 	"bytes"
@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"reflect"
 	"sort"
 	"strconv"
 	"sync"
@@ -15,7 +16,7 @@ import (
 // a string instance within a dataset.
 type StringInstance struct {
 	Value  []rune      // Slice of runes which represents the actual string value.
-	Accepting bool 	   // Accepting status flag for StringInstance.
+	Accepting bool 	   // Accepting label flag for StringInstance.
 }
 
 // Dataset which is a slice of string instances.
@@ -37,7 +38,7 @@ func (dataset Dataset) GetPTA(APTA bool) DFA {
 
 	// If the first string instance within dataset has a length of 0,
 	// it represents the starting state so add a state to the DFA
-	// using the status of the empty string instance.
+	// using the label of the empty string instance.
 	if sortedDataset[0].Length() == 0{
 		if sortedDataset[0].Accepting {
 			currentStateID = dfa.AddState(ACCEPTING)
@@ -88,21 +89,21 @@ func (dataset Dataset) GetPTA(APTA bool) DFA {
 				if count == stringInstance.Length() {
 					if stringInstance.Accepting {
 						// Panic if string instance is accepting and resultant state is rejecting.
-						if dfa.States[currentStateID].StateStatus == REJECTING {
+						if dfa.States[currentStateID].Label == REJECTING {
 							panic("State already set to rejecting, cannot set to accepting")
 						// If string instance is accepting and resultant state is not
-						// rejecting, set state status to accepting.
+						// rejecting, set state label to accepting.
 						} else {
-							dfa.States[currentStateID].StateStatus = ACCEPTING
+							dfa.States[currentStateID].Label = ACCEPTING
 						}
 					} else {
 						// Panic if string instance is rejecting and resultant state is accepting.
-						if dfa.States[currentStateID].StateStatus == ACCEPTING {
+						if dfa.States[currentStateID].Label == ACCEPTING {
 							panic("State already set to accepting, cannot set to rejecting")
 						// If string instance is rejecting and resultant state is not
-						// accepting, set state status to rejecting.
+						// accepting, set state label to rejecting.
 						} else {
-							dfa.States[currentStateID].StateStatus = REJECTING
+							dfa.States[currentStateID].Label = REJECTING
 						}
 					}
 				}
@@ -159,12 +160,12 @@ func (stringInstance StringInstance) ConsistentWithDFA(dfa DFA) bool {
 			if count == stringInstance.Length() {
 				if stringInstance.Accepting {
 					// If string instance is accepting and state is rejecting, return false.
-					if dfa.States[currentStateID].StateStatus == REJECTING {
+					if dfa.States[currentStateID].Label == REJECTING {
 						return false
 					}
 				} else {
 					// If string instance is rejecting and state is accepting, return false.
-					if dfa.States[currentStateID].StateStatus == ACCEPTING {
+					if dfa.States[currentStateID].Label == ACCEPTING {
 						return false
 					}
 				}
@@ -180,9 +181,9 @@ func (stringInstance StringInstance) ConsistentWithDFA(dfa DFA) bool {
 	return true
 }
 
-// ParseToStateStatus returns the State Status of a given string instance
+// ParseToStateLabel returns the State Label of a given string instance
 // within a given DFA. If state does not exist, REJECTING is returned.
-func (stringInstance StringInstance) ParseToStateStatus(dfa DFA) StateStatus {
+func (stringInstance StringInstance) ParseToStateLabel(dfa DFA) StateLabel {
 	// Set the current state ID to the starting state ID.
 	currentStateID := dfa.StartingStateID
 	// Set counter to 0.
@@ -200,12 +201,11 @@ func (stringInstance StringInstance) ParseToStateStatus(dfa DFA) StateStatus {
 			// Check if last symbol in string.
 			if count == stringInstance.Length() {
 				// If state is unknown or rejecting, return rejecting.
-				if dfa.States[currentStateID].StateStatus == UNKNOWN || dfa.States[currentStateID].StateStatus == REJECTING {
+				if dfa.States[currentStateID].Label == UNKNOWN || dfa.States[currentStateID].Label == REJECTING {
 					return REJECTING
-				// If state is accepting, return accepting.
-				} else {
-					return ACCEPTING
 				}
+				// Else, if state is accepting, return accepting.
+				return ACCEPTING
 			}
 		// Return rejecting if no transition exists.
 		} else {
@@ -268,7 +268,7 @@ func BinaryStringToStringInstance(dfa DFA, binaryString string) StringInstance {
 
 	// Set string instance accepting to true if string instance is accepting.
 	// It is set to false if string instance is rejecting.
-	stringInstance.Accepting = stringInstance.ParseToStateStatus(dfa) == ACCEPTING
+	stringInstance.Accepting = stringInstance.ParseToStateLabel(dfa) == ACCEPTING
 
 	// Return populated string instance.
 	return stringInstance
@@ -392,6 +392,14 @@ func (dataset Dataset) AcceptingStringInstancesRatio() float64 {
 // instances to the accepting string instances within dataset.
 func (dataset Dataset) RejectingStringInstancesRatio() float64 {
 	return float64(dataset.RejectingStringInstancesCount()) / float64(len(dataset))
+}
+
+// SameAs checks whether Dataset is the same as the given Dataset.
+// Both datasets are sorted before checking with DeepEqual.
+func (dataset Dataset) SameAs(dataset2 Dataset) bool {
+	dataset1 := dataset.SortDatasetByLength()
+	dataset2 = dataset2.SortDatasetByLength()
+	return reflect.DeepEqual(dataset1, dataset2)
 }
 
 // ToJSON saves the dataset to a JSON file given a file path.

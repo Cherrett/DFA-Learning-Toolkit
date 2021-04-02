@@ -1,12 +1,12 @@
-package DFA_Toolkit
+package dfatoolkit
 
 // Block struct which represents a block within a partition.
 type Block struct {
-	Root    int         // Parent block of state.
-	Size    int         // Size (score) of block.
-	Link    int         // Index of next state within the block.
-	Status  StateStatus // Status of block.
-	Changed bool        // Whether block has been changed.
+	Root    int        // Parent block of state.
+	Size    int        // Size (score) of block.
+	Link    int        // Index of next state within the block.
+	Label   StateLabel // Label of block.
+	Changed bool       // Whether block has been changed.
 }
 
 // StatePartition struct which represents a State Partition.
@@ -33,18 +33,18 @@ func NewStatePartition(dfa DFA) StatePartition {
 		ChangedBlocksCount:   0,
 	}
 
-	// Set root and link as element, and size (score) as 1. Set block status
-	// to state status and increment number of labelled states accordingly.
+	// Set root and link as element, and size (score) as 1. Set block label
+	// to state label and increment number of labelled states accordingly.
 	for i := 0; i < len(dfa.States); i++ {
 		statePartition.Blocks[i].Root = i
 		statePartition.Blocks[i].Size = 1
 		statePartition.Blocks[i].Link = i
-		statePartition.Blocks[i].Status = dfa.States[i].StateStatus
+		statePartition.Blocks[i].Label = dfa.States[i].Label
 		statePartition.Blocks[i].Changed = false
 		statePartition.ChangedBlocks[i] = -1
-		if statePartition.Blocks[i].Status == ACCEPTING {
+		if statePartition.Blocks[i].Label == ACCEPTING {
 			statePartition.AcceptingBlocksCount++
-		} else if statePartition.Blocks[i].Status == REJECTING {
+		} else if statePartition.Blocks[i].Label == REJECTING {
 			statePartition.RejectingBlocksCount++
 		}
 	}
@@ -80,9 +80,9 @@ func (statePartition *StatePartition) Union(blockID1 int, blockID2 int) {
 	statePartition.Blocks[blockID1].Link, statePartition.Blocks[blockID2].Link =
 		statePartition.Blocks[blockID2].Link, statePartition.Blocks[blockID1].Link
 
-	// Get status of each block.
-	block1Status := statePartition.Blocks[blockID1].Status
-	block2Status := statePartition.Blocks[blockID2].Status
+	// Get label of each block.
+	block1Label := statePartition.Blocks[blockID1].Label
+	block2Label := statePartition.Blocks[blockID2].Label
 
 	// If size of block 1 is bigger than size of block 2, merge block 2 into block 1.
 	if statePartition.Blocks[blockID1].Size > statePartition.Blocks[blockID2].Size {
@@ -91,15 +91,15 @@ func (statePartition *StatePartition) Union(blockID1 int, blockID2 int) {
 		// Increment size (score) of block 1.
 		statePartition.Blocks[blockID1].Size++
 
-		// If status of block 1 is unknown and status of block 2 is
-		// not unknown, set status of block 1 to status of block 2.
-		if block1Status == UNKNOWN && block2Status != UNKNOWN {
-			statePartition.Blocks[blockID1].Status = block2Status
+		// If label of block 1 is unknown and label of block 2 is
+		// not unknown, set label of block 1 to label of block 2.
+		if block1Label == UNKNOWN && block2Label != UNKNOWN {
+			statePartition.Blocks[blockID1].Label = block2Label
 		// Else, if both blocks are accepting, decrement accepting blocks count.
-		} else if block1Status == ACCEPTING && block2Status == ACCEPTING {
+		} else if block1Label == ACCEPTING && block2Label == ACCEPTING {
 			statePartition.AcceptingBlocksCount--
 		// Else, if both blocks are rejecting, decrement rejecting blocks count.
-		} else if block1Status == REJECTING && block2Status == REJECTING {
+		} else if block1Label == REJECTING && block2Label == REJECTING {
 			statePartition.RejectingBlocksCount--
 		}
 	// Else, merge block 1 into block 2.
@@ -109,15 +109,15 @@ func (statePartition *StatePartition) Union(blockID1 int, blockID2 int) {
 		// Increment size (score) of block 2.
 		statePartition.Blocks[blockID2].Size++
 
-		// If status of block 2 is unknown and status of block 1 is
-		// not unknown, set status of block 2 to status of block 1.
-		if block2Status == UNKNOWN && block1Status != UNKNOWN {
-			statePartition.Blocks[blockID2].Status = block1Status
+		// If label of block 2 is unknown and label of block 1 is
+		// not unknown, set label of block 2 to label of block 1.
+		if block2Label == UNKNOWN && block1Label != UNKNOWN {
+			statePartition.Blocks[blockID2].Label = block1Label
 		// Else, if both blocks are accepting, decrement accepting blocks count.
-		} else if block1Status == ACCEPTING && block2Status == ACCEPTING {
+		} else if block1Label == ACCEPTING && block2Label == ACCEPTING {
 			statePartition.AcceptingBlocksCount--
 		// Else, if both blocks are rejecting, decrement rejecting blocks count.
-		} else if block1Status == REJECTING && block2Status == REJECTING {
+		} else if block1Label == REJECTING && block2Label == REJECTING {
 			statePartition.RejectingBlocksCount--
 		}
 	}
@@ -194,7 +194,7 @@ func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA) {
 	for stateID := range dfa.States {
 		currentBlockID := statePartition.Find(stateID)
 		if _, ok := newMappings[currentBlockID]; !ok {
-			newMappings[currentBlockID] = resultantDFA.AddState(statePartition.Blocks[currentBlockID].Status)
+			newMappings[currentBlockID] = resultantDFA.AddState(statePartition.Blocks[currentBlockID].Label)
 		}
 	}
 
@@ -212,9 +212,8 @@ func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA) {
 					resultantDFA.States[newStateID].Transitions[symbolID] != resultantStateID {
 					// not deterministic
 					return false, DFA{}
-				} else {
-					resultantDFA.States[newStateID].Transitions[symbolID] = resultantStateID
 				}
+				resultantDFA.States[newStateID].Transitions[symbolID] = resultantStateID
 			}
 		}
 	}
@@ -239,12 +238,12 @@ func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 in
 		return true
 	}
 
-	// Get status of each block.
-	state1Status := statePartition.Blocks[state1].Status
-	state2Status := statePartition.Blocks[state2].Status
-	// If statuses are contradicting, return false since this results
+	// Get label of each block.
+	state1Label := statePartition.Blocks[state1].Label
+	state2Label := statePartition.Blocks[state2].Label
+	// If labels are contradicting, return false since this results
 	// in a non-deterministic automaton so merge cannot be done.
-	if (state1Status == ACCEPTING && state2Status == REJECTING) || (state1Status == REJECTING && state2Status == ACCEPTING) {
+	if (state1Label == ACCEPTING && state2Label == REJECTING) || (state1Label == REJECTING && state2Label == ACCEPTING) {
 		return false
 	}
 
@@ -311,7 +310,7 @@ func (statePartition StatePartition) Copy() StatePartition {
 		ChangedBlocksCount:   0,
 	}
 
-	// Copy root, size, link and blockStatus slices.
+	// Copy root, size, link and blockLabel slices.
 	copy(copiedStatePartition.Blocks, statePartition.Blocks)
 	copy(copiedStatePartition.ChangedBlocks, statePartition.ChangedBlocks)
 
@@ -330,7 +329,7 @@ func (statePartition *StatePartition) RollbackChanges(originalStatePartition Sta
 
 		// Iterate over each altered block (state).
 		for i := 0; i < statePartition.ChangedBlocksCount; i++ {
-			// Update root, size, link and blockStatus values.
+			// Update root, size, link and blockLabel values.
 			stateID := statePartition.ChangedBlocks[i]
 			statePartition.Blocks[stateID] = originalStatePartition.Blocks[stateID]
 			statePartition.ChangedBlocks[i] = -1

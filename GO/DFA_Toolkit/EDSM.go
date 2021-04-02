@@ -1,111 +1,111 @@
-package DFA_Toolkit
+package dfatoolkit
 
 // GreedyEDSMFromDataset is a greedy version of Evidence Driven State-Merging.
 // It takes a dataset as an argument which is used to generate an APTA.
 // The randomFromBest argument is a flag used within the GreedySearch function.
-func GreedyEDSMFromDataset(dataset Dataset, randomFromBest bool) DFA{
+func GreedyEDSMFromDataset(dataset Dataset) DFA{
 	// Store length of dataset.
 	LengthOfDataset := len(dataset)
 	// Construct an APTA from dataset.
 	APTA := dataset.GetPTA(true)
 
 	// EDSM scoring function.
-	EDSM := func (stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition, dfa DFA) int {
-		return LengthOfDataset - partitionAfter.NumberOfLabelledBlocks()
+	EDSM := func (stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition, dfa DFA) float64 {
+		return float64(LengthOfDataset - partitionAfter.NumberOfLabelledBlocks())
 	}
 
 	// Call GreedySearch function using APTA and EDSM scoring function
 	// declared above. Return resultant DFA.
-	return GreedySearch(APTA, EDSM, randomFromBest)
+	return GreedySearch(APTA, EDSM)
 }
 
 // WindowedEDSMFromDataset is a windowed version of Evidence Driven State-Merging.
 // It takes a dataset as an argument which is used to generate an APTA.
 // The randomFromBest argument is a flag used within the WindowedSearch function.
-func WindowedEDSMFromDataset(dataset Dataset, windowSize int, windowGrow float64, randomFromBest bool) DFA{
+func WindowedEDSMFromDataset(dataset Dataset, windowSize int, windowGrow float64) DFA{
 	// Store length of dataset.
 	LengthOfDataset := len(dataset)
 	// Construct an APTA from dataset.
 	APTA := dataset.GetPTA(true)
 
 	// EDSM scoring function.
-	EDSM := func (stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition, dfa DFA) int {
-		return LengthOfDataset - partitionAfter.NumberOfLabelledBlocks()
+	EDSM := func (stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition, dfa DFA) float64 {
+		return float64(LengthOfDataset - partitionAfter.NumberOfLabelledBlocks())
 	}
 
 	// Call WindowedSearch function using APTA and EDSM scoring function
 	// declared above. Return resultant DFA.
-	return WindowedSearch(APTA, windowSize, windowGrow, EDSM, randomFromBest)
+	return WindowedSearch(APTA, windowSize, windowGrow, EDSM)
 }
 
 // BlueFringeEDSMFromDataset is a Blue Fringe version of Evidence Driven State-Merging.
 // It takes a dataset as an argument which is used to generate an APTA.
 // The randomFromBest argument is a flag used within the BlueFringeSearch function.
-func BlueFringeEDSMFromDataset(dataset Dataset, randomFromBest bool) DFA{
+func BlueFringeEDSMFromDataset(dataset Dataset) DFA{
 	// Store length of dataset.
 	LengthOfDataset := len(dataset)
 	// Construct an APTA from dataset.
 	APTA := dataset.GetPTA(true)
 
 	// EDSM scoring function.
-	EDSM := func (stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition, dfa DFA) int {
+	EDSM := func (stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition, dfa DFA) float64 {
 		//return (100 * (partitionBefore.NumberOfLabelledBlocks() - partitionAfter.NumberOfLabelledBlocks())) + 99 - dfa.States[stateID2].Depth()
-		return LengthOfDataset - partitionAfter.NumberOfLabelledBlocks()
+		return float64(LengthOfDataset - partitionAfter.NumberOfLabelledBlocks())
 	}
 
 	// Call WindowedSearch function using APTA and EDSM scoring function
 	// declared above. Return resultant DFA.
-	return BlueFringeSearch(APTA, EDSM, randomFromBest)
+	return BlueFringeSearch(APTA, EDSM)
 }
 
 // GreedyEDSM is a greedy version of Evidence Driven State-Merging.
 // It takes a DFA (APTA) as an argument which is used within the greedy search.
 // The randomFromBest argument is a flag used within the GreedySearch function.
-func GreedyEDSM(apta DFA, randomFromBest bool) DFA{
+func GreedyEDSM(apta DFA) DFA{
 	// Store length of dataset.
 	LengthOfDataset := apta.LabelledStatesCount()
 
 	// EDSM scoring function.
-	EDSM := func (stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition, dfa DFA) int {
-		return LengthOfDataset - partitionAfter.NumberOfLabelledBlocks()
+	EDSM := func (stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition, dfa DFA) float64 {
+		return float64(LengthOfDataset - partitionAfter.NumberOfLabelledBlocks())
 	}
 
 	// Call GreedySearch function using APTA and EDSM scoring function
 	// declared above. Return resultant DFA.
-	return GreedySearch(apta, EDSM, randomFromBest)
+	return GreedySearch(apta, EDSM)
 }
 
 // WindowedEDSM is a windowed version of Evidence Driven State-Merging.
 // It takes a DFA (APTA) as an argument which is used within the windowed search.
 // The randomFromBest argument is a flag used within the WindowedSearch function.
-func WindowedEDSM(apta DFA, windowSize int, windowGrow float64, randomFromBest bool) DFA{
+func WindowedEDSM(apta DFA, windowSize int, windowGrow float64) DFA{
 	// Store length of dataset.
 	LengthOfDataset := apta.LabelledStatesCount()
 
 	// EDSM scoring function.
-	EDSM := func (stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition, dfa DFA) int {
-		return LengthOfDataset - partitionAfter.NumberOfLabelledBlocks()
+	EDSM := func (stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition, dfa DFA) float64 {
+		return float64(LengthOfDataset - partitionAfter.NumberOfLabelledBlocks())
 	}
 
 	// Call WindowedSearch function using APTA and EDSM scoring function
 	// declared above. Return resultant DFA.
-	return WindowedSearch(apta, windowSize, windowGrow, EDSM, randomFromBest)
+	return WindowedSearch(apta, windowSize, windowGrow, EDSM)
 }
 
 // BlueFringeEDSM is a Blue Fringe version of Evidence Driven State-Merging.
 // It takes a DFA (APTA) as an argument which is used within the blue-fringe search.
 // The randomFromBest argument is a flag used within the BlueFringeSearch function.
-func BlueFringeEDSM(apta DFA, randomFromBest bool) DFA{
+func BlueFringeEDSM(apta DFA) DFA{
 	// Store length of dataset.
 	LengthOfDataset := apta.LabelledStatesCount()
 
 	// EDSM scoring function.
-	EDSM := func (stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition, dfa DFA) int {
+	EDSM := func (stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition, dfa DFA) float64 {
 		//return (100 * (partitionBefore.NumberOfLabelledBlocks() - partitionAfter.NumberOfLabelledBlocks())) + 99 - dfa.States[stateID2].Depth()
-		return LengthOfDataset - partitionAfter.NumberOfLabelledBlocks()
+		return float64(LengthOfDataset - partitionAfter.NumberOfLabelledBlocks())
 	}
 
 	// Call WindowedSearch function using APTA and EDSM scoring function
 	// declared above. Return resultant DFA.
-	return BlueFringeSearch(apta, EDSM, randomFromBest)
+	return BlueFringeSearch(apta, EDSM)
 }

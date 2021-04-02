@@ -1,4 +1,4 @@
-package DFA_Toolkit
+package dfatoolkit
 
 // StateIDPair which represents a pair of states.
 type StateIDPair struct {
@@ -19,7 +19,7 @@ func (dfa *DFA) IndistinguishableStatePairs() []StateIDPair {
 	for stateID := range dfa.States {
 		for stateID2 := stateID + 1; stateID2 < dfa.AllStatesCount(); stateID2++ {
 			// If the state pair have different types, add to distinguishable pairs map.
-			if dfa.States[stateID].StateStatus != dfa.States[stateID2].StateStatus {
+			if dfa.States[stateID].Label != dfa.States[stateID2].Label {
 				distinguishablePairs[StateIDPair{stateID, stateID2}] = true
 			}
 		}
@@ -135,12 +135,12 @@ func (dfa DFA) Minimise() DFA{
 
 	// Create a new state for each block.
 	for blockIndex := range currentPartition{
-		var stateStatus StateStatus = UNKNOWN
+		var stateLabel StateLabel = UNKNOWN
 		for stateID := range currentPartition[blockIndex] {
-			stateStatus = dfa.States[stateID].StateStatus
+			stateLabel = dfa.States[stateID].Label
 			break
 		}
-		resultantDFA.AddState(stateStatus)
+		resultantDFA.AddState(stateLabel)
 	}
 
 	// Set Initial State.

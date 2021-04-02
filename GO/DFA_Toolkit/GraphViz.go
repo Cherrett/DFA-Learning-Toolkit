@@ -1,4 +1,4 @@
-package DFA_Toolkit
+package dfatoolkit
 
 import (
 	"bufio"
@@ -54,22 +54,22 @@ func (dfa DFA) ToDOT(filePath string, rankByOrder bool, topDown bool) {
 	}
 
 	// Iterate over each state and write the correct format
-	// depending on the state status.
+	// depending on the state label.
 	for stateID, state := range dfa.States{
 		// If rankByOrder is set to true, the order
 		// of the state is used as the label.
 		if rankByOrder {
-			if state.StateStatus == UNKNOWN{
+			if state.Label == UNKNOWN{
 				_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=\"q%d\" shape=\"circle\" fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"filled\" fillcolor=\"white\"];\n", stateID, state.order))
-			}else if state.StateStatus == ACCEPTING{
+			}else if state.Label == ACCEPTING{
 				_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=\"q%d\" shape=\"circle\" peripheries=2 fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"filled\" fillcolor=\"white\"];\n", stateID, state.order))
 			}else{
 				_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=\"q%d\" shape=\"circle\" fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"setlinewidth(3),filled\" fillcolor=\"white\"];\n", stateID, state.order))
 			}
 		}else{
-			if state.StateStatus == UNKNOWN{
+			if state.Label == UNKNOWN{
 				_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=\"q%d\" shape=\"circle\" fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"filled\" fillcolor=\"white\"];\n", stateID, stateID))
-			}else if state.StateStatus == ACCEPTING{
+			}else if state.Label == ACCEPTING{
 				_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=\"q%d\" shape=\"circle\" peripheries=2 fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"filled\" fillcolor=\"white\"];\n", stateID, stateID))
 			}else{
 				_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=\"q%d\" shape=\"circle\" fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"setlinewidth(3),filled\" fillcolor=\"white\"];\n", stateID, stateID))
@@ -105,7 +105,8 @@ func (dfa DFA) ToDOT(filePath string, rankByOrder bool, topDown bool) {
 // to true, the state IDs/labels are ordered by their canonical order
 // within DFA. If topDown is set to true, the visual representation
 // will be top down. A left to right representation is used otherwise.
-func (dfa DFA) ToPNG(filePath string, rankByOrder bool, topDown bool){
+// Returns true if successful or false if an error occurs.
+func (dfa DFA) ToPNG(filePath string, rankByOrder bool, topDown bool) bool{
 	defer os.Remove("temp.dot")
 	dfa.ToDOT("temp.dot", rankByOrder, topDown)
 
@@ -115,9 +116,11 @@ func (dfa DFA) ToPNG(filePath string, rankByOrder bool, topDown bool){
 	if err != nil {
 		fmt.Println(err.Error())
 		fmt.Println("Kindly download Graphviz executable from https://graphviz.org/download/")
-	}else{
-		fmt.Printf("DFA outputted to: %s\n", filePath)
+		return false
 	}
+
+	fmt.Printf("DFA outputted to: %s\n", filePath)
+	return true
 }
 
 // ToJPG creates and saves a .jpg image to the given file path.
@@ -126,7 +129,8 @@ func (dfa DFA) ToPNG(filePath string, rankByOrder bool, topDown bool){
 // to true, the state IDs/labels are ordered by their canonical order
 // within DFA. If topDown is set to true, the visual representation
 // will be top down. A left to right representation is used otherwise.
-func (dfa DFA) ToJPG(filePath string, rankByOrder bool, topDown bool){
+// Returns true if successful or false if an error occurs.
+func (dfa DFA) ToJPG(filePath string, rankByOrder bool, topDown bool) bool{
 	defer os.Remove("temp.dot")
 	dfa.ToDOT("temp.dot", rankByOrder, topDown)
 
@@ -136,9 +140,11 @@ func (dfa DFA) ToJPG(filePath string, rankByOrder bool, topDown bool){
 	if err != nil {
 		fmt.Println(err.Error())
 		fmt.Println("Kindly download Graphviz executable from https://graphviz.org/download/")
-	}else{
-		fmt.Printf("DFA outputted to: %s\n", filePath)
+		return false
 	}
+
+	fmt.Printf("DFA outputted to: %s\n", filePath)
+	return true
 }
 
 // ToPDF creates and saves a .pdf file to the given file path.
@@ -147,7 +153,8 @@ func (dfa DFA) ToJPG(filePath string, rankByOrder bool, topDown bool){
 // to true, the state IDs/labels are ordered by their canonical order
 // within DFA. If topDown is set to true, the visual representation
 // will be top down. A left to right representation is used otherwise.
-func (dfa DFA) ToPDF(filePath string, rankByOrder bool, topDown bool){
+// Returns true if successful or false if an error occurs.
+func (dfa DFA) ToPDF(filePath string, rankByOrder bool, topDown bool) bool{
 	defer os.Remove("temp.dot")
 	dfa.ToDOT("temp.dot", rankByOrder, topDown)
 
@@ -157,9 +164,11 @@ func (dfa DFA) ToPDF(filePath string, rankByOrder bool, topDown bool){
 	if err != nil {
 		fmt.Println(err.Error())
 		fmt.Println("Kindly download Graphviz executable from https://graphviz.org/download/")
-	}else{
-		fmt.Printf("DFA outputted to: %s\n", filePath)
+		return false
 	}
+
+	fmt.Printf("DFA outputted to: %s\n", filePath)
+	return true
 }
 
 // ToSVG creates and saves a .svg file to the given file path.
@@ -168,7 +177,8 @@ func (dfa DFA) ToPDF(filePath string, rankByOrder bool, topDown bool){
 // to true, the state IDs/labels are ordered by their canonical order
 // within DFA. If topDown is set to true, the visual representation
 // will be top down. A left to right representation is used otherwise.
-func (dfa DFA) ToSVG(filePath string, rankByOrder bool, topDown bool){
+// Returns true if successful or false if an error occurs.
+func (dfa DFA) ToSVG(filePath string, rankByOrder bool, topDown bool) bool{
 	defer os.Remove("temp.dot")
 	dfa.ToDOT("temp.dot", rankByOrder, topDown)
 
@@ -178,7 +188,9 @@ func (dfa DFA) ToSVG(filePath string, rankByOrder bool, topDown bool){
 	if err != nil {
 		fmt.Println(err.Error())
 		fmt.Println("Kindly download Graphviz executable from https://graphviz.org/download/")
-	}else{
-		fmt.Printf("DFA outputted to: %s\n", filePath)
+		return false
 	}
+
+	fmt.Printf("DFA outputted to: %s\n", filePath)
+	return true
 }
