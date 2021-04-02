@@ -1,4 +1,4 @@
-package test
+package dfatoolkit_test
 
 import (
 	"DFA_Toolkit/DFA_Toolkit"
@@ -18,9 +18,9 @@ func TestBenchmarkDetMerge(t *testing.T){
 	rand.Seed(time.Now().UnixNano())
 
 	// These are target DFA sizes we will test.
-	dfaSizes := []int{16, 32, 64, 128}
+	dfaSizes := []int{16, 32, 64}
 	// These are the training set sizes we will test.
-	trainingSetSizes := []int{230, 607, 1521, 4382}
+	trainingSetSizes := []int{230, 607, 1521}
 
 	// Benchmark over the problem instances.
 	for i := range dfaSizes {

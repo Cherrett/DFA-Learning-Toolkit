@@ -89,7 +89,7 @@ func (statePartition *StatePartition) Union(blockID1 int, blockID2 int) {
 		// Set root of block 2 to block 1.
 		statePartition.Blocks[blockID2].Root = blockID1
 		// Increment size (score) of block 1.
-		statePartition.Blocks[blockID1].Size++
+		statePartition.Blocks[blockID1].Size += statePartition.Blocks[blockID2].Size
 
 		// If label of block 1 is unknown and label of block 2 is
 		// not unknown, set label of block 1 to label of block 2.
@@ -107,7 +107,7 @@ func (statePartition *StatePartition) Union(blockID1 int, blockID2 int) {
 		// Set root of block 1 to block 2.
 		statePartition.Blocks[blockID1].Root = blockID2
 		// Increment size (score) of block 2.
-		statePartition.Blocks[blockID2].Size++
+		statePartition.Blocks[blockID2].Size += statePartition.Blocks[blockID1].Size
 
 		// If label of block 2 is unknown and label of block 1 is
 		// not unknown, set label of block 2 to label of block 1.

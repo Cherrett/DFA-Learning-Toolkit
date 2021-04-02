@@ -1,4 +1,4 @@
-package test
+package dfatoolkit_test
 
 import (
 	"DFA_Toolkit/DFA_Toolkit"

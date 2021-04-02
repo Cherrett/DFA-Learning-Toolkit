@@ -41,4 +41,4 @@ jobs:
         golint .
     
     - name: Run testing
-      run: cd GO/DFA_Toolkit/test && go test -v
+      run: cd GO/DFA_Toolkit/test && go test dfatoolkit_test.go -v
