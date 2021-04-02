@@ -576,7 +576,7 @@ func (dfa DFA) Equal(dfa2 DFA) bool{
 
 	// If the number of states or the number of accepting states
 	// or the number of symbols are not equal, return false.
-	if (dfa.AllStatesCount() != dfa2.AllStatesCount()) ||
+	if (dfa1.AllStatesCount() != dfa2.AllStatesCount()) ||
 		(dfa1.SymbolsCount() != dfa2.SymbolsCount() ||
 			len(dfa1.AcceptingStates()) != len(dfa2.AcceptingStates())) {
 		return false
@@ -600,7 +600,7 @@ func (dfa DFA) Equal(dfa2 DFA) bool{
 			childStateID2 := dfa2.States[stateID2].Transitions[symbolID]
 			if (childStateID1 == -1 && childStateID2 != -1) ||
 				(childStateID1 != -1 && childStateID2 == -1) ||
-				(dfa.States[childStateID1].Label != dfa2.States[childStateID2].Label){
+				(childStateID1 != -1 && childStateID2 != -1 && (dfa1.States[childStateID1].Label != dfa2.States[childStateID2].Label)){
 				// If a transition exists for one DFA but does not exist
 				// for another DFA, return false.
 				return false
