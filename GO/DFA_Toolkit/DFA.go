@@ -149,6 +149,19 @@ func (dfa DFA) AllStates() []int {
 	return allStates
 }
 
+// LabelledStates returns state IDs of labelled states within DFA.
+func (dfa DFA) LabelledStates() []int {
+	var labelledStates []int
+
+	for stateID := range dfa.States {
+		if dfa.States[stateID].Label != UNKNOWN {
+			labelledStates = append(labelledStates, stateID)
+		}
+	}
+
+	return labelledStates
+}
+
 // AcceptingStates returns state IDs of accepting states within DFA.
 func (dfa DFA) AcceptingStates() []int {
 	var acceptingStates []int
@@ -660,13 +673,13 @@ func (dfa DFA) StructurallyComplete(dataset Dataset) bool{
 	// Remove non accepting leave states from DFA.
 	dfa.RemoveNonAcceptingLeaves()
 
-	// Store accepting (final) states within DFA.
+	// Store accepting states within DFA.
 	acceptingStates := dfa.AcceptingStates()
 
-	// Create a map with the accepting (final) state IDs
-	// and set value to false. This map is used to keep
-	// track whether at least one string of the dataset
-	// halts in each accepting (final) state.
+	// Create a map with the accepting state IDs
+	// and set value to false. This map is used to
+	// keep track whether at least one string of
+	// the dataset halts in each accepting state.
 	finalStatesHalted := map[int]bool{}
 	for _, finalStateID := range acceptingStates{
 		finalStatesHalted[finalStateID] = false
@@ -678,12 +691,7 @@ func (dfa DFA) StructurallyComplete(dataset Dataset) bool{
 	// least once when parsing the dataset.
 	transitionsUsed := map[Transition]bool{}
 	for stateID:=0; stateID < len(dfa.States); stateID++{
-		// If state is not accepting and all transitions from state
-		// are to the same state, skip current state.
-		// TODO: Confirm this logic.
-		//if dfa.States[stateID].Label != ACCEPTING && dfa.States[stateID].TransitionsCount(stateID) == len(dfa.SymbolMap){
-		//	continue
-		//}
+		// Add valid transitions to transitionsUsed map.
 		for symbolID:=0; symbolID < len(dfa.SymbolMap); symbolID++ {
 			if dfa.States[stateID].Transitions[symbolID] != -1{
 				transitionsUsed[Transition{stateID, symbolID}] = false
@@ -724,11 +732,11 @@ func (dfa DFA) StructurallyComplete(dataset Dataset) bool{
 				// Check if last symbol in string.
 				if count == stringInstance.Length() {
 					// If state is rejecting, return false.
-					if dfa.States[currentStateID].Label == REJECTING {
+					if dfa.States[currentStateID].Label != ACCEPTING {
 						return false
 					}
 
-					// Mark accepting (final) states as halted.
+					// Mark accepting state as halted.
 					finalStatesHalted[currentStateID] = true
 				}
 				// If no transition exists, return false.
@@ -747,7 +755,7 @@ func (dfa DFA) StructurallyComplete(dataset Dataset) bool{
 	}
 
 	// Check if at least one string of the dataset
-	// halted in each accepting (final) state.
+	// halted in each accepting state.
 	for _, finalStateID := range acceptingStates{
 		if !finalStatesHalted[finalStateID]{
 			return false
@@ -760,9 +768,105 @@ func (dfa DFA) StructurallyComplete(dataset Dataset) bool{
 
 // SymmetricallyStructurallyComplete checks if DFA is symmetrically
 // structurally complete with respect to a Dataset.
-//func (dfa DFA) SymmetricallyStructurallyComplete(dataset Dataset) bool{
-//
-//}
+func (dfa DFA) SymmetricallyStructurallyComplete(dataset Dataset) bool{
+	// Sort dataset.
+	dataset = dataset.SortDatasetByLength()
+
+	// Store labelled (final) states within DFA.
+	labelledStates := dfa.LabelledStates()
+
+	// Create a map with the labelled (final) state
+	// IDs and set value to false. This map is used to
+	// keep track whether at least one string of the
+	// dataset halts in each labelled (final) state.
+	finalStatesHalted := map[int]bool{}
+	for _, finalStateID := range labelledStates{
+		finalStatesHalted[finalStateID] = false
+	}
+
+	// Create a map for each valid transition within
+	// DFA and set value to false. This slice is used
+	// to keep track whether each transition is used at
+	// least once when parsing the dataset.
+	transitionsUsed := map[Transition]bool{}
+	for stateID:=0; stateID < len(dfa.States); stateID++{
+		// Add valid transitions to transitionsUsed map.
+		for symbolID:=0; symbolID < len(dfa.SymbolMap); symbolID++ {
+			if dfa.States[stateID].Transitions[symbolID] != -1{
+				transitionsUsed[Transition{stateID, symbolID}] = false
+			}
+		}
+	}
+
+	for _, stringInstance := range dataset{
+		// Set the current state ID to the starting state ID.
+		currentStateID := dfa.StartingStateID
+		// Set counter to 0.
+		count := 0
+
+		// If string instance is the empty string and starting
+		// state is labelled, mark starting state as halted.
+		// If string instance is the empty string and is accepting
+		// while the  starting state is not labelled, return false.
+		if len(stringInstance.Value) == 0{
+			if dfa.StartingState().Label != UNKNOWN{
+				finalStatesHalted[currentStateID] = true
+			}else if stringInstance.Accepting{
+				return false
+			}
+		}
+
+		// Iterate over each symbol (alphabet) within value of string instance.
+		for _, symbol := range stringInstance.Value {
+			// Increment count.
+			count++
+
+			// If a transition exists from the current state to any other state via
+			// the current symbol, set resultant state ID to current state ID.
+			if dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)] != -1 {
+				// Mark transition as visited.
+				transitionsUsed[Transition{currentStateID, dfa.SymbolID(symbol)}] = true
+
+				currentStateID = dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)]
+				// Check if last symbol in string.
+				if count == stringInstance.Length() {
+					// If state is unlabelled (unknown) and string instance is accepting, return false.
+					if dfa.States[currentStateID].Label == UNKNOWN && stringInstance.Accepting {
+						return false
+					}
+
+					// Mark labelled (final) state as halted.
+					finalStatesHalted[currentStateID] = true
+				}
+				// If no transition exists and string instance is accepting, return false.
+				// If string instance is rejecting, return true.
+			} else {
+				if stringInstance.Accepting{
+					return false
+				}
+			}
+		}
+	}
+
+	// Check whether each transition was used at least
+	// once when parsing the dataset.
+	for transition := range transitionsUsed{
+		if !transitionsUsed[transition]{
+			return false
+		}
+	}
+
+	// Check if at least one string of the dataset
+	// halted in each labelled (final) state.
+	for _, finalStateID := range labelledStates{
+		if !finalStatesHalted[finalStateID]{
+			return false
+		}
+	}
+
+	// Return true if reached.
+	return true
+}
 
 // RemoveNonAcceptingLeaves removes all states which
 // are leaves within DFA and are not accepting states.

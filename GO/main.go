@@ -21,7 +21,7 @@ func main() {
 		// Training set.
 		training, _ := dfatoolkit.AbbadingoDataset(target, 100, 0)
 
-		if training.StructurallyComplete(target){
+		if training.SymmetricallyStructurallyComplete(target){
 			structurallyCompleteCount++
 		}
 

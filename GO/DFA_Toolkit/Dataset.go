@@ -445,9 +445,9 @@ func (dataset Dataset) StructurallyComplete(dfa DFA) bool{
 
 // SymmetricallyStructurallyComplete checks if Dataset is symmetrically
 // structurally complete with respect to a DFA.
-//func (dataset Dataset) SymmetricallyStructurallyComplete(dfa DFA) bool{
-//	return dfa.SymmetricallyStructurallyComplete(dataset)
-//}
+func (dataset Dataset) SymmetricallyStructurallyComplete(dfa DFA) bool{
+	return dfa.SymmetricallyStructurallyComplete(dataset)
+}
 
 // ToJSON saves the dataset to a JSON file given a file path.
 func (dataset Dataset) ToJSON(filePath string) bool {
