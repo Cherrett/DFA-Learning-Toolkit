@@ -120,7 +120,7 @@ func AbbadingoDFA(numberOfStates int, exact bool) DFA {
 			// within created DFA must be equal to the amount
 			// of required states.
 			if exact {
-				if dfa.AllStatesCount() == numberOfStates {
+				if len(dfa.States) == numberOfStates {
 					// Return the created DFA  since it
 					// meets all of the requirements.
 					return dfa

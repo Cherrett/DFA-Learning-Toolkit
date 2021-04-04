@@ -185,11 +185,6 @@ func (dfa DFA) UnknownStates() []int {
 	return acceptingStates
 }
 
-// AllStatesCount returns the number of states within DFA.
-func (dfa DFA) AllStatesCount() int {
-	return len(dfa.States)
-}
-
 // LabelledStatesCount returns the number of labelled states (accepting or rejecting) within DFA.
 func (dfa DFA) LabelledStatesCount() int {
 	count := 0
@@ -418,7 +413,7 @@ func (dfa DFA) OrderedStates() []int{
 	}
 
 	// Slice of ordered states using the number of states.
-	orderedStates := make([]int, dfa.AllStatesCount())
+	orderedStates := make([]int, len(dfa.States))
 
 	// Iterate over each state.
 	for stateID := range dfa.States{
@@ -434,7 +429,7 @@ func (dfa DFA) OrderedStates() []int{
 // each state and each transition will also be printed.
 func (dfa DFA) Describe(detail bool) {
 	// Print simple description.
-	fmt.Println("This DFA has", dfa.AllStatesCount(), "states and", dfa.SymbolsCount(), "alphabet (symbols)")
+	fmt.Println("This DFA has", len(dfa.States), "states and", dfa.SymbolsCount(), "alphabet (symbols)")
 
 	// If detail is set to true, print more details.
 	if detail {
@@ -575,7 +570,7 @@ func (dfa DFA) Equal(dfa2 DFA) bool{
 
 	// If the number of states or the number of accepting states
 	// or the number of symbols are not equal, return false.
-	if (dfa1.AllStatesCount() != dfa2.AllStatesCount()) ||
+	if (len(dfa1.States) != len(dfa2.States)) ||
 		(dfa1.SymbolsCount() != dfa2.SymbolsCount() ||
 			len(dfa1.AcceptingStates()) != len(dfa2.AcceptingStates())) {
 		return false
@@ -631,13 +626,13 @@ func (dfa DFA) SameAs(dfa2 DFA) bool {
 // Panics if not valid. Used for error checking.
 func (dfa DFA) IsValid() bool{
 	// Check if starting state is valid.
-	if dfa.StartingStateID < 0 || dfa.StartingStateID >= dfa.AllStatesCount(){
+	if dfa.StartingStateID < 0 || dfa.StartingStateID >= len(dfa.States){
 		panic("Invalid starting state.")
 	// Check if number of symbols is valid.
 	}else if dfa.SymbolsCount() < 1{
 		panic("DFA does not contain any symbols.")
 	// Check if number of states is valid.
-	}else if dfa.AllStatesCount() < 1{
+	}else if len(dfa.States) < 1{
 		panic("DFA does not contain any states.")
 	// Check if any unreachable states exist within DFA.
 	}else if len(dfa.UnreachableStates()) > 0{

@@ -17,7 +17,7 @@ func (dfa *DFA) IndistinguishableStatePairs() []StateIDPair {
 
 	// Iterate over all unique state pairs within DFA where stateID != stateID2.
 	for stateID := range dfa.States {
-		for stateID2 := stateID + 1; stateID2 < dfa.AllStatesCount(); stateID2++ {
+		for stateID2 := stateID + 1; stateID2 < len(dfa.States); stateID2++ {
 			// If the state pair have different types, add to distinguishable pairs map.
 			if dfa.States[stateID].Label != dfa.States[stateID2].Label {
 				distinguishablePairs[StateIDPair{stateID, stateID2}] = true
@@ -35,7 +35,7 @@ func (dfa *DFA) IndistinguishableStatePairs() []StateIDPair {
 
 		// Iterate over all unique state pairs within DFA where stateID != stateID2.
 		for stateID := range dfa.States {
-			for stateID2 := stateID + 1; stateID2 < dfa.AllStatesCount(); stateID2++ {
+			for stateID2 := stateID + 1; stateID2 < len(dfa.States); stateID2++ {
 				// If state pair is already marked as distinguishable, skip.
 				if distinguishablePairs[StateIDPair{stateID, stateID2}] {
 					continue
@@ -63,14 +63,14 @@ func (dfa *DFA) IndistinguishableStatePairs() []StateIDPair {
 	// Slice to store indistinguishable pairs. The size of this slice is all
 	// state pairs (n(n-1)/2 is used via the triangle number method) minus the
 	// number of distinguishable state pairs.
-	indistinguishablePairs := make([]StateIDPair, ((dfa.AllStatesCount()*(dfa.AllStatesCount() - 1)) / 2) - len(distinguishablePairs))
+	indistinguishablePairs := make([]StateIDPair, ((len(dfa.States)*(len(dfa.States) - 1)) / 2) - len(distinguishablePairs))
 
 	// Set counter to 0.
 	count := 0
 
 	// Iterate over all unique state pairs within DFA where stateID != stateID2.
 	for stateID := range dfa.States {
-		for stateID2 := stateID + 1; stateID2 < dfa.AllStatesCount(); stateID2++ {
+		for stateID2 := stateID + 1; stateID2 < len(dfa.States); stateID2++ {
 			// If state pair is not marked as distinguishable, add to indistinguishable pairs.
 			if !distinguishablePairs[StateIDPair{stateID, stateID2}] {
 				indistinguishablePairs[count] = StateIDPair{stateID, stateID2}

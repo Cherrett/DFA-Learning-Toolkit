@@ -15,5 +15,5 @@ func main() {
 	resultantDFA := dfatoolkit.BlueFringeEDSMFromDataset(training)
 	accuracy := resultantDFA.Accuracy(testing)
 
-	fmt.Printf("Accuracy: %.2f. Number of States: %d.\n", accuracy, resultantDFA.AllStatesCount())
+	fmt.Printf("Accuracy: %.2f. Number of States: %d.\n", accuracy, len(resultantDFA.States))
 }
