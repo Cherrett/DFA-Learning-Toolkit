@@ -47,31 +47,31 @@ func (dfa DFA) ToDOT(filePath string, rankByOrder bool, topDown bool) {
 	// If topDown is set to true, do not set rankdir field
 	// within first line of DOT file. Otherwise, rankdir
 	// is set to LR (left-to-right).
-	if topDown{
+	if topDown {
 		_, _ = writer.WriteString("digraph g{\n\tgraph [dpi=300 ordering=\"out\"];\n\tmargin=0;\n\tnull [style=invis];\n")
-	}else{
+	} else {
 		_, _ = writer.WriteString("digraph g{\n\trankdir=LR;\n\tgraph [dpi=300 ordering=\"out\"];\n\tmargin=0;\n\tnull [style=invis];\n")
 	}
 
 	// Iterate over each state and write the correct format
 	// depending on the state label.
-	for stateID, state := range dfa.States{
+	for stateID, state := range dfa.States {
 		// If rankByOrder is set to true, the order
 		// of the state is used as the label.
 		if rankByOrder {
-			if state.Label == UNKNOWN{
+			if state.Label == UNKNOWN {
 				_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=\"q%d\" shape=\"circle\" fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"filled\" fillcolor=\"white\"];\n", stateID, state.order))
-			}else if state.Label == ACCEPTING{
+			} else if state.Label == ACCEPTING {
 				_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=\"q%d\" shape=\"circle\" peripheries=2 fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"filled\" fillcolor=\"white\"];\n", stateID, state.order))
-			}else{
+			} else {
 				_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=\"q%d\" shape=\"circle\" fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"setlinewidth(3),filled\" fillcolor=\"white\"];\n", stateID, state.order))
 			}
-		}else{
-			if state.Label == UNKNOWN{
+		} else {
+			if state.Label == UNKNOWN {
 				_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=\"q%d\" shape=\"circle\" fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"filled\" fillcolor=\"white\"];\n", stateID, stateID))
-			}else if state.Label == ACCEPTING{
+			} else if state.Label == ACCEPTING {
 				_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=\"q%d\" shape=\"circle\" peripheries=2 fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"filled\" fillcolor=\"white\"];\n", stateID, stateID))
-			}else{
+			} else {
 				_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=\"q%d\" shape=\"circle\" fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"setlinewidth(3),filled\" fillcolor=\"white\"];\n", stateID, stateID))
 			}
 
@@ -83,10 +83,10 @@ func (dfa DFA) ToDOT(filePath string, rankByOrder bool, topDown bool) {
 	_, _ = writer.WriteString(fmt.Sprintf("\tnull->q%d;\n", dfa.StartingStateID))
 
 	// Iterate over each transition and write to file.
-	for stateID, state := range dfa.States{
+	for stateID, state := range dfa.States {
 		for symbol, symbolID := range dfa.SymbolMap {
 			resultantStateID := state.Transitions[symbolID]
-			if resultantStateID > -1{
+			if resultantStateID > -1 {
 				_, _ = writer.WriteString(fmt.Sprintf("\tq%d->q%d [label=\"%s\" fontname=verdana fontsize=8];\n", stateID, resultantStateID, string(symbol)))
 			}
 		}
@@ -106,7 +106,7 @@ func (dfa DFA) ToDOT(filePath string, rankByOrder bool, topDown bool) {
 // within DFA. If topDown is set to true, the visual representation
 // will be top down. A left to right representation is used otherwise.
 // Returns true if successful or false if an error occurs.
-func (dfa DFA) ToPNG(filePath string, rankByOrder bool, topDown bool) bool{
+func (dfa DFA) ToPNG(filePath string, rankByOrder bool, topDown bool) bool {
 	defer os.Remove("temp.dot")
 	dfa.ToDOT("temp.dot", rankByOrder, topDown)
 
@@ -130,7 +130,7 @@ func (dfa DFA) ToPNG(filePath string, rankByOrder bool, topDown bool) bool{
 // within DFA. If topDown is set to true, the visual representation
 // will be top down. A left to right representation is used otherwise.
 // Returns true if successful or false if an error occurs.
-func (dfa DFA) ToJPG(filePath string, rankByOrder bool, topDown bool) bool{
+func (dfa DFA) ToJPG(filePath string, rankByOrder bool, topDown bool) bool {
 	defer os.Remove("temp.dot")
 	dfa.ToDOT("temp.dot", rankByOrder, topDown)
 
@@ -154,7 +154,7 @@ func (dfa DFA) ToJPG(filePath string, rankByOrder bool, topDown bool) bool{
 // within DFA. If topDown is set to true, the visual representation
 // will be top down. A left to right representation is used otherwise.
 // Returns true if successful or false if an error occurs.
-func (dfa DFA) ToPDF(filePath string, rankByOrder bool, topDown bool) bool{
+func (dfa DFA) ToPDF(filePath string, rankByOrder bool, topDown bool) bool {
 	defer os.Remove("temp.dot")
 	dfa.ToDOT("temp.dot", rankByOrder, topDown)
 
@@ -178,7 +178,7 @@ func (dfa DFA) ToPDF(filePath string, rankByOrder bool, topDown bool) bool{
 // within DFA. If topDown is set to true, the visual representation
 // will be top down. A left to right representation is used otherwise.
 // Returns true if successful or false if an error occurs.
-func (dfa DFA) ToSVG(filePath string, rankByOrder bool, topDown bool) bool{
+func (dfa DFA) ToSVG(filePath string, rankByOrder bool, topDown bool) bool {
 	defer os.Remove("temp.dot")
 	dfa.ToDOT("temp.dot", rankByOrder, topDown)
 

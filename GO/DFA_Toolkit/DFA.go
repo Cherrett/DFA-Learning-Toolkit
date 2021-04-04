@@ -22,7 +22,7 @@ type DFA struct {
 // NewDFA initializes a new empty DFA.
 func NewDFA() DFA {
 	return DFA{States: make([]State, 0), StartingStateID: -1,
-		SymbolMap: make(map[rune]int), depth: -1, computedDepthAndOrder:false}
+		SymbolMap: make(map[rune]int), depth: -1, computedDepthAndOrder: false}
 }
 
 // AddState adds a new state to the DFA with the corresponding State Label.
@@ -41,11 +41,11 @@ func (dfa *DFA) AddState(stateLabel StateLabel) int {
 
 // RemoveState removes a state from DFA with the corresponding State ID.
 func (dfa *DFA) RemoveState(stateID int) {
-	// Panic if the state to be removed is the starting state.
 	if dfa.StartingStateID == stateID {
+		// Panic if the state to be removed is the starting state.
 		panic("Cannot remove starting state")
-	// Panic if state ID is out of range.
-	}else if stateID > len(dfa.States)-1 || stateID < 0{
+	} else if stateID > len(dfa.States)-1 || stateID < 0 {
+		// Panic if state ID is out of range.
 		panic("stateID is out of range")
 	}
 	// Remove state from slice of states.
@@ -60,29 +60,29 @@ func (dfa *DFA) RemoveState(stateID int) {
 			// If the ID of the resultant state is equal to the ID of the removed state, set resultant state to -1 (undefined).
 			if resultantStateID == stateID {
 				dfa.States[currentStateID].Transitions[symbolID] = -1
-			// Else, if the ID of the resultant state is bigger then the ID of the removed state, decrement starting state.
 			} else if resultantStateID > stateID {
+				// Else, if the ID of the resultant state is bigger then the ID of the removed state, decrement starting state.
 				dfa.States[currentStateID].Transitions[symbolID]--
 			}
 		}
 	}
 	// If the ID of the starting state is bigger then the ID of the removed state, decrement starting state.
-	if dfa.StartingStateID > stateID{
+	if dfa.StartingStateID > stateID {
 		dfa.StartingStateID--
 	}
 }
 
 // SymbolID returns the symbol ID for the given symbol.
-func (dfa DFA) SymbolID(symbol rune) int{
+func (dfa DFA) SymbolID(symbol rune) int {
 	return dfa.SymbolMap[symbol]
 }
 
 // Symbol returns the symbol for the given symbol ID.
-func (dfa DFA) Symbol(symbolID int) rune{
+func (dfa DFA) Symbol(symbolID int) rune {
 	// Iterate over each symbol within the DFA.
 	for symbol := range dfa.SymbolMap {
 		// If symbol ID is equal to the current symbol, return it's ID.
-		if dfa.SymbolMap[symbol] == symbolID{
+		if dfa.SymbolMap[symbol] == symbolID {
 			return symbol
 		}
 	}
@@ -91,7 +91,7 @@ func (dfa DFA) Symbol(symbolID int) rune{
 }
 
 // AddSymbol adds a new symbol to the DFA.
-func (dfa *DFA) AddSymbol(symbol rune){
+func (dfa *DFA) AddSymbol(symbol rune) {
 	// Panic if symbol already exists.
 	if _, ok := dfa.SymbolMap[symbol]; ok {
 		panic("Symbol already exists.")
@@ -106,9 +106,9 @@ func (dfa *DFA) AddSymbol(symbol rune){
 }
 
 // AddSymbols adds multiple new symbols to the DFA.
-func (dfa *DFA) AddSymbols(symbols []rune){
+func (dfa *DFA) AddSymbols(symbols []rune) {
 	// Iteratively add each symbol within slice to the DFA.
-	for _, symbol := range symbols{
+	for _, symbol := range symbols {
 		dfa.AddSymbol(symbol)
 	}
 }
@@ -149,6 +149,19 @@ func (dfa DFA) AllStates() []int {
 	return allStates
 }
 
+// LabelledStates returns state IDs of labelled states within DFA.
+func (dfa DFA) LabelledStates() []int {
+	var labelledStates []int
+
+	for stateID := range dfa.States {
+		if dfa.States[stateID].Label != UNKNOWN {
+			labelledStates = append(labelledStates, stateID)
+		}
+	}
+
+	return labelledStates
+}
+
 // AcceptingStates returns state IDs of accepting states within DFA.
 func (dfa DFA) AcceptingStates() []int {
 	var acceptingStates []int
@@ -183,11 +196,6 @@ func (dfa DFA) UnknownStates() []int {
 		}
 	}
 	return acceptingStates
-}
-
-// AllStatesCount returns the number of states within DFA.
-func (dfa DFA) AllStatesCount() int {
-	return len(dfa.States)
 }
 
 // LabelledStatesCount returns the number of labelled states (accepting or rejecting) within DFA.
@@ -239,7 +247,7 @@ func (dfa DFA) UnknownStatesCount() int {
 }
 
 // TransitionsCount returns the number of transitions within DFA.
-func (dfa DFA) TransitionsCount() int{
+func (dfa DFA) TransitionsCount() int {
 	count := 0
 
 	for stateIndex := range dfa.States {
@@ -253,7 +261,7 @@ func (dfa DFA) TransitionsCount() int{
 }
 
 // TransitionsCountForSymbol returns the number of transitions for a given symbol within DFA.
-func (dfa DFA) TransitionsCountForSymbol(symbol int) int{
+func (dfa DFA) TransitionsCountForSymbol(symbol int) int {
 	count := 0
 
 	for stateIndex := range dfa.States {
@@ -270,17 +278,17 @@ func (dfa DFA) SymbolsCount() int {
 }
 
 // LeavesCount returns the number of leaves within DFA.
-func (dfa DFA) LeavesCount() int{
+func (dfa DFA) LeavesCount() int {
 	count := 0
 
-	for stateIndex := range dfa.States {
+	for stateID := range dfa.States {
 		transitionsCount := 0
 		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
-			if dfa.States[stateIndex].Transitions[symbolID] != -1 {
+			if dfa.States[stateID].Transitions[symbolID] != -1 || dfa.States[stateID].Transitions[symbolID] == stateID {
 				transitionsCount++
 			}
 		}
-		if transitionsCount == 0{
+		if transitionsCount == 0 {
 			count++
 		}
 	}
@@ -288,7 +296,7 @@ func (dfa DFA) LeavesCount() int{
 }
 
 // LoopsCount returns the number of loops within DFA.
-func (dfa DFA) LoopsCount() int{
+func (dfa DFA) LoopsCount() int {
 	var visitedStatesCount = make(map[int]int)
 
 	for stateID := range dfa.States {
@@ -297,7 +305,7 @@ func (dfa DFA) LoopsCount() int{
 				if dfa.States[dfa.States[stateID].Transitions[symbolID]].depth < dfa.States[stateID].depth {
 					if _, ok := visitedStatesCount[stateID]; ok {
 						visitedStatesCount[stateID]++
-					}else{
+					} else {
 						visitedStatesCount[stateID] = 1
 					}
 				}
@@ -309,12 +317,12 @@ func (dfa DFA) LoopsCount() int{
 }
 
 // IsTree returns true if DFA is a tree, false is returned otherwise.
-func (dfa DFA) IsTree() bool{
+func (dfa DFA) IsTree() bool {
 	var visitedStates = make(map[int]bool)
 
 	for stateID := range dfa.States {
 		for symbolID := range dfa.States[stateID].Transitions {
-			if dfa.States[stateID].Transitions[symbolID] != -1 && visitedStates[dfa.States[stateID].Transitions[symbolID]]{
+			if dfa.States[stateID].Transitions[symbolID] != -1 && visitedStates[dfa.States[stateID].Transitions[symbolID]] {
 				return false
 			}
 			visitedStates[dfa.States[stateID].Transitions[symbolID]] = true
@@ -325,10 +333,10 @@ func (dfa DFA) IsTree() bool{
 }
 
 // IsComplete returns true if DFA is complete, false is returned otherwise.
-func (dfa DFA) IsComplete() bool{
+func (dfa DFA) IsComplete() bool {
 	for stateID := range dfa.States {
-		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++{
-			if dfa.States[stateID].Transitions[symbolID] < 0{
+		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
+			if dfa.States[stateID].Transitions[symbolID] < 0 {
 				return false
 			}
 		}
@@ -352,7 +360,7 @@ func (dfa *DFA) Depth() int {
 
 // CalculateDepthAndOrder computes the depth and Order for each state within DFA.
 // This is done by traversing the DFA in a breadth-first order.
-func (dfa *DFA) CalculateDepthAndOrder(){
+func (dfa *DFA) CalculateDepthAndOrder() {
 	// Checks if DFA is valid.
 	// Panics otherwise.
 	dfa.IsValid()
@@ -377,7 +385,7 @@ func (dfa *DFA) CalculateDepthAndOrder(){
 	queue := []int{dfa.StartingStateID}
 
 	// Loop until queue is empty.
-	for len(queue) > 0{
+	for len(queue) > 0 {
 		// Remove and store first state in queue.
 		stateID := queue[0]
 		queue = append(queue[:0], queue[1:]...)
@@ -393,9 +401,9 @@ func (dfa *DFA) CalculateDepthAndOrder(){
 		// Iterate over each symbol (alphabet) within DFA.
 		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
 			// If transition from current state using current symbol is valid and is not a loop to the current state.
-			if childStateID := dfa.States[stateID].Transitions[symbolID]; childStateID != -1 && childStateID != stateID{
+			if childStateID := dfa.States[stateID].Transitions[symbolID]; childStateID != -1 && childStateID != stateID {
 				// If depth for child state has been computed, skip state.
-				if dfa.States[childStateID].depth == -1{
+				if dfa.States[childStateID].depth == -1 {
 					// Set the depth of child state to current state's depth + 1.
 					dfa.States[childStateID].depth = dfa.States[stateID].depth + 1
 					// Add child state to queue.
@@ -410,7 +418,7 @@ func (dfa *DFA) CalculateDepthAndOrder(){
 }
 
 // OrderedStates returns the state IDs in order.
-func (dfa DFA) OrderedStates() []int{
+func (dfa DFA) OrderedStates() []int {
 	// If depth and order for DFA is not computed,
 	// call CalculateDepthAndOrder.
 	if !dfa.computedDepthAndOrder {
@@ -418,10 +426,10 @@ func (dfa DFA) OrderedStates() []int{
 	}
 
 	// Slice of ordered states using the number of states.
-	orderedStates := make([]int, dfa.AllStatesCount())
+	orderedStates := make([]int, len(dfa.States))
 
 	// Iterate over each state.
-	for stateID := range dfa.States{
+	for stateID := range dfa.States {
 		// Use the order as the index of the ordered states slice.
 		orderedStates[dfa.States[stateID].order] = stateID
 	}
@@ -434,14 +442,14 @@ func (dfa DFA) OrderedStates() []int{
 // each state and each transition will also be printed.
 func (dfa DFA) Describe(detail bool) {
 	// Print simple description.
-	fmt.Println("This DFA has", dfa.AllStatesCount(), "states and", dfa.SymbolsCount(), "alphabet (symbols)")
+	fmt.Println("This DFA has", len(dfa.States), "states and", dfa.SymbolsCount(), "alphabet (symbols)")
 
 	// If detail is set to true, print more details.
 	if detail {
 		// Print alphabet/symbols mapping.
 		fmt.Println("Alphabet:")
 		for symbol, symbolID := range dfa.SymbolMap {
-			fmt.Println(symbolID,"-",string(symbol))
+			fmt.Println(symbolID, "-", string(symbol))
 		}
 
 		// Print starting state.
@@ -510,7 +518,7 @@ func (dfa DFA) UnreachableStates() []int {
 			for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
 				// If transition from current state using current symbol
 				// is valid, add resultant state to next states.
-				if dfa.States[stateID].Transitions[symbolID] != -1{
+				if dfa.States[stateID].Transitions[symbolID] != -1 {
 					nextStates[dfa.States[stateID].Transitions[symbolID]] = true
 				}
 			}
@@ -553,29 +561,29 @@ func (dfa *DFA) RemoveUnreachableStates() {
 	// Iterate over unreachable states.
 	for index, stateID := range unreachableStates {
 		// Remove unreachable state.
-		dfa.RemoveState(stateID-index)
+		dfa.RemoveState(stateID - index)
 	}
 }
 
 // StartingState returns a pointer to the starting state within the DFA.
-func (dfa DFA) StartingState() *State{
+func (dfa DFA) StartingState() *State {
 	return &dfa.States[dfa.StartingStateID]
 }
 
 // Clone returns a clone of DFA.
-func (dfa DFA) Clone() DFA{
+func (dfa DFA) Clone() DFA {
 	return DFA{States: dfa.States, StartingStateID: dfa.StartingStateID, SymbolMap: dfa.SymbolMap}
 }
 
 // Equal checks whether DFA is equal to the given DFA.
-func (dfa DFA) Equal(dfa2 DFA) bool{
+func (dfa DFA) Equal(dfa2 DFA) bool {
 	// Minimise both DFAs.
 	dfa1 := dfa.Minimise()
 	dfa2 = dfa2.Minimise()
 
 	// If the number of states or the number of accepting states
 	// or the number of symbols are not equal, return false.
-	if (dfa1.AllStatesCount() != dfa2.AllStatesCount()) ||
+	if (len(dfa1.States) != len(dfa2.States)) ||
 		(dfa1.SymbolsCount() != dfa2.SymbolsCount() ||
 			len(dfa1.AcceptingStates()) != len(dfa2.AcceptingStates())) {
 		return false
@@ -585,7 +593,7 @@ func (dfa DFA) Equal(dfa2 DFA) bool{
 	queue1 := []int{dfa1.StartingStateID}
 	queue2 := []int{dfa2.StartingStateID}
 
-	for len(queue1) > 0{
+	for len(queue1) > 0 {
 		stateID1 := queue1[0]
 		stateID2 := queue2[0]
 		queue1 = append(queue1[:0], queue1[1:]...)
@@ -599,13 +607,13 @@ func (dfa DFA) Equal(dfa2 DFA) bool{
 			childStateID2 := dfa2.States[stateID2].Transitions[symbolID]
 			if (childStateID1 == -1 && childStateID2 != -1) ||
 				(childStateID1 != -1 && childStateID2 == -1) ||
-				(childStateID1 != -1 && childStateID2 != -1 && (dfa1.States[childStateID1].Label != dfa2.States[childStateID2].Label)){
+				(childStateID1 != -1 && childStateID2 != -1 && (dfa1.States[childStateID1].Label != dfa2.States[childStateID2].Label)) {
 				// If a transition exists for one DFA but does not exist
 				// for another DFA, return false.
 				return false
 			}
 			if childStateID1 != -1 && childStateID1 != stateID1 {
-				if dfa1.States[childStateID1].depth == -1{
+				if dfa1.States[childStateID1].depth == -1 {
 					dfa1.States[childStateID1].depth = dfa1.States[stateID1].depth + 1
 					dfa2.States[childStateID2].depth = dfa2.States[stateID2].depth + 1
 					queue1 = append(queue1, childStateID1)
@@ -627,20 +635,20 @@ func (dfa DFA) SameAs(dfa2 DFA) bool {
 	return reflect.DeepEqual(dfa, dfa2)
 }
 
-// IsValid Checks whether DFA is valid.
+// IsValid checks whether DFA is valid.
 // Panics if not valid. Used for error checking.
-func (dfa DFA) IsValid() bool{
-	// Check if starting state is valid.
-	if dfa.StartingStateID < 0 || dfa.StartingStateID >= dfa.AllStatesCount(){
+func (dfa DFA) IsValid() bool {
+	if dfa.StartingStateID < 0 || dfa.StartingStateID >= len(dfa.States) {
+		// Panic if starting state is invalid.
 		panic("Invalid starting state.")
-	// Check if number of symbols is valid.
-	}else if dfa.SymbolsCount() < 1{
+	} else if dfa.SymbolsCount() < 1 {
+		// Panic if number of symbols is invalid.
 		panic("DFA does not contain any symbols.")
-	// Check if number of states is valid.
-	}else if dfa.AllStatesCount() < 1{
+	} else if len(dfa.States) < 1 {
+		// Panic if number of states is invalid.
 		panic("DFA does not contain any states.")
-	// Check if any unreachable states exist within DFA.
-	}else if len(dfa.UnreachableStates()) > 0{
+	} else if len(dfa.UnreachableStates()) > 0 {
+		// Panic if any unreachable states exist within DFA.
 		panic("Unreachable State exist within DFA.")
 	}
 
@@ -648,8 +656,249 @@ func (dfa DFA) IsValid() bool{
 	return true
 }
 
+// Transition struct which represents a transition.
+// Used in SymmetricallyStructurallyComplete and
+// StructurallyComplete functions.
+type Transition struct {
+	stateID  int
+	symbolID int
+}
+
+// StructurallyComplete checks if DFA is structurally
+// complete with respect to a Dataset.
+func (dfa DFA) StructurallyComplete(dataset Dataset) bool {
+	// Get accepting string instances and sort dataset.
+	dataset = dataset.AcceptingStringInstances().SortDatasetByLength()
+
+	// Remove non accepting leave states from DFA.
+	dfa.RemoveNonAcceptingLeaves()
+
+	// Store accepting states within DFA.
+	acceptingStates := dfa.AcceptingStates()
+
+	// Create a map with the accepting state IDs
+	// and set value to false. This map is used to
+	// keep track whether at least one string of
+	// the dataset halts in each accepting state.
+	finalStatesHalted := map[int]bool{}
+	for _, finalStateID := range acceptingStates {
+		finalStatesHalted[finalStateID] = false
+	}
+
+	// Create a map for each valid transition within
+	// DFA and set value to false. This slice is used
+	// to keep track whether each transition is used at
+	// least once when parsing the dataset.
+	transitionsUsed := map[Transition]bool{}
+	for stateID := 0; stateID < len(dfa.States); stateID++ {
+		// Add valid transitions to transitionsUsed map.
+		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
+			if dfa.States[stateID].Transitions[symbolID] != -1 {
+				transitionsUsed[Transition{stateID, symbolID}] = false
+			}
+		}
+	}
+
+	for _, stringInstance := range dataset {
+		// Set the current state ID to the starting state ID.
+		currentStateID := dfa.StartingStateID
+		// Set counter to 0.
+		count := 0
+
+		// If string instance is the empty string and starting
+		// state is accepting, mark starting state as halted.
+		// If string instance is the empty string and starting
+		// state is not accepting, return false.
+		if len(stringInstance.Value) == 0 {
+			if dfa.StartingState().Label == ACCEPTING {
+				finalStatesHalted[currentStateID] = true
+			} else {
+				return false
+			}
+		}
+
+		// Iterate over each symbol (alphabet) within value of string instance.
+		for _, symbol := range stringInstance.Value {
+			// Increment count.
+			count++
+
+			// If a transition exists from the current state to any other state via
+			// the current symbol, set resultant state ID to current state ID.
+			if dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)] != -1 {
+				// Mark transition as visited.
+				transitionsUsed[Transition{currentStateID, dfa.SymbolID(symbol)}] = true
+
+				currentStateID = dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)]
+				// Check if last symbol in string.
+				if count == stringInstance.Length() {
+					// If state is rejecting, return false.
+					if dfa.States[currentStateID].Label != ACCEPTING {
+						return false
+					}
+
+					// Mark accepting state as halted.
+					finalStatesHalted[currentStateID] = true
+				}
+				// If no transition exists, return false.
+			} else {
+				return false
+			}
+		}
+	}
+
+	// Check whether each transition was used at least
+	// once when parsing the dataset.
+	for transition := range transitionsUsed {
+		if !transitionsUsed[transition] {
+			return false
+		}
+	}
+
+	// Check if at least one string of the dataset
+	// halted in each accepting state.
+	for _, finalStateID := range acceptingStates {
+		if !finalStatesHalted[finalStateID] {
+			return false
+		}
+	}
+
+	// Return true if reached.
+	return true
+}
+
+// SymmetricallyStructurallyComplete checks if DFA is symmetrically
+// structurally complete with respect to a Dataset.
+func (dfa DFA) SymmetricallyStructurallyComplete(dataset Dataset) bool {
+	// Sort dataset.
+	dataset = dataset.SortDatasetByLength()
+
+	// Store labelled (final) states within DFA.
+	labelledStates := dfa.LabelledStates()
+
+	// Create a map with the labelled (final) state
+	// IDs and set value to false. This map is used to
+	// keep track whether at least one string of the
+	// dataset halts in each labelled (final) state.
+	finalStatesHalted := map[int]bool{}
+	for _, finalStateID := range labelledStates {
+		finalStatesHalted[finalStateID] = false
+	}
+
+	// Create a map for each valid transition within
+	// DFA and set value to false. This slice is used
+	// to keep track whether each transition is used at
+	// least once when parsing the dataset.
+	transitionsUsed := map[Transition]bool{}
+	for stateID := 0; stateID < len(dfa.States); stateID++ {
+		// Add valid transitions to transitionsUsed map.
+		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
+			if dfa.States[stateID].Transitions[symbolID] != -1 {
+				transitionsUsed[Transition{stateID, symbolID}] = false
+			}
+		}
+	}
+
+	for _, stringInstance := range dataset {
+		// Set the current state ID to the starting state ID.
+		currentStateID := dfa.StartingStateID
+		// Set counter to 0.
+		count := 0
+
+		// If string instance is the empty string and starting
+		// state is labelled, mark starting state as halted.
+		// If string instance is the empty string and is accepting
+		// while the  starting state is not labelled, return false.
+		if len(stringInstance.Value) == 0 {
+			if dfa.StartingState().Label != UNKNOWN {
+				finalStatesHalted[currentStateID] = true
+			} else if stringInstance.Accepting {
+				return false
+			}
+		}
+
+		// Iterate over each symbol (alphabet) within value of string instance.
+		for _, symbol := range stringInstance.Value {
+			// Increment count.
+			count++
+
+			// If a transition exists from the current state to any other state via
+			// the current symbol, set resultant state ID to current state ID.
+			if dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)] != -1 {
+				// Mark transition as visited.
+				transitionsUsed[Transition{currentStateID, dfa.SymbolID(symbol)}] = true
+
+				currentStateID = dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)]
+				// Check if last symbol in string.
+				if count == stringInstance.Length() {
+					// If state is unlabelled (unknown) and string instance is accepting, return false.
+					if dfa.States[currentStateID].Label == UNKNOWN && stringInstance.Accepting {
+						return false
+					}
+
+					// Mark labelled (final) state as halted.
+					finalStatesHalted[currentStateID] = true
+				}
+				// If no transition exists and string instance is accepting, return false.
+				// If string instance is rejecting, return true.
+			} else {
+				if stringInstance.Accepting {
+					return false
+				}
+			}
+		}
+	}
+
+	// Check whether each transition was used at least
+	// once when parsing the dataset.
+	for transition := range transitionsUsed {
+		if !transitionsUsed[transition] {
+			return false
+		}
+	}
+
+	// Check if at least one string of the dataset
+	// halted in each labelled (final) state.
+	for _, finalStateID := range labelledStates {
+		if !finalStatesHalted[finalStateID] {
+			return false
+		}
+	}
+
+	// Return true if reached.
+	return true
+}
+
+// RemoveNonAcceptingLeaves removes all states which
+// are leaves within DFA and are not accepting states.
+// Used in SymmetricallyStructurallyComplete and
+// StructurallyComplete functions.
+func (dfa *DFA) RemoveNonAcceptingLeaves() {
+	found := true
+
+	for found {
+		found = false
+		for stateID := 0; stateID < len(dfa.States); stateID++ {
+			// If state is not accepting and all transitions from state
+			// are to the same state or are not valid, remove state.
+			if dfa.States[stateID].Label != ACCEPTING {
+				transitionsCount := 0
+				for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
+					if dfa.States[stateID].Transitions[symbolID] == -1 || dfa.States[stateID].Transitions[symbolID] == stateID {
+						transitionsCount++
+					}
+				}
+				if transitionsCount == len(dfa.SymbolMap) {
+					found = true
+					dfa.RemoveState(stateID)
+					break
+				}
+			}
+		}
+	}
+}
+
 // ToJSON saves the DFA to a JSON file given a file path.
-func (dfa DFA) ToJSON(filePath string) bool{
+func (dfa DFA) ToJSON(filePath string) bool {
 	// Create file given a path/name.
 	file, err := os.Create(filePath)
 
@@ -674,7 +923,7 @@ func (dfa DFA) ToJSON(filePath string) bool{
 	}
 
 	// Copy JSON to file created.
-	_, err = io.Copy(file,  bytes.NewReader(resultantJSON))
+	_, err = io.Copy(file, bytes.NewReader(resultantJSON))
 
 	// If JSON was not copied successfully,
 	// print error and return false.
@@ -690,7 +939,7 @@ func (dfa DFA) ToJSON(filePath string) bool{
 // DFAFromJSON returns a DFA read from a JSON file
 // given a file path. The boolean value returned is set to
 // true if DFA was read successfully.
-func DFAFromJSON(filePath string) (DFA, bool){
+func DFAFromJSON(filePath string) (DFA, bool) {
 	// Open file from given a path/name.
 	file, err := os.Open(filePath)
 

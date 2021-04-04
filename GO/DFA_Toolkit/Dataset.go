@@ -15,8 +15,8 @@ import (
 // StringInstance struct which represents
 // a string instance within a dataset.
 type StringInstance struct {
-	Value  []rune      // Slice of runes which represents the actual string value.
-	Accepting bool 	   // Accepting label flag for StringInstance.
+	Value     []rune // Slice of runes which represents the actual string value.
+	Accepting bool   // Accepting label flag for StringInstance.
 }
 
 // Dataset which is a slice of string instances.
@@ -39,7 +39,7 @@ func (dataset Dataset) GetPTA(APTA bool) DFA {
 	// If the first string instance within dataset has a length of 0,
 	// it represents the starting state so add a state to the DFA
 	// using the label of the empty string instance.
-	if sortedDataset[0].Length() == 0{
+	if sortedDataset[0].Length() == 0 {
 		if sortedDataset[0].Accepting {
 			currentStateID = dfa.AddState(ACCEPTING)
 		} else if APTA {
@@ -91,23 +91,23 @@ func (dataset Dataset) GetPTA(APTA bool) DFA {
 						// Panic if string instance is accepting and resultant state is rejecting.
 						if dfa.States[currentStateID].Label == REJECTING {
 							panic("State already set to rejecting, cannot set to accepting")
-						// If string instance is accepting and resultant state is not
-						// rejecting, set state label to accepting.
 						} else {
+							// If string instance is accepting and resultant state is not
+							// rejecting, set state label to accepting.
 							dfa.States[currentStateID].Label = ACCEPTING
 						}
 					} else {
 						// Panic if string instance is rejecting and resultant state is accepting.
 						if dfa.States[currentStateID].Label == ACCEPTING {
 							panic("State already set to accepting, cannot set to rejecting")
-						// If string instance is rejecting and resultant state is not
-						// accepting, set state label to rejecting.
 						} else {
+							// If string instance is rejecting and resultant state is not
+							// accepting, set state label to rejecting.
 							dfa.States[currentStateID].Label = REJECTING
 						}
 					}
 				}
-			// If no transition exists, add new state.
+				// If no transition exists, add new state.
 			} else {
 				// Check if last symbol in string.
 				if count == stringInstance.Length() {
@@ -118,7 +118,7 @@ func (dataset Dataset) GetPTA(APTA bool) DFA {
 					} else {
 						newStateID = dfa.AddState(REJECTING)
 					}
-				// If not last symbol in string, add an unknown state.
+					// If not last symbol in string, add an unknown state.
 				} else {
 					newStateID = dfa.AddState(UNKNOWN)
 				}
@@ -135,7 +135,7 @@ func (dataset Dataset) GetPTA(APTA bool) DFA {
 }
 
 // Length returns the length of the string.
-func (stringInstance StringInstance) Length() int{
+func (stringInstance StringInstance) Length() int {
 	return len(stringInstance.Value)
 }
 
@@ -146,6 +146,25 @@ func (stringInstance StringInstance) ConsistentWithDFA(dfa DFA) bool {
 	currentStateID := dfa.StartingStateID
 	// Set counter to 0.
 	count := 0
+
+	// If string instance is the empty string, compare label
+	// with starting state within DFA.
+	if len(stringInstance.Value) == 0 {
+		if stringInstance.Accepting {
+			// If string instance is accepting and starting state is rejecting, return false.
+			if dfa.StartingState().Label == REJECTING {
+				return false
+			}
+		} else {
+			// If string instance is rejecting and starting state is accepting, return false.
+			if dfa.StartingState().Label == ACCEPTING {
+				return false
+			}
+		}
+
+		// Return true since labels match.
+		return true
+	}
 
 	// Iterate over each symbol (alphabet) within value of string instance.
 	for _, symbol := range stringInstance.Value {
@@ -170,9 +189,9 @@ func (stringInstance StringInstance) ConsistentWithDFA(dfa DFA) bool {
 					}
 				}
 			}
-		// If no transition exists and string instance is accepting, return false.
-		// If string instance is rejecting, return true.
 		} else {
+			// If no transition exists and string instance is accepting, return false.
+			// If string instance is rejecting, return true.
 			return !stringInstance.Accepting
 		}
 	}
@@ -188,6 +207,14 @@ func (stringInstance StringInstance) ParseToStateLabel(dfa DFA) StateLabel {
 	currentStateID := dfa.StartingStateID
 	// Set counter to 0.
 	count := 0
+
+	// If string instance is the empty string and the starting
+	// state is accepting, return accepting. Else return rejecting.
+	if len(stringInstance.Value) == 0 {
+		if dfa.StartingState().Label == ACCEPTING {
+			return ACCEPTING
+		}
+	}
 
 	// Iterate over each symbol (alphabet) within value of string instance.
 	for _, symbol := range stringInstance.Value {
@@ -207,11 +234,12 @@ func (stringInstance StringInstance) ParseToStateLabel(dfa DFA) StateLabel {
 				// Else, if state is accepting, return accepting.
 				return ACCEPTING
 			}
-		// Return rejecting if no transition exists.
 		} else {
+			// Return rejecting if no transition exists.
 			return REJECTING
 		}
 	}
+
 	// Return rejecting if reached.
 	return REJECTING
 }
@@ -224,6 +252,12 @@ func (stringInstance StringInstance) ParseToState(dfa DFA) (bool, int) {
 	currentStateID := dfa.StartingStateID
 	// Set counter to 0.
 	count := 0
+
+	// If string instance is the empty string, return
+	// starting state ID within DFA.
+	if len(stringInstance.Value) == 0 {
+		return true, dfa.StartingStateID
+	}
 
 	// Iterate over each symbol (alphabet) within value of string instance.
 	for _, symbol := range stringInstance.Value {
@@ -238,11 +272,12 @@ func (stringInstance StringInstance) ParseToState(dfa DFA) (bool, int) {
 			if count == stringInstance.Length() {
 				return true, currentStateID
 			}
-		// Return false if no transition exists.
 		} else {
+			// Return false if no transition exists.
 			return false, -1
 		}
 	}
+
 	// Return false if reached.
 	return false, -1
 }
@@ -360,7 +395,7 @@ func (dataset Dataset) AcceptingStringInstancesCount() int {
 	count := 0
 
 	for _, stringInstance := range dataset {
-		if stringInstance.Accepting{
+		if stringInstance.Accepting {
 			count++
 		}
 	}
@@ -400,6 +435,18 @@ func (dataset Dataset) SameAs(dataset2 Dataset) bool {
 	dataset1 := dataset.SortDatasetByLength()
 	dataset2 = dataset2.SortDatasetByLength()
 	return reflect.DeepEqual(dataset1, dataset2)
+}
+
+// StructurallyComplete checks if Dataset is structurally
+// complete with respect to a DFA.
+func (dataset Dataset) StructurallyComplete(dfa DFA) bool {
+	return dfa.StructurallyComplete(dataset)
+}
+
+// SymmetricallyStructurallyComplete checks if Dataset is symmetrically
+// structurally complete with respect to a DFA.
+func (dataset Dataset) SymmetricallyStructurallyComplete(dfa DFA) bool {
+	return dfa.SymmetricallyStructurallyComplete(dataset)
 }
 
 // ToJSON saves the dataset to a JSON file given a file path.

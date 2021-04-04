@@ -20,23 +20,23 @@ type State struct {
 }
 
 // IsAccepting returns true if state label is accepting, otherwise returns false.
-func (state State) IsAccepting() bool{
+func (state State) IsAccepting() bool {
 	return state.Label == ACCEPTING
 }
 
 // IsRejecting returns true if state label is rejecting, otherwise returns false.
-func (state State) IsRejecting() bool{
+func (state State) IsRejecting() bool {
 	return state.Label == REJECTING
 }
 
 // IsUnknown returns true if state label is unknown, otherwise returns false.
-func (state State) IsUnknown() bool{
+func (state State) IsUnknown() bool {
 	return state.Label == UNKNOWN
 }
 
 // Depth returns the state's depth within DFA.
-func (state *State) Depth() int{
-	if state.depth == -1{
+func (state *State) Depth() int {
+	if state.depth == -1 {
 		state.dfa.CalculateDepthAndOrder()
 	}
 
@@ -44,8 +44,8 @@ func (state *State) Depth() int{
 }
 
 // Order returns the state's order within DFA.
-func (state *State) Order() int{
-	if state.order == -1{
+func (state *State) Order() int {
+	if state.order == -1 {
 		state.dfa.CalculateDepthAndOrder()
 	}
 
@@ -53,6 +53,23 @@ func (state *State) Order() int{
 }
 
 // DFA returns a pointer to the DFA which contains this State.
-func (state State) DFA() *DFA{
+func (state State) DFA() *DFA {
 	return state.dfa
+}
+
+// TransitionsCount returns the number of transitions to given state ID.
+func (state State) TransitionsCount(stateID int) int {
+	// Counter to store number of transitions.
+	transitionsCount := 0
+
+	// Iterate over each symbol within DFA.
+	for symbolID := 0; symbolID < len(state.DFA().SymbolMap); symbolID++ {
+		// If transition is to given state ID, increment transitions count.
+		if state.Transitions[symbolID] == stateID {
+			transitionsCount++
+		}
+	}
+
+	// Return transitions count.
+	return transitionsCount
 }
