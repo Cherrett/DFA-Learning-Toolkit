@@ -56,3 +56,20 @@ func (state *State) Order() int{
 func (state State) DFA() *DFA{
 	return state.dfa
 }
+
+// TransitionsCount returns the number of transitions to given state ID.
+func (state State) TransitionsCount(stateID int) int{
+	// Counter to store number of transitions.
+	transitionsCount := 0
+
+	// Iterate over each symbol within DFA.
+	for symbolID := 0; symbolID < len(state.DFA().SymbolMap); symbolID++{
+		// If transition is to given state ID, increment transitions count.
+		if state.Transitions[symbolID] == stateID{
+			transitionsCount++
+		}
+	}
+
+	// Return transitions count.
+	return transitionsCount
+}

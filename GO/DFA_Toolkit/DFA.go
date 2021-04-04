@@ -268,10 +268,10 @@ func (dfa DFA) SymbolsCount() int {
 func (dfa DFA) LeavesCount() int{
 	count := 0
 
-	for stateIndex := range dfa.States {
+	for stateID := range dfa.States {
 		transitionsCount := 0
 		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
-			if dfa.States[stateIndex].Transitions[symbolID] != -1 {
+			if dfa.States[stateID].Transitions[symbolID] != -1 || dfa.States[stateID].Transitions[symbolID] == stateID {
 				transitionsCount++
 			}
 		}
@@ -622,7 +622,7 @@ func (dfa DFA) SameAs(dfa2 DFA) bool {
 	return reflect.DeepEqual(dfa, dfa2)
 }
 
-// IsValid Checks whether DFA is valid.
+// IsValid checks whether DFA is valid.
 // Panics if not valid. Used for error checking.
 func (dfa DFA) IsValid() bool{
 	// Check if starting state is valid.
@@ -641,6 +641,156 @@ func (dfa DFA) IsValid() bool{
 
 	// Return true if reached.
 	return true
+}
+
+// Transition struct which represents a transition.
+// Used in SymmetricallyStructurallyComplete and
+// StructurallyComplete functions.
+type Transition struct {
+	stateID int
+	symbolID int
+}
+
+// StructurallyComplete checks if DFA is structurally
+// complete with respect to a Dataset.
+func (dfa DFA) StructurallyComplete(dataset Dataset) bool{
+	// Get accepting string instances and sort dataset.
+	dataset = dataset.AcceptingStringInstances().SortDatasetByLength()
+
+	// Remove non accepting leave states from DFA.
+	dfa.RemoveNonAcceptingLeaves()
+
+	// Store accepting (final) states within DFA.
+	acceptingStates := dfa.AcceptingStates()
+
+	// Create a map with the accepting (final) state IDs
+	// and set value to false. This map is used to keep
+	// track whether at least one string of the dataset
+	// halts in each accepting (final) state.
+	finalStatesHalted := map[int]bool{}
+	for _, finalStateID := range acceptingStates{
+		finalStatesHalted[finalStateID] = false
+	}
+
+	// Create a map for each valid transition within
+	// DFA and set value to false. This slice is used
+	// to keep track whether each transition is used at
+	// least once when parsing the dataset.
+	transitionsUsed := map[Transition]bool{}
+	for stateID:=0; stateID < len(dfa.States); stateID++{
+		// If state is not accepting and all transitions from state
+		// are to the same state, skip current state.
+		// TODO: Confirm this logic.
+		//if dfa.States[stateID].Label != ACCEPTING && dfa.States[stateID].TransitionsCount(stateID) == len(dfa.SymbolMap){
+		//	continue
+		//}
+		for symbolID:=0; symbolID < len(dfa.SymbolMap); symbolID++ {
+			if dfa.States[stateID].Transitions[symbolID] != -1{
+				transitionsUsed[Transition{stateID, symbolID}] = false
+			}
+		}
+	}
+
+	for _, stringInstance := range dataset{
+		// Set the current state ID to the starting state ID.
+		currentStateID := dfa.StartingStateID
+		// Set counter to 0.
+		count := 0
+
+		// If string instance is the empty string and starting
+		// state is accepting, mark starting state as halted.
+		// If string instance is the empty string and starting
+		// state is not accepting, return false.
+		if len(stringInstance.Value) == 0{
+			if dfa.StartingState().Label == ACCEPTING{
+				finalStatesHalted[currentStateID] = true
+			}else{
+				return false
+			}
+		}
+
+		// Iterate over each symbol (alphabet) within value of string instance.
+		for _, symbol := range stringInstance.Value {
+			// Increment count.
+			count++
+
+			// If a transition exists from the current state to any other state via
+			// the current symbol, set resultant state ID to current state ID.
+			if dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)] != -1 {
+				// Mark transition as visited.
+				transitionsUsed[Transition{currentStateID, dfa.SymbolID(symbol)}] = true
+
+				currentStateID = dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)]
+				// Check if last symbol in string.
+				if count == stringInstance.Length() {
+					// If state is rejecting, return false.
+					if dfa.States[currentStateID].Label == REJECTING {
+						return false
+					}
+
+					// Mark accepting (final) states as halted.
+					finalStatesHalted[currentStateID] = true
+				}
+				// If no transition exists, return false.
+			} else {
+				return false
+			}
+		}
+	}
+
+	// Check whether each transition was used at least
+	// once when parsing the dataset.
+	for transition := range transitionsUsed{
+		if !transitionsUsed[transition]{
+			return false
+		}
+	}
+
+	// Check if at least one string of the dataset
+	// halted in each accepting (final) state.
+	for _, finalStateID := range acceptingStates{
+		if !finalStatesHalted[finalStateID]{
+			return false
+		}
+	}
+
+	// Return true if reached.
+	return true
+}
+
+// SymmetricallyStructurallyComplete checks if DFA is symmetrically
+// structurally complete with respect to a Dataset.
+//func (dfa DFA) SymmetricallyStructurallyComplete(dataset Dataset) bool{
+//
+//}
+
+// RemoveNonAcceptingLeaves removes all states which
+// are leaves within DFA and are not accepting states.
+// Used in SymmetricallyStructurallyComplete and
+// StructurallyComplete functions.
+func (dfa *DFA) RemoveNonAcceptingLeaves(){
+	found := true
+
+	for found{
+		found = false
+		for stateID:=0; stateID < len(dfa.States); stateID++ {
+			// If state is not accepting and all transitions from state
+			// are to the same state or are not valid, remove state.
+			if dfa.States[stateID].Label != ACCEPTING{
+				transitionsCount := 0
+				for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
+					if dfa.States[stateID].Transitions[symbolID] == -1 || dfa.States[stateID].Transitions[symbolID] == stateID{
+						transitionsCount++
+					}
+				}
+				if transitionsCount == len(dfa.SymbolMap){
+					found = true
+					dfa.RemoveState(stateID)
+					break
+				}
+			}
+		}
+	}
 }
 
 // ToJSON saves the DFA to a JSON file given a file path.

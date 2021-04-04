@@ -297,30 +297,30 @@ func TestBenchmarkEDSM(t *testing.T) {
 			winnersBlueFringe++
 		}
 
-		fmt.Printf("Greedy: Accuracy: %.2f, Number of States %d\n", accuracyGreedy, len(resultantDFAGreedy.States))
-		fmt.Printf("Windowed: Accuracy: %.2f, Number of States %d\n", accuracyWindowed, len(resultantDFAWindowed.States))
-		fmt.Printf("Blue-Fringe: Accuracy: %.2f, Number of States %d\n", accuracyBlueFringe, len(resultantDFABlueFringe.States))
+		fmt.Printf("Greedy: Accuracy: %.3f, Number of States %d\n", accuracyGreedy, len(resultantDFAGreedy.States))
+		fmt.Printf("Windowed: Accuracy: %.3f, Number of States %d\n", accuracyWindowed, len(resultantDFAWindowed.States))
+		fmt.Printf("Blue-Fringe: Accuracy: %.3f, Number of States %d\n", accuracyBlueFringe, len(resultantDFABlueFringe.States))
 		fmt.Print("-----------------------------------------------------------------------------\n")
 	}
 
 	successfulPercentageGreedy := float64(winnersGreedy) / float64(n)
 	fmt.Print("Greedy Search:\n")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageGreedy)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", totalAccuraciesGreedy.Min(), totalAccuraciesGreedy.Max(), totalAccuraciesGreedy.Avg())
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.3f%%\n", successfulPercentageGreedy)
+	fmt.Printf("Minimum Accuracy: %.3f Maximum Accuracy: %.3f Average Accuracy: %.3f\n", totalAccuraciesGreedy.Min(), totalAccuraciesGreedy.Max(), totalAccuraciesGreedy.Avg())
 	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", totalNumberOfStatesGreedy.Min(), totalNumberOfStatesGreedy.Max(), totalNumberOfStatesGreedy.Avg())
 	fmt.Print("-----------------------------------------------------------------------------\n\n")
 
 	successfulPercentageWindowed := float64(winnersWindowed) / float64(n)
 	fmt.Printf("Windowed Search:\n")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageWindowed)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", totalAccuraciesWindowed.Min(), totalAccuraciesWindowed.Max(), totalAccuraciesWindowed.Avg())
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.3f%%\n", successfulPercentageWindowed)
+	fmt.Printf("Minimum Accuracy: %.3f Maximum Accuracy: %.3f Average Accuracy: %.3f\n", totalAccuraciesWindowed.Min(), totalAccuraciesWindowed.Max(), totalAccuraciesWindowed.Avg())
 	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", totalNumberOfStatesWindowed.Min(), totalNumberOfStatesWindowed.Max(), totalNumberOfStatesWindowed.Avg())
 	fmt.Print("-----------------------------------------------------------------------------\n\n")
 
 	successfulPercentageBlueFringe := float64(winnersBlueFringe) / float64(n)
 	fmt.Printf("Blue-Fringe Search:\n")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageBlueFringe)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", totalAccuraciesBlueFringe.Min(), totalAccuraciesBlueFringe.Max(), totalAccuraciesBlueFringe.Avg())
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.3f%%\n", successfulPercentageBlueFringe)
+	fmt.Printf("Minimum Accuracy: %.3f Maximum Accuracy: %.3f Average Accuracy: %.3f\n", totalAccuraciesBlueFringe.Min(), totalAccuraciesBlueFringe.Max(), totalAccuraciesBlueFringe.Avg())
 	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", totalNumberOfStatesBlueFringe.Min(), totalNumberOfStatesBlueFringe.Max(), totalNumberOfStatesBlueFringe.Avg())
 	fmt.Print("-----------------------------------------------------------------------------\n\n")
 

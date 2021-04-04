@@ -147,6 +147,25 @@ func (stringInstance StringInstance) ConsistentWithDFA(dfa DFA) bool {
 	// Set counter to 0.
 	count := 0
 
+	// If string instance is the empty string, compare label
+	// with starting state within DFA.
+	if len(stringInstance.Value) == 0{
+		if stringInstance.Accepting {
+			// If string instance is accepting and starting state is rejecting, return false.
+			if dfa.StartingState().Label == REJECTING {
+				return false
+			}
+		} else {
+			// If string instance is rejecting and starting state is accepting, return false.
+			if dfa.StartingState().Label == ACCEPTING {
+				return false
+			}
+		}
+
+		// Return true since labels match.
+		return true
+	}
+
 	// Iterate over each symbol (alphabet) within value of string instance.
 	for _, symbol := range stringInstance.Value {
 		// Increment count.
@@ -189,6 +208,14 @@ func (stringInstance StringInstance) ParseToStateLabel(dfa DFA) StateLabel {
 	// Set counter to 0.
 	count := 0
 
+	// If string instance is the empty string and the starting
+	// state is accepting, return accepting. Else return rejecting.
+	if len(stringInstance.Value) == 0{
+		if dfa.StartingState().Label == ACCEPTING{
+			return ACCEPTING
+		}
+	}
+
 	// Iterate over each symbol (alphabet) within value of string instance.
 	for _, symbol := range stringInstance.Value {
 		// Increment count.
@@ -212,6 +239,7 @@ func (stringInstance StringInstance) ParseToStateLabel(dfa DFA) StateLabel {
 			return REJECTING
 		}
 	}
+
 	// Return rejecting if reached.
 	return REJECTING
 }
@@ -224,6 +252,12 @@ func (stringInstance StringInstance) ParseToState(dfa DFA) (bool, int) {
 	currentStateID := dfa.StartingStateID
 	// Set counter to 0.
 	count := 0
+
+	// If string instance is the empty string, return
+	// starting state ID within DFA.
+	if len(stringInstance.Value) == 0{
+		return true, dfa.StartingStateID
+	}
 
 	// Iterate over each symbol (alphabet) within value of string instance.
 	for _, symbol := range stringInstance.Value {
@@ -243,6 +277,7 @@ func (stringInstance StringInstance) ParseToState(dfa DFA) (bool, int) {
 			return false, -1
 		}
 	}
+
 	// Return false if reached.
 	return false, -1
 }
@@ -401,6 +436,18 @@ func (dataset Dataset) SameAs(dataset2 Dataset) bool {
 	dataset2 = dataset2.SortDatasetByLength()
 	return reflect.DeepEqual(dataset1, dataset2)
 }
+
+// StructurallyComplete checks if Dataset is structurally
+// complete with respect to a DFA.
+func (dataset Dataset) StructurallyComplete(dfa DFA) bool{
+	return dfa.StructurallyComplete(dataset)
+}
+
+// SymmetricallyStructurallyComplete checks if Dataset is symmetrically
+// structurally complete with respect to a DFA.
+//func (dataset Dataset) SymmetricallyStructurallyComplete(dfa DFA) bool{
+//	return dfa.SymmetricallyStructurallyComplete(dataset)
+//}
 
 // ToJSON saves the dataset to a JSON file given a file path.
 func (dataset Dataset) ToJSON(filePath string) bool {
