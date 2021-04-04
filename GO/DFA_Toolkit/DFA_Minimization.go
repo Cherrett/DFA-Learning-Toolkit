@@ -44,7 +44,7 @@ func (dfa *DFA) IndistinguishableStatePairs() []StateIDPair {
 					for symbolID := 0; symbolID < dfa.SymbolsCount(); symbolID++ {
 						// If both states have a valid transition using current symbol.
 						if dfa.States[stateID].Transitions[symbolID] != -1 &&
-							dfa.States[stateID2].Transitions[symbolID] != -1{
+							dfa.States[stateID2].Transitions[symbolID] != -1 {
 							// If pair containing both resultant state IDs is marked as distinguishable,
 							// mark current state pair as distinguishable.
 							if distinguishablePairs[StateIDPair{dfa.States[stateID].Transitions[symbolID],
@@ -63,7 +63,7 @@ func (dfa *DFA) IndistinguishableStatePairs() []StateIDPair {
 	// Slice to store indistinguishable pairs. The size of this slice is all
 	// state pairs (n(n-1)/2 is used via the triangle number method) minus the
 	// number of distinguishable state pairs.
-	indistinguishablePairs := make([]StateIDPair, ((len(dfa.States)*(len(dfa.States) - 1)) / 2) - len(distinguishablePairs))
+	indistinguishablePairs := make([]StateIDPair, ((len(dfa.States)*(len(dfa.States)-1))/2)-len(distinguishablePairs))
 
 	// Set counter to 0.
 	count := 0
@@ -86,7 +86,7 @@ func (dfa *DFA) IndistinguishableStatePairs() []StateIDPair {
 
 // Minimise returns a minimised version of the DFA.
 // P. Linz, An Introduction to Formal Languages and Automata. Jones & Bartlett Publishers, 2011.
-func (dfa DFA) Minimise() DFA{
+func (dfa DFA) Minimise() DFA {
 	// Get indistinguishable state pairs from Mark function.
 	indistinguishablePairs := dfa.IndistinguishableStatePairs()
 
@@ -94,39 +94,39 @@ func (dfa DFA) Minimise() DFA{
 	var currentPartition []map[int]bool
 	for stateID := range dfa.States {
 		exists := false
-		for _, block := range currentPartition{
-			if block[stateID]{
+		for _, block := range currentPartition {
+			if block[stateID] {
 				exists = true
 			}
 		}
-		if !exists{
+		if !exists {
 			indistinguishable := false
-			for _, indistinguishablePair := range indistinguishablePairs{
-				if indistinguishablePair.state1 == stateID{
-					for blockIndex, block := range currentPartition{
-						if block[indistinguishablePair.state2]{
+			for _, indistinguishablePair := range indistinguishablePairs {
+				if indistinguishablePair.state1 == stateID {
+					for blockIndex, block := range currentPartition {
+						if block[indistinguishablePair.state2] {
 							currentPartition[blockIndex][stateID] = true
 							indistinguishable = true
 							break
 						}
 					}
-					if indistinguishable{
+					if indistinguishable {
 						break
 					}
-				}else if indistinguishablePair.state2 == stateID{
-					for blockIndex, block := range currentPartition{
-						if block[indistinguishablePair.state1]{
+				} else if indistinguishablePair.state2 == stateID {
+					for blockIndex, block := range currentPartition {
+						if block[indistinguishablePair.state1] {
 							currentPartition[blockIndex][stateID] = true
 							indistinguishable = true
 							break
 						}
 					}
-					if indistinguishable{
+					if indistinguishable {
 						break
 					}
 				}
 			}
-			if !indistinguishable{
+			if !indistinguishable {
 				currentPartition = append(currentPartition, map[int]bool{stateID: true})
 			}
 		}
@@ -134,7 +134,7 @@ func (dfa DFA) Minimise() DFA{
 	resultantDFA := DFA{SymbolMap: dfa.SymbolMap}
 
 	// Create a new state for each block.
-	for blockIndex := range currentPartition{
+	for blockIndex := range currentPartition {
 		var stateLabel StateLabel = UNKNOWN
 		for stateID := range currentPartition[blockIndex] {
 			stateLabel = dfa.States[stateID].Label
@@ -144,7 +144,7 @@ func (dfa DFA) Minimise() DFA{
 	}
 
 	// Set Initial State.
-	for blockIndex := range currentPartition{
+	for blockIndex := range currentPartition {
 		found := false
 		for stateID := range currentPartition[blockIndex] {
 			if stateID == dfa.StartingStateID {
@@ -153,7 +153,7 @@ func (dfa DFA) Minimise() DFA{
 				break
 			}
 		}
-		if found{
+		if found {
 			break
 		}
 	}
@@ -162,32 +162,32 @@ func (dfa DFA) Minimise() DFA{
 	for stateID := range dfa.States {
 		stateBlockIndex := 0
 		found := false
-		for blockIndex := range currentPartition{
+		for blockIndex := range currentPartition {
 			for stateID2 := range currentPartition[blockIndex] {
-				if stateID == stateID2{
+				if stateID == stateID2 {
 					stateBlockIndex = blockIndex
 					found = true
 					break
 				}
 			}
-			if found{
+			if found {
 				break
 			}
 		}
 
 		for symbolID := range dfa.States[stateID].Transitions {
 			resultantStateBlockIndex := 0
-			if resultantDFA.States[stateBlockIndex].Transitions[symbolID] == -1 && dfa.States[stateID].Transitions[symbolID] != -1{
+			if resultantDFA.States[stateBlockIndex].Transitions[symbolID] == -1 && dfa.States[stateID].Transitions[symbolID] != -1 {
 				found := false
-				for blockIndex := range currentPartition{
+				for blockIndex := range currentPartition {
 					for stateID2 := range currentPartition[blockIndex] {
-						if dfa.States[stateID].Transitions[symbolID] == stateID2{
+						if dfa.States[stateID].Transitions[symbolID] == stateID2 {
 							resultantStateBlockIndex = blockIndex
 							found = true
 							break
 						}
 					}
-					if found{
+					if found {
 						break
 					}
 				}

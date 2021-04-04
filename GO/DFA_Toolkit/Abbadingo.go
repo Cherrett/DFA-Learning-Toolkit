@@ -125,9 +125,9 @@ func AbbadingoDFA(numberOfStates int, exact bool) DFA {
 					// meets all of the requirements.
 					return dfa
 				}
-			// If exact is set to false, return the created DFA
-			// since it meets the requirements.
 			} else {
+				// If exact is set to false, return the created DFA
+				// since it meets the requirements.
 				return dfa
 			}
 		}
@@ -139,7 +139,7 @@ func AbbadingoDataset(dfa DFA, percentageFromSamplePool float64, testingRatio fl
 	// Calculate the length of the longest string.
 	maxLength := math.Round((2.0 * math.Log2(float64(len(dfa.States)))) + 3.0)
 	// Calculate the number which represents the longest string.
-	maxDecimal := math.Pow(2, maxLength + 1) - 1
+	maxDecimal := math.Pow(2, maxLength+1) - 1
 	// Calculate the total size of the dataset.
 	totalSetSize := math.Round((percentageFromSamplePool / 100) * maxDecimal)
 	// Calculate the size of the training dataset.
@@ -224,9 +224,9 @@ func (dataset Dataset) WriteToAbbadingoFile(filePath string) {
 	for _, stringInstance := range sortedDataset {
 		// Add string label and string length to output string.
 		outputString := ""
-		if stringInstance.Accepting{
+		if stringInstance.Accepting {
 			outputString = strconv.Itoa(1) + " " + strconv.Itoa(stringInstance.Length()) + " "
-		}else{
+		} else {
 			outputString = strconv.Itoa(0) + " " + strconv.Itoa(stringInstance.Length()) + " "
 		}
 

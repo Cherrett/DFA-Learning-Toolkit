@@ -12,7 +12,7 @@ type Block struct {
 // StatePartition struct which represents a State Partition.
 type StatePartition struct {
 	Blocks               []Block // Slice of blocks.
-	BlocksCount			 int	 // Number of blocks within partition.
+	BlocksCount          int     // Number of blocks within partition.
 	AcceptingBlocksCount int     // Number of accepting blocks within partition.
 	RejectingBlocksCount int     // Number of rejecting blocks within partition.
 
@@ -99,14 +99,14 @@ func (statePartition *StatePartition) Union(blockID1 int, blockID2 int) {
 		// not unknown, set label of block 1 to label of block 2.
 		if block1Label == UNKNOWN && block2Label != UNKNOWN {
 			statePartition.Blocks[blockID1].Label = block2Label
-		// Else, if both blocks are accepting, decrement accepting blocks count.
 		} else if block1Label == ACCEPTING && block2Label == ACCEPTING {
+			// Else, if both blocks are accepting, decrement accepting blocks count.
 			statePartition.AcceptingBlocksCount--
-		// Else, if both blocks are rejecting, decrement rejecting blocks count.
 		} else if block1Label == REJECTING && block2Label == REJECTING {
+			// Else, if both blocks are rejecting, decrement rejecting blocks count.
 			statePartition.RejectingBlocksCount--
 		}
-	// Else, merge block 1 into block 2.
+		// Else, merge block 1 into block 2.
 	} else {
 		// Set root of block 1 to block 2.
 		statePartition.Blocks[blockID1].Root = blockID2
@@ -117,11 +117,11 @@ func (statePartition *StatePartition) Union(blockID1 int, blockID2 int) {
 		// not unknown, set label of block 2 to label of block 1.
 		if block2Label == UNKNOWN && block1Label != UNKNOWN {
 			statePartition.Blocks[blockID2].Label = block1Label
-		// Else, if both blocks are accepting, decrement accepting blocks count.
 		} else if block1Label == ACCEPTING && block2Label == ACCEPTING {
+			// Else, if both blocks are accepting, decrement accepting blocks count.
 			statePartition.AcceptingBlocksCount--
-		// Else, if both blocks are rejecting, decrement rejecting blocks count.
 		} else if block1Label == REJECTING && block2Label == REJECTING {
+			// Else, if both blocks are rejecting, decrement rejecting blocks count.
 			statePartition.RejectingBlocksCount--
 		}
 	}
@@ -309,7 +309,7 @@ func (statePartition StatePartition) Copy() StatePartition {
 		Blocks:               make([]Block, len(statePartition.Blocks)),
 		ChangedBlocks:        make([]int, len(statePartition.Blocks)),
 		IsCopy:               true,
-		BlocksCount: statePartition.BlocksCount,
+		BlocksCount:          statePartition.BlocksCount,
 		AcceptingBlocksCount: statePartition.AcceptingBlocksCount,
 		RejectingBlocksCount: statePartition.RejectingBlocksCount,
 		ChangedBlocksCount:   0,
@@ -352,15 +352,15 @@ func (statePartition StatePartition) NumberOfLabelledBlocks() int {
 }
 
 // RootBlocks returns
-func (statePartition StatePartition) RootBlocks() []int{
+func (statePartition StatePartition) RootBlocks() []int {
 	rootBlocks := make([]int, statePartition.BlocksCount)
 	index := 0
 
-	for blockID := range statePartition.Blocks{
-		if statePartition.Blocks[blockID].Root == blockID{
+	for blockID := range statePartition.Blocks {
+		if statePartition.Blocks[blockID].Root == blockID {
 			rootBlocks[index] = blockID
 			index++
-			if index == statePartition.BlocksCount{
+			if index == statePartition.BlocksCount {
 				break
 			}
 		}

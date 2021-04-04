@@ -7,14 +7,19 @@ import (
 	"time"
 )
 
+// void struct represents an empty struct.
+// Used to decrease memory overhead of maps.
 type void struct{}
+
+// null variable of type void.
+// Used to decrease memory overhead of maps.
 var null void
 
 // StatePairScore struct to store state pairs and their merge score.
 type StatePairScore struct {
-	State1 int 		// StateID for first state.
-	State2 int 	    // StateID for second state.
-	Score  float64  // Score of merge for given states.
+	State1 int     // StateID for first state.
+	State2 int     // StateID for second state.
+	Score  float64 // Score of merge for given states.
 }
 
 // ScoringFunction takes a state partition as input and returns an integer score.
@@ -22,14 +27,14 @@ type ScoringFunction func(stateID1, stateID2 int, partitionBefore, partitionAfte
 
 // GreedySearch deterministically merges all possible state pairs.
 // Returns the resultant DFA when no more valid merges are possible.
-func GreedySearch(dfa DFA, scoringFunction ScoringFunction) DFA{
+func GreedySearch(dfa DFA, scoringFunction ScoringFunction) DFA {
 	// State pair with the highest score.
 	highestScoringStatePair := StatePairScore{-1, -1, -1}
 	start := time.Now()
 	totalMerges := 0
 
 	// Loop until no more deterministic merges are available.
-	for{
+	for {
 		// Convert DFA to StatePartition for state merging.
 		partition := dfa.ToStatePartition()
 		// Copy the state partition for undoing merging.
@@ -37,15 +42,15 @@ func GreedySearch(dfa DFA, scoringFunction ScoringFunction) DFA{
 		// Get all valid merges and compute their score.
 		for i := 0; i < len(dfa.States); i++ {
 			for j := i + 1; j < len(dfa.States); j++ {
-				totalMerges ++
+				totalMerges++
 				// If states are mergeable, calculate score and add to detMerges.
-				if snapshot.MergeStates(dfa, i, j){
+				if snapshot.MergeStates(dfa, i, j) {
 					// Calculate score.
 					score := scoringFunction(i, j, partition, snapshot, dfa)
 
 					// If score is bigger than state pair with the highest score,
 					// set current state pair to state pair with the highest score.
-					if score > highestScoringStatePair.Score{
+					if score > highestScoringStatePair.Score {
 						highestScoringStatePair = StatePairScore{
 							State1: i,
 							State2: j,
@@ -59,7 +64,7 @@ func GreedySearch(dfa DFA, scoringFunction ScoringFunction) DFA{
 		}
 
 		// Check if any deterministic merges were found.
-		if highestScoringStatePair.Score != -1{
+		if highestScoringStatePair.Score != -1 {
 			// Merge the state pairs with the highest score.
 			partition.MergeStates(dfa, highestScoringStatePair.State1, highestScoringStatePair.State2)
 
@@ -68,13 +73,13 @@ func GreedySearch(dfa DFA, scoringFunction ScoringFunction) DFA{
 			valid, dfa = partition.ToDFA(dfa)
 
 			// Panic if state partition to DFA conversion was unsuccessful.
-			if !valid{
+			if !valid {
 				panic("Invalid merged DFA.")
 			}
 
 			// Remove previous state pair with the highest score.
 			highestScoringStatePair = StatePairScore{-1, -1, -1}
-		}else{
+		} else {
 			break
 		}
 	}
@@ -88,7 +93,7 @@ func GreedySearch(dfa DFA, scoringFunction ScoringFunction) DFA{
 
 // WindowedSearch deterministically merges state pairs within a given window.
 // Returns the resultant DFA when no more valid merges are possible.
-func WindowedSearch(dfa DFA, windowSize int, windowGrow float64, scoringFunction ScoringFunction) DFA{
+func WindowedSearch(dfa DFA, windowSize int, windowGrow float64, scoringFunction ScoringFunction) DFA {
 	start := time.Now()
 	totalMerges := 0
 	// State pair with the highest score.
@@ -97,7 +102,7 @@ func WindowedSearch(dfa DFA, windowSize int, windowGrow float64, scoringFunction
 	orderedStates := dfa.OrderedStates()
 
 	// Iterate until stopped.
-	for{
+	for {
 		// Window values.
 		windowMin := 0
 		windowMax := util.Min(windowSize, len(dfa.States))
@@ -121,7 +126,7 @@ func WindowedSearch(dfa DFA, windowSize int, windowGrow float64, scoringFunction
 
 							// If score is bigger than state pair with the highest score,
 							// set current state pair to state pair with the highest score.
-							if score > highestScoringStatePair.Score{
+							if score > highestScoringStatePair.Score {
 								highestScoringStatePair = StatePairScore{
 									State1: orderedStates[i],
 									State2: orderedStates[j],
@@ -152,7 +157,7 @@ func WindowedSearch(dfa DFA, windowSize int, windowGrow float64, scoringFunction
 			}
 		}
 
-		if highestScoringStatePair.Score != -1{
+		if highestScoringStatePair.Score != -1 {
 			// Merge the state pairs with the highest score.
 			partition.MergeStates(dfa, highestScoringStatePair.State1, highestScoringStatePair.State2)
 
@@ -170,7 +175,7 @@ func WindowedSearch(dfa DFA, windowSize int, windowGrow float64, scoringFunction
 
 			// Remove previous state pair with the highest score.
 			highestScoringStatePair = StatePairScore{-1, -1, -1}
-		}else{
+		} else {
 			break
 		}
 	}
@@ -184,7 +189,7 @@ func WindowedSearch(dfa DFA, windowSize int, windowGrow float64, scoringFunction
 
 // BlueFringeSearch deterministically merges possible state pairs within red-blue sets.
 // Returns the resultant DFA when no more valid merges are possible.
-func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA{
+func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA {
 	start := time.Now()
 	totalMerges := 0
 
@@ -209,14 +214,14 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA{
 	merged := false
 
 	// Iterate until stopped.
-	for{
+	for {
 		// Initialize set of blue states to empty set.
 		blue := map[int]void{}
 
 		// Iterate over every red state.
-		for element := range red{
+		for element := range red {
 			// Iterate over each symbol within DFA.
-			for symbolID:=0; symbolID < len(dfa.SymbolMap); symbolID++{
+			for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
 				// Store resultant stateID from red state.
 				resultantStateID := dfa.States[element].Transitions[symbolID]
 				// If transition is valid and resultant state is not red,
@@ -228,25 +233,26 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA{
 		}
 
 		// If blue set is empty, break loop and return resultant DFA.
-		if len(blue) == 0{
+		if len(blue) == 0 {
 			break
 		}
 
 		// Iterate over every blue state.
-		for blueElement := range blue{
+		for blueElement := range blue {
 			// Set merged flag to false.
 			merged = false
 			// Iterate over every red state.
-			for redElement := range red{
+			for redElement := range red {
 				// If scores for the current state pair has already been
 				// computed, set merged flag to true and skip merge.
 				if _, valid := scoresComputed[StateIDPair{blueElement, redElement}]; valid {
 					merged = true
-				// Else, attempt to merge state pair.
-				}else{
-					totalMerges ++
+				} else {
+					// If scores for the current state pair has not
+					// been computed, attempt to merge state pair.
+					totalMerges++
 					// If states are mergeable, calculate score and add to detMerges.
-					if snapshot.MergeStates(dfa, blueElement, redElement){
+					if snapshot.MergeStates(dfa, blueElement, redElement) {
 						// Set the state pairs score as computed.
 						scoresComputed[StateIDPair{blueElement, redElement}] = null
 						scoresComputed[StateIDPair{redElement, blueElement}] = null
@@ -256,7 +262,7 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA{
 
 						// If score is bigger than state pair with the highest score,
 						// set current state pair to state pair with the highest score.
-						if score > highestScoringStatePair.Score{
+						if score > highestScoringStatePair.Score {
 							highestScoringStatePair = StatePairScore{
 								State1: blueElement,
 								State2: redElement,
@@ -274,14 +280,14 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA{
 
 			// If merged flag is false, add current blue state
 			// to red states set and exit loop.
-			if !merged{
+			if !merged {
 				red[blueElement] = null
 				break
 			}
 		}
 
 		// If merged flag is true, merge highest scoring merge.
-		if merged{
+		if merged {
 			// Merge the state pairs with the highest score.
 			partition.MergeStates(dfa, highestScoringStatePair.State1, highestScoringStatePair.State2)
 
@@ -295,7 +301,7 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA{
 			snapshot = partition.Copy()
 
 			// Panic if state partition to DFA conversion was unsuccessful.
-			if !valid{
+			if !valid {
 				panic("Invalid merged DFA.")
 			}
 
