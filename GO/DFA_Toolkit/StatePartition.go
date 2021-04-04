@@ -12,6 +12,7 @@ type Block struct {
 // StatePartition struct which represents a State Partition.
 type StatePartition struct {
 	Blocks               []Block // Slice of blocks.
+	BlocksCount			 int	 // Number of blocks within partition.
 	AcceptingBlocksCount int     // Number of accepting blocks within partition.
 	RejectingBlocksCount int     // Number of rejecting blocks within partition.
 
@@ -28,6 +29,7 @@ func NewStatePartition(dfa DFA) StatePartition {
 		Blocks:               make([]Block, len(dfa.States)),
 		ChangedBlocks:        make([]int, len(dfa.States)),
 		IsCopy:               false,
+		BlocksCount:          len(dfa.States),
 		AcceptingBlocksCount: 0,
 		RejectingBlocksCount: 0,
 		ChangedBlocksCount:   0,
@@ -75,6 +77,8 @@ func (statePartition *StatePartition) Union(blockID1 int, blockID2 int) {
 		statePartition.ChangedBlock(blockID1)
 		statePartition.ChangedBlock(blockID2)
 	}
+
+	statePartition.BlocksCount--
 
 	// Link nodes by assigning the link of block 1 to link of block 2 and vice versa.
 	statePartition.Blocks[blockID1].Link, statePartition.Blocks[blockID2].Link =
@@ -279,12 +283,12 @@ func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 in
 					if currentResultantStateID > -1 {
 						// If resultant block is not equal to the block containing the state within transition
 						// found above, merge the two states to eliminate non-determinism.
-						if statePartition.Find(currentResultantStateID) != statePartition.Find(transitionResult) {
-							// Not deterministic so merge, if states cannot be merged, return false.
-							if !statePartition.MergeStates(dfa, transitionResult, currentResultantStateID) {
-								return false
-							}
+						// Merge states and if states cannot be merged, return false.
+						if !statePartition.MergeStates(dfa, transitionResult, currentResultantStateID) {
+							return false
 						}
+						// The loop is broken since the transition for the current symbol was found.
+						break
 					}
 				}
 
@@ -305,6 +309,7 @@ func (statePartition StatePartition) Copy() StatePartition {
 		Blocks:               make([]Block, len(statePartition.Blocks)),
 		ChangedBlocks:        make([]int, len(statePartition.Blocks)),
 		IsCopy:               true,
+		BlocksCount: statePartition.BlocksCount,
 		AcceptingBlocksCount: statePartition.AcceptingBlocksCount,
 		RejectingBlocksCount: statePartition.RejectingBlocksCount,
 		ChangedBlocksCount:   0,
@@ -323,7 +328,8 @@ func (statePartition *StatePartition) RollbackChanges(originalStatePartition Sta
 	// If the state partition is a copy, copy values of changed blocks from original
 	// state partition. Else, do nothing.
 	if statePartition.IsCopy {
-		// Set accepting and rejecting blocks count values to the original values.
+		// Set blocks count values to the original values.
+		statePartition.BlocksCount = originalStatePartition.BlocksCount
 		statePartition.AcceptingBlocksCount = originalStatePartition.AcceptingBlocksCount
 		statePartition.RejectingBlocksCount = originalStatePartition.RejectingBlocksCount
 
@@ -343,4 +349,22 @@ func (statePartition *StatePartition) RollbackChanges(originalStatePartition Sta
 func (statePartition StatePartition) NumberOfLabelledBlocks() int {
 	// Return the sum of the accepting and rejecting blocks count.
 	return statePartition.AcceptingBlocksCount + statePartition.RejectingBlocksCount
+}
+
+// RootBlocks returns
+func (statePartition StatePartition) RootBlocks() []int{
+	rootBlocks := make([]int, statePartition.BlocksCount)
+	index := 0
+
+	for blockID := range statePartition.Blocks{
+		if statePartition.Blocks[blockID].Root == blockID{
+			rootBlocks[index] = blockID
+			index++
+			if index == statePartition.BlocksCount{
+				break
+			}
+		}
+	}
+
+	return rootBlocks
 }
