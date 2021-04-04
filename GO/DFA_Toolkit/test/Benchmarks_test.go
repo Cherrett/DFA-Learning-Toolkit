@@ -104,7 +104,7 @@ func TestBenchmarkGreedyEDSM(t *testing.T){
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		totalAccuracies.Add(accuracy)
-		totalNumberOfStates.Add(float64(resultantDFA.AllStatesCount()))
+		totalNumberOfStates.Add(float64(len(resultantDFA.States)))
 
 		if accuracy >= 0.99{
 			winners++
@@ -151,7 +151,7 @@ func TestBenchmarkWindowedEDSM(t *testing.T){
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		totalAccuracies.Add(accuracy)
-		totalNumberOfStates.Add(float64(resultantDFA.AllStatesCount()))
+		totalNumberOfStates.Add(float64(len(resultantDFA.States)))
 
 		if accuracy >= 0.99{
 			winners++
@@ -198,7 +198,7 @@ func TestBenchmarkBlueFringeEDSM(t *testing.T){
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		totalAccuracies.Add(accuracy)
-		totalNumberOfStates.Add(float64(resultantDFA.AllStatesCount()))
+		totalNumberOfStates.Add(float64(len(resultantDFA.States)))
 
 		if accuracy >= 0.99{
 			winners++
@@ -281,9 +281,9 @@ func TestBenchmarkEDSM(t *testing.T) {
 		totalAccuraciesWindowed.Add(accuracyWindowed)
 		totalAccuraciesBlueFringe.Add(accuracyBlueFringe)
 
-		totalNumberOfStatesGreedy.Add(float64(resultantDFAGreedy.AllStatesCount()))
-		totalNumberOfStatesWindowed.Add(float64(resultantDFAWindowed.AllStatesCount()))
-		totalNumberOfStatesBlueFringe.Add(float64(resultantDFABlueFringe.AllStatesCount()))
+		totalNumberOfStatesGreedy.Add(float64(len(resultantDFAGreedy.States)))
+		totalNumberOfStatesWindowed.Add(float64(len(resultantDFAWindowed.States)))
+		totalNumberOfStatesBlueFringe.Add(float64(len(resultantDFABlueFringe.States)))
 
 		if accuracyGreedy >= 0.99{
 			winnersGreedy++
@@ -297,9 +297,9 @@ func TestBenchmarkEDSM(t *testing.T) {
 			winnersBlueFringe++
 		}
 
-		fmt.Printf("Greedy: Accuracy: %.2f, Number of States %d\n", accuracyGreedy, resultantDFAGreedy.AllStatesCount())
-		fmt.Printf("Windowed: Accuracy: %.2f, Number of States %d\n", accuracyWindowed, resultantDFAWindowed.AllStatesCount())
-		fmt.Printf("Blue-Fringe: Accuracy: %.2f, Number of States %d\n", accuracyBlueFringe, resultantDFABlueFringe.AllStatesCount())
+		fmt.Printf("Greedy: Accuracy: %.2f, Number of States %d\n", accuracyGreedy, len(resultantDFAGreedy.States))
+		fmt.Printf("Windowed: Accuracy: %.2f, Number of States %d\n", accuracyWindowed, len(resultantDFAWindowed.States))
+		fmt.Printf("Blue-Fringe: Accuracy: %.2f, Number of States %d\n", accuracyBlueFringe, len(resultantDFABlueFringe.States))
 		fmt.Print("-----------------------------------------------------------------------------\n")
 	}
 
