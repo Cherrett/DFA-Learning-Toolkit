@@ -72,6 +72,12 @@ func TestAbbadingoDatasetGeneration(t *testing.T) {
 	if !trainingDatasetConsistentWithAPTA {
 		t.Errorf("Expected training dataset to be consistent with APTA")
 	}
+
+	trainingDataset, _ = dfatoolkit.AbbadingoDataset(AbbadingoDFA, 100, 0)
+
+	if !trainingDataset.SymmetricallyStructurallyComplete(AbbadingoDFA){
+		t.Errorf("Expected training dataset to be symmetrically structurally complete with DFA")
+	}
 }
 
 func TestStateMergingAndDFAEquivalence(t *testing.T) {

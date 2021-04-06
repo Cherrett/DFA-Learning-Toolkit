@@ -7,14 +7,6 @@ import (
 	"time"
 )
 
-// void struct represents an empty struct.
-// Used to decrease memory overhead of maps.
-type void struct{}
-
-// null variable of type void.
-// Used to decrease memory overhead of maps.
-var null void
-
 // StatePairScore struct to store state pairs and their merge score.
 type StatePairScore struct {
 	State1 int     // StateID for first state.
@@ -200,10 +192,10 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA {
 	highestScoringStatePair := StatePairScore{-1, -1, -1}
 
 	// Slice of state pairs to keep track of computed scores.
-	scoresComputed := map[StateIDPair]void{}
+	scoresComputed := map[StateIDPair]util.Void{}
 
 	// Initialize set of red states to starting state.
-	red := map[int]void{dfa.StartingStateID: null}
+	red := map[int]util.Void{dfa.StartingStateID: util.Null}
 
 	// Convert DFA to StatePartition for state merging.
 	partition := dfa.ToStatePartition()
@@ -216,7 +208,7 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA {
 	// Iterate until stopped.
 	for {
 		// Initialize set of blue states to empty set.
-		blue := map[int]void{}
+		blue := map[int]util.Void{}
 
 		// Iterate over every red state.
 		for element := range red {
@@ -227,7 +219,7 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA {
 				// If transition is valid and resultant state is not red,
 				// add resultant state to blue set.
 				if _, exists := red[resultantStateID]; resultantStateID != -1 && !exists {
-					blue[resultantStateID] = null
+					blue[resultantStateID] = util.Null
 				}
 			}
 		}
@@ -254,8 +246,8 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA {
 					// If states are mergeable, calculate score and add to detMerges.
 					if snapshot.MergeStates(dfa, blueElement, redElement) {
 						// Set the state pairs score as computed.
-						scoresComputed[StateIDPair{blueElement, redElement}] = null
-						scoresComputed[StateIDPair{redElement, blueElement}] = null
+						scoresComputed[StateIDPair{blueElement, redElement}] = util.Null
+						scoresComputed[StateIDPair{redElement, blueElement}] = util.Null
 
 						// Calculate score.
 						score := scoringFunction(blueElement, redElement, partition, snapshot, dfa)
@@ -281,7 +273,7 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA {
 			// If merged flag is false, add current blue state
 			// to red states set and exit loop.
 			if !merged {
-				red[blueElement] = null
+				red[blueElement] = util.Null
 				break
 			}
 		}
@@ -312,10 +304,10 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA {
 			highestScoringStatePair = StatePairScore{-1, -1, -1}
 
 			// Slice of state pairs to keep track of computed scores.
-			scoresComputed = map[StateIDPair]void{}
+			scoresComputed = map[StateIDPair]util.Void{}
 
 			// Initialize set of red states to starting state.
-			red = map[int]void{dfa.StartingStateID: null}
+			red = map[int]util.Void{dfa.StartingStateID: util.Null}
 		}
 	}
 

@@ -671,33 +671,20 @@ func (dfa DFA) StructurallyComplete(dataset Dataset) bool {
 	dataset = dataset.AcceptingStringInstances().SortDatasetByLength()
 
 	// Remove non accepting leave states from DFA.
-	dfa.RemoveNonAcceptingLeaves()
+	//dfa.RemoveNonAcceptingLeaves()
 
 	// Store accepting states within DFA.
 	acceptingStates := dfa.AcceptingStates()
 
-	// Create a map with the accepting state IDs
-	// and set value to false. This map is used to
-	// keep track whether at least one string of
-	// the dataset halts in each accepting state.
-	finalStatesHalted := map[int]bool{}
-	for _, finalStateID := range acceptingStates {
-		finalStatesHalted[finalStateID] = false
-	}
+	// This map is used to keep track whether
+	// at least one string within the dataset
+	// halts in each accepting state.
+	finalStatesHalted := map[int]util.Void{}
 
-	// Create a map for each valid transition within
-	// DFA and set value to false. This slice is used
-	// to keep track whether each transition is used at
-	// least once when parsing the dataset.
-	transitionsUsed := map[Transition]bool{}
-	for stateID := 0; stateID < len(dfa.States); stateID++ {
-		// Add valid transitions to transitionsUsed map.
-		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
-			if dfa.States[stateID].Transitions[symbolID] != -1 {
-				transitionsUsed[Transition{stateID, symbolID}] = false
-			}
-		}
-	}
+	// This map is used to keep track whether
+	// each transition is used at least once
+	// when parsing the dataset.
+	transitionsUsed := map[Transition]util.Void{}
 
 	for _, stringInstance := range dataset {
 		// Set the current state ID to the starting state ID.
@@ -711,7 +698,7 @@ func (dfa DFA) StructurallyComplete(dataset Dataset) bool {
 		// state is not accepting, return false.
 		if len(stringInstance.Value) == 0 {
 			if dfa.StartingState().Label == ACCEPTING {
-				finalStatesHalted[currentStateID] = true
+				finalStatesHalted[currentStateID] = util.Null
 			} else {
 				return false
 			}
@@ -726,7 +713,7 @@ func (dfa DFA) StructurallyComplete(dataset Dataset) bool {
 			// the current symbol, set resultant state ID to current state ID.
 			if dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)] != -1 {
 				// Mark transition as visited.
-				transitionsUsed[Transition{currentStateID, dfa.SymbolID(symbol)}] = true
+				transitionsUsed[Transition{currentStateID, dfa.SymbolID(symbol)}] = util.Null
 
 				currentStateID = dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)]
 				// Check if last symbol in string.
@@ -737,7 +724,7 @@ func (dfa DFA) StructurallyComplete(dataset Dataset) bool {
 					}
 
 					// Mark accepting state as halted.
-					finalStatesHalted[currentStateID] = true
+					finalStatesHalted[currentStateID] = util.Null
 				}
 				// If no transition exists, return false.
 			} else {
@@ -748,16 +735,20 @@ func (dfa DFA) StructurallyComplete(dataset Dataset) bool {
 
 	// Check whether each transition was used at least
 	// once when parsing the dataset.
-	for transition := range transitionsUsed {
-		if !transitionsUsed[transition] {
-			return false
+	for stateID := 0; stateID < len(dfa.States); stateID++ {
+		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
+			if dfa.States[stateID].Transitions[symbolID] != -1 {
+				if _, exists := transitionsUsed[Transition{stateID, symbolID}]; !exists {
+					return false
+				}
+			}
 		}
 	}
 
 	// Check if at least one string of the dataset
 	// halted in each accepting state.
 	for _, finalStateID := range acceptingStates {
-		if !finalStatesHalted[finalStateID] {
+		if _, exists := finalStatesHalted[finalStateID]; !exists {
 			return false
 		}
 	}
@@ -775,28 +766,15 @@ func (dfa DFA) SymmetricallyStructurallyComplete(dataset Dataset) bool {
 	// Store labelled (final) states within DFA.
 	labelledStates := dfa.LabelledStates()
 
-	// Create a map with the labelled (final) state
-	// IDs and set value to false. This map is used to
-	// keep track whether at least one string of the
-	// dataset halts in each labelled (final) state.
-	finalStatesHalted := map[int]bool{}
-	for _, finalStateID := range labelledStates {
-		finalStatesHalted[finalStateID] = false
-	}
+	// This map is used to keep track whether
+	// at least one string within the dataset
+	// halts in each labelled (final) state.
+	finalStatesHalted := map[int]util.Void{}
 
-	// Create a map for each valid transition within
-	// DFA and set value to false. This slice is used
-	// to keep track whether each transition is used at
-	// least once when parsing the dataset.
-	transitionsUsed := map[Transition]bool{}
-	for stateID := 0; stateID < len(dfa.States); stateID++ {
-		// Add valid transitions to transitionsUsed map.
-		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
-			if dfa.States[stateID].Transitions[symbolID] != -1 {
-				transitionsUsed[Transition{stateID, symbolID}] = false
-			}
-		}
-	}
+	// This map is used to keep track whether
+	// each transition is used at least once
+	// when parsing the dataset.
+	transitionsUsed := map[Transition]util.Void{}
 
 	for _, stringInstance := range dataset {
 		// Set the current state ID to the starting state ID.
@@ -810,7 +788,7 @@ func (dfa DFA) SymmetricallyStructurallyComplete(dataset Dataset) bool {
 		// while the  starting state is not labelled, return false.
 		if len(stringInstance.Value) == 0 {
 			if dfa.StartingState().Label != UNKNOWN {
-				finalStatesHalted[currentStateID] = true
+				finalStatesHalted[currentStateID] = util.Null
 			} else if stringInstance.Accepting {
 				return false
 			}
@@ -825,7 +803,7 @@ func (dfa DFA) SymmetricallyStructurallyComplete(dataset Dataset) bool {
 			// the current symbol, set resultant state ID to current state ID.
 			if dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)] != -1 {
 				// Mark transition as visited.
-				transitionsUsed[Transition{currentStateID, dfa.SymbolID(symbol)}] = true
+				transitionsUsed[Transition{currentStateID, dfa.SymbolID(symbol)}] = util.Null
 
 				currentStateID = dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)]
 				// Check if last symbol in string.
@@ -836,7 +814,7 @@ func (dfa DFA) SymmetricallyStructurallyComplete(dataset Dataset) bool {
 					}
 
 					// Mark labelled (final) state as halted.
-					finalStatesHalted[currentStateID] = true
+					finalStatesHalted[currentStateID] = util.Null
 				}
 				// If no transition exists and string instance is accepting, return false.
 				// If string instance is rejecting, return true.
@@ -850,16 +828,20 @@ func (dfa DFA) SymmetricallyStructurallyComplete(dataset Dataset) bool {
 
 	// Check whether each transition was used at least
 	// once when parsing the dataset.
-	for transition := range transitionsUsed {
-		if !transitionsUsed[transition] {
-			return false
+	for stateID := 0; stateID < len(dfa.States); stateID++ {
+		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
+			if dfa.States[stateID].Transitions[symbolID] != -1 {
+				if _, exists := transitionsUsed[Transition{stateID, symbolID}]; !exists {
+					return false
+				}
+			}
 		}
 	}
 
 	// Check if at least one string of the dataset
 	// halted in each labelled (final) state.
 	for _, finalStateID := range labelledStates {
-		if !finalStatesHalted[finalStateID] {
+		if _, exists := finalStatesHalted[finalStateID]; !exists {
 			return false
 		}
 	}

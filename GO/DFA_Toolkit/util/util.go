@@ -5,6 +5,14 @@ import (
 	"os"
 )
 
+// Void struct represents an empty struct.
+// Used to decrease memory overhead of maps.
+type Void struct{}
+
+// Null variable of type Void.
+// Used to decrease memory overhead of maps.
+var Null Void
+
 // Max returns the larger of x or y.
 func Max(x, y int) int {
 	if x < y {
