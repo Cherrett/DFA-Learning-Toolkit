@@ -195,11 +195,8 @@ func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA) {
 		computedDepthAndOrder: false,
 	}
 
-	for stateID := range dfa.States {
-		currentBlockID := statePartition.Find(stateID)
-		if _, ok := newMappings[currentBlockID]; !ok {
-			newMappings[currentBlockID] = resultantDFA.AddState(statePartition.Blocks[currentBlockID].Label)
-		}
+	for _, stateID := range statePartition.RootBlocks() {
+		newMappings[stateID] = resultantDFA.AddState(statePartition.Blocks[stateID].Label)
 	}
 
 	// update starting state via mappings
