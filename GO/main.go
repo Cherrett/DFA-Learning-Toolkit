@@ -7,30 +7,56 @@ import (
 )
 
 func main() {
-	// random seed
-	// rand.Seed(time.Now().UnixNano())
+	// These are target DFA sizes we will test.
+	dfaSizes := []int{16, 32, 64}
+	// These are the training set sizes we will test.
+	trainingSetSizes := []int{230, 607, 1521}
 
-	structurallyCompleteCount := 0
-	iterations := 100
-	start := time.Now()
+	// Benchmark over the problem instances.
+	for i := range dfaSizes {
+		targetSize := dfaSizes[i]
+		trainingSetSize := trainingSetSizes[i]
 
-	for i := 0; i < iterations; i++ {
-		// Create a target DFA.
-		target := dfatoolkit.AbbadingoDFA(32, true)
+		fmt.Printf("-------------------------------------------------------------\n")
+		fmt.Printf("-------------------------------------------------------------\n")
+		fmt.Printf("BENCHMARK %d (Target: %d states, Training: %d strings\n", i+1, targetSize, trainingSetSize)
+		fmt.Printf("-------------------------------------------------------------\n")
+		fmt.Printf("-------------------------------------------------------------\n")
 
-		//target.ToJPG("temp.jpg", false, true)
+		// Create APTA.
+		apta, valid := dfatoolkit.DFAFromJSON(fmt.Sprintf("TestingAPTAs/%d.json", targetSize))
 
-		// Training set.
-		training, _ := dfatoolkit.AbbadingoDataset(target, 100, 0)
-
-		if training.SymmetricallyStructurallyComplete(target) {
-			structurallyCompleteCount++
+		if !valid{
+			panic("APTA read not valid.")
 		}
 
-		fmt.Printf("Iteration %d/%d\n", i+1, iterations)
-	}
+		fmt.Printf("APTA size: %d\n", len(apta.States))
 
-	fmt.Printf("Percentage which were Structurally Complete: %.4f\n", float64(structurallyCompleteCount)/float64(iterations))
-	totalTime := (time.Now()).Sub(start).Seconds()
-	fmt.Printf("Total Time: %.2f seconds.\n", totalTime)
+		// Perform all the merges.
+		part := apta.ToStatePartition()
+		snapshot := part.Copy()
+		totalMerges := 0
+		validMerges := 0
+		start := time.Now()
+
+		for i := 0; i < len(apta.States); i++ {
+			for j := i + 1; j < len(apta.States); j++ {
+				totalMerges++
+				if snapshot.MergeStates(apta, i, j) {
+					validMerges++
+					//snapshot.LabelledBlocksCount(apta)
+					//snapshot.BlocksCount()
+					//print(temp, temp2)
+				}
+
+				snapshot.RollbackChanges(part)
+			}
+		}
+
+		totalTime := (time.Now()).Sub(start).Seconds()
+		fmt.Printf("Total merges: %d\n", totalMerges)
+		fmt.Printf("Valid merges: %d\n", validMerges)
+		fmt.Printf("Time: %.2fs\n", totalTime)
+		fmt.Printf("Merges per second: %.2f\n", float64(totalMerges)/totalTime)
+	}
 }
