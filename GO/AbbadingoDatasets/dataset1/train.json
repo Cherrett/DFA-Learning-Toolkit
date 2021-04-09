@@ -1,49 +1,49 @@
 [
 	{
-		"Value": [],
+		"Value": null,
 		"Accepting": false
 	},
 	{
 		"Value": [
-			98
+			1
 		],
 		"Accepting": true
 	},
 	{
 		"Value": [
-			97
+			0
 		],
 		"Accepting": false
 	},
 	{
 		"Value": [
-			97,
-			97
+			0,
+			0
 		],
 		"Accepting": true
 	},
 	{
 		"Value": [
-			97,
-			97,
-			97
+			0,
+			0,
+			0
 		],
 		"Accepting": false
 	},
 	{
 		"Value": [
-			98,
-			97,
-			97
+			1,
+			0,
+			0
 		],
 		"Accepting": false
 	},
 	{
 		"Value": [
-			97,
-			97,
-			97,
-			97
+			0,
+			0,
+			0,
+			0
 		],
 		"Accepting": true
 	}
