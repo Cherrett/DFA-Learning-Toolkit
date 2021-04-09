@@ -78,52 +78,41 @@ func (statePartition *StatePartition) Union(blockID1 int, blockID2 int) {
 		statePartition.ChangedBlock(blockID2)
 	}
 
+	// Decrement blocks count.
 	statePartition.BlocksCount--
 
-	// Link nodes by assigning the link of block 1 to link of block 2 and vice versa.
-	statePartition.Blocks[blockID1].Link, statePartition.Blocks[blockID2].Link =
-		statePartition.Blocks[blockID2].Link, statePartition.Blocks[blockID1].Link
+	// Set block 1 to parent and block 2 to child.
+	parent, child := blockID1, blockID2
+
+	// If size of parent node is smaller than size of child node, switch
+	// parent and child nodes.
+	if statePartition.Blocks[parent].Size < statePartition.Blocks[child].Size{
+		parent, child = child, parent
+	}
+
+	// Link nodes by assigning the link of parent to link of child and vice versa.
+	statePartition.Blocks[parent].Link, statePartition.Blocks[child].Link =
+		statePartition.Blocks[child].Link, statePartition.Blocks[parent].Link
 
 	// Get label of each block.
-	block1Label := statePartition.Blocks[blockID1].Label
-	block2Label := statePartition.Blocks[blockID2].Label
+	parentLabel := statePartition.Blocks[parent].Label
+	childLabel := statePartition.Blocks[child].Label
 
-	// If size of block 1 is bigger than size of block 2, merge block 2 into block 1.
-	if statePartition.Blocks[blockID1].Size > statePartition.Blocks[blockID2].Size {
-		// Set root of block 2 to block 1.
-		statePartition.Blocks[blockID2].Root = blockID1
-		// Increment size (score) of block 1.
-		statePartition.Blocks[blockID1].Size += statePartition.Blocks[blockID2].Size
+	// Set root of child node to parent node.
+	statePartition.Blocks[child].Root = parent
+	// Increment size (score) of parent node by size of child node.
+	statePartition.Blocks[parent].Size += statePartition.Blocks[child].Size
 
-		// If label of block 1 is unknown and label of block 2 is
-		// not unknown, set label of block 1 to label of block 2.
-		if block1Label == UNKNOWN && block2Label != UNKNOWN {
-			statePartition.Blocks[blockID1].Label = block2Label
-		} else if block1Label == ACCEPTING && block2Label == ACCEPTING {
-			// Else, if both blocks are accepting, decrement accepting blocks count.
-			statePartition.AcceptingBlocksCount--
-		} else if block1Label == REJECTING && block2Label == REJECTING {
-			// Else, if both blocks are rejecting, decrement rejecting blocks count.
-			statePartition.RejectingBlocksCount--
-		}
-		// Else, merge block 1 into block 2.
-	} else {
-		// Set root of block 1 to block 2.
-		statePartition.Blocks[blockID1].Root = blockID2
-		// Increment size (score) of block 2.
-		statePartition.Blocks[blockID2].Size += statePartition.Blocks[blockID1].Size
-
-		// If label of block 2 is unknown and label of block 1 is
-		// not unknown, set label of block 2 to label of block 1.
-		if block2Label == UNKNOWN && block1Label != UNKNOWN {
-			statePartition.Blocks[blockID2].Label = block1Label
-		} else if block1Label == ACCEPTING && block2Label == ACCEPTING {
-			// Else, if both blocks are accepting, decrement accepting blocks count.
-			statePartition.AcceptingBlocksCount--
-		} else if block1Label == REJECTING && block2Label == REJECTING {
-			// Else, if both blocks are rejecting, decrement rejecting blocks count.
-			statePartition.RejectingBlocksCount--
-		}
+	// If label of parent is unknown and label of child is
+	// not unknown, set label of parent to label of child.
+	if parentLabel == UNKNOWN && childLabel != UNKNOWN {
+		statePartition.Blocks[parent].Label = childLabel
+	} else if parentLabel == ACCEPTING && childLabel == ACCEPTING {
+		// Else, if both blocks are accepting, decrement accepting blocks count.
+		statePartition.AcceptingBlocksCount--
+	} else if parentLabel == REJECTING && childLabel == REJECTING {
+		// Else, if both blocks are rejecting, decrement rejecting blocks count.
+		statePartition.RejectingBlocksCount--
 	}
 }
 
@@ -195,11 +184,8 @@ func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA) {
 		computedDepthAndOrder: false,
 	}
 
-	for stateID := range dfa.States {
-		currentBlockID := statePartition.Find(stateID)
-		if _, ok := newMappings[currentBlockID]; !ok {
-			newMappings[currentBlockID] = resultantDFA.AddState(statePartition.Blocks[currentBlockID].Label)
-		}
+	for _, stateID := range statePartition.RootBlocks() {
+		newMappings[stateID] = resultantDFA.AddState(statePartition.Blocks[stateID].Label)
 	}
 
 	// update starting state via mappings
@@ -315,9 +301,8 @@ func (statePartition StatePartition) Copy() StatePartition {
 		ChangedBlocksCount:   0,
 	}
 
-	// Copy root, size, link and blockLabel slices.
+	// Copy blocks slice.
 	copy(copiedStatePartition.Blocks, statePartition.Blocks)
-	copy(copiedStatePartition.ChangedBlocks, statePartition.ChangedBlocks)
 
 	// Return copied state partition.
 	return copiedStatePartition
