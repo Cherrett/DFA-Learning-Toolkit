@@ -41,7 +41,7 @@ func (dfa *DFA) IndistinguishableStatePairs() []StateIDPair {
 					continue
 				} else {
 					// Iterate over each symbol within DFA.
-					for symbolID := 0; symbolID < dfa.SymbolsCount(); symbolID++ {
+					for symbolID := 0; symbolID < dfa.SymbolsCount; symbolID++ {
 						// If both states have a valid transition using current symbol.
 						if dfa.States[stateID].Transitions[symbolID] != -1 &&
 							dfa.States[stateID2].Transitions[symbolID] != -1 {
@@ -131,7 +131,7 @@ func (dfa DFA) Minimise() DFA {
 			}
 		}
 	}
-	resultantDFA := DFA{SymbolMap: dfa.SymbolMap}
+	resultantDFA := DFA{SymbolsCount: dfa.SymbolsCount}
 
 	// Create a new state for each block.
 	for blockIndex := range currentPartition {

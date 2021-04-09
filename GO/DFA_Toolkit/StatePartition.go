@@ -179,7 +179,7 @@ func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA) {
 	resultantDFA := DFA{
 		States:                nil,
 		StartingStateID:       -1,
-		SymbolMap:             dfa.SymbolMap,
+		SymbolsCount:          dfa.SymbolsCount,
 		depth:                 -1,
 		computedDepthAndOrder: false,
 	}
@@ -193,7 +193,7 @@ func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA) {
 
 	// update new transitions via mappings
 	for stateID := range dfa.States {
-		for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
+		for symbolID := 0; symbolID < dfa.SymbolsCount; symbolID++ {
 			oldResultantStateID := dfa.States[stateID].Transitions[symbolID]
 			if oldResultantStateID > -1 {
 				newStateID := newMappings[statePartition.Find(stateID)]
@@ -245,7 +245,7 @@ func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 in
 	statePartition.Union(state1, state2)
 
 	// Iterate over each symbol within DFA.
-	for symbolID := 0; symbolID < len(dfa.SymbolMap); symbolID++ {
+	for symbolID := 0; symbolID < dfa.SymbolsCount; symbolID++ {
 		// Iterate over each state within first block.
 		for _, stateID := range block1Set {
 			// Store resultant state from state transition of current state.

@@ -7,6 +7,10 @@ import (
 	"os/exec"
 )
 
+// SymbolAlphabetMappingAbbadingo represents the symbol-alphabet mapping for
+// the Abbadingo competition standard (using only a's and b's / 0s and 1s).
+var SymbolAlphabetMappingAbbadingo = map[int]rune{0: 'a', 1: 'b'}
+
 // GraphViz.go consists of various functions which create a visualisation
 // of a given DFA. Please note that GraphViz must be downloaded and
 // installed before hand from https://graphviz.org/download/.
@@ -18,7 +22,7 @@ import (
 // within DFA. If topDown is set to true, the visual representation
 // will be top down. A left to right representation is used otherwise.
 // This function is also called from all of the functions below.
-func (dfa DFA) ToDOT(filePath string, rankByOrder bool, topDown bool) {
+func (dfa DFA) ToDOT(filePath string, symbolMapping map[int]rune, rankByOrder bool, topDown bool) {
 	// If rank by order is set to true, make sure
 	// that depth and order for DFA are computed.
 	if rankByOrder {
@@ -84,10 +88,14 @@ func (dfa DFA) ToDOT(filePath string, rankByOrder bool, topDown bool) {
 
 	// Iterate over each transition and write to file.
 	for stateID, state := range dfa.States {
-		for symbol, symbolID := range dfa.SymbolMap {
-			resultantStateID := state.Transitions[symbolID]
-			if resultantStateID > -1 {
-				_, _ = writer.WriteString(fmt.Sprintf("\tq%d->q%d [label=\"%s\" fontname=verdana fontsize=8];\n", stateID, resultantStateID, string(symbol)))
+		for symbol := 0; symbol < dfa.SymbolsCount; symbol++ {
+			if value, exists := symbolMapping[symbol]; exists{
+				resultantStateID := state.Transitions[symbol]
+				if resultantStateID > -1 {
+					_, _ = writer.WriteString(fmt.Sprintf("\tq%d->q%d [label=\"%s\" fontname=verdana fontsize=8];\n", stateID, resultantStateID, string(value)))
+				}
+			}else{
+				panic(fmt.Sprintf("Symbol ID %d not in symbolMapping map.", symbol))
 			}
 		}
 	}
@@ -106,9 +114,9 @@ func (dfa DFA) ToDOT(filePath string, rankByOrder bool, topDown bool) {
 // within DFA. If topDown is set to true, the visual representation
 // will be top down. A left to right representation is used otherwise.
 // Returns true if successful or false if an error occurs.
-func (dfa DFA) ToPNG(filePath string, rankByOrder bool, topDown bool) bool {
+func (dfa DFA) ToPNG(filePath string, symbolMapping map[int]rune, rankByOrder bool, topDown bool) bool {
 	defer os.Remove("temp.dot")
-	dfa.ToDOT("temp.dot", rankByOrder, topDown)
+	dfa.ToDOT("temp.dot", symbolMapping, rankByOrder, topDown)
 
 	cmd := exec.Command("dot", "-Tpng", "temp.dot", "-o", filePath)
 	_, err := cmd.Output()
@@ -130,9 +138,9 @@ func (dfa DFA) ToPNG(filePath string, rankByOrder bool, topDown bool) bool {
 // within DFA. If topDown is set to true, the visual representation
 // will be top down. A left to right representation is used otherwise.
 // Returns true if successful or false if an error occurs.
-func (dfa DFA) ToJPG(filePath string, rankByOrder bool, topDown bool) bool {
+func (dfa DFA) ToJPG(filePath string, symbolMapping map[int]rune, rankByOrder bool, topDown bool) bool {
 	defer os.Remove("temp.dot")
-	dfa.ToDOT("temp.dot", rankByOrder, topDown)
+	dfa.ToDOT("temp.dot", symbolMapping, rankByOrder, topDown)
 
 	cmd := exec.Command("dot", "-Tjpg", "temp.dot", "-o", filePath)
 	_, err := cmd.Output()
@@ -154,9 +162,9 @@ func (dfa DFA) ToJPG(filePath string, rankByOrder bool, topDown bool) bool {
 // within DFA. If topDown is set to true, the visual representation
 // will be top down. A left to right representation is used otherwise.
 // Returns true if successful or false if an error occurs.
-func (dfa DFA) ToPDF(filePath string, rankByOrder bool, topDown bool) bool {
+func (dfa DFA) ToPDF(filePath string, symbolMapping map[int]rune, rankByOrder bool, topDown bool) bool {
 	defer os.Remove("temp.dot")
-	dfa.ToDOT("temp.dot", rankByOrder, topDown)
+	dfa.ToDOT("temp.dot", symbolMapping, rankByOrder, topDown)
 
 	cmd := exec.Command("dot", "-Tpdf", "temp.dot", "-o", filePath)
 	_, err := cmd.Output()
@@ -178,9 +186,9 @@ func (dfa DFA) ToPDF(filePath string, rankByOrder bool, topDown bool) bool {
 // within DFA. If topDown is set to true, the visual representation
 // will be top down. A left to right representation is used otherwise.
 // Returns true if successful or false if an error occurs.
-func (dfa DFA) ToSVG(filePath string, rankByOrder bool, topDown bool) bool {
+func (dfa DFA) ToSVG(filePath string, symbolMapping map[int]rune, rankByOrder bool, topDown bool) bool {
 	defer os.Remove("temp.dot")
-	dfa.ToDOT("temp.dot", rankByOrder, topDown)
+	dfa.ToDOT("temp.dot", symbolMapping, rankByOrder, topDown)
 
 	cmd := exec.Command("dot", "-Tsvg", "temp.dot", "-o", filePath)
 	_, err := cmd.Output()

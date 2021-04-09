@@ -19,8 +19,8 @@ func TestAbbadingoDFAFromFile(t *testing.T) {
 	}
 
 	APTA := dataset.GetPTA(true)
-	if len(APTA.SymbolMap) != 2 {
-		t.Errorf("APTA number of symbols = %d, want 2", len(APTA.SymbolMap))
+	if APTA.SymbolsCount != 2 {
+		t.Errorf("APTA number of symbols = %d, want 2", APTA.SymbolsCount)
 	}
 	if len(APTA.States) != 322067 {
 		t.Errorf("APTA number of states = %d, want 322067", len(APTA.States))
@@ -37,8 +37,8 @@ func TestAbbadingoDFAGeneration(t *testing.T) {
 	numberOfStates := rand.Intn(499) + 1
 
 	AbbadingoDFA := dfatoolkit.AbbadingoDFA(numberOfStates, true)
-	if len(AbbadingoDFA.SymbolMap) != 2 {
-		t.Errorf("AbbadingoDFA number of symbols = %d, want 2", len(AbbadingoDFA.SymbolMap))
+	if AbbadingoDFA.SymbolsCount != 2 {
+		t.Errorf("AbbadingoDFA number of symbols = %d, want 2", AbbadingoDFA.SymbolsCount)
 	}
 	if len(AbbadingoDFA.States) != numberOfStates {
 		t.Errorf("AbbadingoDFA number of states = %d, want %d", len(AbbadingoDFA.States), numberOfStates)
@@ -146,7 +146,7 @@ func TestVisualisation(t *testing.T) {
 	// To DOT scenario
 	for exampleIndex := range examplesFilenames {
 		filePath := examplesFilenames[exampleIndex] + ".dot"
-		test.ToDOT(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
+		test.ToDOT(filePath, dfatoolkit.SymbolAlphabetMappingAbbadingo, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
 		if !util.FileExists(filePath) {
 			t.Errorf("DFA toDOT failed, %s file not found.", filePath)
 		}
@@ -155,7 +155,7 @@ func TestVisualisation(t *testing.T) {
 	// To PNG scenario
 	for exampleIndex := range examplesFilenames {
 		filePath := examplesFilenames[exampleIndex] + ".png"
-		if !test.ToPNG(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex]) {
+		if !test.ToPNG(filePath, dfatoolkit.SymbolAlphabetMappingAbbadingo, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex]) {
 			t.Errorf("GraphViz Error. Probabbly not installed properly.")
 		}
 		if !util.FileExists(filePath) {
@@ -166,7 +166,7 @@ func TestVisualisation(t *testing.T) {
 	// To JPG scenario
 	for exampleIndex := range examplesFilenames {
 		filePath := examplesFilenames[exampleIndex] + ".jpg"
-		if !test.ToJPG(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex]) {
+		if !test.ToJPG(filePath, dfatoolkit.SymbolAlphabetMappingAbbadingo, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex]) {
 			t.Errorf("GraphViz Error. Probabbly not installed properly.")
 		}
 		if !util.FileExists(filePath) {
@@ -177,7 +177,7 @@ func TestVisualisation(t *testing.T) {
 	// To PDF scenario
 	for exampleIndex := range examplesFilenames {
 		filePath := examplesFilenames[exampleIndex] + ".pdf"
-		if !test.ToPDF(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex]) {
+		if !test.ToPDF(filePath, dfatoolkit.SymbolAlphabetMappingAbbadingo, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex]) {
 			t.Errorf("GraphViz Error. Probabbly not installed properly.")
 		}
 		if !util.FileExists(filePath) {
@@ -188,7 +188,7 @@ func TestVisualisation(t *testing.T) {
 	// To SVG scenario
 	for exampleIndex := range examplesFilenames {
 		filePath := examplesFilenames[exampleIndex] + ".svg"
-		if !test.ToSVG(filePath, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex]) {
+		if !test.ToSVG(filePath, dfatoolkit.SymbolAlphabetMappingAbbadingo, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex]) {
 			t.Errorf("GraphViz Error. Probabbly not installed properly.")
 		}
 		if !util.FileExists(filePath) {
