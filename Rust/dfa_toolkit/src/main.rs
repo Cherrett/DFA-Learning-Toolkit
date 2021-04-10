@@ -1,4 +1,3 @@
-use crate::dfa::dfa_from_json;
 use std::time::Instant;
 
 mod dfa;
@@ -28,7 +27,7 @@ fn det_merge_benchmark(){
         println!("-------------------------------------------------------------");
 
         // Create APTA.
-        let apta = dfa_from_json(format!("TestingAPTAs/{}.json", target_size));
+        let apta = dfa::dfa_from_json(format!("TestingAPTAs/{}.json", target_size));
 
         println!("APTA size: {}", apta.states.len());
 
@@ -44,21 +43,21 @@ fn det_merge_benchmark(){
             let mut j: i32 = i + 1;
             while j < apta.states.len() as i32 {
                 total_merges += 1;
-                if snapshot.merge_states(apta, i, j){
+                if snapshot.merge_states(&apta, i, j){
                     valid_merges += 1;
                 }
+
+                snapshot.rollback_changes(&part);
                 j += 1;
             }
             i += 1;
         }
 
-
-
         let total_time = start.elapsed().as_secs_f64();
         println!("Total merges: {}", total_merges);
         println!("Valid merges: {}", valid_merges);
-        println!("Time: {}s", total_time);
-        println!("Merges per second: {}", total_merges as f64/total_time);
+        println!("Time: {:.2}s", total_time);
+        println!("Merges per second: {:.2}", total_merges as f64/total_time);
 
         iterator += 1;
     }
