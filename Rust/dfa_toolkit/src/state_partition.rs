@@ -1,4 +1,3 @@
-use std::collections::HashSet;
 use crate::dfa::DFA;
 use crate::dfa_state::{StateLabel, UNKNOWN, ACCEPTING, REJECTING};
 
@@ -18,7 +17,8 @@ pub struct StatePartition{
     pub(crate) rejecting_blocks_count: i32,
 
     pub(crate) is_copy: bool,
-    pub(crate) changed_blocks: HashSet<i32>
+    pub(crate) changed_blocks: Vec<i32>,
+    pub(crate) changed_blocks_count: i32
 }
 
 pub fn new_state_partition(dfa: &DFA) -> StatePartition{
@@ -34,7 +34,8 @@ pub fn new_state_partition(dfa: &DFA) -> StatePartition{
         accepting_blocks_count: 0,
         rejecting_blocks_count: 0,
         is_copy: false,
-        changed_blocks: HashSet::new()
+        changed_blocks: vec![],
+        changed_blocks_count: 0
     };
 
     let mut i = 0;
@@ -64,15 +65,18 @@ impl StatePartition{
             accepting_blocks_count: self.accepting_blocks_count,
             rejecting_blocks_count: self.rejecting_blocks_count,
             is_copy: true,
-            changed_blocks: Default::default()
+            changed_blocks: vec![0;self.blocks.len()],
+            changed_blocks_count: 0
         };
     }
 
     pub fn changed_block(&mut self, block_id: i32){
         // If block is not already changed.
         if !self.blocks[block_id as usize].changed{
-            // Add block to changed blocks set.
-            self.changed_blocks.insert(block_id);
+            // Update changed vector to include changed block ID.
+            self.changed_blocks[self.changed_blocks_count as usize] = block_id;
+            // Increment the changed blocks counter.
+            self.changed_blocks_count += 1;
             // Set changed flag within block to true.
             self.blocks[block_id as usize].changed = true;
         }
@@ -140,14 +144,16 @@ impl StatePartition{
         return state_id;
     }
 
-    pub fn return_set(&self, block: i32) -> HashSet<i32>{
+    pub fn return_set(&self, block: i32) -> Vec<i32>{
         let mut block_id = block;
 
-        // Hash set of state IDs.
-        let mut block_elements: HashSet<i32> = HashSet::with_capacity(self.blocks[block_id as usize].size as usize);
+        // Hash set of state IDs and add root element to set.
+        let mut block_elements: Vec<i32> = vec![block_id];
+
         // Add root element to set.
-        block_elements.insert(block_id);
+        //block_elements.push(block_id);
         // Set root to block ID.
+
         let root = block_id;
 
         // Iterate until link of current block ID is
@@ -156,7 +162,7 @@ impl StatePartition{
             // Set block ID to link of current block.
             block_id = self.blocks[block_id as usize].link;
             // Add block ID to block elements set.
-            block_elements.insert(block_id);
+            block_elements.push(block_id);
         }
 
         // Return state IDs within set.
@@ -254,11 +260,17 @@ impl StatePartition{
             self.rejecting_blocks_count = original_state_partition.rejecting_blocks_count;
 
             // Iterate over each altered block (state).
-            for changed_block_id in &self.changed_blocks{
-                // Update root, size, link and blockLabel values.
-                self.blocks[*changed_block_id as usize] = original_state_partition.blocks[*changed_block_id as usize];
+            let mut i = 0;
+
+            while i < self.changed_blocks_count{
+                let state_id = self.changed_blocks[i as usize];
+                self.blocks[state_id as usize] = original_state_partition.blocks[state_id as usize];
+
+                i += 1;
             }
-            self.changed_blocks = HashSet::new();
+
+            // Empty the changed blocks vector.
+            self.changed_blocks_count = 0;
         }
     }
 }

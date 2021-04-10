@@ -27,7 +27,6 @@ func NewStatePartition(dfa DFA) StatePartition {
 	// empty slices of nodes and changed blocks.
 	statePartition := StatePartition{
 		Blocks:               make([]Block, len(dfa.States)),
-		ChangedBlocks:        make([]int, len(dfa.States)),
 		IsCopy:               false,
 		BlocksCount:          len(dfa.States),
 		AcceptingBlocksCount: 0,
@@ -43,7 +42,6 @@ func NewStatePartition(dfa DFA) StatePartition {
 		statePartition.Blocks[i].Link = i
 		statePartition.Blocks[i].Label = dfa.States[i].Label
 		statePartition.Blocks[i].Changed = false
-		statePartition.ChangedBlocks[i] = -1
 		if statePartition.Blocks[i].Label == ACCEPTING {
 			statePartition.AcceptingBlocksCount++
 		} else if statePartition.Blocks[i].Label == REJECTING {
@@ -323,7 +321,6 @@ func (statePartition *StatePartition) RollbackChanges(originalStatePartition Sta
 			// Update root, size, link and blockLabel values.
 			stateID := statePartition.ChangedBlocks[i]
 			statePartition.Blocks[stateID] = originalStatePartition.Blocks[stateID]
-			statePartition.ChangedBlocks[i] = -1
 		}
 		// Empty the changed blocks slice.
 		statePartition.ChangedBlocksCount = 0
