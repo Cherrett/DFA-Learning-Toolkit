@@ -9,8 +9,8 @@ pub type StateLabel = i8;
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct State {
-    pub(crate) label: StateLabel,
-    pub(crate) transitions: Vec<i32>,
+    pub label: StateLabel,
+    pub transitions: Vec<i32>,
     // #[serde(skip)]
     // depth: i32,
     // #[serde(skip)]

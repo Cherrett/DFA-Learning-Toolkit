@@ -5,9 +5,9 @@ use crate::dfa_state::State;
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DFA{
-    pub(crate) states: Vec<State>,
-    pub(crate) starting_state_id: i32,
-    pub(crate) symbols_count: i32,
+    pub states: Vec<State>,
+    pub starting_state_id: i32,
+    pub symbols_count: i32,
     // #[serde(skip)]
     // depth: i32,
     // #[serde(skip)]

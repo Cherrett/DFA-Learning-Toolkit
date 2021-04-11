@@ -3,22 +3,22 @@ use crate::dfa_state::{StateLabel, UNKNOWN, ACCEPTING, REJECTING};
 
 #[derive(Copy, Clone)]
 pub struct Block{
-    pub(crate) root: i32,
-    pub(crate) size: i32,
-    pub(crate) link: i32,
-    pub(crate) label: StateLabel,
-    pub(crate) changed: bool
+    pub root: i32,
+    pub size: i32,
+    pub link: i32,
+    pub label: StateLabel,
+    pub changed: bool
 }
 
 pub struct StatePartition{
-    pub(crate) blocks: Vec<Block>,
-    pub(crate) blocks_count: i32,
-    pub(crate) accepting_blocks_count: i32,
-    pub(crate) rejecting_blocks_count: i32,
+    pub blocks: Vec<Block>,
+    pub blocks_count: i32,
+    pub accepting_blocks_count: i32,
+    pub rejecting_blocks_count: i32,
 
-    pub(crate) is_copy: bool,
-    pub(crate) changed_blocks: Vec<i32>,
-    pub(crate) changed_blocks_count: i32
+    pub is_copy: bool,
+    pub changed_blocks: Vec<i32>,
+    pub changed_blocks_count: i32
 }
 
 pub fn new_state_partition(dfa: &DFA) -> StatePartition{
@@ -30,7 +30,7 @@ pub fn new_state_partition(dfa: &DFA) -> StatePartition{
             label: UNKNOWN,
             changed: false
         }; dfa.states.len()],
-        blocks_count: 0,
+        blocks_count: dfa.states.len() as i32,
         accepting_blocks_count: 0,
         rejecting_blocks_count: 0,
         is_copy: false,
