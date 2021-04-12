@@ -21,43 +21,39 @@ pub struct StatePartition{
     pub changed_blocks_count: i32
 }
 
-pub fn new_state_partition(dfa: &DFA) -> StatePartition{
-    let mut state_partition = StatePartition{
-        blocks: vec![Block{
-            root: 0,
-            size: 1,
-            link: 0,
-            label: UNKNOWN,
-            changed: false
-        }; dfa.states.len()],
-        blocks_count: dfa.states.len() as i32,
-        accepting_blocks_count: 0,
-        rejecting_blocks_count: 0,
-        is_copy: false,
-        changed_blocks: vec![],
-        changed_blocks_count: 0
-    };
+impl StatePartition{
+    pub fn new(dfa: &DFA) -> StatePartition{
+        let mut state_partition = StatePartition{
+            blocks: vec![Block{
+                root: 0,
+                size: 1,
+                link: 0,
+                label: UNKNOWN,
+                changed: false
+            }; dfa.states.len()],
+            blocks_count: dfa.states.len() as i32,
+            accepting_blocks_count: 0,
+            rejecting_blocks_count: 0,
+            is_copy: false,
+            changed_blocks: vec![],
+            changed_blocks_count: 0
+        };
 
-    let mut i = 0;
+        for i in 0..dfa.states.len() {
+            state_partition.blocks[i].root = i as i32;
+            state_partition.blocks[i].link = i as i32;
+            state_partition.blocks[i].label = dfa.states.get(i).unwrap().label;
 
-    while i < dfa.states.len() {
-        state_partition.blocks[i].root = i as i32;
-        state_partition.blocks[i].link = i as i32;
-        state_partition.blocks[i].label = dfa.states.get(i).unwrap().label;
-
-        if state_partition.blocks[i].label == ACCEPTING{
-            state_partition.accepting_blocks_count += 1;
-        }else if state_partition.blocks[i].label == REJECTING{
-            state_partition.rejecting_blocks_count += 1;
+            if state_partition.blocks[i].label == ACCEPTING{
+                state_partition.accepting_blocks_count += 1;
+            }else if state_partition.blocks[i].label == REJECTING{
+                state_partition.rejecting_blocks_count += 1;
+            }
         }
 
-        i += 1;
+        return state_partition
     }
 
-    return state_partition
-}
-
-impl StatePartition{
     pub fn copy(&self) -> StatePartition{
         return StatePartition{
             blocks: self.blocks.clone(),
@@ -205,8 +201,7 @@ impl StatePartition{
         self.union(state1_id, state2_id);
 
         // Iterate over each symbol within DFA.
-        let mut symbol_id: i32 = 0;
-        while symbol_id < dfa.symbols_count {
+        for symbol_id in 0..dfa.symbols_count {
             // Iterate over each state within first block.
             for state_id in &block1_set{
                 // Store resultant state from state transition of current state.
@@ -242,8 +237,6 @@ impl StatePartition{
                     break
                 }
             }
-
-            symbol_id += 1;
         }
 
         // Return true if this is reached (deterministic).
@@ -260,13 +253,9 @@ impl StatePartition{
             self.rejecting_blocks_count = original_state_partition.rejecting_blocks_count;
 
             // Iterate over each altered block (state).
-            let mut i = 0;
-
-            while i < self.changed_blocks_count{
+            for i in 0..self.changed_blocks_count{
                 let state_id = self.changed_blocks[i as usize];
                 self.blocks[state_id as usize] = original_state_partition.blocks[state_id as usize];
-
-                i += 1;
             }
 
             // Empty the changed blocks vector.
@@ -277,6 +266,6 @@ impl StatePartition{
 
 impl DFA{
     pub fn to_state_partition(&self) -> StatePartition{
-        return new_state_partition(self);
+        return StatePartition::new(self);
     }
 }

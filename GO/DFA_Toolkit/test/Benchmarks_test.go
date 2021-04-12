@@ -23,9 +23,9 @@ func TestBenchmarkDetMerge(t *testing.T) {
 	trainingSetSizes := []int{230, 607, 1521}
 
 	// Benchmark over the problem instances.
-	for i := range dfaSizes {
-		targetSize := dfaSizes[i]
-		trainingSetSize := trainingSetSizes[i]
+	for iterator := range dfaSizes {
+		targetSize := dfaSizes[iterator]
+		trainingSetSize := trainingSetSizes[iterator]
 
 		// Create a target DFA.
 		target := dfatoolkit.AbbadingoDFA(targetSize, true)
@@ -35,7 +35,7 @@ func TestBenchmarkDetMerge(t *testing.T) {
 
 		fmt.Printf("-------------------------------------------------------------\n")
 		fmt.Printf("-------------------------------------------------------------\n")
-		fmt.Printf("BENCHMARK %d (Target: %d states, Training: %d strings\n", i+1, targetSize, len(training))
+		fmt.Printf("BENCHMARK %d (Target: %d states, Training: %d strings\n", iterator+1, targetSize, len(training))
 		fmt.Printf("-------------------------------------------------------------\n")
 		fmt.Printf("-------------------------------------------------------------\n")
 

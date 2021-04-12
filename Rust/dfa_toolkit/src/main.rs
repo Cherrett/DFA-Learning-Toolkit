@@ -14,9 +14,7 @@ fn det_merge_benchmark(){
     // These are the training set sizes we will test.
     let training_set_sizes = [230, 607, 1521];
 
-    let mut iterator = 0;
-
-    while iterator < dfa_sizes.len(){
+    for iterator in 0..dfa_sizes.len(){
         let target_size = dfa_sizes[iterator];
         let training_set_size = training_set_sizes[iterator];
 
@@ -38,19 +36,15 @@ fn det_merge_benchmark(){
         let mut valid_merges = 0;
         let start = Instant::now();
 
-        let mut i: i32 = 0;
-        while i < apta.states.len() as i32 {
-            let mut j: i32 = i + 1;
-            while j < apta.states.len() as i32 {
+        for i in 0..apta.states.len() as i32 {
+            for j in (i+1)..apta.states.len() as i32 {
                 total_merges += 1;
                 if snapshot.merge_states(&apta, i, j){
                     valid_merges += 1;
                 }
 
                 snapshot.rollback_changes(&part);
-                j += 1;
             }
-            i += 1;
         }
 
         let total_time = start.elapsed().as_secs_f64();
@@ -58,7 +52,5 @@ fn det_merge_benchmark(){
         println!("Valid merges: {}", valid_merges);
         println!("Time: {:.2}s", total_time);
         println!("Merges per second: {:.2}", total_merges as f64/total_time);
-
-        iterator += 1;
     }
 }
