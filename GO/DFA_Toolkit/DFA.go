@@ -627,9 +627,6 @@ func (dfa DFA) StructurallyComplete(dataset Dataset) bool {
 	// Get accepting string instances and sort dataset.
 	dataset = dataset.AcceptingStringInstances().SortDatasetByLength()
 
-	// Remove non accepting leave states from DFA.
-	//dfa.RemoveNonAcceptingLeaves()
-
 	// Store accepting states within DFA.
 	acceptingStates := dfa.AcceptingStates()
 
@@ -809,8 +806,6 @@ func (dfa DFA) SymmetricallyStructurallyComplete(dataset Dataset) bool {
 
 // RemoveNonAcceptingLeaves removes all states which
 // are leaves within DFA and are not accepting states.
-// Used in SymmetricallyStructurallyComplete and
-// StructurallyComplete functions.
 func (dfa *DFA) RemoveNonAcceptingLeaves() {
 	found := true
 
