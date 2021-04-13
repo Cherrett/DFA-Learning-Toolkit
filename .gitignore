@@ -91,3 +91,6 @@ GO/DFA_Toolkit/test/EDSMTest.go
 GO/DFA_Toolkit/test/MergePathTest.go
 GO/DFA_Toolkit/test/StatePartitionTest.go
 GO/testing.jpg
+GO/go.sum
+GO/go.mod
+GO/cpu.pprof

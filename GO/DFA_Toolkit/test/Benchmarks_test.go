@@ -60,9 +60,6 @@ func TestBenchmarkDetMerge(t *testing.T) {
 				totalMerges++
 				if snapshot.MergeStates(apta, i, j) {
 					validMerges++
-					//snapshot.LabelledBlocksCount(apta)
-					//snapshot.BlocksCount()
-					//print(temp, temp2)
 				}
 
 				snapshot.RollbackChanges(part)
@@ -218,6 +215,8 @@ func TestBenchmarkBlueFringeEDSM(t *testing.T) {
 	}
 }
 
+// TestBenchmarkEDSM benchmarks the performance of the GreedyEDSMFromDataset(), WindowedEDSMFromDataset()
+// and BlueFringeEDSMFromDataset() functions.
 func TestBenchmarkEDSM(t *testing.T) {
 	// Random Seed.
 	rand.Seed(time.Now().UnixNano())

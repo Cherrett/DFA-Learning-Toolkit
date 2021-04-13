@@ -68,7 +68,7 @@ func (statePartition *StatePartition) ChangedBlock(blockID int) {
 
 // Union connects two blocks by comparing their respective
 // size (score) values to keep the tree flat.
-func (statePartition *StatePartition) Union(blockID1 int, blockID2 int) {
+func (statePartition *StatePartition) Union(blockID1 int, blockID2 int) int{
 	// If state partition is a copy, call ChangedBlock for
 	// both blocks so merge can be undone if necessary.
 	if statePartition.IsCopy {
@@ -79,39 +79,36 @@ func (statePartition *StatePartition) Union(blockID1 int, blockID2 int) {
 	// Decrement blocks count.
 	statePartition.BlocksCount--
 
-	// Set block 1 to parent and block 2 to child.
-	parent, child := blockID1, blockID2
-
 	// If size of parent node is smaller than size of child node, switch
 	// parent and child nodes.
-	if statePartition.Blocks[parent].Size < statePartition.Blocks[child].Size{
-		parent, child = child, parent
+	if statePartition.Blocks[blockID1].Size < statePartition.Blocks[blockID2].Size{
+		blockID1, blockID2 = blockID2, blockID1
 	}
 
-	// Link nodes by assigning the link of parent to link of child and vice versa.
-	statePartition.Blocks[parent].Link, statePartition.Blocks[child].Link =
-		statePartition.Blocks[child].Link, statePartition.Blocks[parent].Link
+	// Set block 1 to parent and block 2 to child.
+	parent, child := &statePartition.Blocks[blockID1], &statePartition.Blocks[blockID2]
 
-	// Get label of each block.
-	parentLabel := statePartition.Blocks[parent].Label
-	childLabel := statePartition.Blocks[child].Label
+	// Link nodes by assigning the link of parent to link of child and vice versa.
+	parent.Link, child.Link = child.Link, parent.Link
 
 	// Set root of child node to parent node.
-	statePartition.Blocks[child].Root = parent
+	child.Root = parent.Root
 	// Increment size (score) of parent node by size of child node.
-	statePartition.Blocks[parent].Size += statePartition.Blocks[child].Size
+	parent.Size += child.Size
 
 	// If label of parent is unknown and label of child is
 	// not unknown, set label of parent to label of child.
-	if parentLabel == UNKNOWN && childLabel != UNKNOWN {
-		statePartition.Blocks[parent].Label = childLabel
-	} else if parentLabel == ACCEPTING && childLabel == ACCEPTING {
+	if parent.Label == UNKNOWN && child.Label != UNKNOWN {
+		parent.Label = child.Label
+	} else if parent.Label == ACCEPTING && child.Label == ACCEPTING {
 		// Else, if both blocks are accepting, decrement accepting blocks count.
 		statePartition.AcceptingBlocksCount--
-	} else if parentLabel == REJECTING && childLabel == REJECTING {
+	} else if parent.Label == REJECTING && child.Label == REJECTING {
 		// Else, if both blocks are rejecting, decrement rejecting blocks count.
 		statePartition.RejectingBlocksCount--
 	}
+
+	return blockID1
 }
 
 // Find traverses each root element while compressing the
@@ -235,48 +232,37 @@ func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 in
 		return false
 	}
 
-	// Get the states within each block.
-	block1Set := statePartition.ReturnSet(state1)
-	block2Set := statePartition.ReturnSet(state2)
-
 	// Merge states within state partition.
-	statePartition.Union(state1, state2)
+	root := statePartition.Union(state1, state2)
 
 	// Iterate over each symbol within DFA.
 	for symbolID := 0; symbolID < dfa.SymbolsCount; symbolID++ {
-		// Iterate over each state within first block.
-		for _, stateID := range block1Set {
-			// Store resultant state from state transition of current state.
-			currentResultantStateID := dfa.States[stateID].Transitions[symbolID]
+		// Set block ID to root.
+		blockID := root
+		// Set resultant state to -1.
+		resultantState := -1
 
-			// If resultant state ID is bigger than -1 (valid transition), get
-			// the block containing state and store in transitionResult. The
-			// states within the second block are then iterated and checked
-			// for non-deterministic properties.
-			if currentResultantStateID > -1 {
-				// Set resultant state to state transition for current symbol.
-				transitionResult := currentResultantStateID
-
-				// Iterate over each state within second block.
-				for _, stateID2 := range block2Set {
-					// Store resultant state from state transition of current state.
-					currentResultantStateID = dfa.States[stateID2].Transitions[symbolID]
-					// If resultant state ID is bigger than -1 (valid transition), get the
-					// block containing state and compare it to the transition found above.
-					// If they are not equal, merge blocks to eliminate non-determinism.
-					if currentResultantStateID > -1 {
-						// If resultant block is not equal to the block containing the state within transition
-						// found above, merge the two states to eliminate non-determinism.
-						// Merge states and if states cannot be merged, return false.
-						if !statePartition.MergeStates(dfa, transitionResult, currentResultantStateID) {
-							return false
-						}
-						// The loop is broken since the transition for the current symbol was found.
-						break
+		// Iterate until link of current block ID is
+		// not equal to the root block.
+		for{
+			// Store current resultant state from state transition of current state and check if transition is valid.
+			if currentResultantState := dfa.States[blockID].Transitions[symbolID]; currentResultantState >= 0{
+				// If transition is valid and resultant state is already found, merge
+				// current resultant state and resultant state. Else, if resultant
+				// state is not found, set it to current resultant state.
+				if resultantState >= 0{
+					// Return false if merge is nondeterministic.
+					if !statePartition.MergeStates(dfa, currentResultantState, resultantState) {
+						return false
 					}
+				}else{
+					resultantState = currentResultantState
 				}
+			}
 
-				// The loop is broken since the transition for the current symbol was found.
+			// Set block ID to link of current block ID and break if
+			// new block ID is equal to the root block.
+			if blockID = statePartition.Blocks[blockID].Link; blockID == root{
 				break
 			}
 		}
