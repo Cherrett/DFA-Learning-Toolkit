@@ -71,7 +71,7 @@ func (dataset Dataset) GetPTA(APTA bool) DFA {
 
 			// While symbol is not within DFA's symbols,
 			// add new symbol to DFA.
-			for symbol > dfa.SymbolsCount - 1{
+			for symbol > len(dfa.Alphabet) - 1{
 				dfa.AddSymbol()
 			}
 

@@ -174,7 +174,7 @@ func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA) {
 	resultantDFA := DFA{
 		States:                nil,
 		StartingStateID:       -1,
-		SymbolsCount:          dfa.SymbolsCount,
+		Alphabet:              dfa.Alphabet,
 		depth:                 -1,
 		computedDepthAndOrder: false,
 	}
@@ -188,17 +188,17 @@ func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA) {
 
 	// update new transitions via mappings
 	for stateID := range dfa.States {
-		for symbolID := 0; symbolID < dfa.SymbolsCount; symbolID++ {
-			oldResultantStateID := dfa.States[stateID].Transitions[symbolID]
+		for alphabetID := range dfa.Alphabet {
+			oldResultantStateID := dfa.States[stateID].Transitions[alphabetID]
 			if oldResultantStateID > -1 {
 				newStateID := newMappings[statePartition.Find(stateID)]
 				resultantStateID := newMappings[statePartition.Find(oldResultantStateID)]
-				if resultantDFA.States[newStateID].Transitions[symbolID] > -1 &&
-					resultantDFA.States[newStateID].Transitions[symbolID] != resultantStateID {
+				if resultantDFA.States[newStateID].Transitions[alphabetID] > -1 &&
+					resultantDFA.States[newStateID].Transitions[alphabetID] != resultantStateID {
 					// not deterministic
 					return false, DFA{}
 				}
-				resultantDFA.States[newStateID].Transitions[symbolID] = resultantStateID
+				resultantDFA.States[newStateID].Transitions[alphabetID] = resultantStateID
 			}
 		}
 	}
@@ -236,7 +236,7 @@ func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 in
 	root := statePartition.Union(state1, state2)
 
 	// Iterate over each symbol within DFA.
-	for symbolID := 0; symbolID < dfa.SymbolsCount; symbolID++ {
+	for alphabetID := range dfa.Alphabet {
 		// Set block ID to root.
 		blockID := root
 		// Set resultant state to -1.
@@ -246,7 +246,7 @@ func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 in
 		// not equal to the root block.
 		for{
 			// Store current resultant state from state transition of current state and check if transition is valid.
-			if currentResultantState := dfa.States[blockID].Transitions[symbolID]; currentResultantState >= 0{
+			if currentResultantState := dfa.States[blockID].Transitions[alphabetID]; currentResultantState >= 0{
 				// If transition is valid and resultant state is already found, merge
 				// current resultant state and resultant state. Else, if resultant
 				// state is not found, set it to current resultant state.

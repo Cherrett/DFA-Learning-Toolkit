@@ -19,8 +19,8 @@ func TestAbbadingoDFAFromFile(t *testing.T) {
 	}
 
 	APTA := dataset.GetPTA(true)
-	if APTA.SymbolsCount != 2 {
-		t.Errorf("APTA number of symbols = %d, want 2", APTA.SymbolsCount)
+	if len(APTA.Alphabet) != 2 {
+		t.Errorf("APTA number of symbols = %d, want 2", APTA.Alphabet)
 	}
 	if len(APTA.States) != 322067 {
 		t.Errorf("APTA number of states = %d, want 322067", len(APTA.States))
@@ -37,8 +37,8 @@ func TestAbbadingoDFAGeneration(t *testing.T) {
 	numberOfStates := rand.Intn(499) + 1
 
 	AbbadingoDFA := dfatoolkit.AbbadingoDFA(numberOfStates, true)
-	if AbbadingoDFA.SymbolsCount != 2 {
-		t.Errorf("AbbadingoDFA number of symbols = %d, want 2", AbbadingoDFA.SymbolsCount)
+	if len(AbbadingoDFA.Alphabet) != 2 {
+		t.Errorf("AbbadingoDFA number of symbols = %d, want 2", AbbadingoDFA.Alphabet)
 	}
 	if len(AbbadingoDFA.States) != numberOfStates {
 		t.Errorf("AbbadingoDFA number of states = %d, want %d", len(AbbadingoDFA.States), numberOfStates)

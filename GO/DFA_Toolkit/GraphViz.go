@@ -88,14 +88,14 @@ func (dfa DFA) ToDOT(filePath string, symbolMapping map[int]rune, rankByOrder bo
 
 	// Iterate over each transition and write to file.
 	for stateID, state := range dfa.States {
-		for symbol := 0; symbol < dfa.SymbolsCount; symbol++ {
-			if value, exists := symbolMapping[symbol]; exists{
-				resultantStateID := state.Transitions[symbol]
+		for alphabetID := range dfa.Alphabet {
+			if value, exists := symbolMapping[alphabetID]; exists{
+				resultantStateID := state.Transitions[alphabetID]
 				if resultantStateID > -1 {
 					_, _ = writer.WriteString(fmt.Sprintf("\tq%d->q%d [label=\"%s\" fontname=verdana fontsize=8];\n", stateID, resultantStateID, string(value)))
 				}
 			}else{
-				panic(fmt.Sprintf("Symbol ID %d not in symbolMapping map.", symbol))
+				panic(fmt.Sprintf("Symbol ID %d not in symbolMapping map.", alphabetID))
 			}
 		}
 	}

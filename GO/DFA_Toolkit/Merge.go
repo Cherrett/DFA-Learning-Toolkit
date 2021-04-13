@@ -213,9 +213,9 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA {
 		// Iterate over every red state.
 		for element := range red {
 			// Iterate over each symbol within DFA.
-			for symbolID := 0; symbolID < dfa.SymbolsCount; symbolID++ {
+			for alphabetID := range dfa.Alphabet {
 				// Store resultant stateID from red state.
-				resultantStateID := dfa.States[element].Transitions[symbolID]
+				resultantStateID := dfa.States[element].Transitions[alphabetID]
 				// If transition is valid and resultant state is not red,
 				// add resultant state to blue set.
 				if _, exists := red[resultantStateID]; resultantStateID != -1 && !exists {
