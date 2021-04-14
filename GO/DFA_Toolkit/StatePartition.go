@@ -188,17 +188,17 @@ func (statePartition StatePartition) ToDFA(dfa DFA) (bool, DFA) {
 
 	// update new transitions via mappings
 	for stateID := range dfa.States {
-		for alphabetID := range dfa.Alphabet {
-			oldResultantStateID := dfa.States[stateID].Transitions[alphabetID]
+		for symbol := range dfa.Alphabet {
+			oldResultantStateID := dfa.States[stateID].Transitions[symbol]
 			if oldResultantStateID > -1 {
 				newStateID := newMappings[statePartition.Find(stateID)]
 				resultantStateID := newMappings[statePartition.Find(oldResultantStateID)]
-				if resultantDFA.States[newStateID].Transitions[alphabetID] > -1 &&
-					resultantDFA.States[newStateID].Transitions[alphabetID] != resultantStateID {
+				if resultantDFA.States[newStateID].Transitions[symbol] > -1 &&
+					resultantDFA.States[newStateID].Transitions[symbol] != resultantStateID {
 					// not deterministic
 					return false, DFA{}
 				}
-				resultantDFA.States[newStateID].Transitions[alphabetID] = resultantStateID
+				resultantDFA.States[newStateID].Transitions[symbol] = resultantStateID
 			}
 		}
 	}
@@ -236,7 +236,7 @@ func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 in
 	root := statePartition.Union(state1, state2)
 
 	// Iterate over each symbol within DFA.
-	for alphabetID := range dfa.Alphabet {
+	for symbol := range dfa.Alphabet {
 		// Set block ID to root.
 		blockID := root
 		// Set resultant state to -1.
@@ -246,7 +246,7 @@ func (statePartition *StatePartition) MergeStates(dfa DFA, state1 int, state2 in
 		// not equal to the root block.
 		for{
 			// Store current resultant state from state transition of current state and check if transition is valid.
-			if currentResultantState := dfa.States[blockID].Transitions[alphabetID]; currentResultantState >= 0{
+			if currentResultantState := dfa.States[blockID].Transitions[symbol]; currentResultantState >= 0{
 				// If transition is valid and resultant state is already found, merge
 				// current resultant state and resultant state. Else, if resultant
 				// state is not found, set it to current resultant state.

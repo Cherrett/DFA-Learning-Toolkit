@@ -41,16 +41,16 @@ func (dfa *DFA) IndistinguishableStatePairs() []StateIDPair {
 					continue
 				} else {
 					// Iterate over each symbol within DFA.
-					for alphabetID := range dfa.Alphabet {
+					for symbol := range dfa.Alphabet {
 						// If both states have a valid transition using current symbol.
-						if dfa.States[stateID].Transitions[alphabetID] != -1 &&
-							dfa.States[stateID2].Transitions[alphabetID] != -1 {
+						if dfa.States[stateID].Transitions[symbol] != -1 &&
+							dfa.States[stateID2].Transitions[symbol] != -1 {
 							// If pair containing both resultant state IDs is marked as distinguishable,
 							// mark current state pair as distinguishable.
-							if distinguishablePairs[StateIDPair{dfa.States[stateID].Transitions[alphabetID],
-								dfa.States[stateID2].Transitions[alphabetID]}] ||
-								distinguishablePairs[StateIDPair{dfa.States[stateID2].Transitions[alphabetID],
-									dfa.States[stateID].Transitions[alphabetID]}] {
+							if distinguishablePairs[StateIDPair{dfa.States[stateID].Transitions[symbol],
+								dfa.States[stateID2].Transitions[symbol]}] ||
+								distinguishablePairs[StateIDPair{dfa.States[stateID2].Transitions[symbol],
+									dfa.States[stateID].Transitions[symbol]}] {
 								distinguishablePairs[StateIDPair{stateID, stateID2}] = true
 							}
 						}
@@ -175,13 +175,13 @@ func (dfa DFA) Minimise() DFA {
 			}
 		}
 
-		for alphabetID := range dfa.States[stateID].Transitions {
+		for symbol := range dfa.States[stateID].Transitions {
 			resultantStateBlockIndex := 0
-			if resultantDFA.States[stateBlockIndex].Transitions[alphabetID] == -1 && dfa.States[stateID].Transitions[alphabetID] != -1 {
+			if resultantDFA.States[stateBlockIndex].Transitions[symbol] == -1 && dfa.States[stateID].Transitions[symbol] != -1 {
 				found := false
 				for blockIndex := range currentPartition {
 					for stateID2 := range currentPartition[blockIndex] {
-						if dfa.States[stateID].Transitions[alphabetID] == stateID2 {
+						if dfa.States[stateID].Transitions[symbol] == stateID2 {
 							resultantStateBlockIndex = blockIndex
 							found = true
 							break
@@ -191,7 +191,7 @@ func (dfa DFA) Minimise() DFA {
 						break
 					}
 				}
-				resultantDFA.States[stateBlockIndex].Transitions[alphabetID] = resultantStateBlockIndex
+				resultantDFA.States[stateBlockIndex].Transitions[symbol] = resultantStateBlockIndex
 			}
 		}
 	}

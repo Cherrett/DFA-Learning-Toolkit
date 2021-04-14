@@ -63,9 +63,9 @@ func (state State) TransitionsCount(stateID int) int {
 	transitionsCount := 0
 
 	// Iterate over each symbol within DFA.
-	for alphabetID := range state.DFA().Alphabet {
+	for symbol := range state.DFA().Alphabet {
 		// If transition is to given state ID, increment transitions count.
-		if state.Transitions[alphabetID] == stateID {
+		if state.Transitions[symbol] == stateID {
 			transitionsCount++
 		}
 	}

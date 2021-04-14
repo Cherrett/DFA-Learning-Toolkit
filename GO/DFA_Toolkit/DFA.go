@@ -53,15 +53,15 @@ func (dfa *DFA) RemoveState(stateID int) {
 	// Iterate over each state within the DFA.
 	for currentStateID := range dfa.States {
 		// Iterate over each symbol within the DFA.
-		for alphabetID := range dfa.Alphabet {
+		for symbol := range dfa.Alphabet {
 			// Store the ID of the resultant state.
-			resultantStateID := dfa.States[currentStateID].Transitions[alphabetID]
+			resultantStateID := dfa.States[currentStateID].Transitions[symbol]
 			// If the ID of the resultant state is equal to the ID of the removed state, set resultant state to -1 (undefined).
 			if resultantStateID == stateID {
-				dfa.States[currentStateID].Transitions[alphabetID] = -1
+				dfa.States[currentStateID].Transitions[symbol] = -1
 			} else if resultantStateID > stateID {
 				// Else, if the ID of the resultant state is bigger then the ID of the removed state, decrement starting state.
-				dfa.States[currentStateID].Transitions[alphabetID]--
+				dfa.States[currentStateID].Transitions[symbol]--
 			}
 		}
 	}
@@ -82,29 +82,29 @@ func (dfa *DFA) AddSymbol() {
 }
 
 // AddTransition adds a new transition for a given symbol from one state to another.
-func (dfa *DFA) AddTransition(alphabetID int, fromStateID int, toStateID int) {
+func (dfa *DFA) AddTransition(symbol int, fromStateID int, toStateID int) {
 	// Panic if either state IDs are out of range.
 	if fromStateID > len(dfa.States)-1 || fromStateID < 0 {
 		panic("fromStateID is out of range")
 	} else if toStateID > len(dfa.States)-1 || toStateID < 0 {
 		panic("toStateID is out of range")
-	} else if alphabetID > len(dfa.Alphabet)-1 || alphabetID < 0 {
-		panic("alphabetID is out of range")
+	} else if symbol > len(dfa.Alphabet)-1 || symbol < 0 {
+		panic("symbol is out of range")
 	}
 	// Add transition to fromState's transitions.
-	dfa.States[fromStateID].Transitions[alphabetID] = toStateID
+	dfa.States[fromStateID].Transitions[symbol] = toStateID
 }
 
 // RemoveTransition removes a transition for a given symbol from one state to another.
-func (dfa *DFA) RemoveTransition(alphabetID int, fromStateID int) {
+func (dfa *DFA) RemoveTransition(symbol int, fromStateID int) {
 	// Panic if either state IDs are out of range.
 	if fromStateID > len(dfa.States) - 1 || fromStateID < 0 {
 		panic("fromStateID is out of range")
-	} else if alphabetID > len(dfa.Alphabet) - 1 || alphabetID < 0 {
-		panic("alphabetID is out of range")
+	} else if symbol > len(dfa.Alphabet) - 1 || symbol < 0 {
+		panic("symbol is out of range")
 	}
 	// Remove transition from fromState's transitions by assigning -1 to the transitions map.
-	dfa.States[fromStateID].Transitions[alphabetID] = -1
+	dfa.States[fromStateID].Transitions[symbol] = -1
 }
 
 // AllStates returns all state IDs within DFA.
@@ -219,8 +219,8 @@ func (dfa DFA) TransitionsCount() int {
 	count := 0
 
 	for stateIndex := range dfa.States {
-		for alphabetID := range dfa.Alphabet{
-			if dfa.States[stateIndex].Transitions[alphabetID] != -1 {
+		for symbol := range dfa.Alphabet{
+			if dfa.States[stateIndex].Transitions[symbol] != -1 {
 				count++
 			}
 		}
@@ -246,8 +246,8 @@ func (dfa DFA) LeavesCount() int {
 
 	for stateID := range dfa.States {
 		transitionsCount := 0
-		for alphabetID := range dfa.Alphabet {
-			if dfa.States[stateID].Transitions[alphabetID] != -1 || dfa.States[stateID].Transitions[alphabetID] == stateID {
+		for symbol := range dfa.Alphabet {
+			if dfa.States[stateID].Transitions[symbol] != -1 || dfa.States[stateID].Transitions[symbol] == stateID {
 				transitionsCount++
 			}
 		}
@@ -263,9 +263,9 @@ func (dfa DFA) LoopsCount() int {
 	var visitedStatesCount = make(map[int]int)
 
 	for stateID := range dfa.States {
-		for alphabetID := range dfa.States[stateID].Transitions {
-			if dfa.States[stateID].Transitions[alphabetID] != -1 {
-				if dfa.States[dfa.States[stateID].Transitions[alphabetID]].depth < dfa.States[stateID].depth {
+		for symbol := range dfa.States[stateID].Transitions {
+			if dfa.States[stateID].Transitions[symbol] != -1 {
+				if dfa.States[dfa.States[stateID].Transitions[symbol]].depth < dfa.States[stateID].depth {
 					if _, ok := visitedStatesCount[stateID]; ok {
 						visitedStatesCount[stateID]++
 					} else {
@@ -284,11 +284,11 @@ func (dfa DFA) IsTree() bool {
 	var visitedStates = make(map[int]bool)
 
 	for stateID := range dfa.States {
-		for alphabetID := range dfa.States[stateID].Transitions {
-			if dfa.States[stateID].Transitions[alphabetID] != -1 && visitedStates[dfa.States[stateID].Transitions[alphabetID]] {
+		for symbol := range dfa.States[stateID].Transitions {
+			if dfa.States[stateID].Transitions[symbol] != -1 && visitedStates[dfa.States[stateID].Transitions[symbol]] {
 				return false
 			}
-			visitedStates[dfa.States[stateID].Transitions[alphabetID]] = true
+			visitedStates[dfa.States[stateID].Transitions[symbol]] = true
 		}
 	}
 
@@ -298,8 +298,8 @@ func (dfa DFA) IsTree() bool {
 // IsComplete returns true if DFA is complete, false is returned otherwise.
 func (dfa DFA) IsComplete() bool {
 	for stateID := range dfa.States {
-		for alphabetID := range dfa.Alphabet {
-			if dfa.States[stateID].Transitions[alphabetID] < 0 {
+		for symbol := range dfa.Alphabet {
+			if dfa.States[stateID].Transitions[symbol] < 0 {
 				return false
 			}
 		}
@@ -362,9 +362,9 @@ func (dfa *DFA) CalculateDepthAndOrder() {
 		currentOrder++
 
 		// Iterate over each symbol (alphabet) within DFA.
-		for alphabetID := range dfa.Alphabet {
+		for symbol := range dfa.Alphabet {
 			// If transition from current state using current symbol is valid and is not a loop to the current state.
-			if childStateID := dfa.States[stateID].Transitions[alphabetID]; childStateID != -1 && childStateID != stateID {
+			if childStateID := dfa.States[stateID].Transitions[symbol]; childStateID != -1 && childStateID != stateID {
 				// If depth for child state has been computed, skip state.
 				if dfa.States[childStateID].depth == -1 {
 					// Set the depth of child state to current state's depth + 1.
@@ -431,8 +431,8 @@ func (dfa DFA) Describe(detail bool) {
 		// Print all transitions.
 		fmt.Println("Transitions:")
 		for fromStateID, fromState := range dfa.States {
-			for alphabetID, toStateID := range fromState.Transitions {
-				fmt.Println(fromStateID, "--", alphabetID, "->", toStateID)
+			for symbol, toStateID := range fromState.Transitions {
+				fmt.Println(fromStateID, "--", symbol, "->", toStateID)
 			}
 		}
 	}
@@ -472,11 +472,11 @@ func (dfa DFA) UnreachableStates() []int {
 		// Iterate over current states.
 		for stateID := range currentStates {
 			// Iterate over each symbol within DFA.
-			for alphabetID := range dfa.Alphabet {
+			for symbol := range dfa.Alphabet {
 				// If transition from current state using current symbol
 				// is valid, add resultant state to next states.
-				if dfa.States[stateID].Transitions[alphabetID] != -1 {
-					nextStates[dfa.States[stateID].Transitions[alphabetID]] = true
+				if dfa.States[stateID].Transitions[symbol] != -1 {
+					nextStates[dfa.States[stateID].Transitions[symbol]] = true
 				}
 			}
 		}
@@ -559,9 +559,9 @@ func (dfa DFA) Equal(dfa2 DFA) bool {
 		dfa1.States[stateID1].order = 0
 		dfa2.States[stateID2].order = 0
 
-		for alphabetID := range dfa.Alphabet {
-			childStateID1 := dfa1.States[stateID1].Transitions[alphabetID]
-			childStateID2 := dfa2.States[stateID2].Transitions[alphabetID]
+		for symbol := range dfa.Alphabet {
+			childStateID1 := dfa1.States[stateID1].Transitions[symbol]
+			childStateID2 := dfa2.States[stateID2].Transitions[symbol]
 			if (childStateID1 == -1 && childStateID2 != -1) ||
 				(childStateID1 != -1 && childStateID2 == -1) ||
 				(childStateID1 != -1 && childStateID2 != -1 && (dfa1.States[childStateID1].Label != dfa2.States[childStateID2].Label)) {
@@ -618,7 +618,7 @@ func (dfa DFA) IsValid() bool {
 // StructurallyComplete functions.
 type Transition struct {
 	stateID  int
-	alphabetID int
+	symbol int
 }
 
 // StructurallyComplete checks if DFA is structurally
@@ -690,9 +690,9 @@ func (dfa DFA) StructurallyComplete(dataset Dataset) bool {
 	// Check whether each transition was used at least
 	// once when parsing the dataset.
 	for stateID := 0; stateID < len(dfa.States); stateID++ {
-		for alphabetID := range dfa.Alphabet {
-			if dfa.States[stateID].Transitions[alphabetID] != -1 {
-				if _, exists := transitionsUsed[Transition{stateID, alphabetID}]; !exists {
+		for symbol := range dfa.Alphabet {
+			if dfa.States[stateID].Transitions[symbol] != -1 {
+				if _, exists := transitionsUsed[Transition{stateID, symbol}]; !exists {
 					return false
 				}
 			}
@@ -783,9 +783,9 @@ func (dfa DFA) SymmetricallyStructurallyComplete(dataset Dataset) bool {
 	// Check whether each transition was used at least
 	// once when parsing the dataset.
 	for stateID := 0; stateID < len(dfa.States); stateID++ {
-		for alphabetID := range dfa.Alphabet {
-			if dfa.States[stateID].Transitions[alphabetID] != -1 {
-				if _, exists := transitionsUsed[Transition{stateID, alphabetID}]; !exists {
+		for symbol := range dfa.Alphabet {
+			if dfa.States[stateID].Transitions[symbol] != -1 {
+				if _, exists := transitionsUsed[Transition{stateID, symbol}]; !exists {
 					return false
 				}
 			}
@@ -816,8 +816,8 @@ func (dfa *DFA) RemoveNonAcceptingLeaves() {
 			// are to the same state or are not valid, remove state.
 			if dfa.States[stateID].Label != ACCEPTING {
 				transitionsCount := 0
-				for alphabetID := range dfa.Alphabet {
-					if dfa.States[stateID].Transitions[alphabetID] == -1 || dfa.States[stateID].Transitions[alphabetID] == stateID {
+				for symbol := range dfa.Alphabet {
+					if dfa.States[stateID].Transitions[symbol] == -1 || dfa.States[stateID].Transitions[symbol] == stateID {
 						transitionsCount++
 					}
 				}
