@@ -19,7 +19,7 @@ type ScoringFunction func(stateID1, stateID2 int, partitionBefore, partitionAfte
 
 // GreedySearch deterministically merges all possible state pairs.
 // Returns the resultant DFA when no more valid merges are possible.
-func GreedySearch(dfa DFA, scoringFunction ScoringFunction) DFA {
+func GreedySearch(referenceDFA DFA, scoringFunction ScoringFunction) DFA {
 	// State pair with the highest score.
 	highestScoringStatePair := StatePairScore{-1, -1, -1}
 	start := time.Now()
@@ -28,17 +28,17 @@ func GreedySearch(dfa DFA, scoringFunction ScoringFunction) DFA {
 	// Loop until no more deterministic merges are available.
 	for {
 		// Convert DFA to StatePartition for state merging.
-		partition := dfa.ToStatePartition()
+		partition := referenceDFA.ToStatePartition()
 		// Copy the state partition for undoing merging.
 		snapshot := partition.Copy()
 		// Get all valid merges and compute their score.
-		for i := 0; i < len(dfa.States); i++ {
-			for j := i + 1; j < len(dfa.States); j++ {
+		for i := 0; i < len(referenceDFA.States); i++ {
+			for j := i + 1; j < len(referenceDFA.States); j++ {
 				totalMerges++
 				// If states are mergeable, calculate score and add to detMerges.
-				if snapshot.MergeStates(dfa, i, j) {
+				if snapshot.MergeStates(referenceDFA, i, j) {
 					// Calculate score.
-					score := scoringFunction(i, j, partition, snapshot, dfa)
+					score := scoringFunction(i, j, partition, snapshot, referenceDFA)
 
 					// If score is bigger than state pair with the highest score,
 					// set current state pair to state pair with the highest score.
@@ -58,11 +58,11 @@ func GreedySearch(dfa DFA, scoringFunction ScoringFunction) DFA {
 		// Check if any deterministic merges were found.
 		if highestScoringStatePair.Score != -1 {
 			// Merge the state pairs with the highest score.
-			partition.MergeStates(dfa, highestScoringStatePair.State1, highestScoringStatePair.State2)
+			partition.MergeStates(referenceDFA, highestScoringStatePair.State1, highestScoringStatePair.State2)
 
 			// Convert the state partition to a DFA.
 			valid := false
-			valid, dfa = partition.ToDFA(dfa)
+			valid, referenceDFA = partition.ToDFA(referenceDFA)
 
 			// Panic if state partition to DFA conversion was unsuccessful.
 			if !valid {
@@ -80,27 +80,27 @@ func GreedySearch(dfa DFA, scoringFunction ScoringFunction) DFA {
 	fmt.Printf("Merges per second: %.2f\n", float64(totalMerges)/totalTime)
 
 	// Return the final resultant DFA.
-	return dfa
+	return referenceDFA
 }
 
 // WindowedSearch deterministically merges state pairs within a given window.
 // Returns the resultant DFA when no more valid merges are possible.
-func WindowedSearch(dfa DFA, windowSize int, windowGrow float64, scoringFunction ScoringFunction) DFA {
+func WindowedSearch(referenceDFA DFA, windowSize int, windowGrow float64, scoringFunction ScoringFunction) DFA {
 	start := time.Now()
 	totalMerges := 0
 	// State pair with the highest score.
 	highestScoringStatePair := StatePairScore{-1, -1, -1}
 	// Store ordered states within DFA.
-	orderedStates := dfa.OrderedStates()
+	orderedStates := referenceDFA.OrderedStates()
 
 	// Iterate until stopped.
 	for {
 		// Window values.
 		windowMin := 0
-		windowMax := util.Min(windowSize, len(dfa.States))
+		windowMax := util.Min(windowSize, len(referenceDFA.States))
 
 		// Convert DFA to StatePartition for state merging.
-		partition := dfa.ToStatePartition()
+		partition := referenceDFA.ToStatePartition()
 		// Copy the state partition for undoing merging.
 		snapshot := partition.Copy()
 
@@ -112,9 +112,9 @@ func WindowedSearch(dfa DFA, windowSize int, windowGrow float64, scoringFunction
 					if i < j {
 						totalMerges++
 						// If states are mergeable, calculate score and add to detMerges.
-						if snapshot.MergeStates(dfa, orderedStates[i], orderedStates[j]) {
+						if snapshot.MergeStates(referenceDFA, orderedStates[i], orderedStates[j]) {
 							// Calculate score.
-							score := scoringFunction(orderedStates[i], orderedStates[j], partition, snapshot, dfa)
+							score := scoringFunction(orderedStates[i], orderedStates[j], partition, snapshot, referenceDFA)
 
 							// If score is bigger than state pair with the highest score,
 							// set current state pair to state pair with the highest score.
@@ -139,11 +139,11 @@ func WindowedSearch(dfa DFA, windowSize int, windowGrow float64, scoringFunction
 			} else {
 				windowMin += windowSize
 				windowSize = int(math.Round(float64(windowSize) * windowGrow))
-				windowMax = util.Min(windowMax+windowSize, len(dfa.States))
+				windowMax = util.Min(windowMax+windowSize, len(referenceDFA.States))
 
 				// If the window size is out of bounds, break loop and return the
 				// most recent DFA found.
-				if windowMin >= len(dfa.States) {
+				if windowMin >= len(referenceDFA.States) {
 					break
 				}
 			}
@@ -151,11 +151,11 @@ func WindowedSearch(dfa DFA, windowSize int, windowGrow float64, scoringFunction
 
 		if highestScoringStatePair.Score != -1 {
 			// Merge the state pairs with the highest score.
-			partition.MergeStates(dfa, highestScoringStatePair.State1, highestScoringStatePair.State2)
+			partition.MergeStates(referenceDFA, highestScoringStatePair.State1, highestScoringStatePair.State2)
 
 			// Convert the state partition to a DFA.
 			valid := false
-			valid, dfa = partition.ToDFA(dfa)
+			valid, referenceDFA = partition.ToDFA(referenceDFA)
 
 			// Panic if state partition to DFA conversion was unsuccessful.
 			if !valid {
@@ -163,7 +163,7 @@ func WindowedSearch(dfa DFA, windowSize int, windowGrow float64, scoringFunction
 			}
 
 			// Update ordered states within new DFA.
-			orderedStates = dfa.OrderedStates()
+			orderedStates = referenceDFA.OrderedStates()
 
 			// Remove previous state pair with the highest score.
 			highestScoringStatePair = StatePairScore{-1, -1, -1}
@@ -176,12 +176,12 @@ func WindowedSearch(dfa DFA, windowSize int, windowGrow float64, scoringFunction
 	fmt.Printf("Merges per second: %.2f\n", float64(totalMerges)/totalTime)
 
 	// Return the final resultant DFA.
-	return dfa
+	return referenceDFA
 }
 
 // BlueFringeSearch deterministically merges possible state pairs within red-blue sets.
 // Returns the resultant DFA when no more valid merges are possible.
-func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA {
+func BlueFringeSearch(referenceDFA DFA, scoringFunction ScoringFunction) DFA {
 	start := time.Now()
 	totalMerges := 0
 
@@ -192,10 +192,10 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA {
 	scoresComputed := map[StateIDPair]util.Void{}
 
 	// Initialize set of red states to starting state.
-	red := map[int]util.Void{dfa.StartingStateID: util.Null}
+	red := map[int]util.Void{referenceDFA.StartingStateID: util.Null}
 
 	// Convert DFA to StatePartition for state merging.
-	partition := dfa.ToStatePartition()
+	partition := referenceDFA.ToStatePartition()
 	// Copy the state partition for undoing merging.
 	snapshot := partition.Copy()
 
@@ -210,9 +210,9 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA {
 		// Iterate over every red state.
 		for element := range red {
 			// Iterate over each symbol within DFA.
-			for alphabetID := range dfa.Alphabet {
+			for alphabetID := range referenceDFA.Alphabet {
 				// Store resultant stateID from red state.
-				resultantStateID := dfa.States[element].Transitions[alphabetID]
+				resultantStateID := referenceDFA.States[element].Transitions[alphabetID]
 				// If transition is valid and resultant state is not red,
 				// add resultant state to blue set.
 				if _, exists := red[resultantStateID]; resultantStateID != -1 && !exists {
@@ -241,13 +241,13 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA {
 					// been computed, attempt to merge state pair.
 					totalMerges++
 					// If states are mergeable, calculate score and add to detMerges.
-					if snapshot.MergeStates(dfa, blueElement, redElement) {
+					if snapshot.MergeStates(referenceDFA, blueElement, redElement) {
 						// Set the state pairs score as computed.
 						scoresComputed[StateIDPair{blueElement, redElement}] = util.Null
 						scoresComputed[StateIDPair{redElement, blueElement}] = util.Null
 
 						// Calculate score.
-						score := scoringFunction(blueElement, redElement, partition, snapshot, dfa)
+						score := scoringFunction(blueElement, redElement, partition, snapshot, referenceDFA)
 
 						// If score is bigger than state pair with the highest score,
 						// set current state pair to state pair with the highest score.
@@ -278,14 +278,14 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA {
 		// If merged flag is true, merge highest scoring merge.
 		if merged {
 			// Merge the state pairs with the highest score.
-			partition.MergeStates(dfa, highestScoringStatePair.State1, highestScoringStatePair.State2)
+			partition.MergeStates(referenceDFA, highestScoringStatePair.State1, highestScoringStatePair.State2)
 
 			// Convert the state partition to a DFA.
 			valid := false
-			valid, dfa = partition.ToDFA(dfa)
+			valid, referenceDFA = partition.ToDFA(referenceDFA)
 
 			// Convert DFA to StatePartition for state merging.
-			partition = dfa.ToStatePartition()
+			partition = referenceDFA.ToStatePartition()
 			// Copy the state partition for undoing merging.
 			snapshot = partition.Copy()
 
@@ -301,7 +301,7 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA {
 			scoresComputed = map[StateIDPair]util.Void{}
 
 			// Initialize set of red states to starting state.
-			red = map[int]util.Void{dfa.StartingStateID: util.Null}
+			red = map[int]util.Void{referenceDFA.StartingStateID: util.Null}
 		}
 	}
 
@@ -309,5 +309,5 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA {
 	fmt.Printf("Merges per second: %.2f\n", float64(totalMerges)/totalTime)
 
 	// Return the final resultant DFA.
-	return dfa
+	return referenceDFA
 }
