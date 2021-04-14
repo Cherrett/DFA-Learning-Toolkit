@@ -185,9 +185,6 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA {
 	start := time.Now()
 	totalMerges := 0
 
-	// Get DFA's depth for calculating scores.
-	// dfa.Depth()
-
 	// State pair with the highest score.
 	highestScoringStatePair := StatePairScore{-1, -1, -1}
 
@@ -296,9 +293,6 @@ func BlueFringeSearch(dfa DFA, scoringFunction ScoringFunction) DFA {
 			if !valid {
 				panic("Invalid merged DFA.")
 			}
-
-			// Get DFA's depth for calculating score.
-			//dfa.Depth()
 
 			// Remove previous state pair with the highest score.
 			highestScoringStatePair = StatePairScore{-1, -1, -1}
