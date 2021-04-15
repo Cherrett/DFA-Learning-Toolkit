@@ -594,7 +594,7 @@ func (dfa DFA) SameAs(dfa2 DFA) bool {
 
 // IsValid checks whether DFA is valid.
 // Panics if not valid. Used for error checking.
-func (dfa DFA) IsValid() bool {
+func (dfa DFA) IsValid() {
 	if dfa.StartingStateID < 0 || dfa.StartingStateID >= len(dfa.States) {
 		// Panic if starting state is invalid.
 		panic("Invalid starting state.")
@@ -608,9 +608,6 @@ func (dfa DFA) IsValid() bool {
 		// Panic if any unreachable states exist within DFA.
 		panic("Unreachable State exist within DFA.")
 	}
-
-	// Return true if reached.
-	return true
 }
 
 // Transition struct which represents a transition.

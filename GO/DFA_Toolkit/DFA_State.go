@@ -13,7 +13,7 @@ const (
 // State struct which represents a State within a DFA.
 type State struct {
 	Label       StateLabel // State Label (Rejecting, Accepting, or Unknown).
-	Transitions []int      // Transition Table where each element corresponds to a transition for each symbol ID.
+	Transitions []int      // Transition Table where each element corresponds to a transition for each symbol.
 	depth       int        // Depth of State within DFA.
 	order       int        // Order of State within DFA.
 	dfa         *DFA       // Pointer to DFA containing state.
