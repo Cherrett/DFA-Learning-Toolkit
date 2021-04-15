@@ -74,7 +74,7 @@ func (dfa *DFA) RemoveState(stateID int) {
 // AddSymbol adds a new symbol to the DFA.
 func (dfa *DFA) AddSymbol() {
 	// Increment symbols count within the DFA.
-	dfa.Alphabet = append(dfa.Alphabet, len(dfa.Alphabet) - 1)
+	dfa.Alphabet = append(dfa.Alphabet, len(dfa.Alphabet))
 	// Iterate over each state within the DFA and add an empty (-1) transition for the newly added state.
 	for stateIndex := range dfa.States {
 		dfa.States[stateIndex].Transitions = append(dfa.States[stateIndex].Transitions, -1)
@@ -351,7 +351,7 @@ func (dfa *DFA) CalculateDepthAndOrder() {
 	for len(queue) > 0 {
 		// Remove and store first state in queue.
 		stateID := queue[0]
-		queue = append(queue[:0], queue[1:]...)
+		queue = queue[1:]
 
 		// If the depth of the current state is bigger than the depth of the
 		// DFA, set the depth of the DFa to the the depth of the current state.

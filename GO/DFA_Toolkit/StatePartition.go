@@ -92,7 +92,7 @@ func (statePartition *StatePartition) Union(blockID1 int, blockID2 int) int{
 	parent.Link, child.Link = child.Link, parent.Link
 
 	// Set root of child node to parent node.
-	child.Root = parent.Root
+	child.Root = blockID1
 	// Increment size (score) of parent node by size of child node.
 	parent.Size += child.Size
 
