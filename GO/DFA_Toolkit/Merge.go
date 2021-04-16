@@ -169,7 +169,7 @@ func WindowedSearch(statePartition StatePartition, windowSize int, windowGrow fl
 // BlueFringeSearch deterministically merges possible state pairs within red-blue sets.
 // Returns the resultant state partition when no more valid merges are possible.
 // TODO: Update using new StatePartition.
-func BlueFringeSearch(referenceDFA DFA, scoringFunction ScoringFunction) DFA {
+func BlueFringeSearch(statePartition StatePartition, scoringFunction ScoringFunction) StatePartition {
 	start := time.Now()
 	totalMerges := 0
 
@@ -180,15 +180,13 @@ func BlueFringeSearch(referenceDFA DFA, scoringFunction ScoringFunction) DFA {
 	scoresComputed := map[StateIDPair]util.Void{}
 
 	// Initialize set of red states to starting state.
-	red := map[int]util.Void{referenceDFA.StartingStateID: util.Null}
-
-	// Convert DFA to StatePartition for state merging.
-	statePartition := referenceDFA.ToStatePartition()
-	// Copy the state partition for undoing merging.
-	copiedPartition := statePartition.Copy()
+	red := map[int]util.Void{statePartition.StartingBlock(): util.Null}
 
 	// Initialize merged flag to false.
 	merged := false
+
+	// Copy the state partition for undoing merging.
+	copiedPartition := statePartition.Copy()
 
 	// Iterate until stopped.
 	for {
@@ -198,13 +196,15 @@ func BlueFringeSearch(referenceDFA DFA, scoringFunction ScoringFunction) DFA {
 		// Iterate over every red state.
 		for element := range red {
 			// Iterate over each symbol within DFA.
-			for symbol := range referenceDFA.Alphabet {
-				// Store resultant stateID from red state.
-				resultantStateID := referenceDFA.States[element].Transitions[symbol]
-				// If transition is valid and resultant state is not red,
-				// add resultant state to blue set.
-				if _, exists := red[resultantStateID]; resultantStateID != -1 && !exists {
-					blue[resultantStateID] = util.Null
+			for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
+				if resultantStateID := statePartition.Blocks[element].Transitions[symbol]; resultantStateID > -1{
+					// Store resultant stateID from red state.
+					resultantStateID = statePartition.Find(resultantStateID)
+					// If transition is valid and resultant state is not red,
+					// add resultant state to blue set.
+					if _, exists := red[resultantStateID]; resultantStateID != -1 && !exists {
+						blue[resultantStateID] = util.Null
+					}
 				}
 			}
 		}
@@ -278,7 +278,7 @@ func BlueFringeSearch(referenceDFA DFA, scoringFunction ScoringFunction) DFA {
 			scoresComputed = map[StateIDPair]util.Void{}
 
 			// Initialize set of red states to starting state.
-			red = map[int]util.Void{referenceDFA.StartingStateID: util.Null}
+			red = map[int]util.Void{statePartition.StartingBlock(): util.Null}
 		}
 	}
 
@@ -286,5 +286,5 @@ func BlueFringeSearch(referenceDFA DFA, scoringFunction ScoringFunction) DFA {
 	fmt.Printf("Merges per second: %.2f\n", float64(totalMerges)/totalTime)
 
 	// Return the final resultant DFA.
-	return referenceDFA
+	return statePartition
 }

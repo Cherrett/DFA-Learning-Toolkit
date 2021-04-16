@@ -58,7 +58,7 @@ func TestBenchmarkDetMerge(t *testing.T) {
 		for i := 0; i < len(apta.States); i++ {
 			for j := i + 1; j < len(apta.States); j++ {
 				totalMerges++
-				if snapshot.MergeStates(apta, i, j) {
+				if snapshot.MergeStates(i, j) {
 					validMerges++
 				}
 

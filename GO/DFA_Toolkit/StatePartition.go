@@ -184,7 +184,7 @@ func (dfa DFA) ToStatePartition() StatePartition {
 // ToDFA converts a State Partition to a DFA. Returns true and
 // the corresponding DFA if state partition is valid. Else,
 // false and an empty DFA are returned.
-func (statePartition StatePartition) ToDFA() DFA {
+func (statePartition *StatePartition) ToDFA() DFA {
 	// Map to store corresponding new state for
 	// each root block within state partition.
 	blockToStateMap := map[int]int{}
@@ -216,7 +216,7 @@ func (statePartition StatePartition) ToDFA() DFA {
 	}
 
 	// Set starting state using block to state map.
-	resultantDFA.StartingStateID = blockToStateMap[statePartition.Find(statePartition.StartingStateID)]
+	resultantDFA.StartingStateID = blockToStateMap[statePartition.StartingBlock()]
 
 	// Return populated resultant DFA.
 	return resultantDFA
@@ -374,13 +374,13 @@ func (statePartition StatePartition) RootBlocks() []int {
 }
 
 // OrderedBlocks returns the IDs of root blocks in order as a slice of integers.
-func (statePartition StatePartition) OrderedBlocks() []int{
+func (statePartition *StatePartition) OrderedBlocks() []int{
 	orderComputed := make([]bool, len(statePartition.Blocks))
 	orderedBlocks := make([]int, statePartition.BlocksCount)
 	index := 0
 
 	// Create a FIFO queue with starting state.
-	queue := []int{statePartition.Find(statePartition.Find(statePartition.StartingStateID))}
+	queue := []int{statePartition.Find(statePartition.StartingBlock())}
 
 	// Loop until queue is empty.
 	for len(queue) > 0 {
@@ -412,4 +412,9 @@ func (statePartition StatePartition) OrderedBlocks() []int{
 	}
 
 	return orderedBlocks
+}
+
+// StartingBlock returns the ID of the block which contains the starting state.
+func (statePartition *StatePartition) StartingBlock() int{
+	return statePartition.Find(statePartition.StartingStateID)
 }

@@ -88,23 +88,23 @@ func TestStateMergingAndDFAEquivalence(t *testing.T) {
 	statePartition := APTA.ToStatePartition()
 	statePartitionCopy := statePartition.Copy()
 
-	if !statePartitionCopy.MergeStates(APTA, 2, 4) {
+	if !statePartitionCopy.MergeStates(2, 4) {
 		t.Errorf("Merge should be valid.")
 	}
-	valid1, mergedDFA1 := statePartitionCopy.ToDFA(APTA)
-	if !valid1 {
+	mergedDFA1 := statePartitionCopy.ToDFA()
+	if !mergedDFA1.IsValidSafe() {
 		t.Errorf("State Partition should be valid.")
 	}
 	statePartitionCopy.RollbackChanges(statePartition)
 
-	if !statePartitionCopy.MergeStates(APTA, 3, 5) {
+	if !statePartitionCopy.MergeStates(3, 5) {
 		t.Errorf("Merge should be valid.")
 	}
-	if !statePartitionCopy.MergeStates(APTA, 2, 4) {
+	if !statePartitionCopy.MergeStates(2, 4) {
 		t.Errorf("Merge should be valid.")
 	}
-	valid2, mergedDFA2 := statePartitionCopy.ToDFA(APTA)
-	if !valid2 {
+	mergedDFA2 := statePartitionCopy.ToDFA()
+	if !mergedDFA2.IsValidSafe() {
 		t.Errorf("State Partition should be valid.")
 	}
 

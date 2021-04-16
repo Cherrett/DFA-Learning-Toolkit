@@ -326,7 +326,7 @@ func (dfa *DFA) Depth() int {
 func (dfa *DFA) CalculateDepthAndOrder() {
 	// Checks if DFA is valid.
 	// Panics otherwise.
-	dfa.IsValid()
+	dfa.IsValidPanic()
 
 	// Set depth of DFA to -1.
 	dfa.depth = -1
@@ -592,9 +592,9 @@ func (dfa DFA) SameAs(dfa2 DFA) bool {
 	return reflect.DeepEqual(dfa, dfa2)
 }
 
-// IsValid checks whether DFA is valid.
+// IsValidPanic checks whether DFA is valid.
 // Panics if not valid. Used for error checking.
-func (dfa DFA) IsValid() {
+func (dfa DFA) IsValidPanic() {
 	if dfa.StartingStateID < 0 || dfa.StartingStateID >= len(dfa.States) {
 		// Panic if starting state is invalid.
 		panic("Invalid starting state.")
@@ -608,6 +608,30 @@ func (dfa DFA) IsValid() {
 		// Panic if any unreachable states exist within DFA.
 		panic("Unreachable State exist within DFA.")
 	}
+}
+
+// IsValidSafe checks whether DFA is valid.
+// Returns false if not valid.
+func (dfa DFA) IsValidSafe() bool{
+	if dfa.StartingStateID < 0 || dfa.StartingStateID >= len(dfa.States) {
+		// Return false if starting state is invalid.
+		return false
+	}
+	if len(dfa.Alphabet) < 1 {
+		// Return false if number of symbols is invalid.
+		return false
+	}
+	if len(dfa.States) < 1 {
+		// Return false if number of states is invalid.
+		return false
+	}
+	if len(dfa.UnreachableStates()) > 0 {
+		// Return false if any unreachable states exist within DFA.
+		return false
+	}
+
+	// Return true if reached (valid).
+	return true
 }
 
 // Transition struct which represents a transition.

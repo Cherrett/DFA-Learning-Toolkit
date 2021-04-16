@@ -55,7 +55,7 @@ func GreedyEDSM(APTA DFA) DFA {
 	resultantDFA := statePartition.ToDFA()
 
 	// Check if DFA generated is valid.
-	resultantDFA.IsValid()
+	resultantDFA.IsValidPanic()
 
 	// Return resultant DFA.
 	return resultantDFA
@@ -83,7 +83,7 @@ func WindowedEDSM(APTA DFA, windowSize int, windowGrow float64) DFA {
 	resultantDFA := statePartition.ToDFA()
 
 	// Check if DFA generated is valid.
-	resultantDFA.IsValid()
+	resultantDFA.IsValidPanic()
 
 	// Return resultant DFA.
 	return resultantDFA
@@ -91,16 +91,28 @@ func WindowedEDSM(APTA DFA, windowSize int, windowGrow float64) DFA {
 
 // BlueFringeEDSM is a Blue Fringe version of Evidence Driven State-Merging.
 // It takes a DFA (APTA) as an argument which is used within the blue-fringe search.
-func BlueFringeEDSM(apta DFA) DFA {
+func BlueFringeEDSM(APTA DFA) DFA {
 	// Store length of dataset.
-	LengthOfDataset := apta.LabelledStatesCount()
+	LengthOfDataset := APTA.LabelledStatesCount()
 
 	// EDSM scoring function.
 	EDSM := func(stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition) float64 {
 		return float64(LengthOfDataset - partitionAfter.NumberOfLabelledBlocks())
 	}
 
-	// Call WindowedSearch function using APTA and EDSM scoring function
-	// declared above. Return resultant DFA.
-	return BlueFringeSearch(apta, EDSM)
+	// Convert APTA to StatePartition for state merging.
+	statePartition := APTA.ToStatePartition()
+
+	// Call BlueFringeSearch function using state partition and EDSM scoring function
+	// declared above. This function returns the resultant state partition.
+	statePartition = BlueFringeSearch(statePartition, EDSM)
+
+	// Convert the state partition to a DFA.
+	resultantDFA := statePartition.ToDFA()
+
+	// Check if DFA generated is valid.
+	resultantDFA.IsValidPanic()
+
+	// Return resultant DFA.
+	return resultantDFA
 }
