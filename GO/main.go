@@ -2,35 +2,50 @@ package main
 
 import (
 	dfatoolkit "DFA_Toolkit/DFA_Toolkit"
+	"DFA_Toolkit/DFA_Toolkit/util"
 	"fmt"
 	"time"
 )
 
 func main() {
-	// random seed
-	// rand.Seed(time.Now().UnixNano())
+	// PROFILING
+	// defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
+	// go tool pprof -http=:8081 cpu.pprof
 
-	structurallyCompleteCount := 0
-	iterations := 100
-	start := time.Now()
+	// Number of iterations.
+	n := 128
+	// Target size.
+	targetSize := 32
 
-	for i := 0; i < iterations; i++ {
+	winners := 0
+	totalAccuracies := util.NewMinMaxAvg()
+	totalNumberOfStates := util.NewMinMaxAvg()
+	for i := 0; i < n; i++ {
+		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
+		start := time.Now()
+
 		// Create a target DFA.
-		target := dfatoolkit.AbbadingoDFA(32, true)
+		target := dfatoolkit.AbbadingoDFA(targetSize, true)
 
-		//target.ToJPG("temp.jpg", false, true)
+		// Training testing sets.
+		trainingSet, testingSet := dfatoolkit.AbbadingoDatasetExact(target, 607, 1800)
 
-		// Training set.
-		training, _ := dfatoolkit.AbbadingoDataset(target, 100, 0)
+		resultantDFA := dfatoolkit.WindowedEDSMFromDataset(trainingSet, targetSize*2, 2.0)
+		accuracy := resultantDFA.Accuracy(testingSet)
 
-		if training.SymmetricallyStructurallyComplete(target) {
-			structurallyCompleteCount++
+		totalAccuracies.Add(accuracy)
+		totalNumberOfStates.Add(float64(len(resultantDFA.States)))
+
+		if accuracy >= 0.99 {
+			winners++
 		}
 
-		fmt.Printf("Iteration %d/%d\n", i+1, iterations)
+		fmt.Printf("Duration: %.2fs\n\n", time.Since(start).Seconds())
 	}
 
-	fmt.Printf("Percentage which were Structurally Complete: %.4f\n", float64(structurallyCompleteCount)/float64(iterations))
-	totalTime := (time.Now()).Sub(start).Seconds()
-	fmt.Printf("Total Time: %.2f seconds.\n", totalTime)
+	successfulPercentage := float64(winners) / float64(n)
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentage)
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", totalAccuracies.Min(), totalAccuracies.Max(), totalAccuracies.Avg())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", totalNumberOfStates.Min(), totalNumberOfStates.Max(), totalNumberOfStates.Avg())
+	fmt.Print("-----------------------------------------------------------------------------\n\n")
 }

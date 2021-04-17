@@ -23,9 +23,9 @@ func TestBenchmarkDetMerge(t *testing.T) {
 	trainingSetSizes := []int{230, 607, 1521}
 
 	// Benchmark over the problem instances.
-	for i := range dfaSizes {
-		targetSize := dfaSizes[i]
-		trainingSetSize := trainingSetSizes[i]
+	for iterator := range dfaSizes {
+		targetSize := dfaSizes[iterator]
+		trainingSetSize := trainingSetSizes[iterator]
 
 		// Create a target DFA.
 		target := dfatoolkit.AbbadingoDFA(targetSize, true)
@@ -35,7 +35,7 @@ func TestBenchmarkDetMerge(t *testing.T) {
 
 		fmt.Printf("-------------------------------------------------------------\n")
 		fmt.Printf("-------------------------------------------------------------\n")
-		fmt.Printf("BENCHMARK %d (Target: %d states, Training: %d strings\n", i+1, targetSize, len(training))
+		fmt.Printf("BENCHMARK %d (Target: %d states, Training: %d strings\n", iterator+1, targetSize, len(training))
 		fmt.Printf("-------------------------------------------------------------\n")
 		fmt.Printf("-------------------------------------------------------------\n")
 
@@ -58,11 +58,8 @@ func TestBenchmarkDetMerge(t *testing.T) {
 		for i := 0; i < len(apta.States); i++ {
 			for j := i + 1; j < len(apta.States); j++ {
 				totalMerges++
-				if snapshot.MergeStates(apta, i, j) {
+				if snapshot.MergeStates(i, j) {
 					validMerges++
-					//snapshot.LabelledBlocksCount(apta)
-					//snapshot.BlocksCount()
-					//print(temp, temp2)
 				}
 
 				snapshot.RollbackChanges(part)
@@ -218,6 +215,8 @@ func TestBenchmarkBlueFringeEDSM(t *testing.T) {
 	}
 }
 
+// TestBenchmarkEDSM benchmarks the performance of the GreedyEDSMFromDataset(), WindowedEDSMFromDataset()
+// and BlueFringeEDSMFromDataset() functions.
 func TestBenchmarkEDSM(t *testing.T) {
 	// Random Seed.
 	rand.Seed(time.Now().UnixNano())

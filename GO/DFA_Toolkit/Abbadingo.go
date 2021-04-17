@@ -10,6 +10,10 @@ import (
 	"strings"
 )
 
+// AlphabetSymbolMappingAbbadingo represents the alphabet-symbol mapping
+// for the Abbadingo competition standard (using only a's and b's).
+var AlphabetSymbolMappingAbbadingo = map[rune]int{'0': 0, '1': 1}
+
 // GetDatasetFromAbbadingoFile returns a Dataset from an Abbadingo File.
 func GetDatasetFromAbbadingoFile(fileName string) Dataset {
 	// Initialize new Dataset.
@@ -63,8 +67,15 @@ func NewStringInstanceFromAbbadingoFile(text string, delimiter string) StringIns
 	}
 
 	// Add the remaining split string values to value of StringInstance since
-	// these contain the actual string value. Note that a slice of rune is used.
-	stringInstance.Value = []rune(strings.Join(splitString[2:], ""))
+	// these contain the actual string value.
+	for i := 2; i < len(splitString); i++{
+		runeValue := rune(splitString[i][0])
+		if value, exists := AlphabetSymbolMappingAbbadingo[runeValue]; exists{
+			stringInstance.Value = append(stringInstance.Value, value)
+		}else{
+			panic("Abbadingo datasets only consist of binary values.")
+		}
+	}
 
 	// Return populated string instance.
 	return stringInstance
@@ -85,7 +96,8 @@ func AbbadingoDFA(numberOfStates int, exact bool) DFA {
 		dfa := NewDFA()
 		// Add symbols 'a' and 'b' since these are
 		// used in Abbadingo DFAs.
-		dfa.AddSymbols([]rune{'a', 'b'})
+		dfa.AddSymbol()
+		dfa.AddSymbol()
 
 		// Create new states and assign either
 		// an accepting or unknown label.
@@ -100,8 +112,8 @@ func AbbadingoDFA(numberOfStates int, exact bool) DFA {
 		// Iterate over created states.
 		for stateID := range dfa.States {
 			// Randomly add transitions for both symbols.
-			dfa.AddTransition(dfa.SymbolID('a'), stateID, rand.Intn(len(dfa.States)))
-			dfa.AddTransition(dfa.SymbolID('b'), stateID, rand.Intn(len(dfa.States)))
+			dfa.AddTransition(0, stateID, rand.Intn(len(dfa.States)))
+			dfa.AddTransition(1, stateID, rand.Intn(len(dfa.States)))
 		}
 
 		// Randomly choose a starting state.
@@ -195,6 +207,16 @@ func AbbadingoDatasetExact(dfa DFA, trainingSetSize int, testingSetSize int) (Da
 
 	// Return populated training and testing datasets.
 	return trainingDataset, testingDataset
+}
+
+// AbbadingoInstance returns a random DFA in Abbadingo format given a number of states while returning a training
+// and testing dataset built on the generated DFA given a set size for each. If exact is set to true, the resultant
+// DFA will have the exact number of states requested.
+func AbbadingoInstance(numberOfStates int, exact bool, trainingSetSize int, testingSetSize int) (DFA, Dataset, Dataset){
+	dfa := AbbadingoDFA(numberOfStates, exact)
+	trainingSet, testingSet := AbbadingoDatasetExact(dfa, trainingSetSize, testingSetSize)
+
+	return dfa,trainingSet, testingSet
 }
 
 // WriteToAbbadingoFile writes a given Dataset to file in Abbadingo format.

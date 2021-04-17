@@ -15,7 +15,7 @@ import (
 // StringInstance struct which represents
 // a string instance within a dataset.
 type StringInstance struct {
-	Value     []rune // Slice of runes which represents the actual string value.
+	Value     []int  // Slice of integers which represents the symbol values.
 	Accepting bool   // Accepting label flag for StringInstance.
 }
 
@@ -27,8 +27,6 @@ type Dataset []StringInstance
 func (dataset Dataset) GetPTA(APTA bool) DFA {
 	// Sort dataset by length.
 	sortedDataset := dataset.SortDatasetByLength()
-	// Create a map to keep track of alphabet (symbols).
-	alphabet := make(map[rune]bool)
 	// Count to keep track of the number of states visited.
 	var count int
 	// Variables to store IDs of current and new states.
@@ -71,20 +69,16 @@ func (dataset Dataset) GetPTA(APTA bool) DFA {
 			// Increment count.
 			count++
 
-			// If symbol is not within symbol map,
-			// add symbol to DFA and to symbol map.
-			if !alphabet[symbol] {
-				dfa.AddSymbol(symbol)
-				alphabet[symbol] = true
+			// While symbol is not within DFA's symbols,
+			// add new symbol to DFA.
+			for symbol > len(dfa.Alphabet) - 1{
+				dfa.AddSymbol()
 			}
-
-			// Set symbol ID to current symbol.
-			symbolID := dfa.SymbolID(symbol)
 
 			// If a transition exists from the current state to any other state via
 			// the current symbol, set resultant state ID to current state ID.
-			if dfa.States[currentStateID].Transitions[symbolID] != -1 {
-				currentStateID = dfa.States[currentStateID].Transitions[symbolID]
+			if dfa.States[currentStateID].Transitions[symbol] != -1 {
+				currentStateID = dfa.States[currentStateID].Transitions[symbol]
 				// Check if last symbol in string.
 				if count == stringInstance.Length() {
 					if stringInstance.Accepting {
@@ -123,7 +117,7 @@ func (dataset Dataset) GetPTA(APTA bool) DFA {
 					newStateID = dfa.AddState(UNKNOWN)
 				}
 				// Add a new transition from current state to newly created state.
-				dfa.AddTransition(symbolID, currentStateID, newStateID)
+				dfa.AddTransition(symbol, currentStateID, newStateID)
 				// Set current state ID to ID of newly created state.
 				currentStateID = newStateID
 			}
@@ -173,8 +167,8 @@ func (stringInstance StringInstance) ConsistentWithDFA(dfa DFA) bool {
 
 		// If a transition exists from the current state to any other state via
 		// the current symbol, set resultant state ID to current state ID.
-		if dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)] != -1 {
-			currentStateID = dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)]
+		if dfa.States[currentStateID].Transitions[symbol] != -1 {
+			currentStateID = dfa.States[currentStateID].Transitions[symbol]
 			// Check if last symbol in string.
 			if count == stringInstance.Length() {
 				if stringInstance.Accepting {
@@ -223,8 +217,8 @@ func (stringInstance StringInstance) ParseToStateLabel(dfa DFA) StateLabel {
 
 		// If a transition exists from the current state to any other state via
 		// the current symbol, set resultant state ID to current state ID.
-		if dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)] != -1 {
-			currentStateID = dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)]
+		if dfa.States[currentStateID].Transitions[symbol] != -1 {
+			currentStateID = dfa.States[currentStateID].Transitions[symbol]
 			// Check if last symbol in string.
 			if count == stringInstance.Length() {
 				// If state is unknown or rejecting, return rejecting.
@@ -266,8 +260,8 @@ func (stringInstance StringInstance) ParseToState(dfa DFA) (bool, int) {
 
 		// If a transition exists from the current state to any other state via
 		// the current symbol, set resultant state ID to current state ID.
-		if dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)] != -1 {
-			currentStateID = dfa.States[currentStateID].Transitions[dfa.SymbolID(symbol)]
+		if dfa.States[currentStateID].Transitions[symbol] != -1 {
+			currentStateID = dfa.States[currentStateID].Transitions[symbol]
 			// If last symbol in string, return the current true and the current state ID.
 			if count == stringInstance.Length() {
 				return true, currentStateID
@@ -298,7 +292,7 @@ func BinaryStringToStringInstance(dfa DFA, binaryString string) StringInstance {
 		}
 
 		// Add symbol to value of string instance.
-		stringInstance.Value = append(stringInstance.Value, dfa.Symbol(symbolID))
+		stringInstance.Value = append(stringInstance.Value, symbolID)
 	}
 
 	// Set string instance accepting to true if string instance is accepting.
