@@ -168,7 +168,6 @@ func WindowedSearch(statePartition StatePartition, windowSize int, windowGrow fl
 
 // BlueFringeSearch deterministically merges possible state pairs within red-blue sets.
 // Returns the resultant state partition when no more valid merges are possible.
-// TODO: Update using new StatePartition.
 func BlueFringeSearch(statePartition StatePartition, scoringFunction ScoringFunction) StatePartition {
 	start := time.Now()
 	totalMerges := 0

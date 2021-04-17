@@ -209,6 +209,16 @@ func AbbadingoDatasetExact(dfa DFA, trainingSetSize int, testingSetSize int) (Da
 	return trainingDataset, testingDataset
 }
 
+// AbbadingoInstance returns a random DFA in Abbadingo format given a number of states while returning a training
+// and testing dataset built on the generated DFA given a set size for each. If exact is set to true, the resultant
+// DFA will have the exact number of states requested.
+func AbbadingoInstance(numberOfStates int, exact bool, trainingSetSize int, testingSetSize int) (DFA, Dataset, Dataset){
+	dfa := AbbadingoDFA(numberOfStates, exact)
+	trainingSet, testingSet := AbbadingoDatasetExact(dfa, trainingSetSize, testingSetSize)
+
+	return dfa,trainingSet, testingSet
+}
+
 // WriteToAbbadingoFile writes a given Dataset to file in Abbadingo format.
 func (dataset Dataset) WriteToAbbadingoFile(filePath string) {
 	// Sort the dataset by length.
