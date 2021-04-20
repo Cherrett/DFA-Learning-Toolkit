@@ -22,6 +22,8 @@ type ScoringFunction func(stateID1, stateID2 int, partitionBefore, partitionAfte
 func GreedySearch(statePartition StatePartition, scoringFunction ScoringFunction) (StatePartition, SearchData) {
 	// Clone StatePartition.
 	statePartition = statePartition.Clone()
+	// Copy the state partition for undoing and copying changed states.
+	copiedPartition := statePartition.Copy()
 	// Initialize search data.
 	searchData := SearchData{[]StatePairScore{}, 0, time.Duration(0)}
 	// State pair with the highest score.
@@ -33,9 +35,6 @@ func GreedySearch(statePartition StatePartition, scoringFunction ScoringFunction
 
 	// Loop until no more deterministic merges are available.
 	for {
-		// Copy the state partition for undoing merging.
-		copiedPartition := statePartition.Copy()
-
 		// Get root blocks within partition.
 		blocks := statePartition.RootBlocks()
 
@@ -62,14 +61,16 @@ func GreedySearch(statePartition StatePartition, scoringFunction ScoringFunction
 				}
 
 				// Undo merges from copied partition.
-				copiedPartition.RollbackChanges(statePartition)
+				copiedPartition.RollbackChangesFrom(statePartition)
 			}
 		}
 
 		// Check if any deterministic merges were found.
 		if highestScoringStatePair.Score != -1 {
 			// Merge the state pairs with the highest score.
-			statePartition.MergeStates(highestScoringStatePair.State1, highestScoringStatePair.State2)
+			copiedPartition.MergeStates(highestScoringStatePair.State1, highestScoringStatePair.State2)
+			// Copy changes to original state partition.
+			statePartition.CopyChangesFrom(&copiedPartition)
 
 			// Add merged state pair with score to search data.
 			searchData.Merges = append(searchData.Merges, highestScoringStatePair)
@@ -104,6 +105,8 @@ func FastWindowedSearch(statePartition StatePartition, windowSize int, windowGro
 
 	// Clone StatePartition.
 	statePartition = statePartition.Clone()
+	// Copy the state partition for undoing and copying changed states.
+	copiedPartition := statePartition.Copy()
 	// Initialize search data.
 	searchData := SearchData{[]StatePairScore{}, 0, time.Duration(0)}
 	// Total merges counter.
@@ -123,8 +126,6 @@ func FastWindowedSearch(statePartition StatePartition, windowSize int, windowGro
 		// Set window size to window size parameter
 		// or length of ordered blocks if smaller.
 		windowSize = util.Min(windowSize, len(orderedBlocks))
-		// Copy the state partition for undoing merging.
-		copiedPartition := statePartition.Copy()
 
 		// Loop until no more deterministic merges are available within all possible windows.
 		for {
@@ -151,7 +152,7 @@ func FastWindowedSearch(statePartition StatePartition, windowSize int, windowGro
 						}
 
 						// Undo merges from copied partition.
-						copiedPartition.RollbackChanges(statePartition)
+						copiedPartition.RollbackChangesFrom(statePartition)
 					}
 				}
 			}
@@ -174,7 +175,120 @@ func FastWindowedSearch(statePartition StatePartition, windowSize int, windowGro
 
 		if highestScoringStatePair.Score != -1 {
 			// Merge the state pairs with the highest score.
-			statePartition.MergeStates(highestScoringStatePair.State1, highestScoringStatePair.State2)
+			copiedPartition.MergeStates(highestScoringStatePair.State1, highestScoringStatePair.State2)
+			// Copy changes to original state partition.
+			statePartition.CopyChangesFrom(&copiedPartition)
+
+			// Add merged state pair with score to search data.
+			searchData.Merges = append(searchData.Merges, highestScoringStatePair)
+		} else {
+			break
+		}
+	}
+
+	// Add total merges count to search data.
+	searchData.AttemptedMergesCount = totalMerges
+	// Add duration to search data.
+	searchData.Duration = time.Now().Sub(start)
+
+	// Return the final resultant state partition and search data.
+	return statePartition, searchData
+}
+
+// WindowedSearch deterministically merges state pairs within a given window.
+// Returns the resultant state partition and search data when no
+// more valid merges are possible.
+func WindowedSearch(statePartition StatePartition, windowSize int, windowGrow float64, scoringFunction ScoringFunction) (StatePartition, SearchData) {
+	// Parameter Error Checking.
+	if windowSize < 1{
+		panic("Window Size cannot be smaller than 1.")
+	}
+	if windowGrow <= 1.00{
+		panic("Window Grow cannot be smaller or equal to 1.")
+	}
+	// Clone StatePartition.
+	statePartition = statePartition.Clone()
+	// Copy the state partition for undoing and copying changed states.
+	copiedPartition := statePartition.Copy()
+	// Initialize search data.
+	searchData := SearchData{[]StatePairScore{}, 0, time.Duration(0)}
+	// Total merges counter.
+	totalMerges := 0
+	// Get ordered blocks within partition.
+	orderedBlocks := statePartition.OrderedBlocks()
+	// Start timer.
+	start := time.Now()
+
+	// Iterate until stopped.
+	for {
+		// State pair with the highest score.
+		highestScoringStatePair := StatePairScore{-1, -1, -1}
+
+		// Set window size before to 0.
+		previousWindowSize := 0
+		// Set window size to window size parameter
+		// or length of ordered blocks if smaller.
+		windowSize = util.Min(windowSize, len(orderedBlocks))
+
+		// Loop until no more deterministic merges are available within all possible windows.
+		for {
+			// Get all valid merges within window and compute their score.
+			for i := 0; i < windowSize; i++ {
+				for j := i + 1; j < windowSize; j++ {
+					if j >= previousWindowSize {
+						// Increment merge count.
+						totalMerges++
+
+						// Check if states are mergeable.
+						if copiedPartition.MergeStates(orderedBlocks[i], orderedBlocks[j]) {
+							// Do not compute score if states are within same block.
+							if statePartition.WithinSameBlock(orderedBlocks[i], orderedBlocks[j]) {
+								continue
+							}
+
+							// Calculate score.
+							score := scoringFunction(orderedBlocks[i], orderedBlocks[j], statePartition, copiedPartition)
+
+							// If score is bigger than state pair with the highest score,
+							// set current state pair to state pair with the highest score.
+							if score > highestScoringStatePair.Score {
+								highestScoringStatePair = StatePairScore{
+									State1: orderedBlocks[i],
+									State2: orderedBlocks[j],
+									Score:  score,
+								}
+							}
+						}
+
+						// Undo merges from copied partition.
+						copiedPartition.RollbackChangesFrom(statePartition)
+					}
+				}
+			}
+
+			// Check if any deterministic merges were found.
+			if highestScoringStatePair.Score != -1 {
+				break
+				// No more possible merges were found so increase window size.
+			} else {
+				// If the window size is biggest possible, break loop
+				// and return the most recent State Partition.
+				if windowSize >= len(orderedBlocks) {
+					break
+				}
+				// Set window size before to window size.
+				previousWindowSize = windowSize
+				// Get new window size which is the smallest from the window size multiplied
+				// by window grow or the number of blocks within initial state partition.
+				windowSize = util.Min(int(math.Round(float64(windowSize) * windowGrow)), len(orderedBlocks))
+			}
+		}
+
+		if highestScoringStatePair.Score != -1 {
+			// Merge the state pairs with the highest score.
+			copiedPartition.MergeStates(highestScoringStatePair.State1, highestScoringStatePair.State2)
+			// Copy changes to original state partition.
+			statePartition.CopyChangesFrom(&copiedPartition)
 
 			// Add merged state pair with score to search data.
 			searchData.Merges = append(searchData.Merges, highestScoringStatePair)
@@ -198,6 +312,8 @@ func FastWindowedSearch(statePartition StatePartition, windowSize int, windowGro
 func BlueFringeSearch(statePartition StatePartition, scoringFunction ScoringFunction) (StatePartition, SearchData) {
 	// Clone StatePartition.
 	statePartition = statePartition.Clone()
+	// Copy the state partition for undoing and copying changed states.
+	copiedPartition := statePartition.Copy()
 	// Initialize search data.
 	searchData := SearchData{[]StatePairScore{}, 0, time.Duration(0)}
 	// State pair with the highest score.
@@ -215,9 +331,6 @@ func BlueFringeSearch(statePartition StatePartition, scoringFunction ScoringFunc
 
 	// Initialize merged flag to false.
 	merged := false
-
-	// Copy the state partition for undoing merging.
-	copiedPartition := statePartition.Copy()
 
 	// Iterate until stopped.
 	for {
@@ -284,7 +397,7 @@ func BlueFringeSearch(statePartition StatePartition, scoringFunction ScoringFunc
 						merged = true
 					}
 					// Undo merge.
-					copiedPartition.RollbackChanges(statePartition)
+					copiedPartition.RollbackChangesFrom(statePartition)
 				}
 			}
 
@@ -299,13 +412,12 @@ func BlueFringeSearch(statePartition StatePartition, scoringFunction ScoringFunc
 		// If merged flag is true, merge highest scoring merge.
 		if merged {
 			// Merge the state pairs with the highest score.
-			statePartition.MergeStates(highestScoringStatePair.State1, highestScoringStatePair.State2)
+			copiedPartition.MergeStates(highestScoringStatePair.State1, highestScoringStatePair.State2)
+			// Copy changes to original state partition.
+			statePartition.CopyChangesFrom(&copiedPartition)
 
 			// Add merged state pair with score to search data.
 			searchData.Merges = append(searchData.Merges, highestScoringStatePair)
-
-			// Copy the state partition for undoing merging.
-			copiedPartition = statePartition.Copy()
 
 			// Remove previous state pair with the highest score.
 			highestScoringStatePair = StatePairScore{-1, -1, -1}
@@ -327,111 +439,3 @@ func BlueFringeSearch(statePartition StatePartition, scoringFunction ScoringFunc
 	return statePartition, searchData
 }
 
-// WindowedSearch deterministically merges state pairs within a given window.
-// Returns the resultant state partition and search data when no
-// more valid merges are possible.
-func WindowedSearch(statePartition StatePartition, windowSize int, windowGrow float64, scoringFunction ScoringFunction) (StatePartition, SearchData) {
-	// Parameter Error Checking.
-	if windowSize < 1{
-		panic("Window Size cannot be smaller than 1.")
-	}
-	if windowGrow <= 1.00{
-		panic("Window Grow cannot be smaller or equal to 1.")
-	}
-	// Clone StatePartition.
-	statePartition = statePartition.Clone()
-	// Initialize search data.
-	searchData := SearchData{[]StatePairScore{}, 0, time.Duration(0)}
-	// Total merges counter.
-	totalMerges := 0
-	// Get ordered blocks within partition.
-	orderedBlocks := statePartition.OrderedBlocks()
-	// Start timer.
-	start := time.Now()
-
-	// Iterate until stopped.
-	for {
-		// State pair with the highest score.
-		highestScoringStatePair := StatePairScore{-1, -1, -1}
-
-		// Set window size before to 0.
-		previousWindowSize := 0
-		// Set window size to window size parameter
-		// or length of ordered blocks if smaller.
-		windowSize = util.Min(windowSize, len(orderedBlocks))
-		// Copy the state partition for undoing merging.
-		copiedPartition := statePartition.Copy()
-
-		// Loop until no more deterministic merges are available within all possible windows.
-		for {
-			// Get all valid merges within window and compute their score.
-			for i := 0; i < windowSize; i++ {
-				for j := i + 1; j < windowSize; j++ {
-					if j >= previousWindowSize {
-						// Increment merge count.
-						totalMerges++
-
-						// Check if states are mergeable.
-						if copiedPartition.MergeStates(orderedBlocks[i], orderedBlocks[j]) {
-							// Do not compute score if states are within same block.
-							if statePartition.WithinSameBlock(orderedBlocks[i], orderedBlocks[j]) {
-								continue
-							}
-
-							// Calculate score.
-							score := scoringFunction(orderedBlocks[i], orderedBlocks[j], statePartition, copiedPartition)
-
-							// If score is bigger than state pair with the highest score,
-							// set current state pair to state pair with the highest score.
-							if score > highestScoringStatePair.Score {
-								highestScoringStatePair = StatePairScore{
-									State1: orderedBlocks[i],
-									State2: orderedBlocks[j],
-									Score:  score,
-								}
-							}
-						}
-
-						// Undo merges from copied partition.
-						copiedPartition.RollbackChanges(statePartition)
-					}
-				}
-			}
-
-			// Check if any deterministic merges were found.
-			if highestScoringStatePair.Score != -1 {
-				break
-				// No more possible merges were found so increase window size.
-			} else {
-				// If the window size is biggest possible, break loop
-				// and return the most recent State Partition.
-				if windowSize >= len(orderedBlocks) {
-					break
-				}
-				// Set window size before to window size.
-				previousWindowSize = windowSize
-				// Get new window size which is the smallest from the window size multiplied
-				// by window grow or the number of blocks within initial state partition.
-				windowSize = util.Min(int(math.Round(float64(windowSize) * windowGrow)), len(orderedBlocks))
-			}
-		}
-
-		if highestScoringStatePair.Score != -1 {
-			// Merge the state pairs with the highest score.
-			statePartition.MergeStates(highestScoringStatePair.State1, highestScoringStatePair.State2)
-
-			// Add merged state pair with score to search data.
-			searchData.Merges = append(searchData.Merges, highestScoringStatePair)
-		} else {
-			break
-		}
-	}
-
-	// Add total merges count to search data.
-	searchData.AttemptedMergesCount = totalMerges
-	// Add duration to search data.
-	searchData.Duration = time.Now().Sub(start)
-
-	// Return the final resultant state partition and search data.
-	return statePartition, searchData
-}

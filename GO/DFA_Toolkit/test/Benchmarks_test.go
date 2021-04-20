@@ -5,7 +5,6 @@ import (
 	"DFA_Toolkit/DFA_Toolkit/util"
 	"fmt"
 	"math/rand"
-	"sync"
 	"testing"
 	"time"
 )
@@ -62,7 +61,7 @@ func TestBenchmarkDetMerge(t *testing.T) {
 					validMerges++
 				}
 
-				snapshot.RollbackChanges(part)
+				snapshot.RollbackChangesFrom(part)
 			}
 		}
 
@@ -131,7 +130,7 @@ func TestBenchmarkFastWindowedEDSM(t *testing.T) {
 	// rand.Seed(time.Now().UnixNano())
 
 	// Number of iterations.
-	n := 20
+	n := 128
 	// Target size.
 	targetSize := 32
 
@@ -278,130 +277,9 @@ func TestBenchmarkBlueFringeEDSM(t *testing.T) {
 	}
 }
 
-// TestBenchmarkEDSM benchmarks the performance of the GreedyEDSMFromDataset(), FastWindowedEDSMFromDataset()
-// and BlueFringeEDSMFromDataset() functions.
-func TestBenchmarkEDSM(t *testing.T) {
-	// Random Seed.
-	rand.Seed(time.Now().UnixNano())
-
-	// Number of iterations.
-	n := 128
-	// Target size.
-	targetSize := 32
-
-	winnersGreedy, winnersWindowed, winnersBlueFringe := 0, 0, 0
-	accuraciesGreedy, accuraciesWindowed, accuraciesBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
-	numberOfStatesGreedy, numberOfStatesWindowed, numberOfStatesBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
-	for i := 0; i < n; i++ {
-		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
-
-		// Create a target DFA.
-		target := dfatoolkit.AbbadingoDFA(targetSize, true)
-
-		// Training testing sets.
-		trainingSet, testingSet := dfatoolkit.AbbadingoDatasetExact(target, 607, 1800)
-
-		// Construct an APTA from training dataset.
-		APTA := trainingSet.GetPTA(true)
-
-		// Create wait group
-		var wg sync.WaitGroup
-		// Add 3 EDSM types to wait group.
-		wg.Add(3)
-
-		var resultantDFAGreedy dfatoolkit.DFA
-		var resultantDFAWindowed dfatoolkit.DFA
-		var resultantDFABlueFringe dfatoolkit.DFA
-
-		go func() {
-			// Decrement 1 from wait group.
-			defer wg.Done()
-			resultantDFAGreedy, _ = dfatoolkit.GreedyEDSM(APTA)
-		}()
-
-		go func() {
-			// Decrement 1 from wait group.
-			defer wg.Done()
-			resultantDFAWindowed, _ = dfatoolkit.FastWindowedEDSM(APTA, targetSize*2, 2.0)
-		}()
-
-		go func() {
-			// Decrement 1 from wait group.
-			defer wg.Done()
-			resultantDFABlueFringe, _ = dfatoolkit.BlueFringeEDSM(APTA)
-		}()
-
-		// Wait for all go routines within wait
-		// group to finish executing.
-		wg.Wait()
-
-		accuracyGreedy := resultantDFAGreedy.Accuracy(testingSet)
-		accuracyWindowed := resultantDFAWindowed.Accuracy(testingSet)
-		accuracyBlueFringe := resultantDFABlueFringe.Accuracy(testingSet)
-
-		accuraciesGreedy.Add(accuracyGreedy)
-		accuraciesWindowed.Add(accuracyWindowed)
-		accuraciesBlueFringe.Add(accuracyBlueFringe)
-
-		numberOfStatesGreedy.Add(float64(len(resultantDFAGreedy.States)))
-		numberOfStatesWindowed.Add(float64(len(resultantDFAWindowed.States)))
-		numberOfStatesBlueFringe.Add(float64(len(resultantDFABlueFringe.States)))
-
-		if accuracyGreedy >= 0.99 {
-			winnersGreedy++
-		}
-
-		if accuracyWindowed >= 0.99 {
-			winnersWindowed++
-		}
-
-		if accuracyBlueFringe >= 0.99 {
-			winnersBlueFringe++
-		}
-
-		fmt.Printf("Greedy: Accuracy: %.3f, Number of States %d\n", accuracyGreedy, len(resultantDFAGreedy.States))
-		fmt.Printf("Windowed: Accuracy: %.3f, Number of States %d\n", accuracyWindowed, len(resultantDFAWindowed.States))
-		fmt.Printf("Blue-Fringe: Accuracy: %.3f, Number of States %d\n", accuracyBlueFringe, len(resultantDFABlueFringe.States))
-		fmt.Print("-----------------------------------------------------------------------------\n")
-	}
-
-	successfulPercentageGreedy := float64(winnersGreedy) / float64(n)
-	fmt.Print("Greedy Search:\n")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.3f%%\n", successfulPercentageGreedy)
-	fmt.Printf("Minimum Accuracy: %.3f Maximum Accuracy: %.3f Average Accuracy: %.3f\n", accuraciesGreedy.Min(), accuraciesGreedy.Max(), accuraciesGreedy.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesGreedy.Min(), numberOfStatesGreedy.Max(), numberOfStatesGreedy.Avg())
-	fmt.Print("-----------------------------------------------------------------------------\n\n")
-
-	successfulPercentageWindowed := float64(winnersWindowed) / float64(n)
-	fmt.Printf("Windowed Search:\n")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.3f%%\n", successfulPercentageWindowed)
-	fmt.Printf("Minimum Accuracy: %.3f Maximum Accuracy: %.3f Average Accuracy: %.3f\n", accuraciesWindowed.Min(), accuraciesWindowed.Max(), accuraciesWindowed.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesWindowed.Min(), numberOfStatesWindowed.Max(), numberOfStatesWindowed.Avg())
-	fmt.Print("-----------------------------------------------------------------------------\n\n")
-
-	successfulPercentageBlueFringe := float64(winnersBlueFringe) / float64(n)
-	fmt.Printf("Blue-Fringe Search:\n")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.3f%%\n", successfulPercentageBlueFringe)
-	fmt.Printf("Minimum Accuracy: %.3f Maximum Accuracy: %.3f Average Accuracy: %.3f\n", accuraciesBlueFringe.Min(), accuraciesBlueFringe.Max(), accuraciesBlueFringe.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesBlueFringe.Min(), numberOfStatesBlueFringe.Max(), numberOfStatesBlueFringe.Avg())
-	fmt.Print("-----------------------------------------------------------------------------\n\n")
-
-	if successfulPercentageGreedy < 0.09 || successfulPercentageGreedy > 0.15 {
-		t.Error("The percentage of successful DFAs for Greedy EDSM is less than 0.09 or bigger than 0.15.")
-	}
-
-	if successfulPercentageWindowed < 0.09 || successfulPercentageWindowed > 0.15 {
-		t.Error("The percentage of successful DFAs for Windowed EDSM is less than 0.09 or bigger than 0.15.")
-	}
-
-	if successfulPercentageBlueFringe < 0.07 || successfulPercentageBlueFringe > 0.15 {
-		t.Error("The percentage of successful DFAs for Blue-Fringe EDSM is less than 0.07 or bigger than 0.15.")
-	}
-}
-
-// TestBenchmarkEDSM2 benchmarks the performance of the GreedyEDSMFromDataset(), FastWindowedEDSMFromDataset()
-// and BlueFringeEDSMFromDataset() functions while comparing performance (merges per second, duration, ..).
-func TestBenchmarkEDSM2(t *testing.T){
+// TestBenchmarkEDSM benchmarks the performance of the GreedyEDSMFromDataset(), FastWindowedEDSMFromDataset(),
+// WindowedEDSMFromDataset() and BlueFringeEDSMFromDataset() functions while comparing their performance.
+func TestBenchmarkEDSM(t *testing.T){
 	// Random Seed.
 	// rand.Seed(time.Now().UnixNano())
 
@@ -496,8 +374,8 @@ func TestBenchmarkEDSM2(t *testing.T){
 	}
 
 	successfulPercentageGreedy := float64(winnersGreedy) / float64(n)
-	successfulPercentageWindowed := float64(winnersFastWindowed) / float64(n)
-	successfulPercentageWindowed2 := float64(winnersWindowed) / float64(n)
+	successfulPercentageFastWindowed := float64(winnersFastWindowed) / float64(n)
+	successfulPercentageWindowed := float64(winnersWindowed) / float64(n)
 	successfulPercentageBlueFringe := float64(winnersBlueFringe) / float64(n)
 
 	fmt.Println("-----------------------------------------------------------------------------")
@@ -509,24 +387,40 @@ func TestBenchmarkEDSM2(t *testing.T){
 	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecGreedy.Min(), mergesPerSecGreedy.Max(), mergesPerSecGreedy.Avg())
 	fmt.Println("-----------------------------------------------------------------------------")
 	fmt.Println("Fast Windowed Search")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageWindowed)
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageFastWindowed)
 	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesFastWindowed.Min(), accuraciesFastWindowed.Max(), accuraciesFastWindowed.Avg())
 	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesFastWindowed.Min(), numberOfStatesFastWindowed.Max(), numberOfStatesFastWindowed.Avg())
 	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationFastWindowed.Min(), durationFastWindowed.Max(), durationFastWindowed.Avg())
 	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecFastWindowed.Min(), mergesPerSecFastWindowed.Max(), mergesPerSecFastWindowed.Avg())
 	fmt.Println("-----------------------------------------------------------------------------")
 	fmt.Println("Windowed Search")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageWindowed2)
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageWindowed)
 	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesWindowed.Min(), accuraciesWindowed.Max(), accuraciesWindowed.Avg())
 	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesWindowed.Min(), numberOfStatesWindowed.Max(), numberOfStatesWindowed.Avg())
 	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationWindowed.Min(), durationWindowed.Max(), durationWindowed.Avg())
 	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecWindowed.Min(), mergesPerSecWindowed.Max(), mergesPerSecWindowed.Avg())
 	fmt.Println("-----------------------------------------------------------------------------")
-	fmt.Println("Blue-Fringe")
+	fmt.Println("Blue-Fringe Search")
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageBlueFringe)
 	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesBlueFringe.Min(), accuraciesBlueFringe.Max(), accuraciesBlueFringe.Avg())
 	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesBlueFringe.Min(), numberOfStatesBlueFringe.Max(), numberOfStatesBlueFringe.Avg())
 	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationBlueFringe.Min(), durationBlueFringe.Max(), durationBlueFringe.Avg())
 	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecBlueFringe.Min(), mergesPerSecBlueFringe.Max(), mergesPerSecBlueFringe.Avg())
 	fmt.Println("-----------------------------------------------------------------------------")
+
+	if successfulPercentageGreedy < 0.09 || successfulPercentageGreedy > 0.15 {
+		t.Error("The percentage of successful DFAs for Greedy EDSM is less than 0.09 or bigger than 0.15.")
+	}
+
+	if successfulPercentageFastWindowed < 0.07 || successfulPercentageFastWindowed > 0.15 {
+		t.Error("The percentage of successful DFAs for Fast Windowed EDSM is less than 0.07 or bigger than 0.15.")
+	}
+
+	if successfulPercentageWindowed < 0.09 || successfulPercentageWindowed > 0.15 {
+		t.Error("The percentage of successful DFAs for Windowed EDSM is less than 0.09 or bigger than 0.15.")
+	}
+
+	if successfulPercentageBlueFringe < 0.07 || successfulPercentageBlueFringe > 0.15 {
+		t.Error("The percentage of successful DFAs for Blue-Fringe EDSM is less than 0.07 or bigger than 0.15.")
+	}
 }

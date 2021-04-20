@@ -95,7 +95,7 @@ func TestStateMergingAndDFAEquivalence(t *testing.T) {
 	if !mergedDFA1.IsValidSafe() {
 		t.Errorf("State Partition should be valid.")
 	}
-	statePartitionCopy.RollbackChanges(statePartition)
+	statePartitionCopy.RollbackChangesFrom(statePartition)
 
 	if !statePartitionCopy.MergeStates(3, 5) {
 		t.Errorf("Merge should be valid.")

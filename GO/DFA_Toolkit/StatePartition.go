@@ -346,8 +346,8 @@ func (statePartition StatePartition) Clone() StatePartition {
 	return clonedStatePartition
 }
 
-// RollbackChanges reverts any changes made within state partition given the original state partition.
-func (statePartition *StatePartition) RollbackChanges(originalStatePartition StatePartition) {
+// RollbackChangesFrom reverts any changes made within state partition given the original state partition.
+func (statePartition *StatePartition) RollbackChangesFrom(originalStatePartition StatePartition) {
 	// If the state partition is a copy, copy values of changed blocks from original
 	// state partition. Else, do nothing.
 	if statePartition.IsCopy {
@@ -376,6 +376,42 @@ func (statePartition *StatePartition) RollbackChanges(originalStatePartition Sta
 
 		// Set the changed blocks count to 0.
 		statePartition.ChangedBlocksCount = 0
+	}
+}
+
+// CopyChangesFrom copies the changes from one state partition to another and resets
+// the changed values within the copied state partition.
+func (statePartition *StatePartition) CopyChangesFrom(copiedStatePartition *StatePartition){
+	// If the state partition is a copy, copy values of changed blocks to original
+	// state partition. Else, do nothing.
+	if copiedStatePartition.IsCopy {
+		// Set blocks count values to the new values.
+		statePartition.BlocksCount = copiedStatePartition.BlocksCount
+		statePartition.AcceptingBlocksCount = copiedStatePartition.AcceptingBlocksCount
+		statePartition.RejectingBlocksCount = copiedStatePartition.RejectingBlocksCount
+
+		// Iterate over each altered block.
+		for _, blockID := range copiedStatePartition.ChangedBlocks[:copiedStatePartition.ChangedBlocksCount] {
+			// Get changed block pointer from copied state partition.
+			changedBlock := &copiedStatePartition.Blocks[blockID]
+			// Get block pointer from original state partition.
+			originalBlock := &statePartition.Blocks[blockID]
+
+			// Update root, size, link, and label.
+			originalBlock.Root = changedBlock.Root
+			originalBlock.Size = changedBlock.Size
+			originalBlock.Link = changedBlock.Link
+			originalBlock.Label = changedBlock.Label
+
+			// Set changed property of changed block to false.
+			changedBlock.Changed = false
+
+			// Copy transitions from changed to original.
+			copy(originalBlock.Transitions, changedBlock.Transitions)
+		}
+
+		// Set the changed blocks count within the copied partition to 0.
+		copiedStatePartition.ChangedBlocksCount = 0
 	}
 }
 
