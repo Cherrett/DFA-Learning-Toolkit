@@ -25,11 +25,11 @@ func GreedySearch(statePartition StatePartition, scoringFunction ScoringFunction
 	// Copy the state partition for undoing and copying changed states.
 	copiedPartition := statePartition.Copy()
 	// Initialize search data.
-	searchData := SearchData{[]StatePairScore{}, 0, time.Duration(0)}
+	searchData := SearchData{[]StatePairScore{}, 0, 0, time.Duration(0)}
 	// State pair with the highest score.
 	highestScoringStatePair := StatePairScore{-1, -1, -1}
-	// Total merges counter.
-	totalMerges := 0
+	// Total merges and valid merges counter.
+	totalMerges, totalValidMerges := 0, 0
 	// Start timer.
 	start := time.Now()
 
@@ -46,6 +46,9 @@ func GreedySearch(statePartition StatePartition, scoringFunction ScoringFunction
 				totalMerges++
 				// Check if states are mergeable.
 				if copiedPartition.MergeStates(blocks[i], blocks[j]) {
+					// Increment valid merge count.
+					totalValidMerges++
+
 					// Calculate score.
 					score := scoringFunction(blocks[i], blocks[j], statePartition, copiedPartition)
 
@@ -82,8 +85,9 @@ func GreedySearch(statePartition StatePartition, scoringFunction ScoringFunction
 		}
 	}
 
-	// Add total merges count to search data.
+	// Add total and valid merges counts to search data.
 	searchData.AttemptedMergesCount = totalMerges
+	searchData.ValidMergesCount = totalValidMerges
 	// Add duration to search data.
 	searchData.Duration = time.Now().Sub(start)
 
@@ -108,9 +112,9 @@ func FastWindowedSearch(statePartition StatePartition, windowSize int, windowGro
 	// Copy the state partition for undoing and copying changed states.
 	copiedPartition := statePartition.Copy()
 	// Initialize search data.
-	searchData := SearchData{[]StatePairScore{}, 0, time.Duration(0)}
-	// Total merges counter.
-	totalMerges := 0
+	searchData := SearchData{[]StatePairScore{}, 0, 0, time.Duration(0)}
+	// Total merges and valid merges counter.
+	totalMerges, totalValidMerges := 0, 0
 
 	// Start timer.
 	start := time.Now()
@@ -137,6 +141,9 @@ func FastWindowedSearch(statePartition StatePartition, windowSize int, windowGro
 						totalMerges++
 						// Check if states are mergeable.
 						if copiedPartition.MergeStates(orderedBlocks[i], orderedBlocks[j]) {
+							// Increment valid merge count.
+							totalValidMerges++
+
 							// Calculate score.
 							score := scoringFunction(orderedBlocks[i], orderedBlocks[j], statePartition, copiedPartition)
 
@@ -186,8 +193,9 @@ func FastWindowedSearch(statePartition StatePartition, windowSize int, windowGro
 		}
 	}
 
-	// Add total merges count to search data.
+	// Add total and valid merges counts to search data.
 	searchData.AttemptedMergesCount = totalMerges
+	searchData.ValidMergesCount = totalValidMerges
 	// Add duration to search data.
 	searchData.Duration = time.Now().Sub(start)
 
@@ -211,9 +219,9 @@ func WindowedSearch(statePartition StatePartition, windowSize int, windowGrow fl
 	// Copy the state partition for undoing and copying changed states.
 	copiedPartition := statePartition.Copy()
 	// Initialize search data.
-	searchData := SearchData{[]StatePairScore{}, 0, time.Duration(0)}
-	// Total merges counter.
-	totalMerges := 0
+	searchData := SearchData{[]StatePairScore{}, 0, 0, time.Duration(0)}
+	// Total merges and valid merges counter.
+	totalMerges, totalValidMerges := 0, 0
 	// Get ordered blocks within partition.
 	orderedBlocks := statePartition.OrderedBlocks()
 	// Start timer.
@@ -242,20 +250,21 @@ func WindowedSearch(statePartition StatePartition, windowSize int, windowGrow fl
 						// Check if states are mergeable.
 						if copiedPartition.MergeStates(orderedBlocks[i], orderedBlocks[j]) {
 							// Do not compute score if states are within same block.
-							if statePartition.WithinSameBlock(orderedBlocks[i], orderedBlocks[j]) {
-								continue
-							}
+							if !statePartition.WithinSameBlock(orderedBlocks[i], orderedBlocks[j]) {
+								// Increment valid merge count.
+								totalValidMerges++
 
-							// Calculate score.
-							score := scoringFunction(orderedBlocks[i], orderedBlocks[j], statePartition, copiedPartition)
+								// Calculate score.
+								score := scoringFunction(orderedBlocks[i], orderedBlocks[j], statePartition, copiedPartition)
 
-							// If score is bigger than state pair with the highest score,
-							// set current state pair to state pair with the highest score.
-							if score > highestScoringStatePair.Score {
-								highestScoringStatePair = StatePairScore{
-									State1: orderedBlocks[i],
-									State2: orderedBlocks[j],
-									Score:  score,
+								// If score is bigger than state pair with the highest score,
+								// set current state pair to state pair with the highest score.
+								if score > highestScoringStatePair.Score {
+									highestScoringStatePair = StatePairScore{
+										State1: orderedBlocks[i],
+										State2: orderedBlocks[j],
+										Score:  score,
+									}
 								}
 							}
 						}
@@ -297,8 +306,9 @@ func WindowedSearch(statePartition StatePartition, windowSize int, windowGrow fl
 		}
 	}
 
-	// Add total merges count to search data.
+	// Add total and valid merges counts to search data.
 	searchData.AttemptedMergesCount = totalMerges
+	searchData.ValidMergesCount = totalValidMerges
 	// Add duration to search data.
 	searchData.Duration = time.Now().Sub(start)
 
@@ -315,11 +325,11 @@ func BlueFringeSearch(statePartition StatePartition, scoringFunction ScoringFunc
 	// Copy the state partition for undoing and copying changed states.
 	copiedPartition := statePartition.Copy()
 	// Initialize search data.
-	searchData := SearchData{[]StatePairScore{}, 0, time.Duration(0)}
+	searchData := SearchData{[]StatePairScore{}, 0, 0, time.Duration(0)}
 	// State pair with the highest score.
 	highestScoringStatePair := StatePairScore{-1, -1, -1}
-	// Total merges counter.
-	totalMerges := 0
+	// Total merges and valid merges counter.
+	totalMerges, totalValidMerges := 0, 0
 	// Start timer.
 	start := time.Now()
 
@@ -376,6 +386,9 @@ func BlueFringeSearch(statePartition StatePartition, scoringFunction ScoringFunc
 					totalMerges++
 					// If states are mergeable, calculate score and add to detMerges.
 					if copiedPartition.MergeStates(blueElement, redElement) {
+						// Increment valid merge count.
+						totalValidMerges++
+
 						// Set the state pairs score as computed.
 						scoresComputed[StateIDPair{blueElement, redElement}] = util.Null
 						scoresComputed[StateIDPair{redElement, blueElement}] = util.Null
@@ -430,12 +443,12 @@ func BlueFringeSearch(statePartition StatePartition, scoringFunction ScoringFunc
 		}
 	}
 
-	// Add total merges count to search data.
+	// Add total and valid merges counts to search data.
 	searchData.AttemptedMergesCount = totalMerges
+	searchData.ValidMergesCount = totalValidMerges
 	// Add duration to search data.
 	searchData.Duration = time.Now().Sub(start)
 
 	// Return the final resultant state partition and search data.
 	return statePartition, searchData
 }
-
