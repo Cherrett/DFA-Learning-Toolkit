@@ -306,6 +306,46 @@ func (statePartition StatePartition) Copy() StatePartition {
 	return copiedStatePartition
 }
 
+// Clone returns a clone of the state partition.
+func (statePartition StatePartition) Clone() StatePartition {
+	// Initialize new StatePartition struct using state partition.
+	clonedStatePartition := StatePartition{
+		Blocks:               make([]Block, len(statePartition.Blocks)),
+		BlocksCount:          statePartition.BlocksCount,
+		AcceptingBlocksCount: statePartition.AcceptingBlocksCount,
+		RejectingBlocksCount: statePartition.RejectingBlocksCount,
+		AlphabetSize:         statePartition.AlphabetSize,
+		StartingStateID:      statePartition.StartingStateID,
+		IsCopy:               statePartition.IsCopy,
+		ChangedBlocks:        make([]int, len(statePartition.ChangedBlocks)),
+		ChangedBlocksCount:   statePartition.ChangedBlocksCount,
+	}
+
+	// Iterate over each block within blocks slice.
+	for blockID := range statePartition.Blocks{
+		// Get block pointer from cloned state partition.
+		block := &clonedStatePartition.Blocks[blockID]
+		// Get block pointer from original state partition.
+		originalBlock := &statePartition.Blocks[blockID]
+
+		// Update root, size, link, and label.
+		block.Root = originalBlock.Root
+		block.Size = originalBlock.Size
+		block.Link = originalBlock.Link
+		block.Label = originalBlock.Label
+
+		// Initialize and copy transitions.
+		block.Transitions = make([]int, statePartition.AlphabetSize)
+		copy(block.Transitions, originalBlock.Transitions)
+	}
+
+	// Copy changed blocks slice.
+	copy(clonedStatePartition.ChangedBlocks, statePartition.ChangedBlocks)
+
+	// Return copied state partition.
+	return clonedStatePartition
+}
+
 // RollbackChanges reverts any changes made within state partition given the original state partition.
 func (statePartition *StatePartition) RollbackChanges(originalStatePartition StatePartition) {
 	// If the state partition is a copy, copy values of changed blocks from original
