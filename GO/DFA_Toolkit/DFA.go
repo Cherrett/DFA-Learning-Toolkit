@@ -527,9 +527,25 @@ func (dfa DFA) StartingState() *State {
 	return &dfa.States[dfa.StartingStateID]
 }
 
-// Clone returns a clone of DFA.
+// Clone returns a clone of the DFA.
 func (dfa DFA) Clone() DFA {
-	return DFA{States: dfa.States, StartingStateID: dfa.StartingStateID, Alphabet: dfa.Alphabet}
+	clonedDFA := DFA{
+		States:                make([]State, len(dfa.States)),
+		Alphabet:              make([]int, len(dfa.Alphabet)),
+		StartingStateID:       dfa.StartingStateID,
+		depth:                 dfa.depth,
+		computedDepthAndOrder: dfa.computedDepthAndOrder,
+	}
+
+	for stateID := range dfa.States{
+		clonedDFA.States[stateID] = dfa.States[stateID]
+	}
+
+	for symbolID := range dfa.Alphabet{
+		clonedDFA.States[symbolID] = dfa.States[symbolID]
+	}
+
+	return clonedDFA
 }
 
 // Equal checks whether DFA is equal to the given DFA.

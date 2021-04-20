@@ -20,6 +20,8 @@ type ScoringFunction func(stateID1, stateID2 int, partitionBefore, partitionAfte
 // Returns the resultant state partition and search data when no
 // more valid merges are possible.
 func GreedySearch(statePartition StatePartition, scoringFunction ScoringFunction) (StatePartition, SearchData) {
+	// Clone StatePartition.
+	statePartition = statePartition.Clone()
 	// Initialize search data.
 	searchData := SearchData{[]StatePairScore{}, 0, time.Duration(0)}
 	// State pair with the highest score.
@@ -88,37 +90,48 @@ func GreedySearch(statePartition StatePartition, scoringFunction ScoringFunction
 	return statePartition, searchData
 }
 
-// WindowedSearch deterministically merges state pairs within a given window.
+// FastWindowedSearch deterministically merges state pairs within a given window.
 // Returns the resultant state partition and search data when no
 // more valid merges are possible.
-func WindowedSearch(statePartition StatePartition, windowSize int, windowGrow float64, scoringFunction ScoringFunction) (StatePartition, SearchData) {
+func FastWindowedSearch(statePartition StatePartition, windowSize int, windowGrow float64, scoringFunction ScoringFunction) (StatePartition, SearchData) {
+	// Parameter Error Checking.
+	if windowSize < 1{
+		panic("Window Size cannot be smaller than 1.")
+	}
+	if windowGrow <= 1.00{
+		panic("Window Grow cannot be smaller or equal to 1.")
+	}
+
+	// Clone StatePartition.
+	statePartition = statePartition.Clone()
 	// Initialize search data.
 	searchData := SearchData{[]StatePairScore{}, 0, time.Duration(0)}
-	// State pair with the highest score.
-	highestScoringStatePair := StatePairScore{-1, -1, -1}
 	// Total merges counter.
 	totalMerges := 0
+
 	// Start timer.
 	start := time.Now()
 
-	// Get ordered blocks within partition.
-	orderedBlocks := statePartition.OrderedBlocks()
-
 	// Iterate until stopped.
 	for {
-		// Window values.
-		windowMin := 0
-		windowMax := util.Min(windowSize, len(orderedBlocks))
-
+		// State pair with the highest score.
+		highestScoringStatePair := StatePairScore{-1, -1, -1}
+		// Get ordered blocks within partition.
+		orderedBlocks := statePartition.OrderedBlocks()
+		// Set previous window size to 0.
+		previousWindowSize := 0
+		// Set window size to window size parameter
+		// or length of ordered blocks if smaller.
+		windowSize = util.Min(windowSize, len(orderedBlocks))
 		// Copy the state partition for undoing merging.
 		copiedPartition := statePartition.Copy()
 
 		// Loop until no more deterministic merges are available within all possible windows.
 		for {
 			// Get all valid merges within window and compute their score.
-			for i := 0; i < windowMax; i++ {
-				for j := windowMin; j < windowMax; j++ {
-					if i < j {
+			for i := 0; i < windowSize; i++ {
+				for j := i + 1; j < windowSize; j++ {
+					if j >= previousWindowSize {
 						// Increment merge count.
 						totalMerges++
 						// Check if states are mergeable.
@@ -148,15 +161,14 @@ func WindowedSearch(statePartition StatePartition, windowSize int, windowGrow fl
 				break
 				// No more possible merges were found so increase window size.
 			} else {
-				windowMin += windowSize
-				windowSize = int(math.Round(float64(windowSize) * windowGrow))
-				windowMax = util.Min(windowMax+windowSize, len(orderedBlocks))
-
-				// If the window size is out of bounds, break loop and return the
-				// most recent DFA found.
-				if windowMin >= len(orderedBlocks) {
+				// If the window size is biggest possible, break loop
+				// and return the most recent State Partition.
+				if windowSize >= len(orderedBlocks) {
 					break
 				}
+
+				previousWindowSize = windowSize
+				windowSize = util.Min(int(math.Round(float64(windowSize) * windowGrow)), len(orderedBlocks))
 			}
 		}
 
@@ -166,12 +178,6 @@ func WindowedSearch(statePartition StatePartition, windowSize int, windowGrow fl
 
 			// Add merged state pair with score to search data.
 			searchData.Merges = append(searchData.Merges, highestScoringStatePair)
-
-			// Update ordered states within merged partition.
-			orderedBlocks = statePartition.OrderedBlocks()
-
-			// Remove previous state pair with the highest score.
-			highestScoringStatePair = StatePairScore{-1, -1, -1}
 		} else {
 			break
 		}
@@ -190,6 +196,8 @@ func WindowedSearch(statePartition StatePartition, windowSize int, windowGrow fl
 // Returns the resultant state partition and search data when no
 // more valid merges are possible.
 func BlueFringeSearch(statePartition StatePartition, scoringFunction ScoringFunction) (StatePartition, SearchData) {
+	// Clone StatePartition.
+	statePartition = statePartition.Clone()
 	// Initialize search data.
 	searchData := SearchData{[]StatePairScore{}, 0, time.Duration(0)}
 	// State pair with the highest score.
@@ -319,70 +327,74 @@ func BlueFringeSearch(statePartition StatePartition, scoringFunction ScoringFunc
 	return statePartition, searchData
 }
 
-// WindowedSearch2 deterministically merges state pairs within a given window.
+// WindowedSearch deterministically merges state pairs within a given window.
 // Returns the resultant state partition and search data when no
 // more valid merges are possible.
-func WindowedSearch2(statePartition StatePartition, windowSize int, windowGrow float64, scoringFunction ScoringFunction) (StatePartition, SearchData) {
+func WindowedSearch(statePartition StatePartition, windowSize int, windowGrow float64, scoringFunction ScoringFunction) (StatePartition, SearchData) {
+	// Parameter Error Checking.
+	if windowSize < 1{
+		panic("Window Size cannot be smaller than 1.")
+	}
+	if windowGrow <= 1.00{
+		panic("Window Grow cannot be smaller or equal to 1.")
+	}
+	// Clone StatePartition.
+	statePartition = statePartition.Clone()
 	// Initialize search data.
 	searchData := SearchData{[]StatePairScore{}, 0, time.Duration(0)}
-	// State pair with the highest score.
-	highestScoringStatePair := StatePairScore{-1, -1, -1}
 	// Total merges counter.
 	totalMerges := 0
+	// Get ordered blocks within partition.
+	orderedBlocks := statePartition.OrderedBlocks()
 	// Start timer.
 	start := time.Now()
 
-	// Get ordered blocks within partition.
-	orderedBlocks := statePartition.OrderedBlocks()
-
-	// Set window size before to 0.
-	windowSizeBefore := 0
-
-	// Set window using windows size.
-	window := orderedBlocks[:windowSize]
-
 	// Iterate until stopped.
 	for {
+		// State pair with the highest score.
+		highestScoringStatePair := StatePairScore{-1, -1, -1}
+
+		// Set window size before to 0.
+		previousWindowSize := 0
+		// Set window size to window size parameter
+		// or length of ordered blocks if smaller.
+		windowSize = util.Min(windowSize, len(orderedBlocks))
 		// Copy the state partition for undoing merging.
 		copiedPartition := statePartition.Copy()
 
 		// Loop until no more deterministic merges are available within all possible windows.
 		for {
-			// Get all states within window.
-			for x, stateID := range window {
-				// Get all states after index x within window.
-				for y, stateID2 := range window[x+1:] {
-					// Skip previously attempted merge pairs.
-					if x+1+y < windowSizeBefore && x < windowSizeBefore {
-						continue
-					}
+			// Get all valid merges within window and compute their score.
+			for i := 0; i < windowSize; i++ {
+				for j := i + 1; j < windowSize; j++ {
+					if j >= previousWindowSize {
+						// Increment merge count.
+						totalMerges++
 
-					// Increment merge count.
-					totalMerges++
+						// Check if states are mergeable.
+						if copiedPartition.MergeStates(orderedBlocks[i], orderedBlocks[j]) {
+							// Do not compute score if states are within same block.
+							if statePartition.WithinSameBlock(orderedBlocks[i], orderedBlocks[j]) {
+								continue
+							}
 
-					// Check if states are mergeable.
-					if copiedPartition.MergeStates(stateID, stateID2) {
-						// Do not compute score if states are within same block.
-						if statePartition.WithinSameBlock(stateID, stateID2) {
-							continue
-						}
+							// Calculate score.
+							score := scoringFunction(orderedBlocks[i], orderedBlocks[j], statePartition, copiedPartition)
 
-						// Calculate score.
-						score := scoringFunction(stateID, stateID2, statePartition, copiedPartition)
-
-						// If score is bigger than state pair with the highest score,
-						// set current state pair to state pair with the highest score.
-						if score > highestScoringStatePair.Score {
-							highestScoringStatePair = StatePairScore{
-								State1: stateID,
-								State2: stateID2,
-								Score:  score,
+							// If score is bigger than state pair with the highest score,
+							// set current state pair to state pair with the highest score.
+							if score > highestScoringStatePair.Score {
+								highestScoringStatePair = StatePairScore{
+									State1: orderedBlocks[i],
+									State2: orderedBlocks[j],
+									Score:  score,
+								}
 							}
 						}
-					}
 
-					// Undo merges from copied partition.
-					copiedPartition.RollbackChanges(statePartition)
+						// Undo merges from copied partition.
+						copiedPartition.RollbackChanges(statePartition)
+					}
 				}
 			}
 
@@ -391,19 +403,16 @@ func WindowedSearch2(statePartition StatePartition, windowSize int, windowGrow f
 				break
 				// No more possible merges were found so increase window size.
 			} else {
-				// Set window size before to window size.
-				windowSizeBefore = windowSize
-				// Get new window size which is the smallest from the window size multiplied
-				// by window grow or the number of blocks within initial state partition.
-				windowSize = util.Min(int(math.Round(float64(windowSize)*windowGrow)), len(orderedBlocks))
-				// Update window using new window size.
-				window = orderedBlocks[:windowSize]
-
-				// If the window size before is equal to the window size,
-				// break loop and return the final state partition.
-				if windowSizeBefore == windowSize {
+				// If the window size is biggest possible, break loop
+				// and return the most recent State Partition.
+				if windowSize >= len(orderedBlocks) {
 					break
 				}
+				// Set window size before to window size.
+				previousWindowSize = windowSize
+				// Get new window size which is the smallest from the window size multiplied
+				// by window grow or the number of blocks within initial state partition.
+				windowSize = util.Min(int(math.Round(float64(windowSize) * windowGrow)), len(orderedBlocks))
 			}
 		}
 
@@ -413,14 +422,6 @@ func WindowedSearch2(statePartition StatePartition, windowSize int, windowGrow f
 
 			// Add merged state pair with score to search data.
 			searchData.Merges = append(searchData.Merges, highestScoringStatePair)
-
-			// Set window size before to 0 since the state pairs
-			// were not tested within this new state partition
-			// (might be redundant, need to check).
-			windowSizeBefore = 0
-
-			// Remove previous state pair with the highest score.
-			highestScoringStatePair = StatePairScore{-1, -1, -1}
 		} else {
 			break
 		}
