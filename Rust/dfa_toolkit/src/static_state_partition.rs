@@ -1,18 +1,18 @@
 use crate::dfa::DFA;
 use crate::dfa_state::{StateLabel, ACCEPTING, REJECTING, UNKNOWN};
-use std::borrow::{Borrow, BorrowMut};
 
-pub struct Block {
+#[derive(Copy, Clone)]
+pub struct StaticBlock {
     pub root: i32,
     pub size: i32,
     pub link: i32,
     pub label: StateLabel,
     pub changed: bool,
-    pub transitions: Vec<i32>,
+    pub transitions: [i32; 2],
 }
 
-pub struct StatePartition {
-    pub blocks: Vec<Block>,
+pub struct StaticStatePartition {
+    pub blocks: Vec<StaticBlock>,
     pub blocks_count: i32,
     pub accepting_blocks_count: i32,
     pub rejecting_blocks_count: i32,
@@ -24,9 +24,9 @@ pub struct StatePartition {
     pub changed_blocks_count: i32,
 }
 
-impl StatePartition {
-    pub fn new(dfa: &DFA) -> StatePartition {
-        let mut state_partition = StatePartition {
+impl StaticStatePartition {
+    pub fn new(dfa: &DFA) -> StaticStatePartition {
+        let mut state_partition = StaticStatePartition {
             blocks: Vec::with_capacity(dfa.states.len()),
             blocks_count: dfa.states.len() as i32,
             accepting_blocks_count: 0,
@@ -39,13 +39,13 @@ impl StatePartition {
         };
 
         for i in 0..dfa.states.len() {
-            let mut block = Block {
+            let mut block = StaticBlock {
                 root: i as i32,
                 size: 1,
                 link: i as i32,
                 label: dfa.states[i].label,
                 changed: false,
-                transitions: Vec::with_capacity(dfa.symbols_count as usize),
+                transitions: [0, 0],
             };
 
             if block.label == ACCEPTING {
@@ -55,9 +55,7 @@ impl StatePartition {
             }
 
             for j in 0..dfa.symbols_count {
-                block
-                    .transitions
-                    .push(dfa.states[i].transitions[j as usize]);
+                block.transitions[j] = dfa.states[i].transitions[j as usize];
             }
 
             state_partition.blocks.push(block);
@@ -66,9 +64,9 @@ impl StatePartition {
         return state_partition;
     }
 
-    pub fn copy(&self) -> StatePartition {
-        let mut copied_state_partition = StatePartition {
-            blocks: Vec::with_capacity(self.blocks.len()),
+    pub fn copy(&self) -> StaticStatePartition {
+        return StaticStatePartition {
+            blocks: self.blocks.clone(),
             blocks_count: self.blocks_count,
             accepting_blocks_count: self.accepting_blocks_count,
             rejecting_blocks_count: self.rejecting_blocks_count,
@@ -78,20 +76,6 @@ impl StatePartition {
             changed_blocks: vec![0; self.blocks.len()],
             changed_blocks_count: 0,
         };
-
-        for i in 0..self.blocks.len() {
-            let block_pointer = self.blocks[i].borrow();
-            copied_state_partition.blocks.push(Block {
-                root: block_pointer.root,
-                size: block_pointer.size,
-                link: block_pointer.link,
-                label: block_pointer.label,
-                changed: false,
-                transitions: block_pointer.transitions.to_vec(),
-            });
-        }
-
-        return copied_state_partition;
     }
 
     pub fn changed_block(&mut self, block_id: i32) {
@@ -185,31 +169,6 @@ impl StatePartition {
         return state_id;
     }
 
-    // pub fn return_set(&self, block: i32) -> Vec<i32>{
-    //     let mut block_id = block;
-    //
-    //     // Hash set of state IDs and add root element to set.
-    //     let mut block_elements: Vec<i32> = vec![block_id];
-    //
-    //     // Add root element to set.
-    //     //block_elements.push(block_id);
-    //     // Set root to block ID.
-    //
-    //     let root = block_id;
-    //
-    //     // Iterate until link of current block ID is
-    //     // not equal to the root block.
-    //     while self.blocks[block_id as usize].link != root{
-    //         // Set block ID to link of current block.
-    //         block_id = self.blocks[block_id as usize].link;
-    //         // Add block ID to block elements set.
-    //         block_elements.push(block_id);
-    //     }
-    //
-    //     // Return state IDs within set.
-    //     return block_elements;
-    // }
-
     pub fn merge_states(&mut self, state1: i32, state2: i32) -> bool {
         let mut state1_id = state1;
         let mut state2_id = state2;
@@ -267,7 +226,7 @@ impl StatePartition {
         return true;
     }
 
-    pub fn rollback_changes(&mut self, original_state_partition: &StatePartition) {
+    pub fn rollback_changes(&mut self, original_state_partition: &StaticStatePartition) {
         // If the state partition is a copy, copy values of changed blocks from original
         // state partition. Else, do nothing.
         if self.is_copy {
@@ -279,18 +238,7 @@ impl StatePartition {
             // Iterate over each altered block (state).
             for i in 0..self.changed_blocks_count {
                 let block_id = self.changed_blocks[i as usize];
-                // Get block pointer from copied state partition.
-                let mut block = self.blocks[block_id as usize].borrow_mut();
-                // Get block pointer from original state partition.
-                let original_block = original_state_partition.blocks[block_id as usize].borrow();
-
-                // Update root, size, link, and label.
-                block.root = original_block.root;
-                block.size = original_block.size;
-                block.link = original_block.link;
-                block.label = original_block.label;
-                block.changed = false;
-                block.transitions = original_block.transitions.to_vec();
+                self.blocks[block_id as usize] = original_state_partition.blocks[block_id as usize];
             }
 
             // Empty the changed blocks vector.
@@ -300,7 +248,7 @@ impl StatePartition {
 }
 
 impl DFA {
-    pub fn to_state_partition(&self) -> StatePartition {
-        return StatePartition::new(self);
+    pub fn to_static_state_partition(&self) -> StaticStatePartition {
+        return StaticStatePartition::new(self);
     }
 }
