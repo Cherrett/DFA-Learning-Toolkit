@@ -7,7 +7,7 @@ use crate::dfa_state::State;
 pub struct DFA{
     pub states: Vec<State>,
     pub starting_state_id: i32,
-    pub symbols_count: i32,
+    pub symbols_count: usize,
     // #[serde(skip)]
     // depth: i32,
     // #[serde(skip)]

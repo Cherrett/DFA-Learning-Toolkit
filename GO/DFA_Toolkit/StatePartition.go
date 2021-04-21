@@ -62,17 +62,14 @@ func NewStatePartition(referenceDFA DFA) StatePartition {
 
 // ChangedBlock updates the required fields to mark block as changed.
 func (statePartition *StatePartition) ChangedBlock(blockID int) {
-	// Check that state partition is a copy.
-	if statePartition.IsCopy{
-		// If block is not already changed.
-		if !statePartition.Blocks[blockID].Changed {
-			// Update changed slice to include changed block ID.
-			statePartition.ChangedBlocks[statePartition.ChangedBlocksCount] = blockID
-			// Increment the changed blocks counter.
-			statePartition.ChangedBlocksCount++
-			// Set changed flag within block to true.
-			statePartition.Blocks[blockID].Changed = true
-		}
+	// Check that state partition is a copy and that block is not modified.
+	if statePartition.IsCopy && !statePartition.Blocks[blockID].Changed {
+		// Update changed slice to include changed block ID.
+		statePartition.ChangedBlocks[statePartition.ChangedBlocksCount] = blockID
+		// Increment the changed blocks counter.
+		statePartition.ChangedBlocksCount++
+		// Set changed flag within block to true.
+		statePartition.Blocks[blockID].Changed = true
 	}
 }
 

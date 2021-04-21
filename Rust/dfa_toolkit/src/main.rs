@@ -39,7 +39,7 @@ fn det_merge_benchmark(){
         for i in 0..apta.states.len() as i32 {
             for j in (i+1)..apta.states.len() as i32 {
                 total_merges += 1;
-                if snapshot.merge_states(&apta, i, j){
+                if snapshot.merge_states(i, j){
                     valid_merges += 1;
                 }
 
