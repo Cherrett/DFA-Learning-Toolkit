@@ -91,7 +91,7 @@ func TestStateMergingAndDFAEquivalence(t *testing.T) {
 	if !statePartitionCopy.MergeStates(2, 4) {
 		t.Errorf("Merge should be valid.")
 	}
-	mergedDFA1 := statePartitionCopy.ToDFA()
+	mergedDFA1 := statePartitionCopy.ToQuotientDFA()
 	if !mergedDFA1.IsValidSafe() {
 		t.Errorf("State Partition should be valid.")
 	}
@@ -103,7 +103,7 @@ func TestStateMergingAndDFAEquivalence(t *testing.T) {
 	if !statePartitionCopy.MergeStates(2, 4) {
 		t.Errorf("Merge should be valid.")
 	}
-	mergedDFA2 := statePartitionCopy.ToDFA()
+	mergedDFA2 := statePartitionCopy.ToQuotientDFA()
 	if !mergedDFA2.IsValidSafe() {
 		t.Errorf("State Partition should be valid.")
 	}

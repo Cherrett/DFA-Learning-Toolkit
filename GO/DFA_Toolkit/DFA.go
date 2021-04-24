@@ -34,6 +34,8 @@ func (dfa *DFA) AddState(stateLabel StateLabel) int {
 	}
 	// Initialize and add the new state to the slice of states within the DFA.
 	dfa.States = append(dfa.States, State{stateLabel, transitions, -1, -1, dfa})
+	// Set computedDepthAndOrder flag to false since DFA was modified.
+	dfa.computedDepthAndOrder = false
 	// Return the ID of the newly created state.
 	return len(dfa.States) - 1
 }
@@ -69,6 +71,8 @@ func (dfa *DFA) RemoveState(stateID int) {
 	if dfa.StartingStateID > stateID {
 		dfa.StartingStateID--
 	}
+	// Set computedDepthAndOrder flag to false since DFA was modified.
+	dfa.computedDepthAndOrder = false
 }
 
 // AddSymbol adds a new symbol to the DFA.
@@ -93,6 +97,8 @@ func (dfa *DFA) AddTransition(symbol int, fromStateID int, toStateID int) {
 	}
 	// Add transition to fromState's transitions.
 	dfa.States[fromStateID].Transitions[symbol] = toStateID
+	// Set computedDepthAndOrder flag to false since DFA was modified.
+	dfa.computedDepthAndOrder = false
 }
 
 // RemoveTransition removes a transition for a given symbol from one state to another.
@@ -105,6 +111,8 @@ func (dfa *DFA) RemoveTransition(symbol int, fromStateID int) {
 	}
 	// Remove transition from fromState's transitions by assigning -1 to the transitions map.
 	dfa.States[fromStateID].Transitions[symbol] = -1
+	// Set computedDepthAndOrder flag to false since DFA was modified.
+	dfa.computedDepthAndOrder = false
 }
 
 // AllStates returns all state IDs within DFA.
@@ -866,6 +874,52 @@ func (dfa *DFA) RemoveNonAcceptingLeaves() {
 			}
 		}
 	}
+}
+
+// SetOrderAsID returns a new DFA where the State IDs are
+// the order of the states within the original DFA.
+func (dfa DFA) SetOrderAsID() DFA{
+	// Compute order if required.
+	if !dfa.computedDepthAndOrder {
+		dfa.CalculateDepthAndOrder()
+	}
+
+	// Slice to store corresponding new state ID
+	// (order) for each state within DFA.
+	newStates := make([]int, len(dfa.States))
+
+	// Initialize resultant DFA to be returned by function.
+	resultantDFA := NewDFA()
+
+	// Create alphabet within DFA.
+	for range dfa.Alphabet {
+		resultantDFA.AddSymbol()
+	}
+
+	// Populate map with order as key and stateID as value.
+	for stateID, state := range dfa.States {
+		newStates[state.order] = stateID
+	}
+
+	// Create a new state within new DFA for each state within
+	// original DFA using the order as the new State ID.
+	for _, stateID := range newStates {
+		resultantDFA.AddState(dfa.States[stateID].Label)
+	}
+
+	// Update transitions using new State IDs.
+	for _, state := range dfa.States {
+		for symbol := range dfa.Alphabet {
+			if resultantStateID := state.Transitions[symbol]; resultantStateID > -1{
+				resultantDFA.States[state.order].Transitions[symbol] = dfa.States[resultantStateID].order
+			}
+		}
+	}
+
+	// Set starting state using new state IDs.
+	resultantDFA.StartingStateID = dfa.States[dfa.StartingStateID].order
+
+	return resultantDFA
 }
 
 // ToJSON saves the DFA to a JSON file given a file path.

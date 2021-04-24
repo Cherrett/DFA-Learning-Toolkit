@@ -58,12 +58,12 @@ func GreedyEDSM(APTA DFA) (DFA, SearchData) {
 	// Convert APTA to StatePartition for state merging.
 	statePartition := APTA.ToStatePartition()
 
-	// Call GreedySearch function using state partition and EDSM scoring function
-	// declared above. This function returns the resultant state partition.
-	statePartition, searchData := GreedySearch(statePartition, EDSM)
+	// Call GreedySearchUsingScoringFunction function using state partition and EDSM scoring function
+	// declared above. This function returns the resultant state partition and the search data.
+	statePartition, searchData := GreedySearchUsingScoringFunction(statePartition, EDSM)
 
 	// Convert the state partition to a DFA.
-	resultantDFA := statePartition.ToDFA()
+	resultantDFA := statePartition.ToQuotientDFA()
 
 	// Check if DFA generated is valid.
 	resultantDFA.IsValidPanic()
@@ -86,12 +86,12 @@ func FastWindowedEDSM(APTA DFA, windowSize int, windowGrow float64) (DFA, Search
 	// Convert APTA to StatePartition for state merging.
 	statePartition := APTA.ToStatePartition()
 
-	// Call FastWindowedSearch function using state partition and EDSM scoring function
-	// declared above. This function returns the resultant state partition.
-	statePartition, searchData := FastWindowedSearch(statePartition, windowSize, windowGrow, EDSM)
+	// Call FastWindowedSearchUsingScoringFunction function using state partition and EDSM scoring function
+	// declared above. This function returns the resultant state partition and the search data.
+	statePartition, searchData := FastWindowedSearchUsingScoringFunction(statePartition, windowSize, windowGrow, EDSM)
 
 	// Convert the state partition to a DFA.
-	resultantDFA := statePartition.ToDFA()
+	resultantDFA := statePartition.ToQuotientDFA()
 
 	// Check if DFA generated is valid.
 	resultantDFA.IsValidPanic()
@@ -114,12 +114,12 @@ func WindowedEDSM(APTA DFA, windowSize int, windowGrow float64) (DFA, SearchData
 	// Convert APTA to StatePartition for state merging.
 	statePartition := APTA.ToStatePartition()
 
-	// Call FastWindowedSearch function using state partition and EDSM scoring function
-	// declared above. This function returns the resultant state partition.
-	statePartition, searchData := WindowedSearch(statePartition, windowSize, windowGrow, EDSM)
+	// Call FastWindowedSearchUsingScoringFunction function using state partition and EDSM scoring function
+	// declared above. This function returns the resultant state partition and the search data.
+	statePartition, searchData := WindowedSearchUsingScoringFunction(statePartition, windowSize, windowGrow, EDSM)
 
 	// Convert the state partition to a DFA.
-	resultantDFA := statePartition.ToDFA()
+	resultantDFA := statePartition.ToQuotientDFA()
 
 	// Check if DFA generated is valid.
 	resultantDFA.IsValidPanic()
@@ -142,12 +142,12 @@ func BlueFringeEDSM(APTA DFA) (DFA, SearchData) {
 	// Convert APTA to StatePartition for state merging.
 	statePartition := APTA.ToStatePartition()
 
-	// Call BlueFringeSearch function using state partition and EDSM scoring function
-	// declared above. This function returns the resultant state partition.
-	statePartition, searchData := BlueFringeSearch(statePartition, EDSM)
+	// Call BlueFringeSearchUsingScoringFunction function using state partition and EDSM scoring function
+	// declared above. This function returns the resultant state partition and the search data.
+	statePartition, searchData := BlueFringeSearchUsingScoringFunction(statePartition, EDSM)
 
 	// Convert the state partition to a DFA.
-	resultantDFA := statePartition.ToDFA()
+	resultantDFA := statePartition.ToQuotientDFA()
 
 	// Check if DFA generated is valid.
 	resultantDFA.IsValidPanic()

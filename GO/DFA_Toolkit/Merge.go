@@ -17,9 +17,71 @@ type StatePairScore struct {
 type ScoringFunction func(stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition) float64
 
 // GreedySearch deterministically merges all possible state pairs.
-// Returns the resultant state partition and search data when no
-// more valid merges are possible.
-func GreedySearch(statePartition StatePartition, scoringFunction ScoringFunction) (StatePartition, SearchData) {
+// The first valid merge with respect to the rejecting examples is chosen.
+// Returns the resultant state partition and search data when no more valid merges are possible.
+// Used by the regular positive and negative inference (RPNI) algorithm
+func GreedySearch(statePartition StatePartition) (StatePartition, SearchData) {
+	// Clone StatePartition.
+	statePartition = statePartition.Clone()
+	// Copy the state partition for undoing and copying changed states.
+	copiedPartition := statePartition.Copy()
+	// Initialize search data.
+	searchData := SearchData{[]StatePairScore{}, 0, 0, time.Duration(0)}
+	// Total merges and valid merges counter.
+	totalMerges, totalValidMerges := 0, 0
+	// Start timer.
+	start := time.Now()
+
+	// Get ordered blocks within partition.
+	orderedBlocks := statePartition.OrderedBlocks()
+
+	// Deterministically merge all valid merges by
+	// iterating over root blocks within partition.
+	for i := 1; i < len(orderedBlocks); i++ {
+		//if copiedPartition.Blocks[i].Root != i{
+		//	continue
+		//}
+		for j := 0; j < i; j++ {
+			if copiedPartition.Blocks[j].Root != j{
+				continue
+			}
+			// Increment merge count.
+			totalMerges++
+			// Check if states are mergeable.
+			if copiedPartition.MergeStates(orderedBlocks[i], orderedBlocks[j]) {
+				// Do not merge if states are within same block.
+				if !statePartition.WithinSameBlock(orderedBlocks[i], orderedBlocks[j]){
+					// Increment valid merge count.
+					totalValidMerges++
+
+					// Copy changes to original state partition.
+					statePartition.CopyChangesFrom(&copiedPartition)
+
+					// Add merged state pair with score to search data.
+					searchData.Merges = append(searchData.Merges, StatePairScore{orderedBlocks[i], orderedBlocks[j], 0})
+					break
+				}
+			}
+
+			// Undo merges from copied partition.
+			copiedPartition.RollbackChangesFrom(statePartition)
+		}
+	}
+
+	// Add total and valid merges counts to search data.
+	searchData.AttemptedMergesCount = totalMerges
+	searchData.ValidMergesCount = totalValidMerges
+	// Add duration to search data.
+	searchData.Duration = time.Now().Sub(start)
+
+	// Return the final resultant state partition and search data.
+	return statePartition, searchData
+}
+
+// GreedySearchUsingScoringFunction deterministically merges all possible state pairs.
+// The state pair to be merged is chosen using a scoring function passed as a parameter.
+// Returns the resultant state partition and search data when no more valid merges are possible.
+func GreedySearchUsingScoringFunction(statePartition StatePartition, scoringFunction ScoringFunction) (StatePartition, SearchData) {
 	// Clone StatePartition.
 	statePartition = statePartition.Clone()
 	// Copy the state partition for undoing and copying changed states.
@@ -95,10 +157,10 @@ func GreedySearch(statePartition StatePartition, scoringFunction ScoringFunction
 	return statePartition, searchData
 }
 
-// FastWindowedSearch deterministically merges state pairs within a given window.
-// Returns the resultant state partition and search data when no
-// more valid merges are possible.
-func FastWindowedSearch(statePartition StatePartition, windowSize int, windowGrow float64, scoringFunction ScoringFunction) (StatePartition, SearchData) {
+// FastWindowedSearchUsingScoringFunction deterministically merges state pairs within a given window.
+// The state pair to be merged is chosen using a scoring function passed as a parameter.
+// Returns the resultant state partition and search data when no more valid merges are possible.
+func FastWindowedSearchUsingScoringFunction(statePartition StatePartition, windowSize int, windowGrow float64, scoringFunction ScoringFunction) (StatePartition, SearchData) {
 	// Parameter Error Checking.
 	if windowSize < 1{
 		panic("Window Size cannot be smaller than 1.")
@@ -203,10 +265,10 @@ func FastWindowedSearch(statePartition StatePartition, windowSize int, windowGro
 	return statePartition, searchData
 }
 
-// WindowedSearch deterministically merges state pairs within a given window.
-// Returns the resultant state partition and search data when no
-// more valid merges are possible.
-func WindowedSearch(statePartition StatePartition, windowSize int, windowGrow float64, scoringFunction ScoringFunction) (StatePartition, SearchData) {
+// WindowedSearchUsingScoringFunction deterministically merges state pairs within a given window.
+// The state pair to be merged is chosen using a scoring function passed as a parameter.
+// Returns the resultant state partition and search data when no more valid merges are possible.
+func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSize int, windowGrow float64, scoringFunction ScoringFunction) (StatePartition, SearchData) {
 	// Parameter Error Checking.
 	if windowSize < 1{
 		panic("Window Size cannot be smaller than 1.")
@@ -316,10 +378,10 @@ func WindowedSearch(statePartition StatePartition, windowSize int, windowGrow fl
 	return statePartition, searchData
 }
 
-// BlueFringeSearch deterministically merges possible state pairs within red-blue sets.
-// Returns the resultant state partition and search data when no
-// more valid merges are possible.
-func BlueFringeSearch(statePartition StatePartition, scoringFunction ScoringFunction) (StatePartition, SearchData) {
+// BlueFringeSearchUsingScoringFunction deterministically merges possible state pairs within red-blue sets.
+// The state pair to be merged is chosen using a scoring function passed as a parameter.
+// Returns the resultant state partition and search data when no more valid merges are possible.
+func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoringFunction ScoringFunction) (StatePartition, SearchData) {
 	// Clone StatePartition.
 	statePartition = statePartition.Clone()
 	// Copy the state partition for undoing and copying changed states.

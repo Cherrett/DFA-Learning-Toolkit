@@ -178,10 +178,9 @@ func (dfa DFA) ToStatePartition() StatePartition {
 	return NewStatePartition(dfa)
 }
 
-// ToDFA converts a State Partition to a DFA. Returns true and
-// the corresponding DFA if state partition is valid. Else,
-// false and an empty DFA are returned.
-func (statePartition *StatePartition) ToDFA() DFA {
+// ToQuotientDFA converts a State Partition to a quotient DFA. Returns true and the
+// corresponding DFA if state partition is valid. Else, false and an empty DFA are returned.
+func (statePartition *StatePartition) ToQuotientDFA() DFA {
 	// Map to store corresponding new state for
 	// each root block within state partition.
 	blockToStateMap := map[int]int{}
