@@ -74,6 +74,57 @@ func TestBenchmarkDetMerge(t *testing.T) {
 	}
 }
 
+// TestBenchmarkRPNI benchmarks the performance of the RPNIFromDataset() function.
+func TestBenchmarkRPNI(t *testing.T) {
+	// Random Seed.
+	rand.Seed(time.Now().UnixNano())
+
+	// Number of iterations.
+	n := 128
+	// Target size.
+	targetSize := 32
+
+	winners := 0
+	accuracies := util.NewMinMaxAvg()
+	numberOfStates := util.NewMinMaxAvg()
+	durations := util.NewMinMaxAvg()
+	mergesPerSec := util.NewMinMaxAvg()
+
+	for i := 0; i < n; i++ {
+		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
+
+		// Create a target DFA.
+		target := dfatoolkit.AbbadingoDFA(targetSize, true)
+
+		// Training testing sets.
+		trainingSet, testingSet := dfatoolkit.AbbadingoDatasetExact(target, 607, 1800)
+
+		resultantDFA, searchData := dfatoolkit.RPNIFromDataset(trainingSet)
+		accuracy := resultantDFA.Accuracy(testingSet)
+
+		accuracies.Add(accuracy)
+		numberOfStates.Add(float64(len(resultantDFA.States)))
+		durations.Add(searchData.Duration.Seconds())
+		mergesPerSec.Add(searchData.AttemptedMergesPerSecond())
+
+		if accuracy >= 0.99 {
+			winners++
+		}
+	}
+
+	successfulPercentage := float64(winners) / float64(n)
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentage)
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Avg())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStates.Min(), numberOfStates.Max(), numberOfStates.Avg())
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durations.Min(), durations.Max(), durations.Avg())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Avg())
+	fmt.Print("-----------------------------------------------------------------------------\n\n")
+
+	if successfulPercentage > 0 {
+		t.Error("The percentage of successful DFAs is bigger than 0.")
+	}
+}
+
 // TestBenchmarkGreedyEDSM benchmarks the performance of the GreedyEDSMFromDataset() function.
 func TestBenchmarkGreedyEDSM(t *testing.T) {
 	// Random Seed.
