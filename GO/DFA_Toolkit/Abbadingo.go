@@ -221,8 +221,8 @@ func AbbadingoInstance(numberOfStates int, exact bool, trainingSetSize int, test
 	return dfa,trainingSet, testingSet
 }
 
-// WriteToAbbadingoFile writes a given Dataset to file in Abbadingo-Format.
-func (dataset Dataset) WriteToAbbadingoFile(filePath string) {
+// ToAbbadingoFile writes a given Dataset to file in Abbadingo-Format.
+func (dataset Dataset) ToAbbadingoFile(filePath string) {
 	// Sort the dataset by length.
 	sortedDataset := dataset.SortDatasetByLength()
 

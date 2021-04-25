@@ -413,7 +413,8 @@ func (dfa DFA) OrderedStates() []int {
 // each state and each transition will also be printed.
 func (dfa DFA) Describe(detail bool) {
 	// Print simple description.
-	fmt.Println("This DFA has", len(dfa.States), "states and", dfa.Alphabet, "alphabet.")
+	fmt.Println("This DFA has", len(dfa.States), "states,",
+		dfa.TransitionsCount(), "transitions and", len(dfa.Alphabet), "alphabet.")
 
 	// If detail is set to true, print more details.
 	if detail {
