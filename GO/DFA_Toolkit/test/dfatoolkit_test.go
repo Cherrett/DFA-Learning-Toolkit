@@ -15,7 +15,7 @@ func TestAbbadingoDFAFromFile(t *testing.T) {
 	t.Parallel()
 	dataset := dfatoolkit.GetDatasetFromAbbadingoFile("../../Datasets/Abbadingo/Problem S/train.a")
 	if len(dataset) != 60000 {
-		t.Errorf("Dataset4 length = %d, want 60000", len(dataset))
+		t.Errorf("Abbadingo Problem S length = %d, want 60000", len(dataset))
 	}
 
 	APTA := dataset.GetPTA(true)
@@ -54,9 +54,7 @@ func TestAbbadingoDatasetGeneration(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 	numberOfStates := rand.Intn(99) + 1
 
-	AbbadingoDFA := dfatoolkit.AbbadingoDFA(numberOfStates, false)
-
-	trainingDataset, testingDataset := dfatoolkit.AbbadingoDataset(AbbadingoDFA, 35, 0.25)
+	AbbadingoDFA, trainingDataset, testingDataset := dfatoolkit.AbbadingoInstance(numberOfStates, false, 35, 0.25)
 
 	trainingDatasetConsistentWithDFA := trainingDataset.ConsistentWithDFA(AbbadingoDFA)
 	testingDatasetConsistentWithDFA := testingDataset.ConsistentWithDFA(AbbadingoDFA)
@@ -77,6 +75,39 @@ func TestAbbadingoDatasetGeneration(t *testing.T) {
 
 	if !trainingDataset.SymmetricallyStructurallyComplete(AbbadingoDFA){
 		t.Errorf("Expected training dataset to be symmetrically structurally complete with DFA")
+	}
+}
+
+func TestStaminaDFAFromFile(t *testing.T) {
+	t.Parallel()
+	dataset := dfatoolkit.GetDatasetFromStaminaFile("../../Datasets/Stamina/96/96_training.txt")
+	if len(dataset) != 1093 {
+		t.Errorf("Stamina Dataset 96 length = %d, want 1093", len(dataset))
+	}
+
+	APTA := dataset.GetPTA(true)
+	if len(APTA.Alphabet) != 50 {
+		t.Errorf("APTA number of symbols = %d, want 50", APTA.Alphabet)
+	}
+	if len(APTA.States) != 3503 {
+		t.Errorf("APTA number of states = %d, want 3503", len(APTA.States))
+	}
+	if APTA.Depth() != 53 {
+		t.Errorf("APTA depth = %d, want 53", APTA.Depth())
+	}
+}
+
+func TestStaminaDFAGeneration(t *testing.T) {
+	t.Parallel()
+	// Random Seed.
+	rand.Seed(time.Now().UnixNano())
+
+	StaminaDFA := dfatoolkit.StaminaDFA(50, 50)
+	if len(StaminaDFA.Alphabet) != 50 {
+		t.Errorf("StaminaDFA number of symbols = %d, want 50", StaminaDFA.Alphabet)
+	}
+	if len(StaminaDFA.States) != 50 {
+		t.Errorf("StaminaDFA number of states = %d, want %d", len(StaminaDFA.States), 50)
 	}
 }
 
