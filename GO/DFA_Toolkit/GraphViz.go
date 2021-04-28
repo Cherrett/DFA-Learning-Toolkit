@@ -84,13 +84,20 @@ func (dfa DFA) ToDOT(filePath string, symbolMapping map[int]rune, showOrder bool
 	// Iterate over each transition and write to file.
 	for stateID, state := range dfa.States {
 		for symbol := range dfa.Alphabet {
-			if value, exists := symbolMapping[symbol]; exists{
+			if symbolMapping == nil{
 				resultantStateID := state.Transitions[symbol]
 				if resultantStateID > -1 {
-					_, _ = writer.WriteString(fmt.Sprintf("\tq%d->q%d [label=\"%s\" fontname=verdana fontsize=8];\n", stateID, resultantStateID, string(value)))
+					_, _ = writer.WriteString(fmt.Sprintf("\tq%d->q%d [label=\"%d\" fontname=verdana fontsize=8];\n", stateID, resultantStateID, symbol))
 				}
 			}else{
-				panic(fmt.Sprintf("Symbol ID %d not in symbolMapping map.", symbol))
+				if value, exists := symbolMapping[symbol]; exists{
+					resultantStateID := state.Transitions[symbol]
+					if resultantStateID > -1 {
+						_, _ = writer.WriteString(fmt.Sprintf("\tq%d->q%d [label=\"%s\" fontname=verdana fontsize=8];\n", stateID, resultantStateID, string(value)))
+					}
+				}else{
+					panic(fmt.Sprintf("Symbol ID %d not in symbolMapping map.", symbol))
+				}
 			}
 		}
 	}
@@ -274,13 +281,20 @@ func (statePartition StatePartition) ToDOT(filePath string, symbolMapping map[in
 	// Iterate over each transition and write to file.
 	for _, blockID := range rootBlocks {
 		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
-			if value, exists := symbolMapping[symbol]; exists{
+			if symbolMapping == nil{
 				if resultantBlockID := statePartition.Blocks[blockID].Transitions[symbol]; resultantBlockID > -1{
 					resultantBlockRootID := statePartition.Find(resultantBlockID)
-					_, _ = writer.WriteString(fmt.Sprintf("\tq%d->q%d [label=\"%s\" fontname=verdana fontsize=8];\n", blockID, resultantBlockRootID, string(value)))
+					_, _ = writer.WriteString(fmt.Sprintf("\tq%d->q%d [label=\"%d\" fontname=verdana fontsize=8];\n", blockID, resultantBlockRootID, symbol))
 				}
 			}else{
-				panic(fmt.Sprintf("Symbol ID %d not in symbolMapping map.", symbol))
+				if value, exists := symbolMapping[symbol]; exists{
+					if resultantBlockID := statePartition.Blocks[blockID].Transitions[symbol]; resultantBlockID > -1{
+						resultantBlockRootID := statePartition.Find(resultantBlockID)
+						_, _ = writer.WriteString(fmt.Sprintf("\tq%d->q%d [label=\"%s\" fontname=verdana fontsize=8];\n", blockID, resultantBlockRootID, string(value)))
+					}
+				}else{
+					panic(fmt.Sprintf("Symbol ID %d not in symbolMapping map.", symbol))
+				}
 			}
 		}
 	}

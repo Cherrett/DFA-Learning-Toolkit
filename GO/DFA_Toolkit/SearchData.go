@@ -13,6 +13,7 @@ import (
 type SearchData struct {
 	Merges               []StatePairScore // Slice of state pairs and scores of merges done.
 	AttemptedMergesCount int              // The number of attempted merges.
+	ValidMergesCount	 int			  // The number of valid attempted merges.
 	Duration             time.Duration    // The duration for the search function to finish.
 }
 

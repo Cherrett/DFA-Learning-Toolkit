@@ -1,8 +1,8 @@
 use serde::Deserialize;
 
-pub const REJECTING:i8 = 0;
-pub const ACCEPTING:i8 = 1;
-pub const UNKNOWN:i8 = 2;
+pub const REJECTING: i8 = 0;
+pub const ACCEPTING: i8 = 1;
+pub const UNKNOWN: i8 = 2;
 
 pub type StateLabel = i8;
 

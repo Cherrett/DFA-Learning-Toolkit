@@ -14,7 +14,7 @@ import (
 // for the Abbadingo competition standard (using only a's and b's).
 var AlphabetSymbolMappingAbbadingo = map[rune]int{'0': 0, '1': 1}
 
-// GetDatasetFromAbbadingoFile returns a Dataset from an Abbadingo File.
+// GetDatasetFromAbbadingoFile returns a Dataset from an Abbadingo-Format File.
 func GetDatasetFromAbbadingoFile(fileName string) Dataset {
 	// Initialize new Dataset.
 	dataset := Dataset{}
@@ -44,7 +44,7 @@ func GetDatasetFromAbbadingoFile(fileName string) Dataset {
 	return dataset
 }
 
-// NewStringInstanceFromAbbadingoFile returns a StringInstance from a line within an Abbadingo File.
+// NewStringInstanceFromAbbadingoFile returns a StringInstance from a line within an Abbadingo-Format File.
 func NewStringInstanceFromAbbadingoFile(text string, delimiter string) StringInstance {
 	// Initialize new StringInstance.
 	stringInstance := StringInstance{}
@@ -81,8 +81,8 @@ func NewStringInstanceFromAbbadingoFile(text string, delimiter string) StringIns
 	return stringInstance
 }
 
-// AbbadingoDFA returns a random DFA in Abbadingo format given a number of states. If exact
-// is set to true, the resultant DFA will have the exact number of states requested.
+// AbbadingoDFA returns a random DFA using the Abbadingo protocol given a number of states.
+// If exact is set to true, the resultant DFA will have the required depth as per Abbadingo protocol.
 func AbbadingoDFA(numberOfStates int, exact bool) DFA {
 	// The size of the DFA to be created.
 	dfaSize := int(math.Round((5.0 * float64(numberOfStates)) / 4.0))
@@ -133,7 +133,7 @@ func AbbadingoDFA(numberOfStates int, exact bool) DFA {
 			// of required states.
 			if exact {
 				if len(dfa.States) == numberOfStates {
-					// Return the created DFA  since it
+					// Return the created DFA since it
 					// meets all of the requirements.
 					return dfa
 				}
@@ -146,14 +146,15 @@ func AbbadingoDFA(numberOfStates int, exact bool) DFA {
 	}
 }
 
-// AbbadingoDataset returns an Abbadingo training and testing Dataset given a DFA and a ratio for each.
-func AbbadingoDataset(dfa DFA, percentageFromSamplePool float64, testingRatio float64) (Dataset, Dataset) {
+// AbbadingoDataset returns a training and testing Dataset using the
+// Abbadingo protocol given a DFA, a sparsity percentage and a training:testing ratio.
+func AbbadingoDataset(dfa DFA, sparsityPercentage float64, testingRatio float64) (Dataset, Dataset) {
 	// Calculate the length of the longest string.
 	maxLength := math.Round((2.0 * math.Log2(float64(len(dfa.States)))) + 3.0)
 	// Calculate the number which represents the longest string.
 	maxDecimal := math.Pow(2, maxLength+1) - 1
 	// Calculate the total size of the dataset.
-	totalSetSize := math.Round((percentageFromSamplePool / 100) * maxDecimal)
+	totalSetSize := math.Round((sparsityPercentage / 100) * maxDecimal)
 	// Calculate the size of the training dataset.
 	trainingSetSize := int(math.Round((1 - testingRatio) * totalSetSize))
 
@@ -162,7 +163,8 @@ func AbbadingoDataset(dfa DFA, percentageFromSamplePool float64, testingRatio fl
 	return AbbadingoDatasetExact(dfa, trainingSetSize, int(totalSetSize)-trainingSetSize)
 }
 
-// AbbadingoDatasetExact returns an Abbadingo training and testing Dataset given a DFA and a set size for each.
+// AbbadingoDatasetExact returns a training and testing Dataset using the
+// Abbadingo protocol given a DFA and a set size for each.
 func AbbadingoDatasetExact(dfa DFA, trainingSetSize int, testingSetSize int) (Dataset, Dataset) {
 	// Initialize training dataset.
 	trainingDataset := Dataset{}
@@ -209,18 +211,29 @@ func AbbadingoDatasetExact(dfa DFA, trainingSetSize int, testingSetSize int) (Da
 	return trainingDataset, testingDataset
 }
 
-// AbbadingoInstance returns a random DFA in Abbadingo format given a number of states while returning a training
-// and testing dataset built on the generated DFA given a set size for each. If exact is set to true, the resultant
-// DFA will have the exact number of states requested.
-func AbbadingoInstance(numberOfStates int, exact bool, trainingSetSize int, testingSetSize int) (DFA, Dataset, Dataset){
+// AbbadingoInstance returns a random DFA using the Abbadingo protocol given a number of states while
+// returning a training and testing dataset built on the generated DFA given a sparsity percentage and
+// a training:testing ratio. If exact is set to true, the resultant DFA will have the required depth as
+// per Abbadingo protocol.
+func AbbadingoInstance(numberOfStates int, exact bool, sparsityPercentage float64, testingRatio float64) (DFA, Dataset, Dataset){
+	dfa := AbbadingoDFA(numberOfStates, exact)
+	trainingSet, testingSet := AbbadingoDataset(dfa, sparsityPercentage, testingRatio)
+
+	return dfa,trainingSet, testingSet
+}
+
+// AbbadingoInstanceExact returns a random DFA using the Abbadingo protocol given a number of states while
+// returning a training and testing dataset built on the generated DFA given a set size for each.
+// If exact is set to true, the resultant DFA will have the required depth as per Abbadingo protocol.
+func AbbadingoInstanceExact(numberOfStates int, exact bool, trainingSetSize int, testingSetSize int) (DFA, Dataset, Dataset){
 	dfa := AbbadingoDFA(numberOfStates, exact)
 	trainingSet, testingSet := AbbadingoDatasetExact(dfa, trainingSetSize, testingSetSize)
 
 	return dfa,trainingSet, testingSet
 }
 
-// WriteToAbbadingoFile writes a given Dataset to file in Abbadingo format.
-func (dataset Dataset) WriteToAbbadingoFile(filePath string) {
+// ToAbbadingoFile writes a given Dataset to file in Abbadingo-Format.
+func (dataset Dataset) ToAbbadingoFile(filePath string) {
 	// Sort the dataset by length.
 	sortedDataset := dataset.SortDatasetByLength()
 

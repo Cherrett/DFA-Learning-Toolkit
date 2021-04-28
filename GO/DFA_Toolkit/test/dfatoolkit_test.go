@@ -13,9 +13,9 @@ import (
 
 func TestAbbadingoDFAFromFile(t *testing.T) {
 	t.Parallel()
-	dataset := dfatoolkit.GetDatasetFromAbbadingoFile("../../AbbadingoDatasets/dataset4/train.a")
+	dataset := dfatoolkit.GetDatasetFromAbbadingoFile("../../Datasets/Abbadingo/Problem S/train.a")
 	if len(dataset) != 60000 {
-		t.Errorf("Dataset4 length = %d, want 60000", len(dataset))
+		t.Errorf("Abbadingo Problem S length = %d, want 60000", len(dataset))
 	}
 
 	APTA := dataset.GetPTA(true)
@@ -54,9 +54,7 @@ func TestAbbadingoDatasetGeneration(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 	numberOfStates := rand.Intn(99) + 1
 
-	AbbadingoDFA := dfatoolkit.AbbadingoDFA(numberOfStates, false)
-
-	trainingDataset, testingDataset := dfatoolkit.AbbadingoDataset(AbbadingoDFA, 35, 0.25)
+	AbbadingoDFA, trainingDataset, testingDataset := dfatoolkit.AbbadingoInstance(numberOfStates, false, 35, 0.25)
 
 	trainingDatasetConsistentWithDFA := trainingDataset.ConsistentWithDFA(AbbadingoDFA)
 	testingDatasetConsistentWithDFA := testingDataset.ConsistentWithDFA(AbbadingoDFA)
@@ -80,9 +78,42 @@ func TestAbbadingoDatasetGeneration(t *testing.T) {
 	}
 }
 
+func TestStaminaDFAFromFile(t *testing.T) {
+	t.Parallel()
+	dataset := dfatoolkit.GetDatasetFromStaminaFile("../../Datasets/Stamina/96/96_training.txt")
+	if len(dataset) != 1093 {
+		t.Errorf("Stamina Dataset 96 length = %d, want 1093", len(dataset))
+	}
+
+	APTA := dataset.GetPTA(true)
+	if len(APTA.Alphabet) != 50 {
+		t.Errorf("APTA number of symbols = %d, want 50", APTA.Alphabet)
+	}
+	if len(APTA.States) != 3503 {
+		t.Errorf("APTA number of states = %d, want 3503", len(APTA.States))
+	}
+	if APTA.Depth() != 53 {
+		t.Errorf("APTA depth = %d, want 53", APTA.Depth())
+	}
+}
+
+func TestStaminaDFAGeneration(t *testing.T) {
+	t.Parallel()
+	// Random Seed.
+	rand.Seed(time.Now().UnixNano())
+
+	StaminaDFA := dfatoolkit.StaminaDFA(50, 50)
+	if len(StaminaDFA.Alphabet) != 50 {
+		t.Errorf("StaminaDFA number of symbols = %d, want 50", StaminaDFA.Alphabet)
+	}
+	if len(StaminaDFA.States) != 50 {
+		t.Errorf("StaminaDFA number of states = %d, want %d", len(StaminaDFA.States), 50)
+	}
+}
+
 func TestStateMergingAndDFAEquivalence(t *testing.T) {
 	t.Parallel()
-	dataset := dfatoolkit.GetDatasetFromAbbadingoFile("../../AbbadingoDatasets/dataset1/train.a")
+	dataset := dfatoolkit.GetDatasetFromAbbadingoFile("../../Datasets/Abbadingo/Simple/train.a")
 	APTA := dataset.GetPTA(false)
 
 	statePartition := APTA.ToStatePartition()
@@ -91,11 +122,11 @@ func TestStateMergingAndDFAEquivalence(t *testing.T) {
 	if !statePartitionCopy.MergeStates(2, 4) {
 		t.Errorf("Merge should be valid.")
 	}
-	mergedDFA1 := statePartitionCopy.ToDFA()
+	mergedDFA1 := statePartitionCopy.ToQuotientDFA()
 	if !mergedDFA1.IsValidSafe() {
 		t.Errorf("State Partition should be valid.")
 	}
-	statePartitionCopy.RollbackChanges(statePartition)
+	statePartitionCopy.RollbackChangesFrom(statePartition)
 
 	if !statePartitionCopy.MergeStates(3, 5) {
 		t.Errorf("Merge should be valid.")
@@ -103,7 +134,7 @@ func TestStateMergingAndDFAEquivalence(t *testing.T) {
 	if !statePartitionCopy.MergeStates(2, 4) {
 		t.Errorf("Merge should be valid.")
 	}
-	mergedDFA2 := statePartitionCopy.ToDFA()
+	mergedDFA2 := statePartitionCopy.ToQuotientDFA()
 	if !mergedDFA2.IsValidSafe() {
 		t.Errorf("State Partition should be valid.")
 	}
@@ -117,9 +148,9 @@ func TestDatasetJSON(t *testing.T) {
 	t.Parallel()
 
 	// Training set from abbadingo file.
-	training1 := dfatoolkit.GetDatasetFromAbbadingoFile("../../AbbadingoDatasets/dataset1/train.a")
+	training1 := dfatoolkit.GetDatasetFromAbbadingoFile("../../Datasets/Abbadingo/Simple/train.a")
 	// Training set from JSON file.
-	training2, valid := dfatoolkit.DatasetFromJSON("../../AbbadingoDatasets/dataset1/train.json")
+	training2, valid := dfatoolkit.DatasetFromJSON("../../Datasets/Abbadingo/Simple/train.json")
 
 	if !valid {
 		t.Errorf("Dataset was not read successfuly from JSON.")
@@ -133,7 +164,7 @@ func TestDatasetJSON(t *testing.T) {
 func TestVisualisation(t *testing.T) {
 	t.Parallel()
 	// Training set.
-	training := dfatoolkit.GetDatasetFromAbbadingoFile("../../AbbadingoDatasets/dataset1/train.a")
+	training := dfatoolkit.GetDatasetFromAbbadingoFile("../../Datasets/Abbadingo/Simple/train.a")
 
 	test := training.GetPTA(true)
 

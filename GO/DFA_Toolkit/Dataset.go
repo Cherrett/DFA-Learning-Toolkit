@@ -194,6 +194,132 @@ func (stringInstance StringInstance) ConsistentWithDFA(dfa DFA) bool {
 	return true
 }
 
+// ConsistentWithDFA checks whether dataset is consistent with a given DFA.
+func (dataset Dataset) ConsistentWithDFA(dfa DFA) bool {
+	// Set consistent flag to true.
+	consistent := true
+	// Create wait group
+	var wg sync.WaitGroup
+	// Add length of dataset to wait group.
+	wg.Add(dataset.Count())
+
+	// Iterate over each string instance within dataset.
+	for _, stringInstance := range dataset {
+		go func(stringInstance StringInstance, dfa DFA) {
+			// Decrement 1 from wait group.
+			defer wg.Done()
+			// If consistent flag is true, check if current
+			// string instance is consistent with DFA. If
+			// consistent flag is already set to false, skip
+			// checking the remaining string instances.
+			if consistent {
+				consistent = stringInstance.ConsistentWithDFA(dfa)
+			}
+		}(stringInstance, dfa)
+	}
+
+	// Wait for all go routines within wait
+	// group to finish executing.
+	wg.Wait()
+
+	// Return consistent flag.
+	return consistent
+}
+
+// ConsistentWithStatePartition returns whether a string instance is consistent
+// within a given StatePartition.
+func (stringInstance StringInstance) ConsistentWithStatePartition(statePartition StatePartition) bool {
+	// Set the current block ID to the starting block ID.
+	currentBlockID := statePartition.StartingBlock()
+	// Set counter to 0.
+	count := 0
+
+	// If string instance is the empty string, compare label
+	// with starting state within DFA.
+	if len(stringInstance.Value) == 0 {
+		if stringInstance.Accepting {
+			// If string instance is accepting and starting state is rejecting, return false.
+			if statePartition.Blocks[currentBlockID].Label == REJECTING {
+				return false
+			}
+		} else {
+			// If string instance is rejecting and starting state is accepting, return false.
+			if statePartition.Blocks[currentBlockID].Label == ACCEPTING {
+				return false
+			}
+		}
+
+		// Return true since labels match.
+		return true
+	}
+
+	// Iterate over each symbol (alphabet) within value of string instance.
+	for _, symbol := range stringInstance.Value {
+		// Increment count.
+		count++
+
+		// If a transition exists from the current state to any other state via
+		// the current symbol, set resultant state ID to current state ID.
+		if statePartition.Blocks[currentBlockID].Transitions[symbol] != -1 {
+			currentStateID := statePartition.Blocks[currentBlockID].Transitions[symbol]
+			currentBlockID = statePartition.Find(currentStateID)
+			// Check if last symbol in string.
+			if count == stringInstance.Length() {
+				if stringInstance.Accepting {
+					// If string instance is accepting and state is rejecting, return false.
+					if statePartition.Blocks[currentBlockID].Label == REJECTING {
+						return false
+					}
+				} else {
+					// If string instance is rejecting and state is accepting, return false.
+					if statePartition.Blocks[currentBlockID].Label == ACCEPTING {
+						return false
+					}
+				}
+			}
+		} else {
+			// If no transition exists and string instance is accepting, return false.
+			// If string instance is rejecting, return true.
+			return !stringInstance.Accepting
+		}
+	}
+
+	// Return true if reached.
+	return true
+}
+
+// ConsistentWithStatePartition checks whether dataset is consistent with a given StatePartition.
+func (dataset Dataset) ConsistentWithStatePartition(statePartition StatePartition) bool {
+	// Set consistent flag to true.
+	consistent := true
+	// Create wait group
+	var wg sync.WaitGroup
+	// Add length of dataset to wait group.
+	wg.Add(dataset.Count())
+
+	// Iterate over each string instance within dataset.
+	for _, stringInstance := range dataset {
+		go func(stringInstance StringInstance, statePartition StatePartition) {
+			// Decrement 1 from wait group.
+			defer wg.Done()
+			// If consistent flag is true, check if current
+			// string instance is consistent with DFA. If
+			// consistent flag is already set to false, skip
+			// checking the remaining string instances.
+			if consistent {
+				consistent = stringInstance.ConsistentWithStatePartition(statePartition)
+			}
+		}(stringInstance, statePartition)
+	}
+
+	// Wait for all go routines within wait
+	// group to finish executing.
+	wg.Wait()
+
+	// Return consistent flag.
+	return consistent
+}
+
 // ParseToStateLabel returns the State Label of a given string instance
 // within a given DFA. If state does not exist, REJECTING is returned.
 func (stringInstance StringInstance) ParseToStateLabel(dfa DFA) StateLabel {
@@ -312,38 +438,6 @@ func (dataset Dataset) SortDatasetByLength() Dataset {
 
 	// Return sorted dataset.
 	return dataset
-}
-
-// ConsistentWithDFA checks whether dataset is consistent with a given DFA.
-func (dataset Dataset) ConsistentWithDFA(dfa DFA) bool {
-	// Set consistent flag to true.
-	consistent := true
-	// Create wait group
-	var wg sync.WaitGroup
-	// Add length of dataset to wait group.
-	wg.Add(dataset.Count())
-
-	// Iterate over each string instance within dataset.
-	for _, stringInstance := range dataset {
-		go func(stringInstance StringInstance, dfa DFA) {
-			// Decrement 1 from wait group.
-			defer wg.Done()
-			// If consistent flag is true, check if current
-			// string instance is consistent with DFA. If
-			// consistent flag is already set to false, skip
-			// checking the remaining string instances.
-			if consistent {
-				consistent = stringInstance.ConsistentWithDFA(dfa)
-			}
-		}(stringInstance, dfa)
-	}
-
-	// Wait for all go routines within wait
-	// group to finish executing.
-	wg.Wait()
-
-	// Return consistent flag.
-	return consistent
 }
 
 // AcceptingStringInstances returns the accepting string instances.

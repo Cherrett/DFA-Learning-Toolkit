@@ -52,6 +52,43 @@ func (state *State) Order() int {
 	return state.order
 }
 
+// AllTransitionsExist checks whether all transitions from a given state
+// exist (not -1). In other words, whether the state has a transition for
+// each of the symbols within the alphabet.
+func (state State) AllTransitionsExist() bool{
+	// Iterate over each transition from state.
+	for _, toStateID := range state.Transitions{
+		// If a transition with -1 is found, false is
+		// returned since this means that a transition
+		// to that respective symbol does not exist.
+		if toStateID == -1{
+			return false
+		}
+	}
+
+	// Return true if reached since
+	// all transitions exist.
+	return true
+}
+
+// TransitionExists checks whether a transition exists from a given state
+// to another state, regardless of the symbol.
+func (state State) TransitionExists(stateID int) bool{
+	// Iterate over each transition from state.
+	for _, toStateID := range state.Transitions{
+		// If a transition with stateID is found, true is
+		// returned since this means that a transition
+		// to that respective stateID exists.
+		if toStateID == stateID{
+			return true
+		}
+	}
+
+	// Return false if reached since transition
+	// to state does not exist.
+	return false
+}
+
 // DFA returns a pointer to the DFA which contains this State.
 func (state State) DFA() *DFA {
 	return state.dfa
