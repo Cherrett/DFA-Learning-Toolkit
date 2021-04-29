@@ -34,6 +34,25 @@ func (state State) IsUnknown() bool {
 	return state.Label == UNKNOWN
 }
 
+// IsLeaf checks whether given state is a leaf within DFA.
+// In other words, whether the state has any valid transitions.
+func (state State) IsLeaf() bool {
+	// Iterate over each transition from state.
+	for _, toStateID := range state.Transitions {
+		// If a transition with a value not equal to -1 is
+		// found (valid), false is returned since. a valid
+		// transition is found, hence state is not a leaf.
+		if toStateID != -1 {
+			return false
+		}
+	}
+
+	// Return true if reached since
+	// no valid transitions exist
+	// which means state is a leaf.
+	return true
+}
+
 // Depth returns the state's depth within DFA.
 func (state *State) Depth() int {
 	if state.depth == -1 {
@@ -55,13 +74,13 @@ func (state *State) Order() int {
 // AllTransitionsExist checks whether all transitions from a given state
 // exist (not -1). In other words, whether the state has a transition for
 // each of the symbols within the alphabet.
-func (state State) AllTransitionsExist() bool{
+func (state State) AllTransitionsExist() bool {
 	// Iterate over each transition from state.
-	for _, toStateID := range state.Transitions{
+	for _, toStateID := range state.Transitions {
 		// If a transition with -1 is found, false is
 		// returned since this means that a transition
 		// to that respective symbol does not exist.
-		if toStateID == -1{
+		if toStateID == -1 {
 			return false
 		}
 	}
@@ -73,13 +92,13 @@ func (state State) AllTransitionsExist() bool{
 
 // TransitionExists checks whether a transition exists from a given state
 // to another state, regardless of the symbol.
-func (state State) TransitionExists(stateID int) bool{
+func (state State) TransitionExists(stateID int) bool {
 	// Iterate over each transition from state.
-	for _, toStateID := range state.Transitions{
+	for _, toStateID := range state.Transitions {
 		// If a transition with stateID is found, true is
 		// returned since this means that a transition
 		// to that respective stateID exists.
-		if toStateID == stateID{
+		if toStateID == stateID {
 			return true
 		}
 	}
@@ -87,6 +106,27 @@ func (state State) TransitionExists(stateID int) bool{
 	// Return false if reached since transition
 	// to state does not exist.
 	return false
+}
+
+// ValidTransitions returns all transitions from a given state
+// that are valid (not -1). The symbolIDs of the corresponding
+// valid transitions are returned in a slice of integers.
+func (state State) ValidTransitions() []int {
+	// Slice of symbolIDs.
+	var validTransitions []int
+
+	// Iterate over each transition from state.
+	for symbolID, toStateID := range state.Transitions {
+		// If a transition with a value not equal to
+		// -1 is found (valid), the symbol is added
+		// to the valid transitions slice.
+		if toStateID != -1 {
+			validTransitions = append(validTransitions, symbolID)
+		}
+	}
+
+	// Return populated slice of symbolIDs.
+	return validTransitions
 }
 
 // DFA returns a pointer to the DFA which contains this State.
@@ -103,6 +143,23 @@ func (state State) TransitionsCount(stateID int) int {
 	for symbol := range state.DFA().Alphabet {
 		// If transition is to given state ID, increment transitions count.
 		if state.Transitions[symbol] == stateID {
+			transitionsCount++
+		}
+	}
+
+	// Return transitions count.
+	return transitionsCount
+}
+
+// TotalTransitionsCount returns the number of transitions from given state.
+func (state State) TotalTransitionsCount() int {
+	// Counter to store number of transitions.
+	transitionsCount := 0
+
+	// Iterate over each symbol within DFA.
+	for symbol := range state.DFA().Alphabet {
+		// If transition is valid (not -1), increment transitions count.
+		if state.Transitions[symbol] != -1 {
 			transitionsCount++
 		}
 	}

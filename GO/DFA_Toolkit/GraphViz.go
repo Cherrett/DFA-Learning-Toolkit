@@ -84,18 +84,18 @@ func (dfa DFA) ToDOT(filePath string, symbolMapping map[int]rune, showOrder bool
 	// Iterate over each transition and write to file.
 	for stateID, state := range dfa.States {
 		for symbol := range dfa.Alphabet {
-			if symbolMapping == nil{
+			if symbolMapping == nil {
 				resultantStateID := state.Transitions[symbol]
 				if resultantStateID > -1 {
 					_, _ = writer.WriteString(fmt.Sprintf("\tq%d->q%d [label=\"%d\" fontname=verdana fontsize=8];\n", stateID, resultantStateID, symbol))
 				}
-			}else{
-				if value, exists := symbolMapping[symbol]; exists{
+			} else {
+				if value, exists := symbolMapping[symbol]; exists {
 					resultantStateID := state.Transitions[symbol]
 					if resultantStateID > -1 {
 						_, _ = writer.WriteString(fmt.Sprintf("\tq%d->q%d [label=\"%s\" fontname=verdana fontsize=8];\n", stateID, resultantStateID, string(value)))
 					}
-				}else{
+				} else {
 					panic(fmt.Sprintf("Symbol ID %d not in symbolMapping map.", symbol))
 				}
 			}
@@ -220,7 +220,7 @@ func (statePartition StatePartition) ToDOT(filePath string, symbolMapping map[in
 	// Else, just get root blocks.
 	if showOrder {
 		rootBlocks = statePartition.OrderedBlocks()
-	}else{
+	} else {
 		rootBlocks = statePartition.RootBlocks()
 	}
 
@@ -253,15 +253,15 @@ func (statePartition StatePartition) ToDOT(filePath string, symbolMapping map[in
 	for index, blockID := range rootBlocks {
 		statesWithinBlock := statePartition.ReturnSet(blockID)
 		label := "\"q"
-		for index2, stateID := range statesWithinBlock{
+		for index2, stateID := range statesWithinBlock {
 			label += fmt.Sprintf("%d", stateID)
-			if index2 < len(statesWithinBlock) - 1{
+			if index2 < len(statesWithinBlock)-1 {
 				label += "\\n"
 			}
 		}
 		// If showOrder is set to true, the order
 		// of the blockID is shown within the label.
-		if showOrder{
+		if showOrder {
 			label += fmt.Sprintf("\\n(%d)", index)
 		}
 		label += "\""
@@ -281,18 +281,18 @@ func (statePartition StatePartition) ToDOT(filePath string, symbolMapping map[in
 	// Iterate over each transition and write to file.
 	for _, blockID := range rootBlocks {
 		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
-			if symbolMapping == nil{
-				if resultantBlockID := statePartition.Blocks[blockID].Transitions[symbol]; resultantBlockID > -1{
+			if symbolMapping == nil {
+				if resultantBlockID := statePartition.Blocks[blockID].Transitions[symbol]; resultantBlockID > -1 {
 					resultantBlockRootID := statePartition.Find(resultantBlockID)
 					_, _ = writer.WriteString(fmt.Sprintf("\tq%d->q%d [label=\"%d\" fontname=verdana fontsize=8];\n", blockID, resultantBlockRootID, symbol))
 				}
-			}else{
-				if value, exists := symbolMapping[symbol]; exists{
-					if resultantBlockID := statePartition.Blocks[blockID].Transitions[symbol]; resultantBlockID > -1{
+			} else {
+				if value, exists := symbolMapping[symbol]; exists {
+					if resultantBlockID := statePartition.Blocks[blockID].Transitions[symbol]; resultantBlockID > -1 {
 						resultantBlockRootID := statePartition.Find(resultantBlockID)
 						_, _ = writer.WriteString(fmt.Sprintf("\tq%d->q%d [label=\"%s\" fontname=verdana fontsize=8];\n", blockID, resultantBlockRootID, string(value)))
 					}
-				}else{
+				} else {
 					panic(fmt.Sprintf("Symbol ID %d not in symbolMapping map.", symbol))
 				}
 			}

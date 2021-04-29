@@ -111,6 +111,35 @@ func TestStaminaDFAGeneration(t *testing.T) {
 	}
 }
 
+func TestStaminaDatasetGeneration(t *testing.T) {
+	t.Parallel()
+	// random seed
+	rand.Seed(time.Now().UnixNano())
+
+	StaminaDFA, trainingDataset, testingDataset := dfatoolkit.StaminaInstance(50, 50, 100, 25000, 2000)
+
+	trainingDatasetConsistentWithDFA := trainingDataset.ConsistentWithDFA(StaminaDFA)
+	testingDatasetConsistentWithDFA := testingDataset.ConsistentWithDFA(StaminaDFA)
+
+	if !trainingDatasetConsistentWithDFA || !testingDatasetConsistentWithDFA {
+		t.Errorf("Expected both training and testing dataset to be consistent with StaminaDFA")
+	}
+
+	APTA := trainingDataset.GetPTA(true)
+
+	trainingDatasetConsistentWithAPTA := trainingDataset.ConsistentWithDFA(APTA)
+
+	if !trainingDatasetConsistentWithAPTA {
+		t.Errorf("Expected training dataset to be consistent with APTA")
+	}
+
+	trainingDataset, _ = dfatoolkit.DefaultStaminaDataset(StaminaDFA, 100)
+
+	if !trainingDataset.SymmetricallyStructurallyComplete(StaminaDFA){
+		t.Errorf("Expected training dataset to be symmetrically structurally complete with DFA")
+	}
+}
+
 func TestStateMergingAndDFAEquivalence(t *testing.T) {
 	t.Parallel()
 	dataset := dfatoolkit.GetDatasetFromAbbadingoFile("../../Datasets/Abbadingo/Simple/train.a")

@@ -104,9 +104,9 @@ func (dfa *DFA) AddTransition(symbol int, fromStateID int, toStateID int) {
 // RemoveTransition removes a transition for a given symbol from one state to another.
 func (dfa *DFA) RemoveTransition(symbol int, fromStateID int) {
 	// Panic if either state IDs are out of range.
-	if fromStateID > len(dfa.States) - 1 || fromStateID < 0 {
+	if fromStateID > len(dfa.States)-1 || fromStateID < 0 {
 		panic("fromStateID is out of range")
-	} else if symbol > len(dfa.Alphabet) - 1 || symbol < 0 {
+	} else if symbol > len(dfa.Alphabet)-1 || symbol < 0 {
 		panic("symbol is out of range")
 	}
 	// Remove transition from fromState's transitions by assigning -1 to the transitions map.
@@ -227,7 +227,7 @@ func (dfa DFA) TransitionsCount() int {
 	count := 0
 
 	for stateIndex := range dfa.States {
-		for symbol := range dfa.Alphabet{
+		for symbol := range dfa.Alphabet {
 			if dfa.States[stateIndex].Transitions[symbol] != -1 {
 				count++
 			}
@@ -546,11 +546,11 @@ func (dfa DFA) Clone() DFA {
 		computedDepthAndOrder: dfa.computedDepthAndOrder,
 	}
 
-	for stateID := range dfa.States{
+	for stateID := range dfa.States {
 		clonedDFA.States[stateID] = dfa.States[stateID]
 	}
 
-	for symbolID := range dfa.Alphabet{
+	for symbolID := range dfa.Alphabet {
 		clonedDFA.States[symbolID] = dfa.States[symbolID]
 	}
 
@@ -637,7 +637,7 @@ func (dfa DFA) IsValidPanic() {
 
 // IsValidSafe checks whether DFA is valid.
 // Returns false if not valid.
-func (dfa DFA) IsValidSafe() bool{
+func (dfa DFA) IsValidSafe() bool {
 	if dfa.StartingStateID < 0 || dfa.StartingStateID >= len(dfa.States) {
 		// Return false if starting state is invalid.
 		return false
@@ -663,8 +663,8 @@ func (dfa DFA) IsValidSafe() bool{
 // Used in SymmetricallyStructurallyComplete and
 // StructurallyComplete functions.
 type Transition struct {
-	stateID  int
-	symbol int
+	stateID int
+	symbol  int
 }
 
 // StructurallyComplete checks if DFA is structurally
@@ -867,7 +867,7 @@ func (dfa *DFA) RemoveNonAcceptingLeaves() {
 						transitionsCount++
 					}
 				}
-				if transitionsCount == len(dfa.Alphabet) - 1 {
+				if transitionsCount == len(dfa.Alphabet)-1 {
 					found = true
 					dfa.RemoveState(stateID)
 					break
@@ -879,7 +879,7 @@ func (dfa *DFA) RemoveNonAcceptingLeaves() {
 
 // SetOrderAsID returns a new DFA where the State IDs are
 // the order of the states within the original DFA.
-func (dfa DFA) SetOrderAsID() DFA{
+func (dfa DFA) SetOrderAsID() DFA {
 	// Compute order if required.
 	if !dfa.computedDepthAndOrder {
 		dfa.CalculateDepthAndOrder()
@@ -911,7 +911,7 @@ func (dfa DFA) SetOrderAsID() DFA{
 	// Update transitions using new State IDs.
 	for _, state := range dfa.States {
 		for symbol := range dfa.Alphabet {
-			if resultantStateID := state.Transitions[symbol]; resultantStateID > -1{
+			if resultantStateID := state.Transitions[symbol]; resultantStateID > -1 {
 				resultantDFA.States[state.order].Transitions[symbol] = dfa.States[resultantStateID].order
 			}
 		}

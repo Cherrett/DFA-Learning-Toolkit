@@ -136,3 +136,13 @@ func (minMaxAvg MinMaxAvg) Avg() float64 {
 	// by the number of elements within struct.
 	return minMaxAvg.sum / float64(minMaxAvg.count)
 }
+
+// Factorial returns the factorial of n by recursively
+// calling itself.
+func Factorial(n int)(result int) {
+	if n > 0 {
+		result = n * Factorial(n-1)
+		return result
+	}
+	return 1
+}
