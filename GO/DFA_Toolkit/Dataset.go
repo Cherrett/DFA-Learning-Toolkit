@@ -402,6 +402,38 @@ func (stringInstance StringInstance) ParseToState(dfa DFA) (bool, int) {
 	return false, -1
 }
 
+// WithinDataset checks whether a StringInstance is within given Dataset.
+func (stringInstance StringInstance) WithinDataset(dataset Dataset) bool {
+	// Sort dataset by length.
+	dataset = dataset.SortDatasetByLength()
+
+	// Iterate over sorted dataset.
+	for _, instance := range dataset {
+		// Skip if length of string instance is smaller
+		// than that of the stringInstance being searched.
+		if len(instance.Value) < len(stringInstance.Value) {
+			continue
+		} else if len(instance.Value) > len(stringInstance.Value) {
+			// Break if length of string instance is bigger
+			// than that of the stringInstance being searched since
+			// all strings which have the same size as the target
+			// string have already been checked.
+			break
+		}
+
+		// Else (same length as string being searched),
+		// compare using deep equal. Return true if
+		// they are equal.
+		if reflect.DeepEqual(instance.Value, stringInstance.Value) {
+			return true
+		}
+	}
+
+	// Return false if reached since
+	// loop was broken.
+	return false
+}
+
 // BinaryStringToStringInstance returns a StringInstances from a binary string.
 func BinaryStringToStringInstance(dfa DFA, binaryString string) StringInstance {
 	// Initialize string instance.
