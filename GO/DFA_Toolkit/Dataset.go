@@ -15,8 +15,8 @@ import (
 // StringInstance struct which represents
 // a string instance within a dataset.
 type StringInstance struct {
-	Value     []int  // Slice of integers which represents the symbol values.
-	Accepting bool   // Accepting label flag for StringInstance.
+	Value     []int // Slice of integers which represents the symbol values.
+	Accepting bool  // Accepting label flag for StringInstance.
 }
 
 // Dataset which is a slice of string instances.
@@ -71,7 +71,7 @@ func (dataset Dataset) GetPTA(APTA bool) DFA {
 
 			// While symbol is not within DFA's symbols,
 			// add new symbol to DFA.
-			for symbol > len(dfa.Alphabet) - 1{
+			for symbol > len(dfa.Alphabet)-1 {
 				dfa.AddSymbol()
 			}
 

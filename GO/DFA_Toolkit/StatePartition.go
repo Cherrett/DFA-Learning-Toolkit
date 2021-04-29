@@ -2,12 +2,12 @@ package dfatoolkit
 
 // Block struct which represents a block within a partition.
 type Block struct {
-	Root    int        // Parent block of state.
-	Size    int        // Size (score) of block.
-	Link    int        // Index of next state within the block.
-	Label   StateLabel // Label of block.
-	Changed bool       // Whether block has been changed.
-	Transitions []int  // Transition Table where each element corresponds to a transition for each symbol.
+	Root        int        // Parent block of state.
+	Size        int        // Size (score) of block.
+	Link        int        // Index of next state within the block.
+	Label       StateLabel // Label of block.
+	Changed     bool       // Whether block has been changed.
+	Transitions []int      // Transition Table where each element corresponds to a transition for each symbol.
 }
 
 // StatePartition struct which represents a State Partition.
@@ -16,8 +16,8 @@ type StatePartition struct {
 	BlocksCount          int     // Number of blocks within partition.
 	AcceptingBlocksCount int     // Number of accepting blocks within partition.
 	RejectingBlocksCount int     // Number of rejecting blocks within partition.
-	AlphabetSize int			 // Size of alphabet.
-	StartingStateID int			 // The ID of the starting state.
+	AlphabetSize         int     // Size of alphabet.
+	StartingStateID      int     // The ID of the starting state.
 
 	IsCopy             bool  // Whether state partition is a copy (for reverting merges).
 	ChangedBlocks      []int // Slice of changed blocks.
@@ -51,7 +51,7 @@ func NewStatePartition(referenceDFA DFA) StatePartition {
 
 		// Initialize transitions.
 		statePartition.Blocks[i].Transitions = make([]int, statePartition.AlphabetSize)
-		for symbol := range referenceDFA.Alphabet{
+		for symbol := range referenceDFA.Alphabet {
 			statePartition.Blocks[i].Transitions[symbol] = referenceDFA.States[i].Transitions[symbol]
 		}
 	}
@@ -75,7 +75,7 @@ func (statePartition *StatePartition) ChangedBlock(blockID int) {
 
 // Union connects two blocks by comparing their respective
 // size (score) values to keep the tree flat.
-func (statePartition *StatePartition) Union(blockID1 int, blockID2 int){
+func (statePartition *StatePartition) Union(blockID1 int, blockID2 int) {
 	// Mark both blocks as changed so merge can be undone.
 	statePartition.ChangedBlock(blockID1)
 	statePartition.ChangedBlock(blockID2)
@@ -85,7 +85,7 @@ func (statePartition *StatePartition) Union(blockID1 int, blockID2 int){
 
 	// If size of parent node is smaller than size of child node, switch
 	// parent and child nodes.
-	if statePartition.Blocks[blockID1].Size < statePartition.Blocks[blockID2].Size{
+	if statePartition.Blocks[blockID1].Size < statePartition.Blocks[blockID2].Size {
 		blockID1, blockID2 = blockID2, blockID1
 	}
 
@@ -130,7 +130,7 @@ func (statePartition *StatePartition) Find(stateID int) int {
 	// Traverse each root block until state is reached.
 	for statePartition.Blocks[stateID].Root != stateID {
 		// Compress if necessary.
-		if statePartition.Blocks[stateID].Root != statePartition.Blocks[statePartition.Blocks[stateID].Root].Root{
+		if statePartition.Blocks[stateID].Root != statePartition.Blocks[statePartition.Blocks[stateID].Root].Root {
 			// If compression is required, mark state as
 			// changed and set root to root of parent.
 			statePartition.ChangedBlock(stateID)
@@ -205,7 +205,7 @@ func (statePartition *StatePartition) ToQuotientDFA() DFA {
 	// Update transitions using transitions within blocks and block to state map.
 	for _, stateID := range rootBlocks {
 		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
-			if resultantState := statePartition.Blocks[stateID].Transitions[symbol]; resultantState > -1{
+			if resultantState := statePartition.Blocks[stateID].Transitions[symbol]; resultantState > -1 {
 				resultantDFA.States[blockToStateMap[stateID]].Transitions[symbol] = blockToStateMap[statePartition.Find(resultantState)]
 			}
 		}
@@ -237,7 +237,7 @@ func (statePartition *StatePartition) MergeStates(state1 int, state2 int) bool {
 	}
 
 	// Get pointer of both blocks.
-	block1, block2 := &statePartition.Blocks[state1],  &statePartition.Blocks[state2]
+	block1, block2 := &statePartition.Blocks[state1], &statePartition.Blocks[state2]
 
 	// If labels are contradicting, return false since this results
 	// in a non-deterministic automaton so merge cannot be done.
@@ -252,7 +252,7 @@ func (statePartition *StatePartition) MergeStates(state1 int, state2 int) bool {
 	for i := 0; i < statePartition.AlphabetSize; i++ {
 		// If either block1 or block2 do not have a transition, continue
 		// since no merge is required.
-		if block1.Transitions[i] == -1 || block2.Transitions[i] == -1{
+		if block1.Transitions[i] == -1 || block2.Transitions[i] == -1 {
 			continue
 		}
 		// Else, merge resultant blocks.
@@ -281,7 +281,7 @@ func (statePartition StatePartition) Copy() StatePartition {
 	}
 
 	// Iterate over each block within blocks slice.
-	for blockID := range statePartition.Blocks{
+	for blockID := range statePartition.Blocks {
 		// Get block pointer from copied state partition.
 		block := &copiedStatePartition.Blocks[blockID]
 		// Get block pointer from original state partition.
@@ -318,7 +318,7 @@ func (statePartition StatePartition) Clone() StatePartition {
 	}
 
 	// Iterate over each block within blocks slice.
-	for blockID := range statePartition.Blocks{
+	for blockID := range statePartition.Blocks {
 		// Get block pointer from cloned state partition.
 		block := &clonedStatePartition.Blocks[blockID]
 		// Get block pointer from original state partition.
@@ -377,7 +377,7 @@ func (statePartition *StatePartition) RollbackChangesFrom(originalStatePartition
 
 // CopyChangesFrom copies the changes from one state partition to another and resets
 // the changed values within the copied state partition.
-func (statePartition *StatePartition) CopyChangesFrom(copiedStatePartition *StatePartition){
+func (statePartition *StatePartition) CopyChangesFrom(copiedStatePartition *StatePartition) {
 	// If the state partition is a copy, copy values of changed blocks to original
 	// state partition. Else, do nothing.
 	if copiedStatePartition.IsCopy {
@@ -446,7 +446,7 @@ func (statePartition StatePartition) RootBlocks() []int {
 }
 
 // OrderedBlocks returns the IDs of root blocks in order as a slice of integers.
-func (statePartition *StatePartition) OrderedBlocks() []int{
+func (statePartition *StatePartition) OrderedBlocks() []int {
 	orderComputed := make([]bool, len(statePartition.Blocks))
 	orderedBlocks := make([]int, statePartition.BlocksCount)
 	index := 0
@@ -460,7 +460,7 @@ func (statePartition *StatePartition) OrderedBlocks() []int{
 		blockID := queue[0]
 		queue = queue[1:]
 
-		if orderComputed[blockID]{
+		if orderComputed[blockID] {
 			continue
 		}
 
@@ -487,6 +487,6 @@ func (statePartition *StatePartition) OrderedBlocks() []int{
 }
 
 // StartingBlock returns the ID of the block which contains the starting state.
-func (statePartition *StatePartition) StartingBlock() int{
+func (statePartition *StatePartition) StartingBlock() int {
 	return statePartition.Find(statePartition.StartingStateID)
 }
