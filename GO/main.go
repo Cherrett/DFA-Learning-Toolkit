@@ -10,9 +10,9 @@ func main() {
 	// defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
 	// go tool pprof -http=:8081 cpu.pprof
 
-	dfa := dfatoolkit.StaminaDFA(50, 50)
+	dfa := dfatoolkit.StaminaDFA(10, 50)
 	dfa.Describe(false)
-	training, testing := dfatoolkit.StaminaDataset(dfa, 100.0, 20000, 1500)
+	training, testing := dfatoolkit.StaminaDataset(dfa, 12.5, 20000, 1500)
 
 	fmt.Println(training.Count())
 	fmt.Println(training.AcceptingStringInstancesCount())

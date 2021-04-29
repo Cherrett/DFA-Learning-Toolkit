@@ -437,11 +437,11 @@ func StaminaDataset(dfa DFA, sparsityPercentage float64, initialStringsGenerated
 	// Initialize 2 sample sets.
 	firstSet := Dataset{}
 	secondSet := Dataset{}
-	positiveStringInstances := firstSample.AcceptingStringInstances()
+	acceptingStringInstances := firstSample.AcceptingStringInstances()
 	rejectingStringInstances := firstSample.RejectingStringInstances()
 
-	for _, stringInstance := range positiveStringInstances {
-		if len(firstSet) < len(positiveStringInstances)/2 {
+	for _, stringInstance := range acceptingStringInstances {
+		if len(firstSet) < len(acceptingStringInstances)/2 {
 			firstSet = append(firstSet, stringInstance)
 		} else {
 			secondSet = append(secondSet, stringInstance)
@@ -449,7 +449,7 @@ func StaminaDataset(dfa DFA, sparsityPercentage float64, initialStringsGenerated
 	}
 
 	for _, stringInstance := range rejectingStringInstances {
-		if len(firstSet) < (len(positiveStringInstances)+len(rejectingStringInstances))/2 {
+		if len(firstSet) < (len(acceptingStringInstances)+len(rejectingStringInstances))/2 {
 			firstSet = append(firstSet, stringInstance)
 		} else {
 			secondSet = append(secondSet, stringInstance)
@@ -458,8 +458,20 @@ func StaminaDataset(dfa DFA, sparsityPercentage float64, initialStringsGenerated
 
 	// Step 4 - Populate Training Sample.
 	requiredStrings := float64(len(secondSet)) * (sparsityPercentage / 100)
+	acceptingStringInstances = secondSet.AcceptingStringInstances()
+	rejectingStringInstances = secondSet.RejectingStringInstances()
+	counter := 0
+
 	for float64(len(trainingDataset)) < requiredStrings {
-		trainingDataset = append(trainingDataset, secondSet[len(trainingDataset)])
+		if counter < len(acceptingStringInstances) {
+			trainingDataset = append(trainingDataset, acceptingStringInstances[counter])
+		}
+
+		if counter < len(rejectingStringInstances) {
+			trainingDataset = append(trainingDataset, rejectingStringInstances[counter])
+		}
+
+		counter++
 	}
 
 	// Step 3 - Populate Test Sample.

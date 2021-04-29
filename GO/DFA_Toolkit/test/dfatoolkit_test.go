@@ -138,6 +138,10 @@ func TestStaminaDatasetGeneration(t *testing.T) {
 	if !trainingDataset.SymmetricallyStructurallyComplete(StaminaDFA){
 		t.Errorf("Expected training dataset to be symmetrically structurally complete with DFA")
 	}
+
+	dfatoolkit.DefaultStaminaDataset(StaminaDFA, 50)
+	dfatoolkit.DefaultStaminaDataset(StaminaDFA, 25)
+	dfatoolkit.DefaultStaminaDataset(StaminaDFA, 12.5)
 }
 
 func TestStateMergingAndDFAEquivalence(t *testing.T) {
