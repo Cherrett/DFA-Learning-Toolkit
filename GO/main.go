@@ -1,32 +1,22 @@
 package main
 
 import (
-	"./DFA"
-	"fmt"
-	"time"
+	dfatoolkit "DFA_Toolkit/DFA_Toolkit"
 )
 
 func main() {
-	var timings []int64
-	iterations := 5
+	// PROFILING
+	// defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
+	// go tool pprof -http=:8081 cpu.pprof
 
-	for i := 0; i < iterations; i++ {
-		start := time.Now()
+	dfa := dfatoolkit.StaminaDFA(5, 50)
+	dfa.Describe(false)
+	//dfa.ToJPG("temp.jpg", nil, false, false)
+	// Construct an APTA from the dataset.
+	//APTA := trainingSet.GetPTA(true)
+	//APTA = APTA.SetOrderAsID()
+	//resultantDFA, searchData := dfatoolkit.RPNI(APTA)
 
-		listOfStrings := DFA.GetListOfStringInstancesFromFile("dataset4/train.a")
-		APTA := DFA.GetPTAFromListOfStringInstances(listOfStrings, true)
-		APTA.Describe(false)
-
-		fmt.Println("DFA Depth:", APTA.Depth())
-
-		//APTA.AddState(DFA.UNKNOWN)
-		fmt.Println(DFA.ListOfStringInstancesConsistentWithDFA(listOfStrings, APTA))
-
-		timings = append(timings, time.Since(start).Milliseconds())
-	}
-	var sum int64
-	for _, timing := range timings{
-		sum += timing
-	}
-	fmt.Printf("Average Time: %vms\n", sum/int64(iterations))
+	//fmt.Println(len(resultantDFA.States), resultantDFA.TransitionsCount())
+	//fmt.Println(searchData.Duration)
 }

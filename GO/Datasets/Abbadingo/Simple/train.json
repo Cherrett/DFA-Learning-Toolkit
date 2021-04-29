@@ -1,0 +1,50 @@
+[
+	{
+		"Value": null,
+		"Accepting": false
+	},
+	{
+		"Value": [
+			0
+		],
+		"Accepting": true
+	},
+	{
+		"Value": [
+			1
+		],
+		"Accepting": false
+	},
+	{
+		"Value": [
+			1,
+			1
+		],
+		"Accepting": true
+	},
+	{
+		"Value": [
+			1,
+			1,
+			1
+		],
+		"Accepting": false
+	},
+	{
+		"Value": [
+			0,
+			1,
+			1
+		],
+		"Accepting": false
+	},
+	{
+		"Value": [
+			1,
+			1,
+			1,
+			1
+		],
+		"Accepting": true
+	}
+]
