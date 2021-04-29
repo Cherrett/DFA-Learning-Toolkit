@@ -13,19 +13,19 @@ import (
 type SearchData struct {
 	Merges               []StatePairScore // Slice of state pairs and scores of merges done.
 	AttemptedMergesCount int              // The number of attempted merges.
-	ValidMergesCount	 int			  // The number of valid attempted merges.
+	ValidMergesCount     int              // The number of valid attempted merges.
 	Duration             time.Duration    // The duration for the search function to finish.
 }
 
 // MergesCount returns the number of merges done before
 // reaching the final StatePartition.
-func (searchData SearchData) MergesCount() int{
+func (searchData SearchData) MergesCount() int {
 	return len(searchData.Merges)
 }
 
 // AttemptedMergesPerSecond returns the number of attempted
 // merges per second. Used for performance evaluation.
-func (searchData SearchData) AttemptedMergesPerSecond() float64{
+func (searchData SearchData) AttemptedMergesPerSecond() float64 {
 	return float64(searchData.AttemptedMergesCount) / searchData.Duration.Seconds()
 }
 

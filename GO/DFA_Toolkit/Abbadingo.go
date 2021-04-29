@@ -68,11 +68,11 @@ func NewStringInstanceFromAbbadingoFile(text string, delimiter string) StringIns
 
 	// Add the remaining split string values to value of StringInstance since
 	// these contain the actual string value.
-	for i := 2; i < len(splitString); i++{
+	for i := 2; i < len(splitString); i++ {
 		runeValue := rune(splitString[i][0])
-		if value, exists := AlphabetSymbolMappingAbbadingo[runeValue]; exists{
+		if value, exists := AlphabetSymbolMappingAbbadingo[runeValue]; exists {
 			stringInstance.Value = append(stringInstance.Value, value)
-		}else{
+		} else {
 			panic("Abbadingo datasets only consist of binary values.")
 		}
 	}
@@ -215,21 +215,21 @@ func AbbadingoDatasetExact(dfa DFA, trainingSetSize int, testingSetSize int) (Da
 // returning a training and testing dataset built on the generated DFA given a sparsity percentage and
 // a training:testing ratio. If exact is set to true, the resultant DFA will have the required depth as
 // per Abbadingo protocol.
-func AbbadingoInstance(numberOfStates int, exact bool, sparsityPercentage float64, testingRatio float64) (DFA, Dataset, Dataset){
+func AbbadingoInstance(numberOfStates int, exact bool, sparsityPercentage float64, testingRatio float64) (DFA, Dataset, Dataset) {
 	dfa := AbbadingoDFA(numberOfStates, exact)
 	trainingSet, testingSet := AbbadingoDataset(dfa, sparsityPercentage, testingRatio)
 
-	return dfa,trainingSet, testingSet
+	return dfa, trainingSet, testingSet
 }
 
 // AbbadingoInstanceExact returns a random DFA using the Abbadingo protocol given a number of states while
 // returning a training and testing dataset built on the generated DFA given a set size for each.
 // If exact is set to true, the resultant DFA will have the required depth as per Abbadingo protocol.
-func AbbadingoInstanceExact(numberOfStates int, exact bool, trainingSetSize int, testingSetSize int) (DFA, Dataset, Dataset){
+func AbbadingoInstanceExact(numberOfStates int, exact bool, trainingSetSize int, testingSetSize int) (DFA, Dataset, Dataset) {
 	dfa := AbbadingoDFA(numberOfStates, exact)
 	trainingSet, testingSet := AbbadingoDatasetExact(dfa, trainingSetSize, testingSetSize)
 
-	return dfa,trainingSet, testingSet
+	return dfa, trainingSet, testingSet
 }
 
 // ToAbbadingoFile writes a given Dataset to file in Abbadingo-Format.

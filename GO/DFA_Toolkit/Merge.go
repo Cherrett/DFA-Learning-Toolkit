@@ -42,7 +42,7 @@ func GreedySearch(statePartition StatePartition) (StatePartition, SearchData) {
 		//	continue
 		//}
 		for j := 0; j < i; j++ {
-			if copiedPartition.Blocks[j].Root != j{
+			if copiedPartition.Blocks[j].Root != j {
 				continue
 			}
 			// Increment merge count.
@@ -50,7 +50,7 @@ func GreedySearch(statePartition StatePartition) (StatePartition, SearchData) {
 			// Check if states are mergeable.
 			if copiedPartition.MergeStates(orderedBlocks[i], orderedBlocks[j]) {
 				// Do not merge if states are within same block.
-				if !statePartition.WithinSameBlock(orderedBlocks[i], orderedBlocks[j]){
+				if !statePartition.WithinSameBlock(orderedBlocks[i], orderedBlocks[j]) {
 					// Increment valid merge count.
 					totalValidMerges++
 
@@ -162,10 +162,10 @@ func GreedySearchUsingScoringFunction(statePartition StatePartition, scoringFunc
 // Returns the resultant state partition and search data when no more valid merges are possible.
 func FastWindowedSearchUsingScoringFunction(statePartition StatePartition, windowSize int, windowGrow float64, scoringFunction ScoringFunction) (StatePartition, SearchData) {
 	// Parameter Error Checking.
-	if windowSize < 1{
+	if windowSize < 1 {
 		panic("Window Size cannot be smaller than 1.")
 	}
-	if windowGrow <= 1.00{
+	if windowGrow <= 1.00 {
 		panic("Window Grow cannot be smaller or equal to 1.")
 	}
 
@@ -238,7 +238,7 @@ func FastWindowedSearchUsingScoringFunction(statePartition StatePartition, windo
 				}
 
 				previousWindowSize = windowSize
-				windowSize = util.Min(int(math.Round(float64(windowSize) * windowGrow)), len(orderedBlocks))
+				windowSize = util.Min(int(math.Round(float64(windowSize)*windowGrow)), len(orderedBlocks))
 			}
 		}
 
@@ -270,10 +270,10 @@ func FastWindowedSearchUsingScoringFunction(statePartition StatePartition, windo
 // Returns the resultant state partition and search data when no more valid merges are possible.
 func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSize int, windowGrow float64, scoringFunction ScoringFunction) (StatePartition, SearchData) {
 	// Parameter Error Checking.
-	if windowSize < 1{
+	if windowSize < 1 {
 		panic("Window Size cannot be smaller than 1.")
 	}
-	if windowGrow <= 1.00{
+	if windowGrow <= 1.00 {
 		panic("Window Grow cannot be smaller or equal to 1.")
 	}
 	// Clone StatePartition.
@@ -351,7 +351,7 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 				previousWindowSize = windowSize
 				// Get new window size which is the smallest from the window size multiplied
 				// by window grow or the number of blocks within initial state partition.
-				windowSize = util.Min(int(math.Round(float64(windowSize) * windowGrow)), len(orderedBlocks))
+				windowSize = util.Min(int(math.Round(float64(windowSize)*windowGrow)), len(orderedBlocks))
 			}
 		}
 
