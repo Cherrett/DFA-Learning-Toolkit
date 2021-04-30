@@ -276,6 +276,7 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 	if windowGrow <= 1.00 {
 		panic("Window Grow cannot be smaller or equal to 1.")
 	}
+
 	// Clone StatePartition.
 	statePartition = statePartition.Clone()
 	// Copy the state partition for undoing and copying changed states.
