@@ -36,13 +36,13 @@ func (state State) IsUnknown() bool {
 
 // IsLeaf checks whether given state is a leaf within DFA.
 // In other words, whether the state has any valid transitions.
-func (state State) IsLeaf() bool {
+func (state State) IsLeaf(stateID int) bool {
 	// Iterate over each transition from state.
 	for _, toStateID := range state.Transitions {
 		// If a transition with a value not equal to -1 is
 		// found (valid), false is returned since. a valid
 		// transition is found, hence state is not a leaf.
-		if toStateID != -1 {
+		if toStateID != -1 && toStateID != stateID {
 			return false
 		}
 	}
