@@ -389,7 +389,7 @@ func (dfa *DFA) CalculateDepthAndOrder() {
 }
 
 // OrderedStates returns the state IDs in order.
-func (dfa DFA) OrderedStates() []int {
+func (dfa *DFA) OrderedStates() []int {
 	// If depth and order for DFA is not computed,
 	// call CalculateDepthAndOrder.
 	if !dfa.computedDepthAndOrder {
@@ -879,7 +879,7 @@ func (dfa *DFA) RemoveNonAcceptingLeaves() {
 
 // SetOrderAsID returns a new DFA where the State IDs are
 // the order of the states within the original DFA.
-func (dfa DFA) SetOrderAsID() DFA {
+func (dfa *DFA) SetOrderAsID() DFA {
 	// Compute order if required.
 	if !dfa.computedDepthAndOrder {
 		dfa.CalculateDepthAndOrder()

@@ -401,6 +401,8 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 
 	// Initialize set of red states to starting state.
 	red := map[int]util.Void{statePartition.StartingBlock(): util.Null}
+	// Slice to store red states in insertion order.
+	orderedRed := []int{statePartition.StartingBlock()}
 
 	// Initialize merged flag to false.
 	merged := false
@@ -409,9 +411,11 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 	for {
 		// Initialize set of blue states to empty set.
 		blue := map[int]util.Void{}
+		// Slice to store blue states in insertion order.
+		var orderedBlue []int
 
 		// Iterate over every red state.
-		for element := range red {
+		for _, element := range orderedRed {
 			// Iterate over each symbol within DFA.
 			for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
 				if resultantStateID := statePartition.Blocks[element].Transitions[symbol]; resultantStateID > -1 {
@@ -420,7 +424,12 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 					// If transition is valid and resultant state is not red,
 					// add resultant state to blue set.
 					if _, exists := red[resultantStateID]; resultantStateID != -1 && !exists {
-						blue[resultantStateID] = util.Null
+						// If resultant state is not already in blue set, add to
+						// both blue set and ordered blue set.
+						if _, exists := blue[resultantStateID]; !exists{
+							orderedBlue = append(orderedBlue, resultantStateID)
+							blue[resultantStateID] = util.Null
+						}
 					}
 				}
 			}
@@ -431,12 +440,12 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 			break
 		}
 
-		// Iterate over every blue state.
-		for blueElement := range blue {
+		// Iterate over every blue state in insertion order.
+		for _, blueElement := range orderedBlue {
 			// Set merged flag to false.
 			merged = false
-			// Iterate over every red state.
-			for redElement := range red {
+			// Iterate over every red state in insertion order.
+			for _, redElement := range orderedRed {
 				// If scores for the current state pair has already been
 				// computed, set merged flag to true and skip merge.
 				if _, valid := scoresComputed[StateIDPair{blueElement, redElement}]; valid {
@@ -478,9 +487,10 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 			}
 
 			// If merged flag is false, add current blue state
-			// to red states set and exit loop.
+			// to red states set and ordered set and exit loop.
 			if !merged {
 				red[blueElement] = util.Null
+				orderedRed = append(orderedRed, blueElement)
 				break
 			}
 		}
@@ -501,8 +511,10 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 			// Slice of state pairs to keep track of computed scores.
 			scoresComputed = map[StateIDPair]util.Void{}
 
-			// Initialize set of red states to starting state.
+			// Set set of red states to starting state.
 			red = map[int]util.Void{statePartition.StartingBlock(): util.Null}
+			// Set slice to store red states in insertion order.
+			orderedRed = []int{statePartition.StartingBlock()}
 		}
 	}
 
