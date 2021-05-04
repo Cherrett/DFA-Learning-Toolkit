@@ -61,19 +61,22 @@ func NewStringInstanceFromStaminaFile(text string, delimiter string) StringInsta
 		panic(fmt.Sprintf("Unknown string label - %s", splitString[0]))
 	}
 
-	// Add the remaining split string values to value of StringInstance since
-	// these contain the actual string value.
-	for i := 1; i < len(splitString); i++ {
-		// Get integer value from split string.
-		integerValue, err := strconv.Atoi(splitString[i])
+	// Stop if no more characters exist in string. (Empty string case)
+	if splitString[1] != ""{
+		// Add the remaining split string values to value of StringInstance since
+		// these contain the actual string value.
+		for i := 1; i < len(splitString); i++ {
+			// Get integer value from split string.
+			integerValue, err := strconv.Atoi(splitString[i])
 
-		// Panic if error.
-		if err != nil {
-			panic(err)
+			// Panic if error.
+			if err != nil {
+				panic(err)
+			}
+
+			// Add integer value to value slice within string instance.
+			stringInstance.Value = append(stringInstance.Value, integerValue)
 		}
-
-		// Add integer value to value slice within string instance.
-		stringInstance.Value = append(stringInstance.Value, integerValue)
 	}
 
 	// Return populated string instance.
