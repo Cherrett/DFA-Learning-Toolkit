@@ -426,7 +426,7 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 					if _, exists := red[resultantStateID]; resultantStateID != -1 && !exists {
 						// If resultant state is not already in blue set, add to
 						// both blue set and ordered blue set.
-						if _, exists := blue[resultantStateID]; !exists{
+						if _, exists := blue[resultantStateID]; !exists {
 							orderedBlue = append(orderedBlue, resultantStateID)
 							blue[resultantStateID] = util.Null
 						}

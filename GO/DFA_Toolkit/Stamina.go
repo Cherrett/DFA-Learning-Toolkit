@@ -62,7 +62,7 @@ func NewStringInstanceFromStaminaFile(text string, delimiter string) StringInsta
 	}
 
 	// Stop if no more characters exist in string. (Empty string case)
-	if splitString[1] != ""{
+	if splitString[1] != "" {
 		// Add the remaining split string values to value of StringInstance since
 		// these contain the actual string value.
 		for i := 1; i < len(splitString); i++ {
@@ -378,8 +378,8 @@ func StaminaDataset(dfa DFA, sparsityPercentage float64, initialStringsGenerated
 			validTransitions := currentState.ValidTransitions()
 
 			// Break if no valid transitions or if current state is a leaf node.
-			if len(validTransitions) == 0 || currentState.IsLeaf(currentStateID){
-				if !currentState.IsAccepting(){
+			if len(validTransitions) == 0 || currentState.IsLeaf(currentStateID) {
+				if !currentState.IsAccepting() {
 					valid = false
 				}
 
@@ -395,7 +395,7 @@ func StaminaDataset(dfa DFA, sparsityPercentage float64, initialStringsGenerated
 			currentState = &dfa.States[currentState.Transitions[validSymbol]]
 		}
 
-		if valid{
+		if valid {
 			// Add string to first sample.
 			firstSample = append(firstSample, currentString)
 		}

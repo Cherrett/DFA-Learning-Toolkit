@@ -328,7 +328,7 @@ func TestBenchmarkBlueFringeEDSM(t *testing.T) {
 
 // TestBenchmarkEDSM benchmarks the performance of the GreedyEDSMFromDataset(), FastWindowedEDSMFromDataset(),
 // WindowedEDSMFromDataset() and BlueFringeEDSMFromDataset() functions while comparing their performance.
-func TestBenchmarkEDSM(t *testing.T){
+func TestBenchmarkEDSM(t *testing.T) {
 	// Random Seed.
 	// rand.Seed(time.Now().UnixNano())
 
@@ -455,7 +455,7 @@ func TestBenchmarkEDSM(t *testing.T){
 
 // TestBenchmarkEDSM concurrently benchmarks the performance of the GreedyEDSM(), FastWindowedEDSM(),
 // WindowedEDSM() and BlueFringeEDSM() functions while comparing their performance.
-func TestBenchmarkFastEDSM(t *testing.T){
+func TestBenchmarkFastEDSM(t *testing.T) {
 	// Random Seed.
 	// rand.Seed(time.Now().UnixNano())
 
@@ -620,7 +620,7 @@ func TestBenchmarkFastEDSM(t *testing.T){
 
 // TestBenchmarkEDSM benchmarks the performance of the GreedyEDSMFromDataset(), FastWindowedEDSMFromDataset(),
 // WindowedEDSMFromDataset() and BlueFringeEDSMFromDataset() functions while comparing their performance on Stamina DFAs and Datasets.
-func TestBenchmarkEDSMStamina(t *testing.T){
+func TestBenchmarkEDSMStamina(t *testing.T) {
 	// Random Seed.
 	// rand.Seed(time.Now().UnixNano())
 
@@ -749,7 +749,7 @@ func TestBenchmarkEDSMStamina(t *testing.T){
 
 // TestBenchmarkFastEDSMStamina concurrently benchmarks the performance of the GreedyEDSM(), FastWindowedEDSM(),
 // WindowedEDSM() and BlueFringeEDSM() functions while comparing their performance on Stamina DFAs and Datasets.
-func TestBenchmarkFastEDSMStamina(t *testing.T){
+func TestBenchmarkFastEDSMStamina(t *testing.T) {
 	// Random Seed.
 	// rand.Seed(time.Now().UnixNano())
 
