@@ -447,7 +447,9 @@ func (statePartition StatePartition) RootBlocks() []int {
 
 // OrderedBlocks returns the IDs of root blocks in order as a slice of integers.
 func (statePartition *StatePartition) OrderedBlocks() []int {
+	// Slice of boolean values to keep track of orders calculated.
 	orderComputed := make([]bool, len(statePartition.Blocks))
+	// Slice of integer values to keep track of ordered blocks.
 	orderedBlocks := make([]int, statePartition.BlocksCount)
 	index := 0
 
@@ -460,12 +462,14 @@ func (statePartition *StatePartition) OrderedBlocks() []int {
 		blockID := queue[0]
 		queue = queue[1:]
 
+		// Skip if order for block is already computed.
 		if orderComputed[blockID] {
 			continue
 		}
 
 		// Set the order of the current state.
 		orderedBlocks[index] = blockID
+		// Mark block as computed.
 		orderComputed[blockID] = true
 		// Increment current state order.
 		index++

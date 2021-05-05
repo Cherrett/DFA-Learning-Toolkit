@@ -276,6 +276,7 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 	if windowGrow <= 1.00 {
 		panic("Window Grow cannot be smaller or equal to 1.")
 	}
+
 	// Clone StatePartition.
 	statePartition = statePartition.Clone()
 	// Copy the state partition for undoing and copying changed states.
@@ -399,43 +400,24 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 	scoresComputed := map[StateIDPair]util.Void{}
 
 	// Initialize set of red states to starting state.
-	red := map[int]util.Void{statePartition.StartingBlock(): util.Null}
+	redSet := map[int]util.Void{statePartition.StartingBlock(): util.Null}
+	// Slice to store red states in insertion order.
+	redStates := []int{statePartition.StartingBlock()}
+
+	// Generated slice of ordered blue states from red states.
+	blueStates := GenerateBlueSetFromRedSet(statePartition, redSet)
 
 	// Initialize merged flag to false.
 	merged := false
 
-	// Iterate until stopped.
-	for {
-		// Initialize set of blue states to empty set.
-		blue := map[int]util.Void{}
-
-		// Iterate over every red state.
-		for element := range red {
-			// Iterate over each symbol within DFA.
-			for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
-				if resultantStateID := statePartition.Blocks[element].Transitions[symbol]; resultantStateID > -1 {
-					// Store resultant stateID from red state.
-					resultantStateID = statePartition.Find(resultantStateID)
-					// If transition is valid and resultant state is not red,
-					// add resultant state to blue set.
-					if _, exists := red[resultantStateID]; resultantStateID != -1 && !exists {
-						blue[resultantStateID] = util.Null
-					}
-				}
-			}
-		}
-
-		// If blue set is empty, break loop and return resultant DFA.
-		if len(blue) == 0 {
-			break
-		}
-
-		// Iterate over every blue state.
-		for blueElement := range blue {
+	// Iterate until blue set is empty.
+	for len(blueStates) != 0 {
+		// Iterate over every blue state in insertion order.
+		for _, blueElement := range blueStates {
 			// Set merged flag to false.
 			merged = false
-			// Iterate over every red state.
-			for redElement := range red {
+			// Iterate over every red state in insertion order.
+			for _, redElement := range redStates {
 				// If scores for the current state pair has already been
 				// computed, set merged flag to true and skip merge.
 				if _, valid := scoresComputed[StateIDPair{blueElement, redElement}]; valid {
@@ -471,15 +453,17 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 						// Set merged flag to true.
 						merged = true
 					}
+
 					// Undo merge.
 					copiedPartition.RollbackChangesFrom(statePartition)
 				}
 			}
 
 			// If merged flag is false, add current blue state
-			// to red states set and exit loop.
+			// to red states set and ordered set and exit loop.
 			if !merged {
-				red[blueElement] = util.Null
+				redSet[blueElement] = util.Null
+				redStates = append(redStates, blueElement)
 				break
 			}
 		}
@@ -499,10 +483,15 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 
 			// Slice of state pairs to keep track of computed scores.
 			scoresComputed = map[StateIDPair]util.Void{}
-
-			// Initialize set of red states to starting state.
-			red = map[int]util.Void{statePartition.StartingBlock(): util.Null}
 		}
+
+		// Update slice and map of ordered red states.
+		// This is done since partition may have changed
+		// or states have been added to the red set.
+		redSet, redStates = UpdateRedSet(statePartition, redSet)
+
+		// Generated slice of ordered blue states from red states.
+		blueStates = GenerateBlueSetFromRedSet(statePartition, redSet)
 	}
 
 	// Add total and valid merges counts to search data.
@@ -513,4 +502,146 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 
 	// Return the final resultant state partition and search data.
 	return statePartition, searchData
+}
+
+// GenerateBlueSetFromRedSet generates the blue set given the state partition and the red set within the Red-Blue framework
+// such as the BlueFringeSearchUsingScoringFunction function. It generates and returns the blue set in canonical order.
+func GenerateBlueSetFromRedSet(statePartition StatePartition, redSet map[int]util.Void) []int {
+	// Step 1 - Gather all blue states and store in map declared below.
+
+	// Initialize set of blue states to empty set.
+	blue := map[int]util.Void{}
+
+	// Iterate over every red state.
+	for element := range redSet {
+		// Iterate over each symbol within DFA.
+		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
+			if resultantStateID := statePartition.Blocks[element].Transitions[symbol]; resultantStateID > -1 {
+				// Store resultant stateID from red state.
+				resultantStateID = statePartition.Find(resultantStateID)
+				// If transition is valid and resultant state is not red,
+				// add resultant state to blue set.
+				if _, exists := redSet[resultantStateID]; !exists {
+					blue[resultantStateID] = util.Null
+				}
+			}
+		}
+	}
+
+	// Step 2 - Sort blue states by canonical order and store in slice declared below.
+
+	// Slice to store blue states in canonical order.
+	var orderedBlue []int
+
+	// Slice of boolean values to keep track of orders calculated.
+	orderComputed := make([]bool, len(statePartition.Blocks))
+	index := 0
+
+	// Create a FIFO queue with starting state.
+	queue := []int{statePartition.Find(statePartition.StartingBlock())}
+
+	// Loop until queue is empty.
+	for len(queue) > 0 {
+		// Remove and store first state in queue.
+		blockID := queue[0]
+		queue = queue[1:]
+
+		// Skip if order for block is already computed.
+		if orderComputed[blockID] {
+			continue
+		}
+
+		// If block is in blue set, add to ordered slice.
+		if _, exists := blue[blockID]; exists {
+			orderedBlue = append(orderedBlue, blockID)
+		}
+
+		// Mark block as computed.
+		orderComputed[blockID] = true
+		// Increment current state order.
+		index++
+
+		// Iterate over each symbol (alphabet) within DFA.
+		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
+			// If transition from current state using current symbol is valid and is not a loop to the current state.
+			if childStateID := statePartition.Blocks[blockID].Transitions[symbol]; childStateID != -1 {
+				// If depth for child state has been computed, skip state.
+				if childBlockID := statePartition.Find(childStateID); childBlockID != blockID {
+					// Add child state to queue.
+					queue = append(queue, childBlockID)
+				}
+			}
+		}
+	}
+
+	// Return populated slice of blue states in canonical order.
+	return orderedBlue
+}
+
+// UpdateRedSet updates the red set given the state partition and the red set within the Red-Blue framework such as the
+// BlueFringeSearchUsingScoringFunction function. It returns the red set in canonical order. This is used when the state
+// partition is changed or when new states have been added to the red set.
+func UpdateRedSet(statePartition StatePartition, redSet map[int]util.Void) (map[int]util.Void, []int) {
+	// Step 1 - Gather root of old red states and store in map declared below.
+
+	// Initialize set of red root states (blocks) to empty set.
+	newRedSet := map[int]util.Void{}
+
+	// Iterate over every red state.
+	for element := range redSet {
+		// Get root block of red state.
+		root := statePartition.Find(element)
+
+		// Add root block to red set.
+		newRedSet[root] = util.Null
+	}
+
+	// Step 2 - Sort red states by canonical order and store in slice declared below.
+
+	// Slice to store red states in canonical order.
+	var orderedRed []int
+
+	// Slice of boolean values to keep track of orders calculated.
+	orderComputed := make([]bool, len(statePartition.Blocks))
+	index := 0
+
+	// Create a FIFO queue with starting state.
+	queue := []int{statePartition.Find(statePartition.StartingBlock())}
+
+	// Loop until queue is empty.
+	for len(queue) > 0 {
+		// Remove and store first state in queue.
+		blockID := queue[0]
+		queue = queue[1:]
+
+		// Skip if order for block is already computed.
+		if orderComputed[blockID] {
+			continue
+		}
+
+		// If block is in red set, add to ordered slice.
+		if _, exists := newRedSet[blockID]; exists {
+			orderedRed = append(orderedRed, blockID)
+		}
+
+		// Mark block as computed.
+		orderComputed[blockID] = true
+		// Increment current state order.
+		index++
+
+		// Iterate over each symbol (alphabet) within DFA.
+		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
+			// If transition from current state using current symbol is valid and is not a loop to the current state.
+			if childStateID := statePartition.Blocks[blockID].Transitions[symbol]; childStateID != -1 {
+				// If depth for child state has been computed, skip state.
+				if childBlockID := statePartition.Find(childStateID); childBlockID != blockID {
+					// Add child state to queue.
+					queue = append(queue, childBlockID)
+				}
+			}
+		}
+	}
+
+	// Return new red set and populated slice of red states in canonical order.
+	return newRedSet, orderedRed
 }

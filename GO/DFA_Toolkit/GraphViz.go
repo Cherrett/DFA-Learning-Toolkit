@@ -22,7 +22,7 @@ var SymbolAlphabetMappingAbbadingo = map[int]rune{0: 'a', 1: 'b'}
 // within DFA. If topDown is set to true, the visual representation
 // will be top down. A left to right representation is used otherwise.
 // This function is also called from all of the functions below.
-func (dfa DFA) ToDOT(filePath string, symbolMapping map[int]rune, showOrder bool, topDown bool) {
+func (dfa *DFA) ToDOT(filePath string, symbolMapping map[int]rune, showOrder bool, topDown bool) {
 	// If show order is set to true, make sure
 	// that depth and order for DFA are computed.
 	if showOrder {

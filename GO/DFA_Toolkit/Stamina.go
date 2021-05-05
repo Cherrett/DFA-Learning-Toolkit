@@ -61,19 +61,22 @@ func NewStringInstanceFromStaminaFile(text string, delimiter string) StringInsta
 		panic(fmt.Sprintf("Unknown string label - %s", splitString[0]))
 	}
 
-	// Add the remaining split string values to value of StringInstance since
-	// these contain the actual string value.
-	for i := 1; i < len(splitString); i++ {
-		// Get integer value from split string.
-		integerValue, err := strconv.Atoi(splitString[i])
+	// Stop if no more characters exist in string. (Empty string case)
+	if splitString[1] != "" {
+		// Add the remaining split string values to value of StringInstance since
+		// these contain the actual string value.
+		for i := 1; i < len(splitString); i++ {
+			// Get integer value from split string.
+			integerValue, err := strconv.Atoi(splitString[i])
 
-		// Panic if error.
-		if err != nil {
-			panic(err)
+			// Panic if error.
+			if err != nil {
+				panic(err)
+			}
+
+			// Add integer value to value slice within string instance.
+			stringInstance.Value = append(stringInstance.Value, integerValue)
 		}
-
-		// Add integer value to value slice within string instance.
-		stringInstance.Value = append(stringInstance.Value, integerValue)
 	}
 
 	// Return populated string instance.
@@ -138,7 +141,7 @@ func StaminaDFA(alphabetSize int, targetDFASize int) DFA {
 			// If ambassador node already covers all transitions,
 			// choose another ambassador node. Loop until a valid
 			// ambassador node is found.
-			for dfa.States[ambassadorNode].AllTransitionsExist() {
+			for dfa.States[ambassadorNode].AllTransitionsExist() || ambassadorNode == newStateID {
 				// Randomly choose an ambassador node.
 				ambassadorNode = rand.Intn(len(dfa.States))
 			}
@@ -159,12 +162,6 @@ func StaminaDFA(alphabetSize int, targetDFASize int) DFA {
 			if rand.Float64() < l {
 				// Select a random symbol within the alphabet.
 				randomSymbol = rand.Intn(alphabetSize)
-
-				// If transition from current node using chosen symbol already exists,
-				// choose another random symbol. Loop until a free symbol is found.
-				for dfa.States[newStateID].Transitions[randomSymbol] != -1 {
-					randomSymbol = rand.Intn(alphabetSize)
-				}
 
 				// Add self-looping edge (transition) using random valid symbol.
 				dfa.AddTransition(randomSymbol, newStateID, newStateID)
@@ -199,38 +196,13 @@ func StaminaDFA(alphabetSize int, targetDFASize int) DFA {
 func ModifiedForestFire(currentNode int, ambassadorNode int, dfa *DFA, visitedStates *map[int]bool, alphabetSize int, f, b, p float64) {
 	// Step 1 within ForestFire algorithm.
 
+	// Mark current node as visited.
+	(*visitedStates)[currentNode] = true
+
 	// If all transitions from current node are already
 	// filled, return.
 	if dfa.States[currentNode].AllTransitionsExist() {
 		return
-	}
-
-	// Generate random number using a geometric distribution as per Stamina protocol.
-	x := int(math.Ceil(math.Logb(1-rand.Float64()) / (math.Logb(1 - (f / (1 - f))))))
-
-	// Slice to store state IDs of nodes which have a transition to ambassador node.
-	var fromNodes []int
-
-	// Iterate over states within dfa.
-	for stateID, state := range dfa.States {
-		// If the amount of required nodes
-		// is reached, break loop.
-		if len(fromNodes) == x {
-			break
-		}
-
-		// Check if state already visited and that not all transitions exist.
-		if !(*visitedStates)[stateID] && !state.AllTransitionsExist() {
-			// Iterate over each symbol within alphabet.
-			for symbol := range dfa.Alphabet {
-				// If resultant state is equal to ID of ambassador node, add to fromNodes slice and
-				// break.
-				if resultantStateID := state.Transitions[symbol]; resultantStateID == ambassadorNode {
-					fromNodes = append(fromNodes, stateID)
-					break
-				}
-			}
-		}
 	}
 
 	// Generate random number using a geometric distribution as per Stamina protocol.
@@ -248,10 +220,39 @@ func ModifiedForestFire(currentNode int, ambassadorNode int, dfa *DFA, visitedSt
 			break
 		}
 
-		// If resultant state is valid, not visited, not in to nodes and not all transitions exist, add to toNodes map.
+		// If resultant state is valid, not visited, not in to nodes,
+		// and not equal to current node, add to toNodes map.
 		if resultantStateID := dfa.States[ambassadorNode].Transitions[symbol]; resultantStateID != -1 &&
-			!(*visitedStates)[resultantStateID] && !toNodes[resultantStateID] && !dfa.States[resultantStateID].AllTransitionsExist() {
+			!(*visitedStates)[resultantStateID] && !toNodes[resultantStateID] && resultantStateID != currentNode {
 			toNodes[resultantStateID] = true
+		}
+	}
+
+	// Generate random number using a geometric distribution as per Stamina protocol.
+	x := int(math.Ceil(math.Logb(1-rand.Float64()) / (math.Logb(1 - (f / (1 - f))))))
+
+	// Slice to store state IDs of nodes which have a transition to ambassador node.
+	var fromNodes []int
+
+	// Iterate over states within dfa.
+	for stateID, state := range dfa.States {
+		// If the amount of required nodes
+		// is reached, break loop.
+		if len(fromNodes) == x {
+			break
+		}
+
+		// Check if state already visited.
+		if !(*visitedStates)[stateID] {
+			// Iterate over each symbol within alphabet.
+			for symbol := range dfa.Alphabet {
+				// If resultant state is equal to ID of ambassador node and not equal
+				// to current node, add to fromNodes slice and break.
+				if resultantStateID := state.Transitions[symbol]; resultantStateID == ambassadorNode && stateID != currentNode && !toNodes[stateID] {
+					fromNodes = append(fromNodes, stateID)
+					break
+				}
+			}
 		}
 	}
 
@@ -259,6 +260,13 @@ func ModifiedForestFire(currentNode int, ambassadorNode int, dfa *DFA, visitedSt
 
 	// Iterate over all from nodes selected.
 	for _, stateID := range fromNodes {
+		// Skip if all transitions already exist within
+		// state. This happens since other recursive
+		// calls can change these transitions.
+		if dfa.States[stateID].AllTransitionsExist() {
+			continue
+		}
+
 		// Select a random symbol within the alphabet.
 		randomSymbol := rand.Intn(alphabetSize)
 
@@ -271,7 +279,7 @@ func ModifiedForestFire(currentNode int, ambassadorNode int, dfa *DFA, visitedSt
 		// Add edge (transition) from current state to from state using random valid symbol.
 		dfa.AddTransition(randomSymbol, currentNode, stateID)
 
-		// Parallel edge label with probability l.
+		// Parallel edge label with probability p.
 		if !dfa.States[currentNode].AllTransitionsExist() && rand.Float64() < p {
 			// Select a random symbol within the alphabet.
 			randomSymbol = rand.Intn(alphabetSize)
@@ -308,7 +316,7 @@ func ModifiedForestFire(currentNode int, ambassadorNode int, dfa *DFA, visitedSt
 		// Add edge (transition) from current state to from state using random valid symbol.
 		dfa.AddTransition(randomSymbol, currentNode, stateID)
 
-		// Parallel edge label with probability l.
+		// Parallel edge label with probability p.
 		if !dfa.States[currentNode].AllTransitionsExist() && rand.Float64() < p {
 			// Select a random symbol within the alphabet.
 			randomSymbol = rand.Intn(alphabetSize)
@@ -326,16 +334,12 @@ func ModifiedForestFire(currentNode int, ambassadorNode int, dfa *DFA, visitedSt
 
 	// Iterate over all from nodes selected.
 	for _, stateID := range fromNodes {
-		// Mark current node as visited.
-		(*visitedStates)[stateID] = true
 		// Recursively call ModifiedForestFire function.
 		ModifiedForestFire(stateID, ambassadorNode, dfa, visitedStates, alphabetSize, f, b, p)
 	}
 
 	// Iterate over all to nodes selected.
 	for stateID := range toNodes {
-		// Mark current node as visited.
-		(*visitedStates)[stateID] = true
 		// Recursively call ModifiedForestFire function.
 		ModifiedForestFire(stateID, ambassadorNode, dfa, visitedStates, alphabetSize, f, b, p)
 	}
@@ -361,6 +365,8 @@ func StaminaDataset(dfa DFA, sparsityPercentage float64, initialStringsGenerated
 	for len(firstSample) < initialStringsGenerated {
 		currentString := StringInstance{make([]int, 0), true}
 		currentState := dfa.StartingState()
+		currentStateID := dfa.StartingStateID
+		valid := true
 		for {
 			if currentState.IsAccepting() {
 				// End generation with probability 1.0/(1 + 2*outdegree(v).
@@ -371,16 +377,28 @@ func StaminaDataset(dfa DFA, sparsityPercentage float64, initialStringsGenerated
 
 			validTransitions := currentState.ValidTransitions()
 
+			// Break if no valid transitions or if current state is a leaf node.
+			if len(validTransitions) == 0 || currentState.IsLeaf(currentStateID) {
+				if !currentState.IsAccepting() {
+					valid = false
+				}
+
+				break
+			}
+
 			// Randomly choose a symbol with a valid transitions.
 			validSymbol := validTransitions[rand.Intn(len(validTransitions))]
 
 			currentString.Value = append(currentString.Value, validSymbol)
 
+			currentStateID = currentState.Transitions[validSymbol]
 			currentState = &dfa.States[currentState.Transitions[validSymbol]]
 		}
 
-		// Add string to first sample.
-		firstSample = append(firstSample, currentString)
+		if valid {
+			// Add string to first sample.
+			firstSample = append(firstSample, currentString)
+		}
 	}
 
 	// Negative strings into first sample.
@@ -437,11 +455,11 @@ func StaminaDataset(dfa DFA, sparsityPercentage float64, initialStringsGenerated
 	// Initialize 2 sample sets.
 	firstSet := Dataset{}
 	secondSet := Dataset{}
-	positiveStringInstances := firstSample.AcceptingStringInstances()
+	acceptingStringInstances := firstSample.AcceptingStringInstances()
 	rejectingStringInstances := firstSample.RejectingStringInstances()
 
-	for _, stringInstance := range positiveStringInstances {
-		if len(firstSet) < len(positiveStringInstances)/2 {
+	for _, stringInstance := range acceptingStringInstances {
+		if len(firstSet) < len(acceptingStringInstances)/2 {
 			firstSet = append(firstSet, stringInstance)
 		} else {
 			secondSet = append(secondSet, stringInstance)
@@ -449,7 +467,7 @@ func StaminaDataset(dfa DFA, sparsityPercentage float64, initialStringsGenerated
 	}
 
 	for _, stringInstance := range rejectingStringInstances {
-		if len(firstSet) < (len(positiveStringInstances)+len(rejectingStringInstances))/2 {
+		if len(firstSet) < (len(acceptingStringInstances)+len(rejectingStringInstances))/2 {
 			firstSet = append(firstSet, stringInstance)
 		} else {
 			secondSet = append(secondSet, stringInstance)
@@ -458,8 +476,20 @@ func StaminaDataset(dfa DFA, sparsityPercentage float64, initialStringsGenerated
 
 	// Step 4 - Populate Training Sample.
 	requiredStrings := float64(len(secondSet)) * (sparsityPercentage / 100)
+	acceptingStringInstances = secondSet.AcceptingStringInstances()
+	rejectingStringInstances = secondSet.RejectingStringInstances()
+	counter := 0
+
 	for float64(len(trainingDataset)) < requiredStrings {
-		trainingDataset = append(trainingDataset, secondSet[len(trainingDataset)])
+		if counter < len(acceptingStringInstances) {
+			trainingDataset = append(trainingDataset, acceptingStringInstances[counter])
+		}
+
+		if counter < len(rejectingStringInstances) {
+			trainingDataset = append(trainingDataset, rejectingStringInstances[counter])
+		}
+
+		counter++
 	}
 
 	// Step 3 - Populate Test Sample.

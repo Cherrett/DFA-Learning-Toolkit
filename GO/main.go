@@ -10,19 +10,24 @@ func main() {
 	// defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
 	// go tool pprof -http=:8081 cpu.pprof
 
-	dfa := dfatoolkit.StaminaDFA(50, 50)
-	dfa.Describe(false)
-	training, testing := dfatoolkit.StaminaDataset(dfa, 100.0, 20000, 1500)
+	// Random Seed.
+	// rand.Seed(time.Now().UnixNano())
 
-	fmt.Println(training.Count())
-	fmt.Println(training.AcceptingStringInstancesCount())
-	fmt.Println(training.AcceptingStringInstancesRatio())
-	fmt.Println(training.RejectingStringInstancesCount())
-	fmt.Println(training.RejectingStringInstancesRatio())
-	fmt.Println()
-	fmt.Println(testing.Count())
-	fmt.Println(testing.AcceptingStringInstancesCount())
-	fmt.Println(testing.AcceptingStringInstancesRatio())
-	fmt.Println(testing.RejectingStringInstancesCount())
-	fmt.Println(testing.RejectingStringInstancesRatio())
+	// Number of iterations.
+	n := 128
+	// Target size.
+	targetSize := 50
+	// Alphabet size.
+	alphabetSize := 2
+	// Training sparsity percentage.
+	sparsityPercentage := 12.5
+
+	for i := 0; i < n; i++ {
+		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
+
+		// Create a target DFA, training set, and testing set.
+		_, trainingSet, _ := dfatoolkit.DefaultStaminaInstance(alphabetSize, targetSize, sparsityPercentage)
+
+		trainingSet.GetPTA(true)
+	}
 }

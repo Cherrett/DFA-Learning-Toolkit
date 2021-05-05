@@ -73,7 +73,7 @@ func TestAbbadingoDatasetGeneration(t *testing.T) {
 
 	trainingDataset, _ = dfatoolkit.AbbadingoDataset(AbbadingoDFA, 100, 0)
 
-	if !trainingDataset.SymmetricallyStructurallyComplete(AbbadingoDFA){
+	if !trainingDataset.SymmetricallyStructurallyComplete(AbbadingoDFA) {
 		t.Errorf("Expected training dataset to be symmetrically structurally complete with DFA")
 	}
 }
@@ -102,12 +102,14 @@ func TestStaminaDFAGeneration(t *testing.T) {
 	// Random Seed.
 	rand.Seed(time.Now().UnixNano())
 
-	StaminaDFA := dfatoolkit.StaminaDFA(50, 50)
-	if len(StaminaDFA.Alphabet) != 50 {
-		t.Errorf("StaminaDFA number of symbols = %d, want 50", StaminaDFA.Alphabet)
-	}
-	if len(StaminaDFA.States) != 50 {
-		t.Errorf("StaminaDFA number of states = %d, want %d", len(StaminaDFA.States), 50)
+	for _, alphabetSize := range []int{2, 5, 10, 20, 50} {
+		StaminaDFA := dfatoolkit.StaminaDFA(alphabetSize, 50)
+		if len(StaminaDFA.Alphabet) != alphabetSize {
+			t.Errorf("StaminaDFA number of symbols = %d, want %d", StaminaDFA.Alphabet, alphabetSize)
+		}
+		if len(StaminaDFA.States) != 50 {
+			t.Errorf("StaminaDFA number of states = %d, want %d", len(StaminaDFA.States), 50)
+		}
 	}
 }
 
@@ -135,8 +137,25 @@ func TestStaminaDatasetGeneration(t *testing.T) {
 
 	trainingDataset, _ = dfatoolkit.DefaultStaminaDataset(StaminaDFA, 100)
 
-	if !trainingDataset.SymmetricallyStructurallyComplete(StaminaDFA){
+	if !trainingDataset.SymmetricallyStructurallyComplete(StaminaDFA) {
 		t.Errorf("Expected training dataset to be symmetrically structurally complete with DFA")
+	}
+
+	// Cover all possible combinations used in the Stamina competition.
+	for _, alphabetSize := range []int{2, 5, 10, 20, 50} {
+		StaminaDFA = dfatoolkit.StaminaDFA(alphabetSize, 50)
+
+		for _, sparsityPercentage := range []float64{12.5, 25.0, 50.0, 100.0} {
+			trainingDataset, testingDataset = dfatoolkit.DefaultStaminaDataset(StaminaDFA, sparsityPercentage)
+		}
+
+		if trainingDataset.AcceptingStringInstancesCount() == 0 || trainingDataset.RejectingStringInstancesCount() == 0 {
+			t.Errorf("No accepting or rejecting string instances found within training dataset.")
+		}
+
+		if testingDataset.AcceptingStringInstancesCount() == 0 || testingDataset.RejectingStringInstancesCount() == 0 {
+			t.Errorf("No accepting or rejecting string instances found within testing dataset.")
+		}
 	}
 }
 
