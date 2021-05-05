@@ -177,7 +177,7 @@ func TestBenchmarkGreedyEDSM(t *testing.T) {
 // TestBenchmarkFastWindowedEDSM benchmarks the performance of the FastWindowedEDSMFromDataset() function.
 func TestBenchmarkFastWindowedEDSM(t *testing.T) {
 	// Random Seed.
-	// rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano())
 
 	// Number of iterations.
 	n := 128
@@ -227,9 +227,7 @@ func TestBenchmarkFastWindowedEDSM(t *testing.T) {
 // TestBenchmarkWindowedEDSM benchmarks the performance of the WindowedEDSMFromDataset() function.
 func TestBenchmarkWindowedEDSM(t *testing.T) {
 	// Random Seed.
-	// rand.Seed(time.Now().UnixNano())
-
-	//defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
+	rand.Seed(time.Now().UnixNano())
 
 	// Number of iterations.
 	n := 128
@@ -279,7 +277,7 @@ func TestBenchmarkWindowedEDSM(t *testing.T) {
 // TestBenchmarkBlueFringeEDSM benchmarks the performance of the BlueFringeEDSMFromDataset() function.
 func TestBenchmarkBlueFringeEDSM(t *testing.T) {
 	// Random Seed.
-	// rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano())
 
 	// Number of iterations.
 	n := 128
@@ -330,7 +328,7 @@ func TestBenchmarkBlueFringeEDSM(t *testing.T) {
 // WindowedEDSMFromDataset() and BlueFringeEDSMFromDataset() functions while comparing their performance.
 func TestBenchmarkEDSM(t *testing.T) {
 	// Random Seed.
-	// rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano())
 
 	// Number of iterations.
 	n := 128
@@ -457,7 +455,7 @@ func TestBenchmarkEDSM(t *testing.T) {
 // WindowedEDSM() and BlueFringeEDSM() functions while comparing their performance.
 func TestBenchmarkFastEDSM(t *testing.T) {
 	// Random Seed.
-	// rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano())
 
 	// Number of iterations.
 	n := 128
@@ -622,7 +620,7 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 // WindowedEDSMFromDataset() and BlueFringeEDSMFromDataset() functions while comparing their performance on Stamina DFAs and Datasets.
 func TestBenchmarkEDSMStamina(t *testing.T) {
 	// Random Seed.
-	// rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano())
 
 	// Number of iterations.
 	n := 128
@@ -751,7 +749,7 @@ func TestBenchmarkEDSMStamina(t *testing.T) {
 // WindowedEDSM() and BlueFringeEDSM() functions while comparing their performance on Stamina DFAs and Datasets.
 func TestBenchmarkFastEDSMStamina(t *testing.T) {
 	// Random Seed.
-	// rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano())
 
 	// Number of iterations.
 	n := 128
@@ -917,7 +915,7 @@ func TestBenchmarkFastEDSMStamina(t *testing.T) {
 // TestBenchmarkGreedyEDSMStamina benchmarks the performance of the GreedyEDSMFromDataset() function on Stamina DFAs and Datasets.
 func TestBenchmarkGreedyEDSMStamina(t *testing.T) {
 	// Random Seed.
-	// rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano())
 
 	// Number of iterations.
 	n := 128
@@ -969,7 +967,7 @@ func TestBenchmarkGreedyEDSMStamina(t *testing.T) {
 // TestBenchmarkFastWindowedEDSMStamina benchmarks the performance of the FastWindowedEDSMFromDataset() function on Stamina DFAs and Datasets.
 func TestBenchmarkFastWindowedEDSMStamina(t *testing.T) {
 	// Random Seed.
-	// rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano())
 
 	// Number of iterations.
 	n := 128
@@ -1023,7 +1021,7 @@ func TestBenchmarkFastWindowedEDSMStamina(t *testing.T) {
 // TestBenchmarkBlueFringeEDSMStamina benchmarks the performance of the BlueFringeEDSMFromDataset() function on Stamina DFAs and Datasets.
 func TestBenchmarkBlueFringeEDSMStamina(t *testing.T) {
 	// Random Seed.
-	// rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano())
 
 	// Number of iterations.
 	n := 128
