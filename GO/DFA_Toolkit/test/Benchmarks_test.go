@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-// -------------------- BENCHMARKS --------------------
+// -------------------- BENCHMARKS USING ABBADINGO PROTOCOL --------------------
 
 // TestBenchmarkDetMerge benchmarks the performance of the MergeStates() function.
 func TestBenchmarkDetMerge(t *testing.T) {
@@ -615,6 +615,8 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 		t.Error("The percentage of successful DFAs for Blue-Fringe EDSM is less than 0.07 or bigger than 0.15.")
 	}
 }
+
+// -------------------- BENCHMARKS USING STAMINA PROTOCOL --------------------
 
 // TestBenchmarkEDSM benchmarks the performance of the GreedyEDSMFromDataset(), FastWindowedEDSMFromDataset(),
 // WindowedEDSMFromDataset() and BlueFringeEDSMFromDataset() functions while comparing their performance on Stamina DFAs and Datasets.
