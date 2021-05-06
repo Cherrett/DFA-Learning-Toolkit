@@ -62,7 +62,7 @@ func NewStringInstanceFromStaminaFile(text string, delimiter string) StringInsta
 	}
 
 	// Stop if no more characters exist in string. (Empty string case)
-	if splitString[1] != "" {
+	if len(splitString) > 1 && splitString[1] != "" {
 		// Add the remaining split string values to value of StringInstance since
 		// these contain the actual string value.
 		for i := 1; i < len(splitString); i++ {
@@ -554,27 +554,19 @@ func (dataset Dataset) ToStaminaFile(filePath string) {
 	// Initialize a new writer given the created file.
 	writer := bufio.NewWriter(file)
 
-	// Write the length of the dataset and 2 (Since abbadingo DFAs
-	// consist of  2 symbols (a and b).
-	_, _ = writer.WriteString(strconv.Itoa(len(dataset)) + " 2\n")
-
 	// Iterate over each string instance within sorted dataset.
 	for _, stringInstance := range dataset {
 		// Add string label and string length to output string.
 		outputString := ""
 		if stringInstance.Accepting {
-			outputString = strconv.Itoa(1) + " " + strconv.Itoa(stringInstance.Length()) + " "
+			outputString = "+ "
 		} else {
-			outputString = strconv.Itoa(0) + " " + strconv.Itoa(stringInstance.Length()) + " "
+			outputString = "- "
 		}
 
 		// Iterate over the value of string and add to output string.
 		for _, symbol := range stringInstance.Value {
-			if symbol == 'a' {
-				outputString += "0 "
-			} else {
-				outputString += "1 "
-			}
+			outputString += strconv.Itoa(symbol) + " "
 		}
 		// Remove trailing space from output string and add new line char.
 		outputString = strings.TrimSuffix(outputString, " ") + "\n"

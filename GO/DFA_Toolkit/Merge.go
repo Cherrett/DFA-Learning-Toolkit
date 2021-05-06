@@ -42,9 +42,6 @@ func GreedySearch(statePartition StatePartition) (StatePartition, SearchData) {
 		//	continue
 		//}
 		for j := 0; j < i; j++ {
-			if copiedPartition.Blocks[j].Root != j {
-				continue
-			}
 			// Increment merge count.
 			totalMerges++
 			// Check if states are mergeable.
