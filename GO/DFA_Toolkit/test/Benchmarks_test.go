@@ -102,7 +102,7 @@ func TestBenchmarkRPNI(t *testing.T) {
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		accuracies.Add(accuracy)
-		numberOfStates.Add(float64(len(resultantDFA.States)))
+		numberOfStates.AddInt(len(resultantDFA.States))
 		durations.Add(searchData.Duration.Seconds())
 		mergesPerSec.Add(searchData.AttemptedMergesPerSecond())
 
@@ -152,7 +152,7 @@ func TestBenchmarkGreedyEDSM(t *testing.T) {
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		accuracies.Add(accuracy)
-		numberOfStates.Add(float64(len(resultantDFA.States)))
+		numberOfStates.AddInt(len(resultantDFA.States))
 		durations.Add(searchData.Duration.Seconds())
 		mergesPerSec.Add(searchData.AttemptedMergesPerSecond())
 
@@ -202,7 +202,7 @@ func TestBenchmarkFastWindowedEDSM(t *testing.T) {
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		accuracies.Add(accuracy)
-		numberOfStates.Add(float64(len(resultantDFA.States)))
+		numberOfStates.AddInt(len(resultantDFA.States))
 		durations.Add(searchData.Duration.Seconds())
 		mergesPerSec.Add(searchData.AttemptedMergesPerSecond())
 
@@ -252,7 +252,7 @@ func TestBenchmarkWindowedEDSM(t *testing.T) {
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		accuracies.Add(accuracy)
-		numberOfStates.Add(float64(len(resultantDFA.States)))
+		numberOfStates.AddInt(len(resultantDFA.States))
 		durations.Add(searchData.Duration.Seconds())
 		mergesPerSec.Add(searchData.AttemptedMergesPerSecond())
 
@@ -302,7 +302,7 @@ func TestBenchmarkBlueFringeEDSM(t *testing.T) {
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		accuracies.Add(accuracy)
-		numberOfStates.Add(float64(len(resultantDFA.States)))
+		numberOfStates.AddInt(len(resultantDFA.States))
 		durations.Add(searchData.Duration.Seconds())
 		mergesPerSec.Add(searchData.AttemptedMergesPerSecond())
 
@@ -356,7 +356,7 @@ func TestBenchmarkEDSM(t *testing.T) {
 		mergesPerSecGreedy.Add(searchData.AttemptedMergesPerSecond())
 		accuracy := resultantDFA.Accuracy(testingSet)
 		accuraciesGreedy.Add(accuracy)
-		numberOfStatesGreedy.Add(float64(len(resultantDFA.States)))
+		numberOfStatesGreedy.AddInt(len(resultantDFA.States))
 		if accuracy >= 0.99 {
 			winnersGreedy++
 		}
@@ -368,7 +368,7 @@ func TestBenchmarkEDSM(t *testing.T) {
 		mergesPerSecFastWindowed.Add(searchData.AttemptedMergesPerSecond())
 		accuracy = resultantDFA.Accuracy(testingSet)
 		accuraciesFastWindowed.Add(accuracy)
-		numberOfStatesFastWindowed.Add(float64(len(resultantDFA.States)))
+		numberOfStatesFastWindowed.AddInt(len(resultantDFA.States))
 		if accuracy >= 0.99 {
 			winnersFastWindowed++
 		}
@@ -380,7 +380,7 @@ func TestBenchmarkEDSM(t *testing.T) {
 		mergesPerSecWindowed.Add(searchData.AttemptedMergesPerSecond())
 		accuracy = resultantDFA.Accuracy(testingSet)
 		accuraciesWindowed.Add(accuracy)
-		numberOfStatesWindowed.Add(float64(len(resultantDFA.States)))
+		numberOfStatesWindowed.AddInt(len(resultantDFA.States))
 		if accuracy >= 0.99 {
 			winnersWindowed++
 		}
@@ -392,7 +392,7 @@ func TestBenchmarkEDSM(t *testing.T) {
 		mergesPerSecBlueFringe.Add(searchData.AttemptedMergesPerSecond())
 		accuracy = resultantDFA.Accuracy(testingSet)
 		accuraciesBlueFringe.Add(accuracy)
-		numberOfStatesBlueFringe.Add(float64(len(resultantDFA.States)))
+		numberOfStatesBlueFringe.AddInt(len(resultantDFA.States))
 		if accuracy >= 0.99 {
 			winnersBlueFringe++
 		}
@@ -524,7 +524,7 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 		mergesPerSecGreedy.Add(searchDataGreedy.AttemptedMergesPerSecond())
 		accuracy := resultantDFAGreedy.Accuracy(testingSet)
 		accuraciesGreedy.Add(accuracy)
-		numberOfStatesGreedy.Add(float64(len(resultantDFAGreedy.States)))
+		numberOfStatesGreedy.AddInt(len(resultantDFAGreedy.States))
 		if accuracy >= 0.99 {
 			winnersGreedy++
 		}
@@ -535,7 +535,7 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 		mergesPerSecFastWindowed.Add(searchDataFastWindowed.AttemptedMergesPerSecond())
 		accuracy = resultantDFAFastWindowed.Accuracy(testingSet)
 		accuraciesFastWindowed.Add(accuracy)
-		numberOfStatesFastWindowed.Add(float64(len(resultantDFAFastWindowed.States)))
+		numberOfStatesFastWindowed.AddInt(len(resultantDFAFastWindowed.States))
 		if accuracy >= 0.99 {
 			winnersFastWindowed++
 		}
@@ -546,7 +546,7 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 		mergesPerSecWindowed.Add(searchDataWindowed.AttemptedMergesPerSecond())
 		accuracy = resultantDFAWindowed.Accuracy(testingSet)
 		accuraciesWindowed.Add(accuracy)
-		numberOfStatesWindowed.Add(float64(len(resultantDFAWindowed.States)))
+		numberOfStatesWindowed.AddInt(len(resultantDFAWindowed.States))
 		if accuracy >= 0.99 {
 			winnersWindowed++
 		}
@@ -557,7 +557,7 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 		mergesPerSecBlueFringe.Add(searchDataBlueFringe.AttemptedMergesPerSecond())
 		accuracy = resultantDFABlueFringe.Accuracy(testingSet)
 		accuraciesBlueFringe.Add(accuracy)
-		numberOfStatesBlueFringe.Add(float64(len(resultantDFABlueFringe.States)))
+		numberOfStatesBlueFringe.AddInt(len(resultantDFABlueFringe.States))
 		if accuracy >= 0.99 {
 			winnersBlueFringe++
 		}
@@ -652,7 +652,7 @@ func TestBenchmarkEDSMStamina(t *testing.T) {
 		mergesPerSecGreedy.Add(searchData.AttemptedMergesPerSecond())
 		accuracy := resultantDFA.Accuracy(testingSet)
 		accuraciesGreedy.Add(accuracy)
-		numberOfStatesGreedy.Add(float64(len(resultantDFA.States)))
+		numberOfStatesGreedy.AddInt(len(resultantDFA.States))
 		if accuracy >= 0.99 {
 			winnersGreedy++
 		}
@@ -664,7 +664,7 @@ func TestBenchmarkEDSMStamina(t *testing.T) {
 		mergesPerSecFastWindowed.Add(searchData.AttemptedMergesPerSecond())
 		accuracy = resultantDFA.Accuracy(testingSet)
 		accuraciesFastWindowed.Add(accuracy)
-		numberOfStatesFastWindowed.Add(float64(len(resultantDFA.States)))
+		numberOfStatesFastWindowed.AddInt(len(resultantDFA.States))
 		if accuracy >= 0.99 {
 			winnersFastWindowed++
 		}
@@ -676,7 +676,7 @@ func TestBenchmarkEDSMStamina(t *testing.T) {
 		mergesPerSecWindowed.Add(searchData.AttemptedMergesPerSecond())
 		accuracy = resultantDFA.Accuracy(testingSet)
 		accuraciesWindowed.Add(accuracy)
-		numberOfStatesWindowed.Add(float64(len(resultantDFA.States)))
+		numberOfStatesWindowed.AddInt(len(resultantDFA.States))
 		if accuracy >= 0.99 {
 			winnersWindowed++
 		}
@@ -688,7 +688,7 @@ func TestBenchmarkEDSMStamina(t *testing.T) {
 		mergesPerSecBlueFringe.Add(searchData.AttemptedMergesPerSecond())
 		accuracy = resultantDFA.Accuracy(testingSet)
 		accuraciesBlueFringe.Add(accuracy)
-		numberOfStatesBlueFringe.Add(float64(len(resultantDFA.States)))
+		numberOfStatesBlueFringe.AddInt(len(resultantDFA.States))
 		if accuracy >= 0.99 {
 			winnersBlueFringe++
 		}
@@ -822,7 +822,7 @@ func TestBenchmarkFastEDSMStamina(t *testing.T) {
 		mergesPerSecGreedy.Add(searchDataGreedy.AttemptedMergesPerSecond())
 		accuracy := resultantDFAGreedy.Accuracy(testingSet)
 		accuraciesGreedy.Add(accuracy)
-		numberOfStatesGreedy.Add(float64(len(resultantDFAGreedy.States)))
+		numberOfStatesGreedy.AddInt(len(resultantDFAGreedy.States))
 		if accuracy >= 0.99 {
 			winnersGreedy++
 		}
@@ -833,7 +833,7 @@ func TestBenchmarkFastEDSMStamina(t *testing.T) {
 		mergesPerSecFastWindowed.Add(searchDataFastWindowed.AttemptedMergesPerSecond())
 		accuracy = resultantDFAFastWindowed.Accuracy(testingSet)
 		accuraciesFastWindowed.Add(accuracy)
-		numberOfStatesFastWindowed.Add(float64(len(resultantDFAFastWindowed.States)))
+		numberOfStatesFastWindowed.AddInt(len(resultantDFAFastWindowed.States))
 		if accuracy >= 0.99 {
 			winnersFastWindowed++
 		}
@@ -844,7 +844,7 @@ func TestBenchmarkFastEDSMStamina(t *testing.T) {
 		mergesPerSecWindowed.Add(searchDataWindowed.AttemptedMergesPerSecond())
 		accuracy = resultantDFAWindowed.Accuracy(testingSet)
 		accuraciesWindowed.Add(accuracy)
-		numberOfStatesWindowed.Add(float64(len(resultantDFAWindowed.States)))
+		numberOfStatesWindowed.AddInt(len(resultantDFAWindowed.States))
 		if accuracy >= 0.99 {
 			winnersWindowed++
 		}
@@ -855,7 +855,7 @@ func TestBenchmarkFastEDSMStamina(t *testing.T) {
 		mergesPerSecBlueFringe.Add(searchDataBlueFringe.AttemptedMergesPerSecond())
 		accuracy = resultantDFABlueFringe.Accuracy(testingSet)
 		accuraciesBlueFringe.Add(accuracy)
-		numberOfStatesBlueFringe.Add(float64(len(resultantDFABlueFringe.States)))
+		numberOfStatesBlueFringe.AddInt(len(resultantDFABlueFringe.States))
 		if accuracy >= 0.99 {
 			winnersBlueFringe++
 		}
@@ -944,7 +944,7 @@ func TestBenchmarkGreedyEDSMStamina(t *testing.T) {
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		accuracies.Add(accuracy)
-		numberOfStates.Add(float64(len(resultantDFA.States)))
+		numberOfStates.AddInt(len(resultantDFA.States))
 		durations.Add(searchData.Duration.Seconds())
 		mergesPerSec.Add(searchData.AttemptedMergesPerSecond())
 
@@ -998,7 +998,7 @@ func TestBenchmarkFastWindowedEDSMStamina(t *testing.T) {
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		accuracies.Add(accuracy)
-		numberOfStates.Add(float64(len(resultantDFA.States)))
+		numberOfStates.AddInt(len(resultantDFA.States))
 		durations.Add(searchData.Duration.Seconds())
 		mergesPerSec.Add(searchData.AttemptedMergesPerSecond())
 
@@ -1050,7 +1050,7 @@ func TestBenchmarkBlueFringeEDSMStamina(t *testing.T) {
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		accuracies.Add(accuracy)
-		numberOfStates.Add(float64(len(resultantDFA.States)))
+		numberOfStates.AddInt(len(resultantDFA.States))
 		durations.Add(searchData.Duration.Seconds())
 		mergesPerSec.Add(searchData.AttemptedMergesPerSecond())
 

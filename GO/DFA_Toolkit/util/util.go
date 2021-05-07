@@ -1,7 +1,10 @@
 package util
 
 import (
+	"fmt"
+	"io"
 	"math"
+	"net/http"
 	"os"
 )
 
@@ -99,8 +102,30 @@ func NewMinMaxAvg() MinMaxAvg {
 	}
 }
 
-// Add adds an element to the MinMaxAvg struct.
+// Add adds a float value to the MinMaxAvg struct.
 func (minMaxAvg *MinMaxAvg) Add(value float64) {
+	// If value is smaller than the minimum value,
+	// set minimum value within struct to value.
+	if value < minMaxAvg.min {
+		minMaxAvg.min = value
+	}
+
+	// If value is larger than the maximum value,
+	// set maximum value within struct to value.
+	if value > minMaxAvg.max {
+		minMaxAvg.max = value
+	}
+
+	// Add value to sum.
+	minMaxAvg.sum += value
+
+	// Increment counter.
+	minMaxAvg.count++
+}
+
+// AddInt adds an integer value to the MinMaxAvg struct.
+func (minMaxAvg *MinMaxAvg) AddInt(intValue int) {
+	value := float64(intValue)
 	// If value is smaller than the minimum value,
 	// set minimum value within struct to value.
 	if value < minMaxAvg.min {
@@ -145,4 +170,38 @@ func Factorial(n int)(result int) {
 		return result
 	}
 	return 1
+}
+
+// DownloadAllStaminaDatasets downloads all of the stamina datasets to a given directory.
+func DownloadAllStaminaDatasets(directory string){
+	// Iterate from 1 to 100 (number of stamina datasets).
+	for i := 1; i < 101; i++{
+		// Get training and test sets from URL.
+		resp, _ := http.Get(fmt.Sprintf("http://stamina.chefbe.net/downloads/grid/%d_training.txt", i))
+		resp2, _ := http.Get(fmt.Sprintf("http://stamina.chefbe.net/downloads/grid/%d_test.txt", i))
+
+		// Create training file.
+		out, err := os.Create(fmt.Sprintf("%s/%d_training.txt", directory, i))
+		if err != nil {
+			panic("Training file failed to be created.")
+		}
+
+		// Create test file.
+		out2, err := os.Create(fmt.Sprintf("%s/%d_test.txt", directory, i))
+		if err != nil {
+			panic("Testing file failed to be created.")
+		}
+
+		// Copy to files.
+		_, _ = io.Copy(out, resp.Body)
+		_, err = io.Copy(out2, resp2.Body)
+
+		// Close io/file buffers.
+		_ = resp.Body.Close()
+		_ = resp2.Body.Close()
+		out.Close()
+		out2.Close()
+
+		fmt.Printf("Downloaded dataset %d/100.\n", i)
+	}
 }
