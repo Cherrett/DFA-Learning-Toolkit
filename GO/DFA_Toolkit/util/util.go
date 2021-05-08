@@ -1,7 +1,10 @@
 package util
 
 import (
+	"fmt"
+	"io"
 	"math"
+	"net/http"
 	"os"
 )
 
@@ -79,62 +82,103 @@ func FileExists(filePath string) bool {
 	return !info.IsDir()
 }
 
-// MinMaxAvg struct is used to keep track of
-// minimum, maximum and average values given
-// a number of values.
-type MinMaxAvg struct {
+// StatsTracker struct is used to keep track of
+// minimum, maximum, average, variance and
+// standard deviation values given a sequence
+// of values. Mean and variance calculation
+// is done using Welford's online algorithm.
+type StatsTracker struct {
 	min   float64 // Minimum of values.
 	max   float64 // Maximum of values.
-	sum   float64 // Sum of values.
 	count uint    // Number of values.
+	mean  float64 // Mean of values.
+	m2    float64 // Value used to calculate variance.
 }
 
-// NewMinMaxAvg returns an empty MinMaxAvg struct.
-func NewMinMaxAvg() MinMaxAvg {
-	return MinMaxAvg{
+// NewStatsTracker returns an empty StatsTracker struct.
+func NewStatsTracker() StatsTracker {
+	return StatsTracker{
 		min:   math.Inf(1),
 		max:   math.Inf(-1),
-		sum:   0,
 		count: 0,
+		mean:  0.0,
+		m2:    0.0,
 	}
 }
 
-// Add adds an element to the MinMaxAvg struct.
-func (minMaxAvg *MinMaxAvg) Add(value float64) {
+// Add adds a float value to the StatsTracker struct.
+func (statsTracker *StatsTracker) Add(value float64) {
 	// If value is smaller than the minimum value,
 	// set minimum value within struct to value.
-	if value < minMaxAvg.min {
-		minMaxAvg.min = value
+	if value < statsTracker.min {
+		statsTracker.min = value
 	}
 
 	// If value is larger than the maximum value,
 	// set maximum value within struct to value.
-	if value > minMaxAvg.max {
-		minMaxAvg.max = value
+	if value > statsTracker.max {
+		statsTracker.max = value
 	}
 
-	// Add value to sum.
-	minMaxAvg.sum += value
-
 	// Increment counter.
-	minMaxAvg.count++
+	statsTracker.count++
+
+	muNew := statsTracker.mean + ((value - statsTracker.mean) / float64(statsTracker.count))
+
+	statsTracker.m2 += (value - statsTracker.mean) * (value - muNew)
+
+	statsTracker.mean = muNew
 }
 
-// Min returns the minimum value within the MinMaxAvg struct.
-func (minMaxAvg MinMaxAvg) Min() float64 {
-	return minMaxAvg.min
+// AddInt adds an integer value to the StatsTracker struct.
+func (statsTracker *StatsTracker) AddInt(intValue int) {
+	// Cast to float64 and call Add function.
+	statsTracker.Add(float64(intValue))
 }
 
-// Max returns the maximum value within the MinMaxAvg struct.
-func (minMaxAvg MinMaxAvg) Max() float64 {
-	return minMaxAvg.max
+// Min returns the minimum value within the StatsTracker struct.
+func (statsTracker StatsTracker) Min() float64 {
+	return statsTracker.min
 }
 
-// Avg returns the average value within the MinMaxAvg struct.
-func (minMaxAvg MinMaxAvg) Avg() float64 {
+// Max returns the maximum value within the StatsTracker struct.
+func (statsTracker StatsTracker) Max() float64 {
+	return statsTracker.max
+}
+
+// Mean returns the average value within the StatsTracker struct.
+func (statsTracker StatsTracker) Mean() float64 {
 	// Get average by dividing the sum of elements
 	// by the number of elements within struct.
-	return minMaxAvg.sum / float64(minMaxAvg.count)
+	return statsTracker.mean
+}
+
+// PopulationVariance returns the population variance value within the StatsTracker struct.
+func (statsTracker StatsTracker) PopulationVariance() float64 {
+	if statsTracker.count > 1{
+		return statsTracker.m2 / float64(statsTracker.count)
+	}else{
+		return 0.0
+	}
+}
+
+// SampleVariance returns the sample variance value within the StatsTracker struct.
+func (statsTracker StatsTracker) SampleVariance() float64 {
+	if statsTracker.count > 1{
+		return statsTracker.m2 / float64(statsTracker.count - 1)
+	}else{
+		return 0.0
+	}
+}
+
+// PopulationStandardDev returns the population standard deviation value within the StatsTracker struct.
+func (statsTracker StatsTracker) PopulationStandardDev() float64{
+	return math.Sqrt(statsTracker.PopulationVariance())
+}
+
+// SampleStandardDev returns the sample standard deviation value within the StatsTracker struct.
+func (statsTracker StatsTracker) SampleStandardDev() float64{
+	return math.Sqrt(statsTracker.SampleVariance())
 }
 
 // Factorial returns the factorial of n by recursively
@@ -145,4 +189,38 @@ func Factorial(n int)(result int) {
 		return result
 	}
 	return 1
+}
+
+// DownloadAllStaminaDatasets downloads all of the stamina datasets to a given directory.
+func DownloadAllStaminaDatasets(directory string){
+	// Iterate from 1 to 100 (number of stamina datasets).
+	for i := 1; i < 101; i++{
+		// Get training and test sets from URL.
+		resp, _ := http.Get(fmt.Sprintf("http://stamina.chefbe.net/downloads/grid/%d_training.txt", i))
+		resp2, _ := http.Get(fmt.Sprintf("http://stamina.chefbe.net/downloads/grid/%d_test.txt", i))
+
+		// Create training file.
+		out, err := os.Create(fmt.Sprintf("%s/%d_training.txt", directory, i))
+		if err != nil {
+			panic("Training file failed to be created.")
+		}
+
+		// Create test file.
+		out2, err := os.Create(fmt.Sprintf("%s/%d_test.txt", directory, i))
+		if err != nil {
+			panic("Testing file failed to be created.")
+		}
+
+		// Copy to files.
+		_, _ = io.Copy(out, resp.Body)
+		_, err = io.Copy(out2, resp2.Body)
+
+		// Close io/file buffers.
+		_ = resp.Body.Close()
+		_ = resp2.Body.Close()
+		out.Close()
+		out2.Close()
+
+		fmt.Printf("Downloaded dataset %d/100.\n", i)
+	}
 }

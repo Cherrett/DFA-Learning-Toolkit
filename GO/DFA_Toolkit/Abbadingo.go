@@ -267,11 +267,7 @@ func (dataset Dataset) ToAbbadingoFile(filePath string) {
 
 		// Iterate over the value of string and add to output string.
 		for _, symbol := range stringInstance.Value {
-			if symbol == 'a' {
-				outputString += "0 "
-			} else {
-				outputString += "1 "
-			}
+			outputString += strconv.Itoa(symbol) + " "
 		}
 		// Remove trailing space from output string and add new line char.
 		outputString = strings.TrimSuffix(outputString, " ") + "\n"

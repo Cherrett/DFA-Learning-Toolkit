@@ -42,9 +42,6 @@ func GreedySearch(statePartition StatePartition) (StatePartition, SearchData) {
 		//	continue
 		//}
 		for j := 0; j < i; j++ {
-			if copiedPartition.Blocks[j].Root != j {
-				continue
-			}
 			// Increment merge count.
 			totalMerges++
 			// Check if states are mergeable.
@@ -226,17 +223,11 @@ func FastWindowedSearchUsingScoringFunction(statePartition StatePartition, windo
 				}
 			}
 
-			// Check if any deterministic merges were found.
-			if highestScoringStatePair.Score != -1 {
+			// Break loop if no deterministic merges were found or if the window size is the biggest possible.
+			if highestScoringStatePair.Score != -1 || windowSize >= len(orderedBlocks){
 				break
-				// No more possible merges were found so increase window size.
 			} else {
-				// If the window size is biggest possible, break loop
-				// and return the most recent State Partition.
-				if windowSize >= len(orderedBlocks) {
-					break
-				}
-
+				// No more possible merges were found so increase window size.
 				previousWindowSize = windowSize
 				windowSize = util.Min(int(math.Round(float64(windowSize)*windowGrow)), len(orderedBlocks))
 			}
@@ -286,7 +277,7 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 	// Total merges and valid merges counter.
 	totalMerges, totalValidMerges := 0, 0
 	// Get ordered blocks within partition.
-	orderedBlocks := statePartition.OrderedBlocks()
+	window := statePartition.OrderedBlocks()
 	// Start timer.
 	start := time.Now()
 
@@ -297,9 +288,10 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 
 		// Set window size before to 0.
 		previousWindowSize := 0
+
 		// Set window size to window size parameter
 		// or length of ordered blocks if smaller.
-		windowSize = util.Min(windowSize, len(orderedBlocks))
+		windowSize = util.Min(windowSize, len(window))
 
 		// Loop until no more deterministic merges are available within all possible windows.
 		for {
@@ -311,23 +303,20 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 						totalMerges++
 
 						// Check if states are mergeable.
-						if copiedPartition.MergeStates(orderedBlocks[i], orderedBlocks[j]) {
-							// Do not compute score if states are within same block.
-							if !statePartition.WithinSameBlock(orderedBlocks[i], orderedBlocks[j]) {
-								// Increment valid merge count.
-								totalValidMerges++
+						if copiedPartition.MergeStates(window[i], window[j]) {
+							// Increment valid merge count.
+							totalValidMerges++
 
-								// Calculate score.
-								score := scoringFunction(orderedBlocks[i], orderedBlocks[j], statePartition, copiedPartition)
+							// Calculate score.
+							score := scoringFunction(window[i], window[j], statePartition, copiedPartition)
 
-								// If score is bigger than state pair with the highest score,
-								// set current state pair to state pair with the highest score.
-								if score > highestScoringStatePair.Score {
-									highestScoringStatePair = StatePairScore{
-										State1: orderedBlocks[i],
-										State2: orderedBlocks[j],
-										Score:  score,
-									}
+							// If score is bigger than state pair with the highest score,
+							// set current state pair to state pair with the highest score.
+							if score > highestScoringStatePair.Score {
+								highestScoringStatePair = StatePairScore{
+									State1: window[i],
+									State2: window[j],
+									Score:  score,
 								}
 							}
 						}
@@ -338,21 +327,16 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 				}
 			}
 
-			// Check if any deterministic merges were found.
-			if highestScoringStatePair.Score != -1 {
+			// Break loop if no deterministic merges were found or if the window size is the biggest possible.
+			if highestScoringStatePair.Score != -1 || windowSize >= len(window){
 				break
-				// No more possible merges were found so increase window size.
 			} else {
-				// If the window size is biggest possible, break loop
-				// and return the most recent State Partition.
-				if windowSize >= len(orderedBlocks) {
-					break
-				}
+				// No more possible merges were found so increase window size.
 				// Set window size before to window size.
 				previousWindowSize = windowSize
 				// Get new window size which is the smallest from the window size multiplied
 				// by window grow or the number of blocks within initial state partition.
-				windowSize = util.Min(int(math.Round(float64(windowSize)*windowGrow)), len(orderedBlocks))
+				windowSize = util.Min(int(math.Round(float64(windowSize)*windowGrow)), len(window))
 			}
 		}
 
@@ -367,6 +351,9 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 		} else {
 			break
 		}
+
+		// Update new window.
+		window = UpdateWindow(window, statePartition)
 	}
 
 	// Add total and valid merges counts to search data.
@@ -377,6 +364,36 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 
 	// Return the final resultant state partition and search data.
 	return statePartition, searchData
+}
+
+// UpdateWindow updates a window given the state partition within a Windowed framework such as the
+// WindowedSearchUsingScoringFunction function. It returns the new window as a slice of integers.
+// This works by gathering the root of each block within the previous window and assigns it to the
+// position of the first index of any block which is part of that block. This is used to avoid attempting
+// merges more than once within a windowed search.
+func UpdateWindow(window []int, statePartition StatePartition) []int{
+	// Gather root of ordered blocks and store in map and slice declared below.
+
+	// Initialize set of root states (blocks) to empty set.
+	rootBlocks := map[int]util.Void{}
+	// Slice to store new blocks in canonical order (new window).
+	var newWindow []int
+
+	// Iterate over every block within window.
+	for _, element := range window {
+		// Get root block of current block.
+		root := statePartition.Find(element)
+
+		// If root is already visited, skip.
+		// Else, add root to map and slice.
+		if _, exists := rootBlocks[root]; !exists{
+			rootBlocks[root] = util.Null
+			newWindow = append(newWindow, root)
+		}
+	}
+
+	// Return new red set and populated slice of red states in canonical order.
+	return newWindow
 }
 
 // BlueFringeSearchUsingScoringFunction deterministically merges possible state pairs within red-blue sets.
