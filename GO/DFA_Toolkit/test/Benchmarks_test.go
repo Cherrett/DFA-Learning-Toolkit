@@ -4,6 +4,7 @@ import (
 	"DFA_Toolkit/DFA_Toolkit"
 	"DFA_Toolkit/DFA_Toolkit/util"
 	"fmt"
+	"math"
 	"math/rand"
 	"sync"
 	"testing"
@@ -113,10 +114,10 @@ func TestBenchmarkRPNI(t *testing.T) {
 
 	successfulPercentage := float64(winners) / float64(n)
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentage)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStates.Min(), numberOfStates.Max(), numberOfStates.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durations.Min(), durations.Max(), durations.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Mean())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStates.Min(), numberOfStates.Max(), numberOfStates.Mean())
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durations.Min(), durations.Max(), durations.Mean())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Mean())
 	fmt.Print("-----------------------------------------------------------------------------\n\n")
 
 	if successfulPercentage > 0 {
@@ -163,10 +164,10 @@ func TestBenchmarkGreedyEDSM(t *testing.T) {
 
 	successfulPercentage := float64(winners) / float64(n)
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentage)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStates.Min(), numberOfStates.Max(), numberOfStates.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durations.Min(), durations.Max(), durations.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Mean())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStates.Min(), numberOfStates.Max(), numberOfStates.Mean())
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durations.Min(), durations.Max(), durations.Mean())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Mean())
 	fmt.Print("-----------------------------------------------------------------------------\n\n")
 
 	if successfulPercentage < 0.10 || successfulPercentage > 0.15 {
@@ -213,10 +214,10 @@ func TestBenchmarkFastWindowedEDSM(t *testing.T) {
 
 	successfulPercentage := float64(winners) / float64(n)
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentage)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStates.Min(), numberOfStates.Max(), numberOfStates.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durations.Min(), durations.Max(), durations.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Mean())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStates.Min(), numberOfStates.Max(), numberOfStates.Mean())
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durations.Min(), durations.Max(), durations.Mean())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Mean())
 	fmt.Print("-----------------------------------------------------------------------------\n\n")
 
 	if successfulPercentage < 0.09 || successfulPercentage > 0.15 {
@@ -263,10 +264,10 @@ func TestBenchmarkWindowedEDSM(t *testing.T) {
 
 	successfulPercentage := float64(winners) / float64(n)
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentage)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStates.Min(), numberOfStates.Max(), numberOfStates.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durations.Min(), durations.Max(), durations.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Mean())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStates.Min(), numberOfStates.Max(), numberOfStates.Mean())
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durations.Min(), durations.Max(), durations.Mean())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Mean())
 	fmt.Print("-----------------------------------------------------------------------------\n\n")
 
 	if successfulPercentage < 0.09 || successfulPercentage > 0.15 {
@@ -313,10 +314,10 @@ func TestBenchmarkBlueFringeEDSM(t *testing.T) {
 
 	successfulPercentage := float64(winners) / float64(n)
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentage)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStates.Min(), numberOfStates.Max(), numberOfStates.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durations.Min(), durations.Max(), durations.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Mean())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStates.Min(), numberOfStates.Max(), numberOfStates.Mean())
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durations.Min(), durations.Max(), durations.Mean())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Mean())
 	fmt.Print("-----------------------------------------------------------------------------\n\n")
 
 	if successfulPercentage < 0.07 || successfulPercentage > 0.15 {
@@ -407,31 +408,31 @@ func TestBenchmarkEDSM(t *testing.T) {
 	fmt.Println("-----------------------------------------------------------------------------")
 	fmt.Println("Greedy Search")
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageGreedy)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesGreedy.Min(), accuraciesGreedy.Max(), accuraciesGreedy.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesGreedy.Min(), numberOfStatesGreedy.Max(), numberOfStatesGreedy.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationGreedy.Min(), durationGreedy.Max(), durationGreedy.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecGreedy.Min(), mergesPerSecGreedy.Max(), mergesPerSecGreedy.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesGreedy.Min(), accuraciesGreedy.Max(), accuraciesGreedy.Mean())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesGreedy.Min(), numberOfStatesGreedy.Max(), numberOfStatesGreedy.Mean())
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationGreedy.Min(), durationGreedy.Max(), durationGreedy.Mean())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecGreedy.Min(), mergesPerSecGreedy.Max(), mergesPerSecGreedy.Mean())
 	fmt.Println("-----------------------------------------------------------------------------")
 	fmt.Println("Fast Windowed Search")
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageFastWindowed)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesFastWindowed.Min(), accuraciesFastWindowed.Max(), accuraciesFastWindowed.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesFastWindowed.Min(), numberOfStatesFastWindowed.Max(), numberOfStatesFastWindowed.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationFastWindowed.Min(), durationFastWindowed.Max(), durationFastWindowed.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecFastWindowed.Min(), mergesPerSecFastWindowed.Max(), mergesPerSecFastWindowed.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesFastWindowed.Min(), accuraciesFastWindowed.Max(), accuraciesFastWindowed.Mean())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesFastWindowed.Min(), numberOfStatesFastWindowed.Max(), numberOfStatesFastWindowed.Mean())
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationFastWindowed.Min(), durationFastWindowed.Max(), durationFastWindowed.Mean())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecFastWindowed.Min(), mergesPerSecFastWindowed.Max(), mergesPerSecFastWindowed.Mean())
 	fmt.Println("-----------------------------------------------------------------------------")
 	fmt.Println("Windowed Search")
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageWindowed)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesWindowed.Min(), accuraciesWindowed.Max(), accuraciesWindowed.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesWindowed.Min(), numberOfStatesWindowed.Max(), numberOfStatesWindowed.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationWindowed.Min(), durationWindowed.Max(), durationWindowed.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecWindowed.Min(), mergesPerSecWindowed.Max(), mergesPerSecWindowed.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesWindowed.Min(), accuraciesWindowed.Max(), accuraciesWindowed.Mean())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesWindowed.Min(), numberOfStatesWindowed.Max(), numberOfStatesWindowed.Mean())
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationWindowed.Min(), durationWindowed.Max(), durationWindowed.Mean())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecWindowed.Min(), mergesPerSecWindowed.Max(), mergesPerSecWindowed.Mean())
 	fmt.Println("-----------------------------------------------------------------------------")
 	fmt.Println("Blue-Fringe Search")
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageBlueFringe)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesBlueFringe.Min(), accuraciesBlueFringe.Max(), accuraciesBlueFringe.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesBlueFringe.Min(), numberOfStatesBlueFringe.Max(), numberOfStatesBlueFringe.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationBlueFringe.Min(), durationBlueFringe.Max(), durationBlueFringe.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecBlueFringe.Min(), mergesPerSecBlueFringe.Max(), mergesPerSecBlueFringe.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesBlueFringe.Min(), accuraciesBlueFringe.Max(), accuraciesBlueFringe.Mean())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesBlueFringe.Min(), numberOfStatesBlueFringe.Max(), numberOfStatesBlueFringe.Mean())
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationBlueFringe.Min(), durationBlueFringe.Max(), durationBlueFringe.Mean())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecBlueFringe.Min(), mergesPerSecBlueFringe.Max(), mergesPerSecBlueFringe.Mean())
 	fmt.Println("-----------------------------------------------------------------------------")
 
 	if successfulPercentageGreedy < 0.09 || successfulPercentageGreedy > 0.15 {
@@ -470,6 +471,8 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 	numberOfStatesGreedy, numberOfStatesFastWindowed, numberOfStatesWindowed, numberOfStatesBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
 	durationGreedy, durationFastWindowed, durationWindowed, durationBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
 	mergesPerSecGreedy, mergesPerSecFastWindowed, mergesPerSecWindowed, mergesPerSecBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
+	mergesGreedy, mergesFastWindowed, mergesWindowed, mergesBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
+	validMergesGreedy, validMergesFastWindowed, validMergesWindowed, validMergesBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
 
 	for i := 0; i < n; i++ {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
@@ -525,6 +528,8 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 		accuracy := resultantDFAGreedy.Accuracy(testingSet)
 		accuraciesGreedy.Add(accuracy)
 		numberOfStatesGreedy.AddInt(len(resultantDFAGreedy.States))
+		mergesGreedy.AddInt(searchDataGreedy.AttemptedMergesCount)
+		validMergesGreedy.AddInt(searchDataGreedy.ValidMergesCount)
 		if accuracy >= 0.99 {
 			winnersGreedy++
 		}
@@ -536,6 +541,8 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 		accuracy = resultantDFAFastWindowed.Accuracy(testingSet)
 		accuraciesFastWindowed.Add(accuracy)
 		numberOfStatesFastWindowed.AddInt(len(resultantDFAFastWindowed.States))
+		mergesFastWindowed.AddInt(searchDataFastWindowed.AttemptedMergesCount)
+		validMergesFastWindowed.AddInt(searchDataFastWindowed.ValidMergesCount)
 		if accuracy >= 0.99 {
 			winnersFastWindowed++
 		}
@@ -547,6 +554,8 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 		accuracy = resultantDFAWindowed.Accuracy(testingSet)
 		accuraciesWindowed.Add(accuracy)
 		numberOfStatesWindowed.AddInt(len(resultantDFAWindowed.States))
+		mergesWindowed.AddInt(searchDataWindowed.AttemptedMergesCount)
+		validMergesWindowed.AddInt(searchDataWindowed.ValidMergesCount)
 		if accuracy >= 0.99 {
 			winnersWindowed++
 		}
@@ -558,6 +567,8 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 		accuracy = resultantDFABlueFringe.Accuracy(testingSet)
 		accuraciesBlueFringe.Add(accuracy)
 		numberOfStatesBlueFringe.AddInt(len(resultantDFABlueFringe.States))
+		mergesBlueFringe.AddInt(searchDataBlueFringe.AttemptedMergesCount)
+		validMergesBlueFringe.AddInt(searchDataBlueFringe.ValidMergesCount)
 		if accuracy >= 0.99 {
 			winnersBlueFringe++
 		}
@@ -572,47 +583,57 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 	fmt.Println("-----------------------------------------------------------------------------")
 	fmt.Println("Greedy Search")
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageGreedy)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesGreedy.Min(), accuraciesGreedy.Max(), accuraciesGreedy.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesGreedy.Min(), numberOfStatesGreedy.Max(), numberOfStatesGreedy.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationGreedy.Min(), durationGreedy.Max(), durationGreedy.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecGreedy.Min(), mergesPerSecGreedy.Max(), mergesPerSecGreedy.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f Accuracy Standard Deviation: %.2f\n", accuraciesGreedy.Min(), accuraciesGreedy.Max(), accuraciesGreedy.Mean(), accuraciesGreedy.PopulationStandardDev())
+	fmt.Printf("Minimum States: %d Maximum States: %d Average States: %d States Standard Deviation: %d\n", int(numberOfStatesGreedy.Min()),  int(numberOfStatesGreedy.Max()), int(math.Round(numberOfStatesGreedy.Mean())), int(numberOfStatesGreedy.PopulationStandardDev()))
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f Duration Standard Deviation: %.2f\n", durationGreedy.Min(), durationGreedy.Max(), durationGreedy.Mean(), durationGreedy.PopulationStandardDev())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f Merges/s Standard Deviation: %.2f\n", mergesPerSecGreedy.Min(), mergesPerSecGreedy.Max(), mergesPerSecGreedy.Mean(), mergesPerSecGreedy.PopulationStandardDev())
+	fmt.Printf("Minimum Merges: %d Maximum Merges: %d Average Merges: %d Merges Standard Deviation: %d\n", int(mergesGreedy.Min()), int(mergesGreedy.Max()), int(math.Round(mergesGreedy.Mean())), int(mergesGreedy.PopulationStandardDev()))
+	fmt.Printf("Minimum Valid Merges: %d Maximum Valid Merges: %d Average Valid Merges: %d Valid Merges Standard Deviation: %d\n", int(validMergesGreedy.Min()), int(validMergesGreedy.Max()), int(math.Round(validMergesGreedy.Mean())), int(validMergesGreedy.PopulationStandardDev()))
 	fmt.Println("-----------------------------------------------------------------------------")
 	fmt.Println("Fast Windowed Search")
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageFastWindowed)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesFastWindowed.Min(), accuraciesFastWindowed.Max(), accuraciesFastWindowed.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesFastWindowed.Min(), numberOfStatesFastWindowed.Max(), numberOfStatesFastWindowed.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationFastWindowed.Min(), durationFastWindowed.Max(), durationFastWindowed.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecFastWindowed.Min(), mergesPerSecFastWindowed.Max(), mergesPerSecFastWindowed.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f Accuracy Standard Deviation: %.2f\n", accuraciesFastWindowed.Min(), accuraciesFastWindowed.Max(), accuraciesFastWindowed.Mean(), accuraciesFastWindowed.PopulationStandardDev())
+	fmt.Printf("Minimum States: %d Maximum States: %d Average States: %d States Standard Deviation: %d\n", int(numberOfStatesFastWindowed.Min()), int(numberOfStatesFastWindowed.Max()), int(math.Round(numberOfStatesFastWindowed.Mean())), int(numberOfStatesFastWindowed.PopulationStandardDev()))
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f Duration Standard Deviation: %.2f\n", durationFastWindowed.Min(), durationFastWindowed.Max(), durationFastWindowed.Mean(), durationFastWindowed.PopulationStandardDev())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f Merges/s Standard Deviation: %.2f\n", mergesPerSecFastWindowed.Min(), mergesPerSecFastWindowed.Max(), mergesPerSecFastWindowed.Mean(), mergesPerSecFastWindowed.PopulationStandardDev())
+	fmt.Printf("Minimum Merges: %d Maximum Merges: %d Average Merges: %d Merges Standard Deviation: %d\n", int(mergesFastWindowed.Min()), int(mergesFastWindowed.Max()), int(math.Round(mergesFastWindowed.Mean())), int(mergesFastWindowed.PopulationStandardDev()))
+	fmt.Printf("Minimum Valid Merges: %d Maximum Valid Merges: %d Average Valid Merges: %d Valid Merges Standard Deviation: %d\n", int(validMergesFastWindowed.Min()), int(validMergesFastWindowed.Max()), int(math.Round(validMergesFastWindowed.Mean())), int(validMergesFastWindowed.PopulationStandardDev()))
 	fmt.Println("-----------------------------------------------------------------------------")
 	fmt.Println("Windowed Search")
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageWindowed)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesWindowed.Min(), accuraciesWindowed.Max(), accuraciesWindowed.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesWindowed.Min(), numberOfStatesWindowed.Max(), numberOfStatesWindowed.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationWindowed.Min(), durationWindowed.Max(), durationWindowed.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecWindowed.Min(), mergesPerSecWindowed.Max(), mergesPerSecWindowed.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f Accuracy Standard Deviation: %.2f\n", accuraciesWindowed.Min(), accuraciesWindowed.Max(), accuraciesWindowed.Mean(), accuraciesWindowed.PopulationStandardDev())
+	fmt.Printf("Minimum States: %d Maximum States: %d Average States: %d States Standard Deviation: %d\n", int(numberOfStatesWindowed.Min()), int(numberOfStatesWindowed.Max()), int(math.Round(numberOfStatesWindowed.Mean())), int(numberOfStatesWindowed.PopulationStandardDev()))
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f Duration Standard Deviation: %.2f\n", durationWindowed.Min(), durationWindowed.Max(), durationWindowed.Mean(), durationWindowed.PopulationStandardDev())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f Merges/s Standard Deviation: %.2f\n", mergesPerSecWindowed.Min(), mergesPerSecWindowed.Max(), mergesPerSecWindowed.Mean(), mergesPerSecWindowed.PopulationStandardDev())
+	fmt.Printf("Minimum Merges: %d Maximum Merges: %d Average Merges: %d Merges Standard Deviation: %d\n", int(mergesWindowed.Min()), int(mergesWindowed.Max()), int(math.Round(mergesWindowed.Mean())), int(mergesWindowed.PopulationStandardDev()))
+	fmt.Printf("Minimum Valid Merges: %d Maximum Valid Merges: %d Average Valid Merges: %d Valid Merges Standard Deviation: %d\n", int(validMergesWindowed.Min()), int(validMergesWindowed.Max()), int(math.Round(validMergesWindowed.Mean())), int(validMergesWindowed.PopulationStandardDev()))
 	fmt.Println("-----------------------------------------------------------------------------")
 	fmt.Println("Blue-Fringe Search")
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageBlueFringe)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesBlueFringe.Min(), accuraciesBlueFringe.Max(), accuraciesBlueFringe.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesBlueFringe.Min(), numberOfStatesBlueFringe.Max(), numberOfStatesBlueFringe.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationBlueFringe.Min(), durationBlueFringe.Max(), durationBlueFringe.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecBlueFringe.Min(), mergesPerSecBlueFringe.Max(), mergesPerSecBlueFringe.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f Accuracy Standard Deviation: %.2f\n", accuraciesBlueFringe.Min(), accuraciesBlueFringe.Max(), accuraciesBlueFringe.Mean(), accuraciesBlueFringe.PopulationStandardDev())
+	fmt.Printf("Minimum States: %d Maximum States: %d Average States: %d States Standard Deviation: %d\n", int(numberOfStatesBlueFringe.Min()), int(numberOfStatesBlueFringe.Max()), int(math.Round(numberOfStatesBlueFringe.Mean())), int(numberOfStatesBlueFringe.PopulationStandardDev()))
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f Duration Standard Deviation: %.2f\n", durationBlueFringe.Min(), durationBlueFringe.Max(), durationBlueFringe.Mean(), durationBlueFringe.PopulationStandardDev())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f Merges/s Standard Deviation: %.2f\n", mergesPerSecBlueFringe.Min(), mergesPerSecBlueFringe.Max(), mergesPerSecBlueFringe.Mean(), mergesPerSecBlueFringe.PopulationStandardDev())
+	fmt.Printf("Minimum Merges: %d Maximum Merges: %d Average Merges: %d Merges Standard Deviation: %d\n", int(mergesBlueFringe.Min()), int(mergesBlueFringe.Max()), int(math.Round(mergesBlueFringe.Mean())), int(mergesBlueFringe.PopulationStandardDev()))
+	fmt.Printf("Minimum Valid Merges: %d Maximum Valid Merges: %d Average Valid Merges: %d Valid Merges Standard Deviation: %d\n", int(validMergesBlueFringe.Min()), int(validMergesBlueFringe.Max()), int(math.Round(validMergesBlueFringe.Mean())), int(validMergesBlueFringe.PopulationStandardDev()))
 	fmt.Println("-----------------------------------------------------------------------------")
 
-	if successfulPercentageGreedy < 0.09 || successfulPercentageGreedy > 0.15 {
-		t.Error("The percentage of successful DFAs for Greedy EDSM is less than 0.09 or bigger than 0.15.")
-	}
+	if targetSize == 32{
+		if successfulPercentageGreedy < 0.09 || successfulPercentageGreedy > 0.15 {
+			t.Error("The percentage of successful DFAs for Greedy EDSM is less than 0.09 or bigger than 0.15.")
+		}
 
-	if successfulPercentageFastWindowed < 0.07 || successfulPercentageFastWindowed > 0.15 {
-		t.Error("The percentage of successful DFAs for Fast Windowed EDSM is less than 0.07 or bigger than 0.15.")
-	}
+		if successfulPercentageFastWindowed < 0.07 || successfulPercentageFastWindowed > 0.15 {
+			t.Error("The percentage of successful DFAs for Fast Windowed EDSM is less than 0.07 or bigger than 0.15.")
+		}
 
-	if successfulPercentageWindowed < 0.07 || successfulPercentageWindowed > 0.15 {
-		t.Error("The percentage of successful DFAs for Windowed EDSM is less than 0.07 or bigger than 0.15.")
-	}
+		if successfulPercentageWindowed < 0.07 || successfulPercentageWindowed > 0.15 {
+			t.Error("The percentage of successful DFAs for Windowed EDSM is less than 0.07 or bigger than 0.15.")
+		}
 
-	if successfulPercentageBlueFringe < 0.07 || successfulPercentageBlueFringe > 0.15 {
-		t.Error("The percentage of successful DFAs for Blue-Fringe EDSM is less than 0.07 or bigger than 0.15.")
+		if successfulPercentageBlueFringe < 0.07 || successfulPercentageBlueFringe > 0.15 {
+			t.Error("The percentage of successful DFAs for Blue-Fringe EDSM is less than 0.07 or bigger than 0.15.")
+		}
 	}
 }
 
@@ -703,31 +724,31 @@ func TestBenchmarkEDSMStamina(t *testing.T) {
 	fmt.Println("-----------------------------------------------------------------------------")
 	fmt.Println("Greedy Search")
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageGreedy)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesGreedy.Min(), accuraciesGreedy.Max(), accuraciesGreedy.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesGreedy.Min(), numberOfStatesGreedy.Max(), numberOfStatesGreedy.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationGreedy.Min(), durationGreedy.Max(), durationGreedy.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecGreedy.Min(), mergesPerSecGreedy.Max(), mergesPerSecGreedy.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesGreedy.Min(), accuraciesGreedy.Max(), accuraciesGreedy.Mean())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesGreedy.Min(), numberOfStatesGreedy.Max(), numberOfStatesGreedy.Mean())
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationGreedy.Min(), durationGreedy.Max(), durationGreedy.Mean())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecGreedy.Min(), mergesPerSecGreedy.Max(), mergesPerSecGreedy.Mean())
 	fmt.Println("-----------------------------------------------------------------------------")
 	fmt.Println("Fast Windowed Search")
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageFastWindowed)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesFastWindowed.Min(), accuraciesFastWindowed.Max(), accuraciesFastWindowed.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesFastWindowed.Min(), numberOfStatesFastWindowed.Max(), numberOfStatesFastWindowed.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationFastWindowed.Min(), durationFastWindowed.Max(), durationFastWindowed.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecFastWindowed.Min(), mergesPerSecFastWindowed.Max(), mergesPerSecFastWindowed.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesFastWindowed.Min(), accuraciesFastWindowed.Max(), accuraciesFastWindowed.Mean())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesFastWindowed.Min(), numberOfStatesFastWindowed.Max(), numberOfStatesFastWindowed.Mean())
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationFastWindowed.Min(), durationFastWindowed.Max(), durationFastWindowed.Mean())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecFastWindowed.Min(), mergesPerSecFastWindowed.Max(), mergesPerSecFastWindowed.Mean())
 	fmt.Println("-----------------------------------------------------------------------------")
 	fmt.Println("Windowed Search")
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageWindowed)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesWindowed.Min(), accuraciesWindowed.Max(), accuraciesWindowed.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesWindowed.Min(), numberOfStatesWindowed.Max(), numberOfStatesWindowed.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationWindowed.Min(), durationWindowed.Max(), durationWindowed.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecWindowed.Min(), mergesPerSecWindowed.Max(), mergesPerSecWindowed.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesWindowed.Min(), accuraciesWindowed.Max(), accuraciesWindowed.Mean())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesWindowed.Min(), numberOfStatesWindowed.Max(), numberOfStatesWindowed.Mean())
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationWindowed.Min(), durationWindowed.Max(), durationWindowed.Mean())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecWindowed.Min(), mergesPerSecWindowed.Max(), mergesPerSecWindowed.Mean())
 	fmt.Println("-----------------------------------------------------------------------------")
 	fmt.Println("Blue-Fringe Search")
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageBlueFringe)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesBlueFringe.Min(), accuraciesBlueFringe.Max(), accuraciesBlueFringe.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesBlueFringe.Min(), numberOfStatesBlueFringe.Max(), numberOfStatesBlueFringe.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationBlueFringe.Min(), durationBlueFringe.Max(), durationBlueFringe.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecBlueFringe.Min(), mergesPerSecBlueFringe.Max(), mergesPerSecBlueFringe.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesBlueFringe.Min(), accuraciesBlueFringe.Max(), accuraciesBlueFringe.Mean())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesBlueFringe.Min(), numberOfStatesBlueFringe.Max(), numberOfStatesBlueFringe.Mean())
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationBlueFringe.Min(), durationBlueFringe.Max(), durationBlueFringe.Mean())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecBlueFringe.Min(), mergesPerSecBlueFringe.Max(), mergesPerSecBlueFringe.Mean())
 	fmt.Println("-----------------------------------------------------------------------------")
 
 	if successfulPercentageGreedy < 0.09 || successfulPercentageGreedy > 0.15 {
@@ -870,31 +891,31 @@ func TestBenchmarkFastEDSMStamina(t *testing.T) {
 	fmt.Println("-----------------------------------------------------------------------------")
 	fmt.Println("Greedy Search")
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageGreedy)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesGreedy.Min(), accuraciesGreedy.Max(), accuraciesGreedy.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesGreedy.Min(), numberOfStatesGreedy.Max(), numberOfStatesGreedy.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationGreedy.Min(), durationGreedy.Max(), durationGreedy.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecGreedy.Min(), mergesPerSecGreedy.Max(), mergesPerSecGreedy.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesGreedy.Min(), accuraciesGreedy.Max(), accuraciesGreedy.Mean())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesGreedy.Min(), numberOfStatesGreedy.Max(), numberOfStatesGreedy.Mean())
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationGreedy.Min(), durationGreedy.Max(), durationGreedy.Mean())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecGreedy.Min(), mergesPerSecGreedy.Max(), mergesPerSecGreedy.Mean())
 	fmt.Println("-----------------------------------------------------------------------------")
 	fmt.Println("Fast Windowed Search")
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageFastWindowed)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesFastWindowed.Min(), accuraciesFastWindowed.Max(), accuraciesFastWindowed.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesFastWindowed.Min(), numberOfStatesFastWindowed.Max(), numberOfStatesFastWindowed.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationFastWindowed.Min(), durationFastWindowed.Max(), durationFastWindowed.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecFastWindowed.Min(), mergesPerSecFastWindowed.Max(), mergesPerSecFastWindowed.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesFastWindowed.Min(), accuraciesFastWindowed.Max(), accuraciesFastWindowed.Mean())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesFastWindowed.Min(), numberOfStatesFastWindowed.Max(), numberOfStatesFastWindowed.Mean())
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationFastWindowed.Min(), durationFastWindowed.Max(), durationFastWindowed.Mean())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecFastWindowed.Min(), mergesPerSecFastWindowed.Max(), mergesPerSecFastWindowed.Mean())
 	fmt.Println("-----------------------------------------------------------------------------")
 	fmt.Println("Windowed Search")
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageWindowed)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesWindowed.Min(), accuraciesWindowed.Max(), accuraciesWindowed.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesWindowed.Min(), numberOfStatesWindowed.Max(), numberOfStatesWindowed.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationWindowed.Min(), durationWindowed.Max(), durationWindowed.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecWindowed.Min(), mergesPerSecWindowed.Max(), mergesPerSecWindowed.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesWindowed.Min(), accuraciesWindowed.Max(), accuraciesWindowed.Mean())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesWindowed.Min(), numberOfStatesWindowed.Max(), numberOfStatesWindowed.Mean())
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationWindowed.Min(), durationWindowed.Max(), durationWindowed.Mean())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecWindowed.Min(), mergesPerSecWindowed.Max(), mergesPerSecWindowed.Mean())
 	fmt.Println("-----------------------------------------------------------------------------")
 	fmt.Println("Blue-Fringe Search")
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageBlueFringe)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesBlueFringe.Min(), accuraciesBlueFringe.Max(), accuraciesBlueFringe.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesBlueFringe.Min(), numberOfStatesBlueFringe.Max(), numberOfStatesBlueFringe.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationBlueFringe.Min(), durationBlueFringe.Max(), durationBlueFringe.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecBlueFringe.Min(), mergesPerSecBlueFringe.Max(), mergesPerSecBlueFringe.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuraciesBlueFringe.Min(), accuraciesBlueFringe.Max(), accuraciesBlueFringe.Mean())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStatesBlueFringe.Min(), numberOfStatesBlueFringe.Max(), numberOfStatesBlueFringe.Mean())
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durationBlueFringe.Min(), durationBlueFringe.Max(), durationBlueFringe.Mean())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSecBlueFringe.Min(), mergesPerSecBlueFringe.Max(), mergesPerSecBlueFringe.Mean())
 	fmt.Println("-----------------------------------------------------------------------------")
 
 	if successfulPercentageGreedy < 0.09 || successfulPercentageGreedy > 0.15 {
@@ -955,10 +976,10 @@ func TestBenchmarkGreedyEDSMStamina(t *testing.T) {
 
 	successfulPercentage := float64(winners) / float64(n)
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentage)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStates.Min(), numberOfStates.Max(), numberOfStates.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durations.Min(), durations.Max(), durations.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Mean())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStates.Min(), numberOfStates.Max(), numberOfStates.Mean())
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durations.Min(), durations.Max(), durations.Mean())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Mean())
 	fmt.Print("-----------------------------------------------------------------------------\n\n")
 
 	if successfulPercentage < 0.10 || successfulPercentage > 0.15 {
@@ -1009,10 +1030,10 @@ func TestBenchmarkFastWindowedEDSMStamina(t *testing.T) {
 
 	successfulPercentage := float64(winners) / float64(n)
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentage)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStates.Min(), numberOfStates.Max(), numberOfStates.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durations.Min(), durations.Max(), durations.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Mean())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStates.Min(), numberOfStates.Max(), numberOfStates.Mean())
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durations.Min(), durations.Max(), durations.Mean())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Mean())
 	fmt.Print("-----------------------------------------------------------------------------\n\n")
 
 	if successfulPercentage < 0.09 || successfulPercentage > 0.15 {
@@ -1061,10 +1082,10 @@ func TestBenchmarkBlueFringeEDSMStamina(t *testing.T) {
 
 	successfulPercentage := float64(winners) / float64(n)
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentage)
-	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Avg())
-	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStates.Min(), numberOfStates.Max(), numberOfStates.Avg())
-	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durations.Min(), durations.Max(), durations.Avg())
-	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Avg())
+	fmt.Printf("Minimum Accuracy: %.2f Maximum Accuracy: %.2f Average Accuracy: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Mean())
+	fmt.Printf("Minimum States: %.2f Maximum States: %.2f Average States: %.2f\n", numberOfStates.Min(), numberOfStates.Max(), numberOfStates.Mean())
+	fmt.Printf("Minimum Duration: %.2f Maximum Duration: %.2f Average Duration: %.2f\n", durations.Min(), durations.Max(), durations.Mean())
+	fmt.Printf("Minimum Merges/s: %.2f Maximum Merges/s: %.2f Average Merges/s: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Mean())
 	fmt.Print("-----------------------------------------------------------------------------\n\n")
 
 	if successfulPercentage < 0.07 || successfulPercentage > 0.15 {

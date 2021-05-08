@@ -223,17 +223,11 @@ func FastWindowedSearchUsingScoringFunction(statePartition StatePartition, windo
 				}
 			}
 
-			// Check if any deterministic merges were found.
-			if highestScoringStatePair.Score != -1 {
+			// Break loop if no deterministic merges were found or if the window size is the biggest possible.
+			if highestScoringStatePair.Score != -1 || windowSize >= len(orderedBlocks){
 				break
-				// No more possible merges were found so increase window size.
 			} else {
-				// If the window size is biggest possible, break loop
-				// and return the most recent State Partition.
-				if windowSize >= len(orderedBlocks) {
-					break
-				}
-
+				// No more possible merges were found so increase window size.
 				previousWindowSize = windowSize
 				windowSize = util.Min(int(math.Round(float64(windowSize)*windowGrow)), len(orderedBlocks))
 			}
@@ -333,16 +327,11 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 				}
 			}
 
-			// Check if any deterministic merges were found.
-			if highestScoringStatePair.Score != -1 {
+			// Break loop if no deterministic merges were found or if the window size is the biggest possible.
+			if highestScoringStatePair.Score != -1 || windowSize >= len(window){
 				break
-				// No more possible merges were found so increase window size.
 			} else {
-				// If the window size is biggest possible, break loop
-				// and return the most recent State Partition.
-				if windowSize >= len(window) {
-					break
-				}
+				// No more possible merges were found so increase window size.
 				// Set window size before to window size.
 				previousWindowSize = windowSize
 				// Get new window size which is the smallest from the window size multiplied
@@ -387,8 +376,8 @@ func UpdateWindow(window []int, statePartition StatePartition) []int{
 
 	// Initialize set of root states (blocks) to empty set.
 	rootBlocks := map[int]util.Void{}
-	// Slice to store new blocks in canonical order.
-	var newOrderedBlocks []int
+	// Slice to store new blocks in canonical order (new window).
+	var newWindow []int
 
 	// Iterate over every block within window.
 	for _, element := range window {
@@ -399,12 +388,12 @@ func UpdateWindow(window []int, statePartition StatePartition) []int{
 		// Else, add root to map and slice.
 		if _, exists := rootBlocks[root]; !exists{
 			rootBlocks[root] = util.Null
-			newOrderedBlocks = append(newOrderedBlocks, root)
+			newWindow = append(newWindow, root)
 		}
 	}
 
 	// Return new red set and populated slice of red states in canonical order.
-	return newOrderedBlocks
+	return newWindow
 }
 
 // BlueFringeSearchUsingScoringFunction deterministically merges possible state pairs within red-blue sets.
