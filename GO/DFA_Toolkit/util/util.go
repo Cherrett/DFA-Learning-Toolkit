@@ -82,12 +82,12 @@ func FileExists(filePath string) bool {
 	return !info.IsDir()
 }
 
-// MinMaxAvg struct is used to keep track of
+// StatsTracker struct is used to keep track of
 // minimum, maximum, average, variance and
 // standard deviation values given a sequence
 // of values. Mean and variance calculation
 // is done using Welford's online algorithm.
-type MinMaxAvg struct {
+type StatsTracker struct {
 	min   float64 // Minimum of values.
 	max   float64 // Maximum of values.
 	count uint    // Number of values.
@@ -95,9 +95,9 @@ type MinMaxAvg struct {
 	m2    float64 // Value used to calculate variance.
 }
 
-// NewMinMaxAvg returns an empty MinMaxAvg struct.
-func NewMinMaxAvg() MinMaxAvg {
-	return MinMaxAvg{
+// NewStatsTracker returns an empty StatsTracker struct.
+func NewStatsTracker() StatsTracker {
+	return StatsTracker{
 		min:   math.Inf(1),
 		max:   math.Inf(-1),
 		count: 0,
@@ -106,79 +106,79 @@ func NewMinMaxAvg() MinMaxAvg {
 	}
 }
 
-// Add adds a float value to the MinMaxAvg struct.
-func (minMaxAvg *MinMaxAvg) Add(value float64) {
+// Add adds a float value to the StatsTracker struct.
+func (statsTracker *StatsTracker) Add(value float64) {
 	// If value is smaller than the minimum value,
 	// set minimum value within struct to value.
-	if value < minMaxAvg.min {
-		minMaxAvg.min = value
+	if value < statsTracker.min {
+		statsTracker.min = value
 	}
 
 	// If value is larger than the maximum value,
 	// set maximum value within struct to value.
-	if value > minMaxAvg.max {
-		minMaxAvg.max = value
+	if value > statsTracker.max {
+		statsTracker.max = value
 	}
 
 	// Increment counter.
-	minMaxAvg.count++
+	statsTracker.count++
 
-	muNew := minMaxAvg.mean + ((value - minMaxAvg.mean) / float64(minMaxAvg.count))
+	muNew := statsTracker.mean + ((value - statsTracker.mean) / float64(statsTracker.count))
 
-	minMaxAvg.m2 += (value - minMaxAvg.mean) * (value - muNew)
+	statsTracker.m2 += (value - statsTracker.mean) * (value - muNew)
 
-	minMaxAvg.mean = muNew
+	statsTracker.mean = muNew
 }
 
-// AddInt adds an integer value to the MinMaxAvg struct.
-func (minMaxAvg *MinMaxAvg) AddInt(intValue int) {
+// AddInt adds an integer value to the StatsTracker struct.
+func (statsTracker *StatsTracker) AddInt(intValue int) {
 	// Cast to float64 and call Add function.
-	minMaxAvg.Add(float64(intValue))
+	statsTracker.Add(float64(intValue))
 }
 
-// Min returns the minimum value within the MinMaxAvg struct.
-func (minMaxAvg MinMaxAvg) Min() float64 {
-	return minMaxAvg.min
+// Min returns the minimum value within the StatsTracker struct.
+func (statsTracker StatsTracker) Min() float64 {
+	return statsTracker.min
 }
 
-// Max returns the maximum value within the MinMaxAvg struct.
-func (minMaxAvg MinMaxAvg) Max() float64 {
-	return minMaxAvg.max
+// Max returns the maximum value within the StatsTracker struct.
+func (statsTracker StatsTracker) Max() float64 {
+	return statsTracker.max
 }
 
-// Mean returns the average value within the MinMaxAvg struct.
-func (minMaxAvg MinMaxAvg) Mean() float64 {
+// Mean returns the average value within the StatsTracker struct.
+func (statsTracker StatsTracker) Mean() float64 {
 	// Get average by dividing the sum of elements
 	// by the number of elements within struct.
-	return minMaxAvg.mean
+	return statsTracker.mean
 }
 
-// PopulationVariance returns the population variance value within the MinMaxAvg struct.
-func (minMaxAvg MinMaxAvg) PopulationVariance() float64 {
-	if minMaxAvg.count > 1{
-		return minMaxAvg.m2 / float64(minMaxAvg.count)
+// PopulationVariance returns the population variance value within the StatsTracker struct.
+func (statsTracker StatsTracker) PopulationVariance() float64 {
+	if statsTracker.count > 1{
+		return statsTracker.m2 / float64(statsTracker.count)
 	}else{
 		return 0.0
 	}
 }
 
-// SampleVariance returns the sample variance value within the MinMaxAvg struct.
-func (minMaxAvg MinMaxAvg) SampleVariance() float64 {
-	if minMaxAvg.count > 1{
-		return minMaxAvg.m2 / float64(minMaxAvg.count - 1)
+// SampleVariance returns the sample variance value within the StatsTracker struct.
+func (statsTracker StatsTracker) SampleVariance() float64 {
+	if statsTracker.count > 1{
+		return statsTracker.m2 / float64(statsTracker.count - 1)
 	}else{
 		return 0.0
 	}
 }
 
-// PopulationStandardDev returns the population standard deviation value within the MinMaxAvg struct.
-func (minMaxAvg MinMaxAvg) PopulationStandardDev() float64{
-	return math.Sqrt(minMaxAvg.PopulationVariance())
+// PopulationStandardDev returns the population standard deviation value within the StatsTracker struct.
+func (statsTracker StatsTracker) PopulationStandardDev() float64{
+	return math.Sqrt(statsTracker.PopulationVariance())
 }
 
-// SampleStandardDev returns the sample standard deviation value within the MinMaxAvg struct.
-func (minMaxAvg MinMaxAvg) SampleStandardDev() float64{
-	return math.Sqrt(minMaxAvg.SampleVariance())
+// SampleStandardDev returns the sample standard deviation value within the StatsTracker struct.
+func (statsTracker StatsTracker) SampleStandardDev() float64{
+	return math.Sqrt(statsTracker.SampleVariance())
 }
 
 // Factorial returns the factorial of n by recursively

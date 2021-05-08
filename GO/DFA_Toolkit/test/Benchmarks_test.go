@@ -88,10 +88,10 @@ func TestBenchmarkRPNI(t *testing.T) {
 	trainingSetSize, testingSetSize := 607, 1800
 
 	winners := 0
-	accuracies := util.NewMinMaxAvg()
-	numberOfStates := util.NewMinMaxAvg()
-	durations := util.NewMinMaxAvg()
-	mergesPerSec := util.NewMinMaxAvg()
+	accuracies := util.NewStatsTracker()
+	numberOfStates := util.NewStatsTracker()
+	durations := util.NewStatsTracker()
+	mergesPerSec := util.NewStatsTracker()
 
 	for i := 0; i < n; i++ {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
@@ -138,10 +138,10 @@ func TestBenchmarkGreedyEDSM(t *testing.T) {
 	trainingSetSize, testingSetSize := 607, 1800
 
 	winners := 0
-	accuracies := util.NewMinMaxAvg()
-	numberOfStates := util.NewMinMaxAvg()
-	durations := util.NewMinMaxAvg()
-	mergesPerSec := util.NewMinMaxAvg()
+	accuracies := util.NewStatsTracker()
+	numberOfStates := util.NewStatsTracker()
+	durations := util.NewStatsTracker()
+	mergesPerSec := util.NewStatsTracker()
 
 	for i := 0; i < n; i++ {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
@@ -188,10 +188,10 @@ func TestBenchmarkFastWindowedEDSM(t *testing.T) {
 	trainingSetSize, testingSetSize := 607, 1800
 
 	winners := 0
-	accuracies := util.NewMinMaxAvg()
-	numberOfStates := util.NewMinMaxAvg()
-	durations := util.NewMinMaxAvg()
-	mergesPerSec := util.NewMinMaxAvg()
+	accuracies := util.NewStatsTracker()
+	numberOfStates := util.NewStatsTracker()
+	durations := util.NewStatsTracker()
+	mergesPerSec := util.NewStatsTracker()
 
 	for i := 0; i < n; i++ {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
@@ -238,10 +238,10 @@ func TestBenchmarkWindowedEDSM(t *testing.T) {
 	trainingSetSize, testingSetSize := 607, 1800
 
 	winners := 0
-	accuracies := util.NewMinMaxAvg()
-	numberOfStates := util.NewMinMaxAvg()
-	durations := util.NewMinMaxAvg()
-	mergesPerSec := util.NewMinMaxAvg()
+	accuracies := util.NewStatsTracker()
+	numberOfStates := util.NewStatsTracker()
+	durations := util.NewStatsTracker()
+	mergesPerSec := util.NewStatsTracker()
 
 	for i := 0; i < n; i++ {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
@@ -288,10 +288,10 @@ func TestBenchmarkBlueFringeEDSM(t *testing.T) {
 	trainingSetSize, testingSetSize := 607, 1800
 
 	winners := 0
-	accuracies := util.NewMinMaxAvg()
-	numberOfStates := util.NewMinMaxAvg()
-	durations := util.NewMinMaxAvg()
-	mergesPerSec := util.NewMinMaxAvg()
+	accuracies := util.NewStatsTracker()
+	numberOfStates := util.NewStatsTracker()
+	durations := util.NewStatsTracker()
+	mergesPerSec := util.NewStatsTracker()
 
 	for i := 0; i < n; i++ {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
@@ -340,10 +340,10 @@ func TestBenchmarkEDSM(t *testing.T) {
 
 	// Initialize values.
 	winnersGreedy, winnersFastWindowed, winnersWindowed, winnersBlueFringe := 0, 0, 0, 0
-	accuraciesGreedy, accuraciesFastWindowed, accuraciesWindowed, accuraciesBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
-	numberOfStatesGreedy, numberOfStatesFastWindowed, numberOfStatesWindowed, numberOfStatesBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
-	durationGreedy, durationFastWindowed, durationWindowed, durationBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
-	mergesPerSecGreedy, mergesPerSecFastWindowed, mergesPerSecWindowed, mergesPerSecBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
+	accuraciesGreedy, accuraciesFastWindowed, accuraciesWindowed, accuraciesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	numberOfStatesGreedy, numberOfStatesFastWindowed, numberOfStatesWindowed, numberOfStatesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	durationGreedy, durationFastWindowed, durationWindowed, durationBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	mergesPerSecGreedy, mergesPerSecFastWindowed, mergesPerSecWindowed, mergesPerSecBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
 
 	for i := 0; i < n; i++ {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
@@ -467,12 +467,12 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 
 	// Initialize values.
 	winnersGreedy, winnersFastWindowed, winnersWindowed, winnersBlueFringe := 0, 0, 0, 0
-	accuraciesGreedy, accuraciesFastWindowed, accuraciesWindowed, accuraciesBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
-	numberOfStatesGreedy, numberOfStatesFastWindowed, numberOfStatesWindowed, numberOfStatesBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
-	durationGreedy, durationFastWindowed, durationWindowed, durationBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
-	mergesPerSecGreedy, mergesPerSecFastWindowed, mergesPerSecWindowed, mergesPerSecBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
-	mergesGreedy, mergesFastWindowed, mergesWindowed, mergesBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
-	validMergesGreedy, validMergesFastWindowed, validMergesWindowed, validMergesBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
+	accuraciesGreedy, accuraciesFastWindowed, accuraciesWindowed, accuraciesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	numberOfStatesGreedy, numberOfStatesFastWindowed, numberOfStatesWindowed, numberOfStatesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	durationGreedy, durationFastWindowed, durationWindowed, durationBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	mergesPerSecGreedy, mergesPerSecFastWindowed, mergesPerSecWindowed, mergesPerSecBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	mergesGreedy, mergesFastWindowed, mergesWindowed, mergesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	validMergesGreedy, validMergesFastWindowed, validMergesWindowed, validMergesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
 
 	for i := 0; i < n; i++ {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
@@ -656,10 +656,10 @@ func TestBenchmarkEDSMStamina(t *testing.T) {
 
 	// Initialize values.
 	winnersGreedy, winnersFastWindowed, winnersWindowed, winnersBlueFringe := 0, 0, 0, 0
-	accuraciesGreedy, accuraciesFastWindowed, accuraciesWindowed, accuraciesBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
-	numberOfStatesGreedy, numberOfStatesFastWindowed, numberOfStatesWindowed, numberOfStatesBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
-	durationGreedy, durationFastWindowed, durationWindowed, durationBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
-	mergesPerSecGreedy, mergesPerSecFastWindowed, mergesPerSecWindowed, mergesPerSecBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
+	accuraciesGreedy, accuraciesFastWindowed, accuraciesWindowed, accuraciesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	numberOfStatesGreedy, numberOfStatesFastWindowed, numberOfStatesWindowed, numberOfStatesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	durationGreedy, durationFastWindowed, durationWindowed, durationBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	mergesPerSecGreedy, mergesPerSecFastWindowed, mergesPerSecWindowed, mergesPerSecBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
 
 	for i := 0; i < n; i++ {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
@@ -785,10 +785,10 @@ func TestBenchmarkFastEDSMStamina(t *testing.T) {
 
 	// Initialize values.
 	winnersGreedy, winnersFastWindowed, winnersWindowed, winnersBlueFringe := 0, 0, 0, 0
-	accuraciesGreedy, accuraciesFastWindowed, accuraciesWindowed, accuraciesBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
-	numberOfStatesGreedy, numberOfStatesFastWindowed, numberOfStatesWindowed, numberOfStatesBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
-	durationGreedy, durationFastWindowed, durationWindowed, durationBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
-	mergesPerSecGreedy, mergesPerSecFastWindowed, mergesPerSecWindowed, mergesPerSecBlueFringe := util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg(), util.NewMinMaxAvg()
+	accuraciesGreedy, accuraciesFastWindowed, accuraciesWindowed, accuraciesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	numberOfStatesGreedy, numberOfStatesFastWindowed, numberOfStatesWindowed, numberOfStatesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	durationGreedy, durationFastWindowed, durationWindowed, durationBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	mergesPerSecGreedy, mergesPerSecFastWindowed, mergesPerSecWindowed, mergesPerSecBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
 
 	for i := 0; i < n; i++ {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
@@ -950,10 +950,10 @@ func TestBenchmarkGreedyEDSMStamina(t *testing.T) {
 	sparsityPercentage := 50.0
 
 	winners := 0
-	accuracies := util.NewMinMaxAvg()
-	numberOfStates := util.NewMinMaxAvg()
-	durations := util.NewMinMaxAvg()
-	mergesPerSec := util.NewMinMaxAvg()
+	accuracies := util.NewStatsTracker()
+	numberOfStates := util.NewStatsTracker()
+	durations := util.NewStatsTracker()
+	mergesPerSec := util.NewStatsTracker()
 
 	for i := 0; i < n; i++ {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
@@ -1002,10 +1002,10 @@ func TestBenchmarkFastWindowedEDSMStamina(t *testing.T) {
 	sparsityPercentage := 12.5
 
 	winners := 0
-	accuracies := util.NewMinMaxAvg()
-	numberOfStates := util.NewMinMaxAvg()
-	durations := util.NewMinMaxAvg()
-	mergesPerSec := util.NewMinMaxAvg()
+	accuracies := util.NewStatsTracker()
+	numberOfStates := util.NewStatsTracker()
+	durations := util.NewStatsTracker()
+	mergesPerSec := util.NewStatsTracker()
 
 	for i := 0; i < n; i++ {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
@@ -1056,10 +1056,10 @@ func TestBenchmarkBlueFringeEDSMStamina(t *testing.T) {
 	sparsityPercentage := 50.0
 
 	winners := 0
-	accuracies := util.NewMinMaxAvg()
-	numberOfStates := util.NewMinMaxAvg()
-	durations := util.NewMinMaxAvg()
-	mergesPerSec := util.NewMinMaxAvg()
+	accuracies := util.NewStatsTracker()
+	numberOfStates := util.NewStatsTracker()
+	durations := util.NewStatsTracker()
+	mergesPerSec := util.NewStatsTracker()
 
 	for i := 0; i < n; i++ {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
