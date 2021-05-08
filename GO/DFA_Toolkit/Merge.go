@@ -283,7 +283,7 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 	// Total merges and valid merges counter.
 	totalMerges, totalValidMerges := 0, 0
 	// Get ordered blocks within partition.
-	orderedBlocks := statePartition.OrderedBlocks()
+	window := statePartition.OrderedBlocks()
 	// Start timer.
 	start := time.Now()
 
@@ -294,9 +294,6 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 
 		// Set window size before to 0.
 		previousWindowSize := 0
-
-		// Update new window.
-		window := UpdateWindow(statePartition, orderedBlocks)
 
 		// Set window size to window size parameter
 		// or length of ordered blocks if smaller.
@@ -365,6 +362,9 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 		} else {
 			break
 		}
+
+		// Update new window.
+		window = UpdateWindow(window, statePartition)
 	}
 
 	// Add total and valid merges counts to search data.
@@ -377,11 +377,12 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 	return statePartition, searchData
 }
 
-// UpdateWindow updates a window given the state partition and the original ordered blocks within a Windowed framework
-// such as the WindowedSearchUsingScoringFunction function. It returns the new window as a slice of integers. This works
-// by gathering the root of each block within the ordered blocks slice and assigns it to the position of the first index
-// of any block which is part of that block. This is used to avoid attempting merges more than once within a windowed search.
-func UpdateWindow(statePartition StatePartition, orderedBlocks []int) []int{
+// UpdateWindow updates a window given the state partition within a Windowed framework such as the
+// WindowedSearchUsingScoringFunction function. It returns the new window as a slice of integers.
+// This works by gathering the root of each block within the previous window and assigns it to the
+// position of the first index of any block which is part of that block. This is used to avoid attempting
+// merges more than once within a windowed search.
+func UpdateWindow(window []int, statePartition StatePartition) []int{
 	// Gather root of ordered blocks and store in map and slice declared below.
 
 	// Initialize set of root states (blocks) to empty set.
@@ -389,8 +390,8 @@ func UpdateWindow(statePartition StatePartition, orderedBlocks []int) []int{
 	// Slice to store new blocks in canonical order.
 	var newOrderedBlocks []int
 
-	// Iterate over every block.
-	for _, element := range orderedBlocks {
+	// Iterate over every block within window.
+	for _, element := range window {
 		// Get root block of current block.
 		root := statePartition.Find(element)
 
