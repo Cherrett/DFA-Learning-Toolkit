@@ -224,7 +224,7 @@ func FastWindowedSearchUsingScoringFunction(statePartition StatePartition, windo
 			}
 
 			// Break loop if no deterministic merges were found or if the window size is the biggest possible.
-			if highestScoringStatePair.Score != -1 || windowSize >= len(orderedBlocks){
+			if highestScoringStatePair.Score != -1 || windowSize >= len(orderedBlocks) {
 				break
 			} else {
 				// No more possible merges were found so increase window size.
@@ -328,7 +328,7 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 			}
 
 			// Break loop if no deterministic merges were found or if the window size is the biggest possible.
-			if highestScoringStatePair.Score != -1 || windowSize >= len(window){
+			if highestScoringStatePair.Score != -1 || windowSize >= len(window) {
 				break
 			} else {
 				// No more possible merges were found so increase window size.
@@ -371,7 +371,7 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 // This works by gathering the root of each block within the previous window and assigns it to the
 // position of the first index of any block which is part of that block. This is used to avoid attempting
 // merges more than once within a windowed search.
-func UpdateWindow(window []int, statePartition StatePartition) []int{
+func UpdateWindow(window []int, statePartition StatePartition) []int {
 	// Gather root of ordered blocks and store in map and slice declared below.
 
 	// Initialize set of root states (blocks) to empty set.
@@ -386,7 +386,7 @@ func UpdateWindow(window []int, statePartition StatePartition) []int{
 
 		// If root is already visited, skip.
 		// Else, add root to map and slice.
-		if _, exists := rootBlocks[root]; !exists{
+		if _, exists := rootBlocks[root]; !exists {
 			rootBlocks[root] = util.Null
 			newWindow = append(newWindow, root)
 		}

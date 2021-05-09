@@ -91,8 +91,8 @@ type StatsTracker struct {
 	min   float64 // Minimum of values.
 	max   float64 // Maximum of values.
 	count uint    // Number of values.
-	mean  float64 // Mean of values.
-	m2    float64 // Value used to calculate variance.
+	mean  float64 // Running average of values.
+	m2    float64 // Running value used to calculate variance/standard dev.
 }
 
 // NewStatsTracker returns an empty StatsTracker struct.
