@@ -224,7 +224,7 @@ func FastWindowedSearchUsingScoringFunction(statePartition StatePartition, windo
 			}
 
 			// Break loop if no deterministic merges were found or if the window size is the biggest possible.
-			if highestScoringStatePair.Score != -1 || windowSize >= len(orderedBlocks){
+			if highestScoringStatePair.Score != -1 || windowSize >= len(orderedBlocks) {
 				break
 			} else {
 				// No more possible merges were found so increase window size.
@@ -328,7 +328,7 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 			}
 
 			// Break loop if no deterministic merges were found or if the window size is the biggest possible.
-			if highestScoringStatePair.Score != -1 || windowSize >= len(window){
+			if highestScoringStatePair.Score != -1 || windowSize >= len(window) {
 				break
 			} else {
 				// No more possible merges were found so increase window size.
@@ -371,7 +371,7 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 // This works by gathering the root of each block within the previous window and assigns it to the
 // position of the first index of any block which is part of that block. This is used to avoid attempting
 // merges more than once within a windowed search.
-func UpdateWindow(window []int, statePartition StatePartition) []int{
+func UpdateWindow(window []int, statePartition StatePartition) []int {
 	// Gather root of ordered blocks and store in map and slice declared below.
 
 	// Initialize set of root states (blocks) to empty set.
@@ -386,7 +386,7 @@ func UpdateWindow(window []int, statePartition StatePartition) []int{
 
 		// If root is already visited, skip.
 		// Else, add root to map and slice.
-		if _, exists := rootBlocks[root]; !exists{
+		if _, exists := rootBlocks[root]; !exists {
 			rootBlocks[root] = util.Null
 			newWindow = append(newWindow, root)
 		}
@@ -550,12 +550,19 @@ func GenerateBlueSetFromRedSet(statePartition StatePartition, redSet map[int]uti
 	// Slice to store blue states in canonical order.
 	var orderedBlue []int
 
+	// Get starting block ID.
+	startingBlock := statePartition.StartingBlock()
+	// Create a FIFO queue with starting block.
+	queue := []int{statePartition.Find(startingBlock)}
 	// Slice of boolean values to keep track of orders calculated.
 	orderComputed := make([]bool, len(statePartition.Blocks))
-	index := 0
+	// Mark starting block as computed.
+	orderComputed[startingBlock] = true
 
-	// Create a FIFO queue with starting state.
-	queue := []int{statePartition.Find(statePartition.StartingBlock())}
+	// If starting block is in blue set, add to ordered slice.
+	if _, exists := blue[startingBlock]; exists {
+		orderedBlue = append(orderedBlue, startingBlock)
+	}
 
 	// Loop until queue is empty.
 	for len(queue) > 0 {
@@ -563,29 +570,24 @@ func GenerateBlueSetFromRedSet(statePartition StatePartition, redSet map[int]uti
 		blockID := queue[0]
 		queue = queue[1:]
 
-		// Skip if order for block is already computed.
-		if orderComputed[blockID] {
-			continue
-		}
-
-		// If block is in blue set, add to ordered slice.
-		if _, exists := blue[blockID]; exists {
-			orderedBlue = append(orderedBlue, blockID)
-		}
-
-		// Mark block as computed.
-		orderComputed[blockID] = true
-		// Increment current state order.
-		index++
-
 		// Iterate over each symbol (alphabet) within DFA.
 		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
 			// If transition from current state using current symbol is valid and is not a loop to the current state.
 			if childStateID := statePartition.Blocks[blockID].Transitions[symbol]; childStateID != -1 {
-				// If depth for child state has been computed, skip state.
-				if childBlockID := statePartition.Find(childStateID); childBlockID != blockID {
-					// Add child state to queue.
+				// Get block ID of child state.
+				childBlockID := statePartition.Find(childStateID)
+				// If depth for child block has been computed, skip block.
+				if !orderComputed[childBlockID] {
+					// Add child block to queue.
 					queue = append(queue, childBlockID)
+
+					// If block is in blue set, add to ordered slice.
+					if _, exists := blue[childBlockID]; exists {
+						orderedBlue = append(orderedBlue, childBlockID)
+					}
+
+					// Mark block as computed.
+					orderComputed[childBlockID] = true
 				}
 			}
 		}
@@ -618,12 +620,19 @@ func UpdateRedSet(statePartition StatePartition, redSet map[int]util.Void) (map[
 	// Slice to store red states in canonical order.
 	var orderedRed []int
 
+	// Get starting block ID.
+	startingBlock := statePartition.StartingBlock()
+	// Create a FIFO queue with starting block.
+	queue := []int{statePartition.Find(startingBlock)}
 	// Slice of boolean values to keep track of orders calculated.
 	orderComputed := make([]bool, len(statePartition.Blocks))
-	index := 0
+	// Mark starting block as computed.
+	orderComputed[startingBlock] = true
 
-	// Create a FIFO queue with starting state.
-	queue := []int{statePartition.Find(statePartition.StartingBlock())}
+	// If starting block is in red set, add to ordered slice.
+	if _, exists := newRedSet[startingBlock]; exists {
+		orderedRed = append(orderedRed, startingBlock)
+	}
 
 	// Loop until queue is empty.
 	for len(queue) > 0 {
@@ -631,29 +640,24 @@ func UpdateRedSet(statePartition StatePartition, redSet map[int]util.Void) (map[
 		blockID := queue[0]
 		queue = queue[1:]
 
-		// Skip if order for block is already computed.
-		if orderComputed[blockID] {
-			continue
-		}
-
-		// If block is in red set, add to ordered slice.
-		if _, exists := newRedSet[blockID]; exists {
-			orderedRed = append(orderedRed, blockID)
-		}
-
-		// Mark block as computed.
-		orderComputed[blockID] = true
-		// Increment current state order.
-		index++
-
 		// Iterate over each symbol (alphabet) within DFA.
 		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
 			// If transition from current state using current symbol is valid and is not a loop to the current state.
 			if childStateID := statePartition.Blocks[blockID].Transitions[symbol]; childStateID != -1 {
-				// If depth for child state has been computed, skip state.
-				if childBlockID := statePartition.Find(childStateID); childBlockID != blockID {
-					// Add child state to queue.
+				// Get block ID of child state.
+				childBlockID := statePartition.Find(childStateID)
+				// If depth for child block has been computed, skip block.
+				if !orderComputed[childBlockID] {
+					// Add child block to queue.
 					queue = append(queue, childBlockID)
+
+					// If block is in red set, add to ordered slice.
+					if _, exists := newRedSet[childBlockID]; exists {
+						orderedRed = append(orderedRed, childBlockID)
+					}
+
+					// Mark block as computed.
+					orderComputed[childBlockID] = true
 				}
 			}
 		}

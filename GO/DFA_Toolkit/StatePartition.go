@@ -451,10 +451,17 @@ func (statePartition *StatePartition) OrderedBlocks() []int {
 	orderComputed := make([]bool, len(statePartition.Blocks))
 	// Slice of integer values to keep track of ordered blocks.
 	orderedBlocks := make([]int, statePartition.BlocksCount)
-	index := 0
 
-	// Create a FIFO queue with starting state.
-	queue := []int{statePartition.Find(statePartition.StartingBlock())}
+	// Get starting block ID.
+	startingBlock := statePartition.StartingBlock()
+	// Create a FIFO queue with starting block.
+	queue := []int{startingBlock}
+	// Add starting block to ordered blocks.
+	orderedBlocks[0] = startingBlock
+	// Mark starting block as computed.
+	orderComputed[startingBlock] = true
+	// Set index to 1.
+	index := 1
 
 	// Loop until queue is empty.
 	for len(queue) > 0 {
@@ -462,26 +469,22 @@ func (statePartition *StatePartition) OrderedBlocks() []int {
 		blockID := queue[0]
 		queue = queue[1:]
 
-		// Skip if order for block is already computed.
-		if orderComputed[blockID] {
-			continue
-		}
-
-		// Set the order of the current state.
-		orderedBlocks[index] = blockID
-		// Mark block as computed.
-		orderComputed[blockID] = true
-		// Increment current state order.
-		index++
-
 		// Iterate over each symbol (alphabet) within DFA.
 		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
-			// If transition from current state using current symbol is valid and is not a loop to the current state.
+			// If transition from current state using current symbol is valid.
 			if childStateID := statePartition.Blocks[blockID].Transitions[symbol]; childStateID != -1 {
-				// If depth for child state has been computed, skip state.
-				if childBlockID := statePartition.Find(childStateID); childBlockID != blockID {
-					// Add child state to queue.
+				// Get block ID of child state.
+				childBlockID := statePartition.Find(childStateID)
+				// If depth for child block has been computed, skip block.
+				if !orderComputed[childBlockID] {
+					// Add child block to queue.
 					queue = append(queue, childBlockID)
+					// Set the order of the current block.
+					orderedBlocks[index] = childBlockID
+					// Mark block as computed.
+					orderComputed[childBlockID] = true
+					// Increment current block order.
+					index++
 				}
 			}
 		}
@@ -493,4 +496,31 @@ func (statePartition *StatePartition) OrderedBlocks() []int {
 // StartingBlock returns the ID of the block which contains the starting state.
 func (statePartition *StatePartition) StartingBlock() int {
 	return statePartition.Find(statePartition.StartingStateID)
+}
+
+// DepthOfBlocks returns the depth of each block.
+func (statePartition *StatePartition) DepthOfBlocks() map[int]int{
+	// Create a FIFO queue with starting state.
+	start := statePartition.StartingBlock()
+	result := map[int]int{start: 0}
+	queue := []int{start}
+
+	for len(queue) > 0{
+		// Remove and store first state in queue.
+		blockID := queue[0]
+		queue = queue[1:]
+		depth := result[blockID]
+
+		for symbolID := 0; symbolID < statePartition.AlphabetSize; symbolID++{
+			if childStateID := statePartition.Blocks[blockID].Transitions[symbolID]; childStateID != -1{
+				childBlockID := statePartition.Find(childStateID)
+				if _, exists := result[childBlockID]; !exists{
+					result[childBlockID] = depth + 1
+					queue = append(queue, childBlockID)
+				}
+			}
+		}
+	}
+
+	return result
 }
