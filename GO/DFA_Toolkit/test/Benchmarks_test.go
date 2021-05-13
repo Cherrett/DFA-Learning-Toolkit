@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"os"
 	"sync"
 	"testing"
+	"text/tabwriter"
 	"time"
 )
 
@@ -690,6 +692,23 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 			t.Error("The percentage of successful DFAs for Blue-Fringe EDSM is less than 7% or bigger than 15%.")
 		}
 	}
+}
+
+func PrintBenchmarkInformation(accuracies, numberOfStates, duration, mergesPerSec, merges, validMerges util.StatsTracker){
+	// Initialize tabwriter.
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 17, 4, 0, '\t', 0)
+
+	_, _ = fmt.Fprintf(w, "\t%s\t%s\t%s\t%s\t\n",  "Minimum", "Maximum", "Average", "Standard Dev")
+	_, _ = fmt.Fprintf(w, "\t%s\t%s\t%s\t%s\t\n", "------------", "------------", "------------", "------------")
+	_, _ = fmt.Fprintf(w, "%s\t%.2f\t%.2f\t%.2f\t%.2f\t\n", "Accuracy", accuracies.Min(), accuracies.Max(), accuracies.Mean(), accuracies.PopulationStandardDev())
+	_, _ = fmt.Fprintf(w, "%s\t%d\t%d\t%d\t%d\t\n", "Number of States", int(numberOfStates.Min()), int(numberOfStates.Max()), int(numberOfStates.Mean()), int(numberOfStates.PopulationStandardDev()))
+	_, _ = fmt.Fprintf(w, "%s\t%.2f\t%.2f\t%.2f\t%.2f\t\n", "Duration", duration.Min(), duration.Max(), duration.Mean(), duration.PopulationStandardDev())
+	_, _ = fmt.Fprintf(w, "%s\t%d\t%d\t%d\t%d\t\n", "Merges/s", int(math.Round(mergesPerSec.Min())), int(math.Round(mergesPerSec.Max())), int(math.Round(mergesPerSec.Mean())), int(math.Round(mergesPerSec.PopulationStandardDev())))
+	_, _ = fmt.Fprintf(w, "%s\t%d\t%d\t%d\t%d\t\n", "Attempted Merges", int(merges.Min()), int(merges.Max()), int(merges.Mean()), int(merges.PopulationStandardDev()))
+	_, _ = fmt.Fprintf(w, "%s\t%d\t%d\t%d\t%d\t\n", "Valid Merges", int(validMerges.Min()), int(validMerges.Max()), int(validMerges.Mean()), int(validMerges.PopulationStandardDev()))
+
+	_ = w.Flush()
 }
 
 // -------------------- BENCHMARKS USING STAMINA PROTOCOL --------------------
