@@ -119,15 +119,10 @@ func TestBenchmarkRPNI(t *testing.T) {
 	}
 
 	successfulPercentage := (float64(winners) / float64(n)) * 100
-	fmt.Println("-----------------------------------------------------------------------------")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentage)
-	fmt.Printf("Accuracy - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Mean(), accuracies.PopulationStandardDev())
-	fmt.Printf("Number of States - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(numberOfStates.Min()), int(numberOfStates.Max()), int(math.Round(numberOfStates.Mean())), int(numberOfStates.PopulationStandardDev()))
-	fmt.Printf("Duration - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", durations.Min(), durations.Max(), durations.Mean(), durations.PopulationStandardDev())
-	fmt.Printf("Merges/s - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Mean(), mergesPerSec.PopulationStandardDev())
-	fmt.Printf("Attempted Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(merges.Min()), int(merges.Max()), int(math.Round(merges.Mean())), int(merges.PopulationStandardDev()))
-	fmt.Printf("Valid Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(validMerges.Min()), int(validMerges.Max()), int(math.Round(validMerges.Mean())), int(validMerges.PopulationStandardDev()))
-	fmt.Println("-----------------------------------------------------------------------------")
+	fmt.Println("--------------------------------------------------------------------------------------------")
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n\n", successfulPercentage)
+	PrintBenchmarkInformation(accuracies, numberOfStates, durations, mergesPerSec, merges, validMerges)
+	fmt.Println("--------------------------------------------------------------------------------------------")
 
 	if successfulPercentage > 0 {
 		t.Error("The percentage of successful DFAs is bigger than 0%.")
@@ -176,15 +171,10 @@ func TestBenchmarkGreedyEDSM(t *testing.T) {
 	}
 
 	successfulPercentage := (float64(winners) / float64(n)) * 100
-	fmt.Println("-----------------------------------------------------------------------------")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentage)
-	fmt.Printf("Accuracy - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Mean(), accuracies.PopulationStandardDev())
-	fmt.Printf("Number of States - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(numberOfStates.Min()), int(numberOfStates.Max()), int(math.Round(numberOfStates.Mean())), int(numberOfStates.PopulationStandardDev()))
-	fmt.Printf("Duration - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", durations.Min(), durations.Max(), durations.Mean(), durations.PopulationStandardDev())
-	fmt.Printf("Merges/s - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Mean(), mergesPerSec.PopulationStandardDev())
-	fmt.Printf("Attempted Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(merges.Min()), int(merges.Max()), int(math.Round(merges.Mean())), int(merges.PopulationStandardDev()))
-	fmt.Printf("Valid Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(validMerges.Min()), int(validMerges.Max()), int(math.Round(validMerges.Mean())), int(validMerges.PopulationStandardDev()))
-	fmt.Println("-----------------------------------------------------------------------------")
+	fmt.Println("--------------------------------------------------------------------------------------------")
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n\n", successfulPercentage)
+	PrintBenchmarkInformation(accuracies, numberOfStates, durations, mergesPerSec, merges, validMerges)
+	fmt.Println("--------------------------------------------------------------------------------------------")
 
 	if targetSize == 32 {
 		if successfulPercentage < 9 || successfulPercentage > 15 {
@@ -235,15 +225,10 @@ func TestBenchmarkFastWindowedEDSM(t *testing.T) {
 	}
 
 	successfulPercentage := (float64(winners) / float64(n)) * 100
-	fmt.Println("-----------------------------------------------------------------------------")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentage)
-	fmt.Printf("Accuracy - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Mean(), accuracies.PopulationStandardDev())
-	fmt.Printf("Number of States - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(numberOfStates.Min()), int(numberOfStates.Max()), int(math.Round(numberOfStates.Mean())), int(numberOfStates.PopulationStandardDev()))
-	fmt.Printf("Duration - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", durations.Min(), durations.Max(), durations.Mean(), durations.PopulationStandardDev())
-	fmt.Printf("Merges/s - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Mean(), mergesPerSec.PopulationStandardDev())
-	fmt.Printf("Attempted Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(merges.Min()), int(merges.Max()), int(math.Round(merges.Mean())), int(merges.PopulationStandardDev()))
-	fmt.Printf("Valid Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(validMerges.Min()), int(validMerges.Max()), int(math.Round(validMerges.Mean())), int(validMerges.PopulationStandardDev()))
-	fmt.Println("-----------------------------------------------------------------------------")
+	fmt.Println("--------------------------------------------------------------------------------------------")
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n\n", successfulPercentage)
+	PrintBenchmarkInformation(accuracies, numberOfStates, durations, mergesPerSec, merges, validMerges)
+	fmt.Println("--------------------------------------------------------------------------------------------")
 
 	if targetSize == 32 {
 		if successfulPercentage < 7 || successfulPercentage > 15 {
@@ -294,15 +279,10 @@ func TestBenchmarkWindowedEDSM(t *testing.T) {
 	}
 
 	successfulPercentage := (float64(winners) / float64(n)) * 100
-	fmt.Println("-----------------------------------------------------------------------------")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentage)
-	fmt.Printf("Accuracy - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Mean(), accuracies.PopulationStandardDev())
-	fmt.Printf("Number of States - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(numberOfStates.Min()), int(numberOfStates.Max()), int(math.Round(numberOfStates.Mean())), int(numberOfStates.PopulationStandardDev()))
-	fmt.Printf("Duration - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", durations.Min(), durations.Max(), durations.Mean(), durations.PopulationStandardDev())
-	fmt.Printf("Merges/s - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Mean(), mergesPerSec.PopulationStandardDev())
-	fmt.Printf("Attempted Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(merges.Min()), int(merges.Max()), int(math.Round(merges.Mean())), int(merges.PopulationStandardDev()))
-	fmt.Printf("Valid Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(validMerges.Min()), int(validMerges.Max()), int(math.Round(validMerges.Mean())), int(validMerges.PopulationStandardDev()))
-	fmt.Println("-----------------------------------------------------------------------------")
+	fmt.Println("--------------------------------------------------------------------------------------------")
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n\n", successfulPercentage)
+	PrintBenchmarkInformation(accuracies, numberOfStates, durations, mergesPerSec, merges, validMerges)
+	fmt.Println("--------------------------------------------------------------------------------------------")
 
 	if targetSize == 32 {
 		if successfulPercentage < 7 || successfulPercentage > 15 {
@@ -353,15 +333,10 @@ func TestBenchmarkBlueFringeEDSM(t *testing.T) {
 	}
 
 	successfulPercentage := (float64(winners) / float64(n)) * 100
-	fmt.Println("-----------------------------------------------------------------------------")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentage)
-	fmt.Printf("Accuracy - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", accuracies.Min(), accuracies.Max(), accuracies.Mean(), accuracies.PopulationStandardDev())
-	fmt.Printf("Number of States - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(numberOfStates.Min()), int(numberOfStates.Max()), int(math.Round(numberOfStates.Mean())), int(numberOfStates.PopulationStandardDev()))
-	fmt.Printf("Duration - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", durations.Min(), durations.Max(), durations.Mean(), durations.PopulationStandardDev())
-	fmt.Printf("Merges/s - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", mergesPerSec.Min(), mergesPerSec.Max(), mergesPerSec.Mean(), mergesPerSec.PopulationStandardDev())
-	fmt.Printf("Attempted Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(merges.Min()), int(merges.Max()), int(math.Round(merges.Mean())), int(merges.PopulationStandardDev()))
-	fmt.Printf("Valid Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(validMerges.Min()), int(validMerges.Max()), int(math.Round(validMerges.Mean())), int(validMerges.PopulationStandardDev()))
-	fmt.Println("-----------------------------------------------------------------------------")
+	fmt.Println("--------------------------------------------------------------------------------------------")
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n\n", successfulPercentage)
+	PrintBenchmarkInformation(accuracies, numberOfStates, durations, mergesPerSec, merges, validMerges)
+	fmt.Println("--------------------------------------------------------------------------------------------")
 
 	if targetSize == 32 {
 		if successfulPercentage < 7 || successfulPercentage > 15 {
@@ -456,43 +431,23 @@ func TestBenchmarkEDSM(t *testing.T) {
 	successfulPercentageWindowed := (float64(winnersWindowed) / float64(n)) * 100
 	successfulPercentageBlueFringe := (float64(winnersBlueFringe) / float64(n)) * 100
 
-	fmt.Println("-----------------------------------------------------------------------------")
+	fmt.Println("--------------------------------------------------------------------------------------------")
 	fmt.Println("Greedy Search")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageGreedy)
-	fmt.Printf("Accuracy - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", accuraciesGreedy.Min(), accuraciesGreedy.Max(), accuraciesGreedy.Mean(), accuraciesGreedy.PopulationStandardDev())
-	fmt.Printf("Number of States - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(numberOfStatesGreedy.Min()), int(numberOfStatesGreedy.Max()), int(math.Round(numberOfStatesGreedy.Mean())), int(numberOfStatesGreedy.PopulationStandardDev()))
-	fmt.Printf("Duration - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", durationGreedy.Min(), durationGreedy.Max(), durationGreedy.Mean(), durationGreedy.PopulationStandardDev())
-	fmt.Printf("Merges/s - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", mergesPerSecGreedy.Min(), mergesPerSecGreedy.Max(), mergesPerSecGreedy.Mean(), mergesPerSecGreedy.PopulationStandardDev())
-	fmt.Printf("Attempted Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(mergesGreedy.Min()), int(mergesGreedy.Max()), int(math.Round(mergesGreedy.Mean())), int(mergesGreedy.PopulationStandardDev()))
-	fmt.Printf("Valid Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(validMergesGreedy.Min()), int(validMergesGreedy.Max()), int(math.Round(validMergesGreedy.Mean())), int(validMergesGreedy.PopulationStandardDev()))
-	fmt.Println("-----------------------------------------------------------------------------")
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n\n", successfulPercentageGreedy)
+	PrintBenchmarkInformation(accuraciesGreedy, numberOfStatesGreedy, durationGreedy, mergesPerSecGreedy, mergesGreedy, validMergesGreedy)
+	fmt.Println("--------------------------------------------------------------------------------------------")
 	fmt.Println("Fast Windowed Search")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageFastWindowed)
-	fmt.Printf("Accuracy - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", accuraciesFastWindowed.Min(), accuraciesFastWindowed.Max(), accuraciesFastWindowed.Mean(), accuraciesFastWindowed.PopulationStandardDev())
-	fmt.Printf("Number of States - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(numberOfStatesFastWindowed.Min()), int(numberOfStatesFastWindowed.Max()), int(math.Round(numberOfStatesFastWindowed.Mean())), int(numberOfStatesFastWindowed.PopulationStandardDev()))
-	fmt.Printf("Duration - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", durationFastWindowed.Min(), durationFastWindowed.Max(), durationFastWindowed.Mean(), durationFastWindowed.PopulationStandardDev())
-	fmt.Printf("Merges/s - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", mergesPerSecFastWindowed.Min(), mergesPerSecFastWindowed.Max(), mergesPerSecFastWindowed.Mean(), mergesPerSecFastWindowed.PopulationStandardDev())
-	fmt.Printf("Attempted Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(mergesFastWindowed.Min()), int(mergesFastWindowed.Max()), int(math.Round(mergesFastWindowed.Mean())), int(mergesFastWindowed.PopulationStandardDev()))
-	fmt.Printf("Valid Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(validMergesFastWindowed.Min()), int(validMergesFastWindowed.Max()), int(math.Round(validMergesFastWindowed.Mean())), int(validMergesFastWindowed.PopulationStandardDev()))
-	fmt.Println("-----------------------------------------------------------------------------")
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n\n", successfulPercentageFastWindowed)
+	PrintBenchmarkInformation(accuraciesFastWindowed, numberOfStatesFastWindowed, durationFastWindowed, mergesPerSecFastWindowed, mergesFastWindowed, validMergesFastWindowed)
+	fmt.Println("--------------------------------------------------------------------------------------------")
 	fmt.Println("Windowed Search")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageWindowed)
-	fmt.Printf("Accuracy - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", accuraciesWindowed.Min(), accuraciesWindowed.Max(), accuraciesWindowed.Mean(), accuraciesWindowed.PopulationStandardDev())
-	fmt.Printf("Number of States - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(numberOfStatesWindowed.Min()), int(numberOfStatesWindowed.Max()), int(math.Round(numberOfStatesWindowed.Mean())), int(numberOfStatesWindowed.PopulationStandardDev()))
-	fmt.Printf("Duration - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", durationWindowed.Min(), durationWindowed.Max(), durationWindowed.Mean(), durationWindowed.PopulationStandardDev())
-	fmt.Printf("Merges/s - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", mergesPerSecWindowed.Min(), mergesPerSecWindowed.Max(), mergesPerSecWindowed.Mean(), mergesPerSecWindowed.PopulationStandardDev())
-	fmt.Printf("Attempted Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(mergesWindowed.Min()), int(mergesWindowed.Max()), int(math.Round(mergesWindowed.Mean())), int(mergesWindowed.PopulationStandardDev()))
-	fmt.Printf("Valid Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(validMergesWindowed.Min()), int(validMergesWindowed.Max()), int(math.Round(validMergesWindowed.Mean())), int(validMergesWindowed.PopulationStandardDev()))
-	fmt.Println("-----------------------------------------------------------------------------")
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n\n", successfulPercentageWindowed)
+	PrintBenchmarkInformation(accuraciesWindowed, numberOfStatesWindowed, durationWindowed, mergesPerSecWindowed, mergesWindowed, validMergesWindowed)
+	fmt.Println("--------------------------------------------------------------------------------------------")
 	fmt.Println("Blue-Fringe Search")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageBlueFringe)
-	fmt.Printf("Accuracy - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", accuraciesBlueFringe.Min(), accuraciesBlueFringe.Max(), accuraciesBlueFringe.Mean(), accuraciesBlueFringe.PopulationStandardDev())
-	fmt.Printf("Number of States - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(numberOfStatesBlueFringe.Min()), int(numberOfStatesBlueFringe.Max()), int(math.Round(numberOfStatesBlueFringe.Mean())), int(numberOfStatesBlueFringe.PopulationStandardDev()))
-	fmt.Printf("Duration - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", durationBlueFringe.Min(), durationBlueFringe.Max(), durationBlueFringe.Mean(), durationBlueFringe.PopulationStandardDev())
-	fmt.Printf("Merges/s - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", mergesPerSecBlueFringe.Min(), mergesPerSecBlueFringe.Max(), mergesPerSecBlueFringe.Mean(), mergesPerSecBlueFringe.PopulationStandardDev())
-	fmt.Printf("Attempted Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(mergesBlueFringe.Min()), int(mergesBlueFringe.Max()), int(math.Round(mergesBlueFringe.Mean())), int(mergesBlueFringe.PopulationStandardDev()))
-	fmt.Printf("Valid Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(validMergesBlueFringe.Min()), int(validMergesBlueFringe.Max()), int(math.Round(validMergesBlueFringe.Mean())), int(validMergesBlueFringe.PopulationStandardDev()))
-	fmt.Println("-----------------------------------------------------------------------------")
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n\n", successfulPercentageBlueFringe)
+	PrintBenchmarkInformation(accuraciesBlueFringe, numberOfStatesBlueFringe, durationBlueFringe, mergesPerSecBlueFringe, mergesBlueFringe, validMergesBlueFringe)
+	fmt.Println("--------------------------------------------------------------------------------------------")
 
 	if targetSize == 32 {
 		if successfulPercentageGreedy < 9 || successfulPercentageGreedy > 15 {
@@ -637,43 +592,23 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 	successfulPercentageWindowed := (float64(winnersWindowed) / float64(n)) * 100
 	successfulPercentageBlueFringe := (float64(winnersBlueFringe) / float64(n)) * 100
 
-	fmt.Println("-----------------------------------------------------------------------------")
+	fmt.Println("--------------------------------------------------------------------------------------------")
 	fmt.Println("Greedy Search")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageGreedy)
-	fmt.Printf("Accuracy - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", accuraciesGreedy.Min(), accuraciesGreedy.Max(), accuraciesGreedy.Mean(), accuraciesGreedy.PopulationStandardDev())
-	fmt.Printf("Number of States - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(numberOfStatesGreedy.Min()), int(numberOfStatesGreedy.Max()), int(math.Round(numberOfStatesGreedy.Mean())), int(numberOfStatesGreedy.PopulationStandardDev()))
-	fmt.Printf("Duration - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", durationGreedy.Min(), durationGreedy.Max(), durationGreedy.Mean(), durationGreedy.PopulationStandardDev())
-	fmt.Printf("Merges/s - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", mergesPerSecGreedy.Min(), mergesPerSecGreedy.Max(), mergesPerSecGreedy.Mean(), mergesPerSecGreedy.PopulationStandardDev())
-	fmt.Printf("Attempted Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(mergesGreedy.Min()), int(mergesGreedy.Max()), int(math.Round(mergesGreedy.Mean())), int(mergesGreedy.PopulationStandardDev()))
-	fmt.Printf("Valid Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(validMergesGreedy.Min()), int(validMergesGreedy.Max()), int(math.Round(validMergesGreedy.Mean())), int(validMergesGreedy.PopulationStandardDev()))
-	fmt.Println("-----------------------------------------------------------------------------")
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n\n", successfulPercentageGreedy)
+	PrintBenchmarkInformation(accuraciesGreedy, numberOfStatesGreedy, durationGreedy, mergesPerSecGreedy, mergesGreedy, validMergesGreedy)
+	fmt.Println("--------------------------------------------------------------------------------------------")
 	fmt.Println("Fast Windowed Search")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageFastWindowed)
-	fmt.Printf("Accuracy - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", accuraciesFastWindowed.Min(), accuraciesFastWindowed.Max(), accuraciesFastWindowed.Mean(), accuraciesFastWindowed.PopulationStandardDev())
-	fmt.Printf("Number of States - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(numberOfStatesFastWindowed.Min()), int(numberOfStatesFastWindowed.Max()), int(math.Round(numberOfStatesFastWindowed.Mean())), int(numberOfStatesFastWindowed.PopulationStandardDev()))
-	fmt.Printf("Duration - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", durationFastWindowed.Min(), durationFastWindowed.Max(), durationFastWindowed.Mean(), durationFastWindowed.PopulationStandardDev())
-	fmt.Printf("Merges/s - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", mergesPerSecFastWindowed.Min(), mergesPerSecFastWindowed.Max(), mergesPerSecFastWindowed.Mean(), mergesPerSecFastWindowed.PopulationStandardDev())
-	fmt.Printf("Attempted Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(mergesFastWindowed.Min()), int(mergesFastWindowed.Max()), int(math.Round(mergesFastWindowed.Mean())), int(mergesFastWindowed.PopulationStandardDev()))
-	fmt.Printf("Valid Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(validMergesFastWindowed.Min()), int(validMergesFastWindowed.Max()), int(math.Round(validMergesFastWindowed.Mean())), int(validMergesFastWindowed.PopulationStandardDev()))
-	fmt.Println("-----------------------------------------------------------------------------")
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n\n", successfulPercentageFastWindowed)
+	PrintBenchmarkInformation(accuraciesFastWindowed, numberOfStatesFastWindowed, durationFastWindowed, mergesPerSecFastWindowed, mergesFastWindowed, validMergesFastWindowed)
+	fmt.Println("--------------------------------------------------------------------------------------------")
 	fmt.Println("Windowed Search")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageWindowed)
-	fmt.Printf("Accuracy - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", accuraciesWindowed.Min(), accuraciesWindowed.Max(), accuraciesWindowed.Mean(), accuraciesWindowed.PopulationStandardDev())
-	fmt.Printf("Number of States - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(numberOfStatesWindowed.Min()), int(numberOfStatesWindowed.Max()), int(math.Round(numberOfStatesWindowed.Mean())), int(numberOfStatesWindowed.PopulationStandardDev()))
-	fmt.Printf("Duration - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", durationWindowed.Min(), durationWindowed.Max(), durationWindowed.Mean(), durationWindowed.PopulationStandardDev())
-	fmt.Printf("Merges/s - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", mergesPerSecWindowed.Min(), mergesPerSecWindowed.Max(), mergesPerSecWindowed.Mean(), mergesPerSecWindowed.PopulationStandardDev())
-	fmt.Printf("Attempted Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(mergesWindowed.Min()), int(mergesWindowed.Max()), int(math.Round(mergesWindowed.Mean())), int(mergesWindowed.PopulationStandardDev()))
-	fmt.Printf("Valid Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(validMergesWindowed.Min()), int(validMergesWindowed.Max()), int(math.Round(validMergesWindowed.Mean())), int(validMergesWindowed.PopulationStandardDev()))
-	fmt.Println("-----------------------------------------------------------------------------")
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n\n", successfulPercentageWindowed)
+	PrintBenchmarkInformation(accuraciesWindowed, numberOfStatesWindowed, durationWindowed, mergesPerSecWindowed, mergesWindowed, validMergesWindowed)
+	fmt.Println("--------------------------------------------------------------------------------------------")
 	fmt.Println("Blue-Fringe Search")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n", successfulPercentageBlueFringe)
-	fmt.Printf("Accuracy - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", accuraciesBlueFringe.Min(), accuraciesBlueFringe.Max(), accuraciesBlueFringe.Mean(), accuraciesBlueFringe.PopulationStandardDev())
-	fmt.Printf("Number of States - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(numberOfStatesBlueFringe.Min()), int(numberOfStatesBlueFringe.Max()), int(math.Round(numberOfStatesBlueFringe.Mean())), int(numberOfStatesBlueFringe.PopulationStandardDev()))
-	fmt.Printf("Duration - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", durationBlueFringe.Min(), durationBlueFringe.Max(), durationBlueFringe.Mean(), durationBlueFringe.PopulationStandardDev())
-	fmt.Printf("Merges/s - Min: %.2f, Max: %.2f, Avg: %.2f, Standard Dev: %.2f\n", mergesPerSecBlueFringe.Min(), mergesPerSecBlueFringe.Max(), mergesPerSecBlueFringe.Mean(), mergesPerSecBlueFringe.PopulationStandardDev())
-	fmt.Printf("Attempted Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(mergesBlueFringe.Min()), int(mergesBlueFringe.Max()), int(math.Round(mergesBlueFringe.Mean())), int(mergesBlueFringe.PopulationStandardDev()))
-	fmt.Printf("Valid Merges - Min: %d, Max: %d, Avg: %d, Standard Dev: %d\n", int(validMergesBlueFringe.Min()), int(validMergesBlueFringe.Max()), int(math.Round(validMergesBlueFringe.Mean())), int(validMergesBlueFringe.PopulationStandardDev()))
-	fmt.Println("-----------------------------------------------------------------------------")
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n\n", successfulPercentageBlueFringe)
+	PrintBenchmarkInformation(accuraciesBlueFringe, numberOfStatesBlueFringe, durationBlueFringe, mergesPerSecBlueFringe, mergesBlueFringe, validMergesBlueFringe)
+	fmt.Println("--------------------------------------------------------------------------------------------")
 
 	if targetSize == 32 {
 		if successfulPercentageGreedy < 9 || successfulPercentageGreedy > 15 {
