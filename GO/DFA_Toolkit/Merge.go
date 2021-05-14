@@ -16,11 +16,11 @@ type StatePairScore struct {
 // ScoringFunction takes two stateIDs and two state partitions as input and returns a score as a float.
 type ScoringFunction func(stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition) float64
 
-// GreedySearch deterministically merges all possible state pairs.
+// ExhaustiveSearch deterministically merges all possible state pairs.
 // The first valid merge with respect to the rejecting examples is chosen.
 // Returns the resultant state partition and search data when no more valid merges are possible.
 // Used by the regular positive and negative inference (RPNI) algorithm
-func GreedySearch(statePartition StatePartition) (StatePartition, SearchData) {
+func ExhaustiveSearch(statePartition StatePartition) (StatePartition, SearchData) {
 	// Clone StatePartition.
 	statePartition = statePartition.Clone()
 	// Copy the state partition for undoing and copying changed states.
@@ -75,10 +75,10 @@ func GreedySearch(statePartition StatePartition) (StatePartition, SearchData) {
 	return statePartition, searchData
 }
 
-// GreedySearchUsingScoringFunction deterministically merges all possible state pairs.
+// ExhaustiveSearchUsingScoringFunction deterministically merges all possible state pairs.
 // The state pair to be merged is chosen using a scoring function passed as a parameter.
 // Returns the resultant state partition and search data when no more valid merges are possible.
-func GreedySearchUsingScoringFunction(statePartition StatePartition, scoringFunction ScoringFunction) (StatePartition, SearchData) {
+func ExhaustiveSearchUsingScoringFunction(statePartition StatePartition, scoringFunction ScoringFunction) (StatePartition, SearchData) {
 	// Clone StatePartition.
 	statePartition = statePartition.Clone()
 	// Copy the state partition for undoing and copying changed states.
@@ -413,9 +413,6 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 	// Start timer.
 	start := time.Now()
 
-	// Slice of state pairs to keep track of computed scores.
-	scoresComputed := map[StateIDPair]util.Void{}
-
 	// Initialize set of red states to starting state.
 	redSet := map[int]util.Void{statePartition.StartingBlock(): util.Null}
 	// Slice to store red states in insertion order.
@@ -435,45 +432,32 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 			merged = false
 			// Iterate over every red state in insertion order.
 			for _, redElement := range redStates {
-				// If scores for the current state pair has already been
-				// computed, set merged flag to true and skip merge.
-				if _, valid := scoresComputed[StateIDPair{blueElement, redElement}]; valid {
-					merged = true
-				} else {
-					// If scores for the current state pair has not
-					// been computed, attempt to merge state pair.
+				// Increment merge count.
+				totalMerges++
+				// If states are mergeable, calculate score and add to detMerges.
+				if copiedPartition.MergeStates(blueElement, redElement) {
+					// Increment valid merge count.
+					totalValidMerges++
 
-					// Increment merge count.
-					totalMerges++
-					// If states are mergeable, calculate score and add to detMerges.
-					if copiedPartition.MergeStates(blueElement, redElement) {
-						// Increment valid merge count.
-						totalValidMerges++
+					// Calculate score.
+					score := scoringFunction(blueElement, redElement, statePartition, copiedPartition)
 
-						// Set the state pairs score as computed.
-						scoresComputed[StateIDPair{blueElement, redElement}] = util.Null
-						scoresComputed[StateIDPair{redElement, blueElement}] = util.Null
-
-						// Calculate score.
-						score := scoringFunction(blueElement, redElement, statePartition, copiedPartition)
-
-						// If score is bigger than state pair with the highest score,
-						// set current state pair to state pair with the highest score.
-						if score > highestScoringStatePair.Score {
-							highestScoringStatePair = StatePairScore{
-								State1: blueElement,
-								State2: redElement,
-								Score:  score,
-							}
+					// If score is bigger than state pair with the highest score,
+					// set current state pair to state pair with the highest score.
+					if score > highestScoringStatePair.Score {
+						highestScoringStatePair = StatePairScore{
+							State1: blueElement,
+							State2: redElement,
+							Score:  score,
 						}
-
-						// Set merged flag to true.
-						merged = true
 					}
 
-					// Undo merge.
-					copiedPartition.RollbackChangesFrom(statePartition)
+					// Set merged flag to true.
+					merged = true
 				}
+
+				// Undo merge.
+				copiedPartition.RollbackChangesFrom(statePartition)
 			}
 
 			// If merged flag is false, add current blue state
@@ -497,9 +481,6 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 
 			// Remove previous state pair with the highest score.
 			highestScoringStatePair = StatePairScore{-1, -1, -1}
-
-			// Slice of state pairs to keep track of computed scores.
-			scoresComputed = map[StateIDPair]util.Void{}
 		}
 
 		// Update slice and map of ordered red states.

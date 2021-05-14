@@ -129,8 +129,8 @@ func TestBenchmarkRPNI(t *testing.T) {
 	}
 }
 
-// TestBenchmarkGreedyEDSM benchmarks the performance of the GreedyEDSMFromDataset() function.
-func TestBenchmarkGreedyEDSM(t *testing.T) {
+// TestBenchmarkExhaustiveEDSM benchmarks the performance of the ExhaustiveEDSMFromDataset() function.
+func TestBenchmarkExhaustiveEDSM(t *testing.T) {
 	// Random Seed.
 	rand.Seed(time.Now().UnixNano())
 
@@ -155,7 +155,7 @@ func TestBenchmarkGreedyEDSM(t *testing.T) {
 		// Create a target DFA, training set, and testing set.
 		_, trainingSet, testingSet := dfatoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
 
-		resultantDFA, searchData := dfatoolkit.GreedyEDSMFromDataset(trainingSet)
+		resultantDFA, searchData := dfatoolkit.ExhaustiveEDSMFromDataset(trainingSet)
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		accuracies.Add(accuracy)
@@ -345,7 +345,7 @@ func TestBenchmarkBlueFringeEDSM(t *testing.T) {
 	}
 }
 
-// TestBenchmarkEDSM benchmarks the performance of the GreedyEDSMFromDataset(), FastWindowedEDSMFromDataset(),
+// TestBenchmarkEDSM benchmarks the performance of the ExhaustiveEDSMFromDataset(), FastWindowedEDSMFromDataset(),
 // WindowedEDSMFromDataset() and BlueFringeEDSMFromDataset() functions while comparing their performance.
 func TestBenchmarkEDSM(t *testing.T) {
 	// Random Seed.
@@ -359,13 +359,13 @@ func TestBenchmarkEDSM(t *testing.T) {
 	trainingSetSize, testingSetSize := 607, 1800
 
 	// Initialize values.
-	winnersGreedy, winnersFastWindowed, winnersWindowed, winnersBlueFringe := 0, 0, 0, 0
-	accuraciesGreedy, accuraciesFastWindowed, accuraciesWindowed, accuraciesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
-	numberOfStatesGreedy, numberOfStatesFastWindowed, numberOfStatesWindowed, numberOfStatesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
-	durationGreedy, durationFastWindowed, durationWindowed, durationBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
-	mergesPerSecGreedy, mergesPerSecFastWindowed, mergesPerSecWindowed, mergesPerSecBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
-	mergesGreedy, mergesFastWindowed, mergesWindowed, mergesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
-	validMergesGreedy, validMergesFastWindowed, validMergesWindowed, validMergesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	winnersExhaustive, winnersFastWindowed, winnersWindowed, winnersBlueFringe := 0, 0, 0, 0
+	accuraciesExhaustive, accuraciesFastWindowed, accuraciesWindowed, accuraciesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	numberOfStatesExhaustive, numberOfStatesFastWindowed, numberOfStatesWindowed, numberOfStatesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	durationExhaustive, durationFastWindowed, durationWindowed, durationBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	mergesPerSecExhaustive, mergesPerSecFastWindowed, mergesPerSecWindowed, mergesPerSecBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	mergesExhaustive, mergesFastWindowed, mergesWindowed, mergesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	validMergesExhaustive, validMergesFastWindowed, validMergesWindowed, validMergesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
 
 	for i := 0; i < n; i++ {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
@@ -373,17 +373,17 @@ func TestBenchmarkEDSM(t *testing.T) {
 		// Create a target DFA, training set, and testing set.
 		_, trainingSet, testingSet := dfatoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
 
-		// Greedy
-		resultantDFA, searchData := dfatoolkit.GreedyEDSMFromDataset(trainingSet)
-		durationGreedy.Add(searchData.Duration.Seconds())
-		mergesPerSecGreedy.Add(searchData.AttemptedMergesPerSecond())
+		// Exhaustive
+		resultantDFA, searchData := dfatoolkit.ExhaustiveEDSMFromDataset(trainingSet)
+		durationExhaustive.Add(searchData.Duration.Seconds())
+		mergesPerSecExhaustive.Add(searchData.AttemptedMergesPerSecond())
 		accuracy := resultantDFA.Accuracy(testingSet)
-		accuraciesGreedy.Add(accuracy)
-		numberOfStatesGreedy.AddInt(len(resultantDFA.States))
-		mergesGreedy.AddInt(searchData.AttemptedMergesCount)
-		validMergesGreedy.AddInt(searchData.ValidMergesCount)
+		accuraciesExhaustive.Add(accuracy)
+		numberOfStatesExhaustive.AddInt(len(resultantDFA.States))
+		mergesExhaustive.AddInt(searchData.AttemptedMergesCount)
+		validMergesExhaustive.AddInt(searchData.ValidMergesCount)
 		if accuracy >= 0.99 {
-			winnersGreedy++
+			winnersExhaustive++
 		}
 
 		// Fast Windowed
@@ -426,15 +426,15 @@ func TestBenchmarkEDSM(t *testing.T) {
 		}
 	}
 
-	successfulPercentageGreedy := (float64(winnersGreedy) / float64(n)) * 100
+	successfulPercentageExhaustive := (float64(winnersExhaustive) / float64(n)) * 100
 	successfulPercentageFastWindowed := (float64(winnersFastWindowed) / float64(n)) * 100
 	successfulPercentageWindowed := (float64(winnersWindowed) / float64(n)) * 100
 	successfulPercentageBlueFringe := (float64(winnersBlueFringe) / float64(n)) * 100
 
 	fmt.Println("--------------------------------------------------------------------------------------------")
-	fmt.Println("Greedy Search")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n\n", successfulPercentageGreedy)
-	PrintBenchmarkInformation(accuraciesGreedy, numberOfStatesGreedy, durationGreedy, mergesPerSecGreedy, mergesGreedy, validMergesGreedy)
+	fmt.Println("Exhaustive Search")
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n\n", successfulPercentageExhaustive)
+	PrintBenchmarkInformation(accuraciesExhaustive, numberOfStatesExhaustive, durationExhaustive, mergesPerSecExhaustive, mergesExhaustive, validMergesExhaustive)
 	fmt.Println("--------------------------------------------------------------------------------------------")
 	fmt.Println("Fast Windowed Search")
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n\n", successfulPercentageFastWindowed)
@@ -450,8 +450,8 @@ func TestBenchmarkEDSM(t *testing.T) {
 	fmt.Println("--------------------------------------------------------------------------------------------")
 
 	if targetSize == 32 {
-		if successfulPercentageGreedy < 9 || successfulPercentageGreedy > 15 {
-			t.Error("The percentage of successful DFAs for Greedy EDSM is less than 9% or bigger than 15%.")
+		if successfulPercentageExhaustive < 9 || successfulPercentageExhaustive > 15 {
+			t.Error("The percentage of successful DFAs for Exhaustive EDSM is less than 9% or bigger than 15%.")
 		}
 
 		if successfulPercentageFastWindowed < 7 || successfulPercentageFastWindowed > 15 {
@@ -468,7 +468,7 @@ func TestBenchmarkEDSM(t *testing.T) {
 	}
 }
 
-// TestBenchmarkEDSM concurrently benchmarks the performance of the GreedyEDSM(), FastWindowedEDSM(),
+// TestBenchmarkEDSM concurrently benchmarks the performance of the ExhaustiveEDSM(), FastWindowedEDSM(),
 // WindowedEDSM() and BlueFringeEDSM() functions while comparing their performance.
 func TestBenchmarkFastEDSM(t *testing.T) {
 	// Random Seed.
@@ -482,13 +482,13 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 	trainingSetSize, testingSetSize := 607, 1800
 
 	// Initialize values.
-	winnersGreedy, winnersFastWindowed, winnersWindowed, winnersBlueFringe := 0, 0, 0, 0
-	accuraciesGreedy, accuraciesFastWindowed, accuraciesWindowed, accuraciesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
-	numberOfStatesGreedy, numberOfStatesFastWindowed, numberOfStatesWindowed, numberOfStatesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
-	durationGreedy, durationFastWindowed, durationWindowed, durationBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
-	mergesPerSecGreedy, mergesPerSecFastWindowed, mergesPerSecWindowed, mergesPerSecBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
-	mergesGreedy, mergesFastWindowed, mergesWindowed, mergesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
-	validMergesGreedy, validMergesFastWindowed, validMergesWindowed, validMergesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	winnersExhaustive, winnersFastWindowed, winnersWindowed, winnersBlueFringe := 0, 0, 0, 0
+	accuraciesExhaustive, accuraciesFastWindowed, accuraciesWindowed, accuraciesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	numberOfStatesExhaustive, numberOfStatesFastWindowed, numberOfStatesWindowed, numberOfStatesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	durationExhaustive, durationFastWindowed, durationWindowed, durationBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	mergesPerSecExhaustive, mergesPerSecFastWindowed, mergesPerSecWindowed, mergesPerSecBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	mergesExhaustive, mergesFastWindowed, mergesWindowed, mergesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
+	validMergesExhaustive, validMergesFastWindowed, validMergesWindowed, validMergesBlueFringe := util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker(), util.NewStatsTracker()
 
 	for i := 0; i < n; i++ {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
@@ -504,14 +504,14 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 		// Add 4 EDSM types to wait group.
 		wg.Add(4)
 
-		resultantDFAGreedy, resultantDFAFastWindowed, resultantDFAWindowed, resultantDFABlueFringe := dfatoolkit.DFA{}, dfatoolkit.DFA{}, dfatoolkit.DFA{}, dfatoolkit.DFA{}
-		searchDataGreedy, searchDataFastWindowed, searchDataWindowed, searchDataBlueFringe := dfatoolkit.SearchData{}, dfatoolkit.SearchData{}, dfatoolkit.SearchData{}, dfatoolkit.SearchData{}
+		resultantDFAExhaustive, resultantDFAFastWindowed, resultantDFAWindowed, resultantDFABlueFringe := dfatoolkit.DFA{}, dfatoolkit.DFA{}, dfatoolkit.DFA{}, dfatoolkit.DFA{}
+		searchDataExhaustive, searchDataFastWindowed, searchDataWindowed, searchDataBlueFringe := dfatoolkit.SearchData{}, dfatoolkit.SearchData{}, dfatoolkit.SearchData{}, dfatoolkit.SearchData{}
 
-		// Greedy
+		// Exhaustive
 		go func() {
 			// Decrement 1 from wait group.
 			defer wg.Done()
-			resultantDFAGreedy, searchDataGreedy = dfatoolkit.GreedyEDSM(APTA)
+			resultantDFAExhaustive, searchDataExhaustive = dfatoolkit.ExhaustiveEDSM(APTA)
 		}()
 
 		// Fast Windowed
@@ -538,16 +538,16 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 		// Wait for all go routines within wait group to finish executing.
 		wg.Wait()
 
-		// Greedy
-		durationGreedy.Add(searchDataGreedy.Duration.Seconds())
-		mergesPerSecGreedy.Add(searchDataGreedy.AttemptedMergesPerSecond())
-		accuracy := resultantDFAGreedy.Accuracy(testingSet)
-		accuraciesGreedy.Add(accuracy)
-		numberOfStatesGreedy.AddInt(len(resultantDFAGreedy.States))
-		mergesGreedy.AddInt(searchDataGreedy.AttemptedMergesCount)
-		validMergesGreedy.AddInt(searchDataGreedy.ValidMergesCount)
+		// Exhaustive
+		durationExhaustive.Add(searchDataExhaustive.Duration.Seconds())
+		mergesPerSecExhaustive.Add(searchDataExhaustive.AttemptedMergesPerSecond())
+		accuracy := resultantDFAExhaustive.Accuracy(testingSet)
+		accuraciesExhaustive.Add(accuracy)
+		numberOfStatesExhaustive.AddInt(len(resultantDFAExhaustive.States))
+		mergesExhaustive.AddInt(searchDataExhaustive.AttemptedMergesCount)
+		validMergesExhaustive.AddInt(searchDataExhaustive.ValidMergesCount)
 		if accuracy >= 0.99 {
-			winnersGreedy++
+			winnersExhaustive++
 		}
 
 		// Fast Windowed
@@ -587,15 +587,15 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 		}
 	}
 
-	successfulPercentageGreedy := (float64(winnersGreedy) / float64(n)) * 100
+	successfulPercentageExhaustive := (float64(winnersExhaustive) / float64(n)) * 100
 	successfulPercentageFastWindowed := (float64(winnersFastWindowed) / float64(n)) * 100
 	successfulPercentageWindowed := (float64(winnersWindowed) / float64(n)) * 100
 	successfulPercentageBlueFringe := (float64(winnersBlueFringe) / float64(n)) * 100
 
 	fmt.Println("--------------------------------------------------------------------------------------------")
-	fmt.Println("Greedy Search")
-	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n\n", successfulPercentageGreedy)
-	PrintBenchmarkInformation(accuraciesGreedy, numberOfStatesGreedy, durationGreedy, mergesPerSecGreedy, mergesGreedy, validMergesGreedy)
+	fmt.Println("Exhaustive Search")
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n\n", successfulPercentageExhaustive)
+	PrintBenchmarkInformation(accuraciesExhaustive, numberOfStatesExhaustive, durationExhaustive, mergesPerSecExhaustive, mergesExhaustive, validMergesExhaustive)
 	fmt.Println("--------------------------------------------------------------------------------------------")
 	fmt.Println("Fast Windowed Search")
 	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n\n", successfulPercentageFastWindowed)
@@ -611,8 +611,8 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 	fmt.Println("--------------------------------------------------------------------------------------------")
 
 	if targetSize == 32 {
-		if successfulPercentageGreedy < 9 || successfulPercentageGreedy > 15 {
-			t.Error("The percentage of successful DFAs for Greedy EDSM is less than 9% or bigger than 15%.")
+		if successfulPercentageExhaustive < 9 || successfulPercentageExhaustive > 15 {
+			t.Error("The percentage of successful DFAs for Exhaustive EDSM is less than 9% or bigger than 15%.")
 		}
 
 		if successfulPercentageFastWindowed < 7 || successfulPercentageFastWindowed > 15 {

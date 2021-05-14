@@ -1,5 +1,13 @@
 package dfatoolkit
 
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"os"
+)
+
 // Block struct which represents a block within a partition.
 type Block struct {
 	Root        int        // Parent block of state.
@@ -523,4 +531,117 @@ func (statePartition *StatePartition) DepthOfBlocks() map[int]int{
 	}
 
 	return result
+}
+
+// OrderOfBlocks returns the order of each block.
+func (statePartition *StatePartition) OrderOfBlocks() map[int]int{
+	// Map of integer values to keep track of ordered blocks.
+	orderedBlocks := make(map[int]int, statePartition.BlocksCount)
+
+	// Get starting block ID.
+	startingBlock := statePartition.StartingBlock()
+	// Create a FIFO queue with starting block.
+	queue := []int{startingBlock}
+	// Add starting block to ordered blocks.
+	orderedBlocks[startingBlock] = 0
+	// Set index to 1.
+	index := 1
+
+	// Loop until queue is empty.
+	for len(queue) > 0 {
+		// Remove and store first state in queue.
+		blockID := queue[0]
+		queue = queue[1:]
+
+		// Iterate over each symbol (alphabet) within DFA.
+		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
+			// If transition from current state using current symbol is valid.
+			if childStateID := statePartition.Blocks[blockID].Transitions[symbol]; childStateID != -1 {
+				// Get block ID of child state.
+				childBlockID := statePartition.Find(childStateID)
+				// If depth for child block has been computed, skip block.
+				if _, exists := orderedBlocks[childBlockID]; !exists {
+					// Add child block to queue.
+					queue = append(queue, childBlockID)
+					// Set the order of the current block.
+					orderedBlocks[childBlockID] = index
+					// Increment current block order.
+					index++
+				}
+			}
+		}
+	}
+
+	return orderedBlocks
+}
+
+// ToJSON saves the StatePartition to a JSON file given a file path.
+func (statePartition StatePartition) ToJSON(filePath string) bool {
+	// Create file given a path/name.
+	file, err := os.Create(filePath)
+
+	// If file was not created successfully,
+	// print error and return false.
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	// Close file at end of function.
+	defer file.Close()
+
+	// Convert StatePartition to JSON.
+	resultantJSON, err := json.MarshalIndent(statePartition, "", "\t")
+
+	// If StatePartition was not converted successfully,
+	// print error and return false.
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	// Copy JSON to file created.
+	_, err = io.Copy(file, bytes.NewReader(resultantJSON))
+
+	// If JSON was not copied successfully,
+	// print error and return false.
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	// Return true if reached.
+	return true
+}
+
+// StatePartitionFromJSON returns a StatePartition read from a JSON file
+// given a file path. The boolean value returned is set to
+// true if DFA was read successfully.
+func StatePartitionFromJSON(filePath string) (StatePartition, bool) {
+	// Open file from given a path/name.
+	file, err := os.Open(filePath)
+
+	// If file was not opened successfully,
+	// return empty DFA and false.
+	if err != nil {
+		return StatePartition{}, false
+	}
+
+	// Close file at end of function.
+	defer file.Close()
+
+	// Initialize empty StatePartition.
+	resultantStatePartition := StatePartition{}
+
+	// Convert JSON to StatePartition.
+	err = json.NewDecoder(file).Decode(&resultantStatePartition)
+
+	// If JSON was not converted successfully,
+	// return empty StatePartition and false.
+	if err != nil {
+		return StatePartition{}, false
+	}
+
+	// Return populated StatePartition and true if reached.
+	return resultantStatePartition, true
 }
