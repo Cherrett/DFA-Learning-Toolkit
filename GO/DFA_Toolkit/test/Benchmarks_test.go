@@ -319,8 +319,11 @@ func TestBenchmarkEDSM(t *testing.T) {
 		// Create a target DFA, training set, and testing set.
 		_, trainingSet, testingSet := dfatoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
 
+		// Construct an APTA from training dataset.
+		APTA := trainingSet.GetPTA(true)
+
 		// Exhaustive
-		resultantDFA, searchData := dfatoolkit.ExhaustiveEDSMFromDataset(trainingSet)
+		resultantDFA, searchData := dfatoolkit.ExhaustiveEDSM(APTA)
 		durationExhaustive.Add(searchData.Duration.Seconds())
 		mergesPerSecExhaustive.Add(searchData.AttemptedMergesPerSecond())
 		accuracy := resultantDFA.Accuracy(testingSet)
@@ -333,7 +336,7 @@ func TestBenchmarkEDSM(t *testing.T) {
 		}
 
 		// Windowed
-		resultantDFA, searchData = dfatoolkit.WindowedEDSMFromDataset(trainingSet, targetSize*2, 2.0)
+		resultantDFA, searchData = dfatoolkit.WindowedEDSM(APTA, targetSize*2, 2.0)
 		durationWindowed.Add(searchData.Duration.Seconds())
 		mergesPerSecWindowed.Add(searchData.AttemptedMergesPerSecond())
 		accuracy = resultantDFA.Accuracy(testingSet)
@@ -346,7 +349,7 @@ func TestBenchmarkEDSM(t *testing.T) {
 		}
 
 		// Blue-Fringe
-		resultantDFA, searchData = dfatoolkit.BlueFringeEDSMFromDataset(trainingSet)
+		resultantDFA, searchData = dfatoolkit.BlueFringeEDSM(APTA)
 		durationBlueFringe.Add(searchData.Duration.Seconds())
 		mergesPerSecBlueFringe.Add(searchData.AttemptedMergesPerSecond())
 		accuracy = resultantDFA.Accuracy(testingSet)

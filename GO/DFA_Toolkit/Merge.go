@@ -38,9 +38,6 @@ func ExhaustiveSearch(statePartition StatePartition) (StatePartition, SearchData
 	// Deterministically merge all valid merges by
 	// iterating over root blocks within partition.
 	for i := 1; i < len(orderedBlocks); i++ {
-		//if copiedPartition.Blocks[i].Root != i{
-		//	continue
-		//}
 		for j := 0; j < i; j++ {
 			// Increment merge count.
 			totalMerges++
@@ -317,7 +314,7 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 	redStates := []int{statePartition.StartingBlock()}
 
 	// Generated slice of ordered blue states from red states.
-	blueStates := GenerateBlueSetFromRedSet(statePartition, redSet)
+	blueStates := GenerateBlueSetFromRedSet(&statePartition, redSet)
 
 	// Initialize merged flag to false.
 	merged := false
@@ -384,10 +381,10 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 		// Update slice and map of ordered red states.
 		// This is done since partition may have changed
 		// or states have been added to the red set.
-		redSet, redStates = UpdateRedSet(statePartition, redSet)
+		redSet, redStates = UpdateRedSet(&statePartition, redSet)
 
 		// Generated slice of ordered blue states from red states.
-		blueStates = GenerateBlueSetFromRedSet(statePartition, redSet)
+		blueStates = GenerateBlueSetFromRedSet(&statePartition, redSet)
 	}
 
 	// Add total and valid merges counts to search data.
@@ -402,7 +399,7 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 
 // GenerateBlueSetFromRedSet generates the blue set given the state partition and the red set within the Red-Blue framework
 // such as the BlueFringeSearchUsingScoringFunction function. It generates and returns the blue set in canonical order.
-func GenerateBlueSetFromRedSet(statePartition StatePartition, redSet map[int]util.Void) []int {
+func GenerateBlueSetFromRedSet(statePartition *StatePartition, redSet map[int]util.Void) []int {
 	// Step 1 - Gather all blue states and store in map declared below.
 
 	// Initialize set of blue states to empty set.
@@ -479,7 +476,7 @@ func GenerateBlueSetFromRedSet(statePartition StatePartition, redSet map[int]uti
 // UpdateRedSet updates the red set given the state partition and the red set within the Red-Blue framework such as the
 // BlueFringeSearchUsingScoringFunction function. It returns the red set in canonical order. This is used when the state
 // partition is changed or when new states have been added to the red set.
-func UpdateRedSet(statePartition StatePartition, redSet map[int]util.Void) (map[int]util.Void, []int) {
+func UpdateRedSet(statePartition *StatePartition, redSet map[int]util.Void) (map[int]util.Void, []int) {
 	// Step 1 - Gather root of old red states and store in map declared below.
 
 	// Initialize set of red root states (blocks) to empty set.

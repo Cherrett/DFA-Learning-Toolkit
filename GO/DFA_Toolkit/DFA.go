@@ -292,11 +292,14 @@ func (dfa DFA) IsTree() bool {
 	var visitedStates = make(map[int]bool)
 
 	for stateID := range dfa.States {
-		for symbol := range dfa.States[stateID].Transitions {
-			if dfa.States[stateID].Transitions[symbol] != -1 && visitedStates[dfa.States[stateID].Transitions[symbol]] {
-				return false
+		for symbol := range dfa.Alphabet {
+			resultantStateID := dfa.States[stateID].Transitions[symbol]
+			if resultantStateID != -1{
+				if visitedStates[resultantStateID]{
+					return false
+				}
+				visitedStates[resultantStateID] = true
 			}
-			visitedStates[dfa.States[stateID].Transitions[symbol]] = true
 		}
 	}
 
