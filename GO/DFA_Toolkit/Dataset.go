@@ -43,10 +43,10 @@ func (dataset Dataset) GetPTA(APTA bool) DFA {
 		} else if APTA {
 			currentStateID = dfa.AddState(REJECTING)
 		} else {
-			currentStateID = dfa.AddState(UNKNOWN)
+			currentStateID = dfa.AddState(UNLABELLED)
 		}
 	} else {
-		currentStateID = dfa.AddState(UNKNOWN)
+		currentStateID = dfa.AddState(UNLABELLED)
 	}
 
 	// Set starting state ID within DFA to current state ID.
@@ -114,7 +114,7 @@ func (dataset Dataset) GetPTA(APTA bool) DFA {
 					}
 					// If not last symbol in string, add an unknown state.
 				} else {
-					newStateID = dfa.AddState(UNKNOWN)
+					newStateID = dfa.AddState(UNLABELLED)
 				}
 				// Add a new transition from current state to newly created state.
 				dfa.AddTransition(symbol, currentStateID, newStateID)
@@ -348,7 +348,7 @@ func (stringInstance StringInstance) ParseToStateLabel(dfa DFA) StateLabel {
 			// Check if last symbol in string.
 			if count == stringInstance.Length() {
 				// If state is unknown or rejecting, return rejecting.
-				if dfa.States[currentStateID].Label == UNKNOWN || dfa.States[currentStateID].Label == REJECTING {
+				if dfa.States[currentStateID].Label == UNLABELLED || dfa.States[currentStateID].Label == REJECTING {
 					return REJECTING
 				}
 				// Else, if state is accepting, return accepting.

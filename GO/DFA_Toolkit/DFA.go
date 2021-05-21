@@ -130,7 +130,7 @@ func (dfa DFA) LabelledStates() []int {
 	var labelledStates []int
 
 	for stateID := range dfa.States {
-		if dfa.States[stateID].Label != UNKNOWN {
+		if dfa.States[stateID].Label != UNLABELLED {
 			labelledStates = append(labelledStates, stateID)
 		}
 	}
@@ -167,7 +167,7 @@ func (dfa DFA) UnknownStates() []int {
 	var acceptingStates []int
 
 	for stateID := range dfa.States {
-		if dfa.States[stateID].Label == UNKNOWN {
+		if dfa.States[stateID].Label == UNLABELLED {
 			acceptingStates = append(acceptingStates, stateID)
 		}
 	}
@@ -215,7 +215,7 @@ func (dfa DFA) UnknownStatesCount() int {
 	count := 0
 
 	for stateID := range dfa.States {
-		if dfa.States[stateID].Label == UNKNOWN {
+		if dfa.States[stateID].Label == UNLABELLED {
 			count++
 		}
 	}
@@ -308,11 +308,9 @@ func (dfa DFA) IsTree() bool {
 
 // IsComplete returns true if DFA is complete, false is returned otherwise.
 func (dfa DFA) IsComplete() bool {
-	for stateID := range dfa.States {
-		for symbol := range dfa.Alphabet {
-			if dfa.States[stateID].Transitions[symbol] < 0 {
-				return false
-			}
+	for _, state := range dfa.States {
+		if state.OutDegree() != len(dfa.Alphabet){
+			return false
 		}
 	}
 
@@ -434,8 +432,8 @@ func (dfa DFA) Describe(detail bool) {
 			case REJECTING:
 				fmt.Println(k, "REJECTING")
 				break
-			case UNKNOWN:
-				fmt.Println(k, "UNKNOWN")
+			case UNLABELLED:
+				fmt.Println(k, "UNLABELLED")
 				break
 			}
 		}
@@ -444,7 +442,9 @@ func (dfa DFA) Describe(detail bool) {
 		fmt.Println("Transitions:")
 		for fromStateID, fromState := range dfa.States {
 			for symbol, toStateID := range fromState.Transitions {
-				fmt.Println(fromStateID, "--", symbol, "->", toStateID)
+				if toStateID != -1{
+					fmt.Println(fromStateID, "--", symbol, "->", toStateID)
+				}
 			}
 		}
 	}
@@ -541,6 +541,7 @@ func (dfa DFA) StartingState() *State {
 
 // Clone returns a clone of the DFA.
 func (dfa DFA) Clone() DFA {
+	// Initialize cloned DFA.
 	clonedDFA := DFA{
 		States:                make([]State, len(dfa.States)),
 		Alphabet:              make([]int, len(dfa.Alphabet)),
@@ -549,14 +550,15 @@ func (dfa DFA) Clone() DFA {
 		computedDepthAndOrder: dfa.computedDepthAndOrder,
 	}
 
+	// Clone the states.
 	for stateID := range dfa.States {
-		clonedDFA.States[stateID] = dfa.States[stateID]
+		clonedDFA.States[stateID] = dfa.States[stateID].Clone()
 	}
 
-	for symbolID := range dfa.Alphabet {
-		clonedDFA.States[symbolID] = dfa.States[symbolID]
-	}
+	// Clone the alphabet.
+	copy(clonedDFA.Alphabet, dfa.Alphabet)
 
+	// Return cloned DFA.
 	return clonedDFA
 }
 
@@ -790,7 +792,7 @@ func (dfa DFA) SymmetricallyStructurallyComplete(dataset Dataset) bool {
 		// If string instance is the empty string and is accepting
 		// while the  starting state is not labelled, return false.
 		if len(stringInstance.Value) == 0 {
-			if dfa.StartingState().Label != UNKNOWN {
+			if dfa.StartingState().Label != UNLABELLED {
 				finalStatesHalted[currentStateID] = util.Null
 			} else if stringInstance.Accepting {
 				return false
@@ -812,7 +814,7 @@ func (dfa DFA) SymmetricallyStructurallyComplete(dataset Dataset) bool {
 				// Check if last symbol in string.
 				if count == stringInstance.Length() {
 					// If state is unlabelled (unknown) and string instance is accepting, return false.
-					if dfa.States[currentStateID].Label == UNKNOWN && stringInstance.Accepting {
+					if dfa.States[currentStateID].Label == UNLABELLED && stringInstance.Accepting {
 						return false
 					}
 

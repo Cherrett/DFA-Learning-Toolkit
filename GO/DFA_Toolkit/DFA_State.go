@@ -7,7 +7,7 @@ type StateLabel uint8
 const (
 	REJECTING = iota // 0
 	ACCEPTING        // 1
-	UNKNOWN          // 2
+	UNLABELLED       // 2
 )
 
 // State struct which represents a State within a DFA.
@@ -31,26 +31,53 @@ func (state State) IsRejecting() bool {
 
 // IsUnknown returns true if state label is unknown, otherwise returns false.
 func (state State) IsUnknown() bool {
-	return state.Label == UNKNOWN
+	return state.Label == UNLABELLED
+}
+
+// InDegree returns the in degree of the state..
+func (state State) InDegree(stateID int) int {
+	// Initialize in degree counter.
+	count := 0
+
+	// Iterate over each state within reference DFA.
+	for _, state2 := range state.DFA().States{
+		// Iterate over each transition from state.
+		for _, toStateID := range state2.Transitions {
+			// If a transition with a value equal to the stateID
+			// is found, the in degree counter is incremented.
+			if toStateID == stateID {
+				count ++
+			}
+		}
+	}
+
+
+	// Return in degree count.
+	return count
+}
+
+// OutDegree returns the out degree of the state..
+func (state State) OutDegree() int {
+	// Initialize out degree counter.
+	count := 0
+
+	// Iterate over each transition from state.
+	for _, toStateID := range state.Transitions {
+		// If a transition with a value not equal to -1 is
+		// found (valid), the counter is incremented.
+		if toStateID != -1 {
+			count ++
+		}
+	}
+
+	// Return out degree count.
+	return count
 }
 
 // IsLeaf checks whether given state is a leaf within DFA.
 // In other words, whether the state has any valid transitions.
-func (state State) IsLeaf(stateID int) bool {
-	// Iterate over each transition from state.
-	for _, toStateID := range state.Transitions {
-		// If a transition with a value not equal to -1 is
-		// found (valid), false is returned since. a valid
-		// transition is found, hence state is not a leaf.
-		if toStateID != -1 && toStateID != stateID {
-			return false
-		}
-	}
-
-	// Return true if reached since
-	// no valid transitions exist
-	// which means state is a leaf.
-	return true
+func (state State) IsLeaf() bool {
+	return state.OutDegree() == 0
 }
 
 // Depth returns the state's depth within DFA.
@@ -167,3 +194,22 @@ func (state State) TotalTransitionsCount() int {
 	// Return transitions count.
 	return transitionsCount
 }
+
+// Clone returns a clone of the State.
+func (state State) Clone() State {
+	// Initialize cloned State.
+	clonedState := State{
+		Label:                 state.Label,
+		Transitions:           make([]int, len(state.Transitions)),
+		depth:                 state.depth,
+		order: 				   state.order,
+		dfa: 				   state.dfa,
+	}
+
+	// Clone the transitions.
+	copy(clonedState.Transitions, state.Transitions)
+
+	// Return cloned State.
+	return clonedState
+}
+

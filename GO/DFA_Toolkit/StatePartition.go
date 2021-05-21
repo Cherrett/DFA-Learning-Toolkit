@@ -110,7 +110,7 @@ func (statePartition *StatePartition) Union(blockID1 int, blockID2 int) {
 
 	// If label of parent is unknown and label of child is
 	// not unknown, set label of parent to label of child.
-	if parent.Label == UNKNOWN && child.Label != UNKNOWN {
+	if parent.Label == UNLABELLED && child.Label != UNLABELLED {
 		parent.Label = child.Label
 	} else if parent.Label == ACCEPTING && child.Label == ACCEPTING {
 		// Else, if both blocks are accepting, decrement accepting blocks count.
@@ -186,8 +186,7 @@ func (dfa DFA) ToStatePartition() StatePartition {
 	return NewStatePartition(dfa)
 }
 
-// ToQuotientDFA converts a State Partition to a quotient DFA. Returns true and the
-// corresponding DFA if state partition is valid. Else, false and an empty DFA are returned.
+// ToQuotientDFA converts a State Partition to a quotient DFA and returns it.
 func (statePartition *StatePartition) ToQuotientDFA() DFA {
 	// Map to store corresponding new state for
 	// each root block within state partition.
@@ -224,6 +223,46 @@ func (statePartition *StatePartition) ToQuotientDFA() DFA {
 
 	// Return populated resultant DFA.
 	return resultantDFA
+}
+
+// ToQuotientDFAWithMapping converts a State Partition to a quotient DFA and returns it. This function
+// also returns the state partition's blocks to state mapping.
+func (statePartition *StatePartition) ToQuotientDFAWithMapping() (DFA, map[int]int) {
+	// Map to store corresponding new state for
+	// each root block within state partition.
+	blockToStateMap := map[int]int{}
+
+	// Initialize resultant DFA to be returned by function.
+	resultantDFA := NewDFA()
+
+	// Get root blocks within state partition.
+	rootBlocks := statePartition.RootBlocks()
+
+	// Create a new state within DFA for each root block and
+	// set state label to block label.
+	for _, stateID := range rootBlocks {
+		blockToStateMap[stateID] = resultantDFA.AddState(statePartition.Blocks[stateID].Label)
+	}
+
+	// Create alphabet within DFA.
+	for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
+		resultantDFA.AddSymbol()
+	}
+
+	// Update transitions using transitions within blocks and block to state map.
+	for _, stateID := range rootBlocks {
+		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
+			if resultantState := statePartition.Blocks[stateID].Transitions[symbol]; resultantState > -1 {
+				resultantDFA.States[blockToStateMap[stateID]].Transitions[symbol] = blockToStateMap[statePartition.Find(resultantState)]
+			}
+		}
+	}
+
+	// Set starting state using block to state map.
+	resultantDFA.StartingStateID = blockToStateMap[statePartition.StartingBlock()]
+
+	// Return populated resultant DFA and blocks to state map.
+	return resultantDFA, blockToStateMap
 }
 
 // MergeStates recursively merges states to merge state1 and state2. Returns false if merge
