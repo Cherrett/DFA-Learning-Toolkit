@@ -308,13 +308,11 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 	// Start timer.
 	start := time.Now()
 
-	// Initialize set of red states to starting state.
-	redSet := map[int]util.Void{statePartition.StartingBlock(): util.Null}
 	// Slice to store red states in insertion order.
 	redStates := []int{statePartition.StartingBlock()}
 
 	// Generated slice of ordered blue states from red states.
-	blueStates := GenerateBlueSetFromRedSet(&statePartition, redSet)
+	blueStates := GenerateBlueSetFromRedSet(&statePartition, map[int]util.Void{statePartition.StartingBlock(): util.Null})
 
 	// Initialize merged flag to false.
 	merged := false
@@ -358,7 +356,6 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 			// If merged flag is false, add current blue state
 			// to red states set and ordered set and exit loop.
 			if !merged {
-				redSet[blueElement] = util.Null
 				redStates = append(redStates, blueElement)
 				break
 			}
@@ -377,14 +374,9 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 			// Remove previous state pair with the highest score.
 			highestScoringStatePair = StatePairScore{-1, -1, -1}
 		}
-
-		// Update slice and map of ordered red states.
-		// This is done since partition may have changed
-		// or states have been added to the red set.
-		redSet, redStates = UpdateRedSet(&statePartition, redSet)
-
-		// Generated slice of ordered blue states from red states.
-		blueStates = GenerateBlueSetFromRedSet(&statePartition, redSet)
+		
+		// Update red and blue states using UpdateRedBlueSets function.
+		redStates, blueStates = UpdateRedBlueSets(&statePartition, redStates)
 	}
 
 	// Add total and valid merges counts to search data.
@@ -473,28 +465,51 @@ func GenerateBlueSetFromRedSet(statePartition *StatePartition, redSet map[int]ut
 	return orderedBlue
 }
 
-// UpdateRedSet updates the red set given the state partition and the red set within the Red-Blue framework such as the
-// BlueFringeSearchUsingScoringFunction function. It returns the red set in canonical order. This is used when the state
-// partition is changed or when new states have been added to the red set.
-func UpdateRedSet(statePartition *StatePartition, redSet map[int]util.Void) (map[int]util.Void, []int) {
+// UpdateRedBlueSets updates the red and blue sets given the state partition and the red set within the Red-Blue framework
+// such as the BlueFringeSearchUsingScoringFunction function. It returns the red and blue sets in canonical order. This is
+// used when the state partition is changed or when new states have been added to the red set.
+func UpdateRedBlueSets(statePartition *StatePartition, redStates []int) ([]int, []int){
 	// Step 1 - Gather root of old red states and store in map declared below.
 
 	// Initialize set of red root states (blocks) to empty set.
-	newRedSet := map[int]util.Void{}
+	redSet := map[int]util.Void{}
 
 	// Iterate over every red state.
-	for element := range redSet {
+	for _, element := range redStates {
 		// Get root block of red state.
 		root := statePartition.Find(element)
 
 		// Add root block to red set.
-		newRedSet[root] = util.Null
+		redSet[root] = util.Null
 	}
 
-	// Step 2 - Sort red states by canonical order and store in slice declared below.
+	// Step 2 - Gather all blue states and store in map declared below.
+
+	// Initialize set of blue states to empty set.
+	blueSet := map[int]util.Void{}
+
+	// Iterate over every red state.
+	for element := range redSet {
+		// Iterate over each symbol within DFA.
+		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
+			if resultantStateID := statePartition.Blocks[element].Transitions[symbol]; resultantStateID > -1 {
+				// Store resultant stateID from red state.
+				resultantStateID = statePartition.Find(resultantStateID)
+				// If transition is valid and resultant state is not red,
+				// add resultant state to blue set.
+				if _, exists := redSet[resultantStateID]; !exists {
+					blueSet[resultantStateID] = util.Null
+				}
+			}
+		}
+	}
+
+	// Step 3 - Sort red and blue states by canonical order and store in slice declared below.
 
 	// Slice to store red states in canonical order.
 	var orderedRed []int
+	// Slice to store red states in canonical order.
+	var orderedBlue []int
 
 	// Get starting block ID.
 	startingBlock := statePartition.StartingBlock()
@@ -505,9 +520,12 @@ func UpdateRedSet(statePartition *StatePartition, redSet map[int]util.Void) (map
 	// Mark starting block as computed.
 	orderComputed[startingBlock] = true
 
-	// If starting block is in red set, add to ordered slice.
-	if _, exists := newRedSet[startingBlock]; exists {
+	// If starting block is in red set, add to red ordered slice.
+	if _, exists := redSet[startingBlock]; exists {
 		orderedRed = append(orderedRed, startingBlock)
+		// Else, if starting block is in blue set, add to blue ordered slice.
+	}else if _, exists = blueSet[startingBlock]; exists {
+		orderedBlue = append(orderedBlue, startingBlock)
 	}
 
 	// Loop until queue is empty.
@@ -519,7 +537,7 @@ func UpdateRedSet(statePartition *StatePartition, redSet map[int]util.Void) (map
 		// Iterate over each symbol (alphabet) within DFA.
 		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
 			// If transition from current state using current symbol is valid and is not a loop to the current state.
-			if childStateID := statePartition.Blocks[blockID].Transitions[symbol]; childStateID >= 0 {
+			if childStateID := statePartition.Blocks[blockID].Transitions[symbol]; childStateID != -1 {
 				// Get block ID of child state.
 				childBlockID := statePartition.Find(childStateID)
 				// If depth for child block has been computed, skip block.
@@ -527,9 +545,12 @@ func UpdateRedSet(statePartition *StatePartition, redSet map[int]util.Void) (map
 					// Add child block to queue.
 					queue = append(queue, childBlockID)
 
-					// If block is in red set, add to ordered slice.
-					if _, exists := newRedSet[childBlockID]; exists {
+					// If block is in red set, add to ordered red slice.
+					if _, exists := redSet[childBlockID]; exists {
 						orderedRed = append(orderedRed, childBlockID)
+						// Else, if block is in blue set, add to ordered blue slice.
+					}else if _, exists = blueSet[childBlockID]; exists {
+						orderedBlue = append(orderedBlue, childBlockID)
 					}
 
 					// Mark block as computed.
@@ -539,6 +560,7 @@ func UpdateRedSet(statePartition *StatePartition, redSet map[int]util.Void) (map
 		}
 	}
 
-	// Return new red set and populated slice of red states in canonical order.
-	return newRedSet, orderedRed
+
+	// Return populated slice of red states and  populated slice of blue states in canonical order.
+	return orderedRed, orderedBlue
 }
