@@ -105,7 +105,7 @@ func AbbadingoDFA(numberOfStates int, exact bool) DFA {
 			if rand.Intn(2) == 0 {
 				dfa.AddState(ACCEPTING)
 			} else {
-				dfa.AddState(UNKNOWN)
+				dfa.AddState(UNLABELLED)
 			}
 		}
 

@@ -1,5 +1,13 @@
 package dfatoolkit
 
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"os"
+)
+
 // Block struct which represents a block within a partition.
 type Block struct {
 	Root        int        // Parent block of state.
@@ -102,7 +110,7 @@ func (statePartition *StatePartition) Union(blockID1 int, blockID2 int) {
 
 	// If label of parent is unknown and label of child is
 	// not unknown, set label of parent to label of child.
-	if parent.Label == UNKNOWN && child.Label != UNKNOWN {
+	if parent.Label == UNLABELLED && child.Label != UNLABELLED {
 		parent.Label = child.Label
 	} else if parent.Label == ACCEPTING && child.Label == ACCEPTING {
 		// Else, if both blocks are accepting, decrement accepting blocks count.
@@ -178,8 +186,7 @@ func (dfa DFA) ToStatePartition() StatePartition {
 	return NewStatePartition(dfa)
 }
 
-// ToQuotientDFA converts a State Partition to a quotient DFA. Returns true and the
-// corresponding DFA if state partition is valid. Else, false and an empty DFA are returned.
+// ToQuotientDFA converts a State Partition to a quotient DFA and returns it.
 func (statePartition *StatePartition) ToQuotientDFA() DFA {
 	// Map to store corresponding new state for
 	// each root block within state partition.
@@ -216,6 +223,46 @@ func (statePartition *StatePartition) ToQuotientDFA() DFA {
 
 	// Return populated resultant DFA.
 	return resultantDFA
+}
+
+// ToQuotientDFAWithMapping converts a State Partition to a quotient DFA and returns it. This function
+// also returns the state partition's blocks to state mapping.
+func (statePartition *StatePartition) ToQuotientDFAWithMapping() (DFA, map[int]int) {
+	// Map to store corresponding new state for
+	// each root block within state partition.
+	blockToStateMap := map[int]int{}
+
+	// Initialize resultant DFA to be returned by function.
+	resultantDFA := NewDFA()
+
+	// Get root blocks within state partition.
+	rootBlocks := statePartition.RootBlocks()
+
+	// Create a new state within DFA for each root block and
+	// set state label to block label.
+	for _, stateID := range rootBlocks {
+		blockToStateMap[stateID] = resultantDFA.AddState(statePartition.Blocks[stateID].Label)
+	}
+
+	// Create alphabet within DFA.
+	for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
+		resultantDFA.AddSymbol()
+	}
+
+	// Update transitions using transitions within blocks and block to state map.
+	for _, stateID := range rootBlocks {
+		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
+			if resultantState := statePartition.Blocks[stateID].Transitions[symbol]; resultantState > -1 {
+				resultantDFA.States[blockToStateMap[stateID]].Transitions[symbol] = blockToStateMap[statePartition.Find(resultantState)]
+			}
+		}
+	}
+
+	// Set starting state using block to state map.
+	resultantDFA.StartingStateID = blockToStateMap[statePartition.StartingBlock()]
+
+	// Return populated resultant DFA and blocks to state map.
+	return resultantDFA, blockToStateMap
 }
 
 // MergeStates recursively merges states to merge state1 and state2. Returns false if merge
@@ -499,22 +546,22 @@ func (statePartition *StatePartition) StartingBlock() int {
 }
 
 // DepthOfBlocks returns the depth of each block.
-func (statePartition *StatePartition) DepthOfBlocks() map[int]int{
+func (statePartition *StatePartition) DepthOfBlocks() map[int]int {
 	// Create a FIFO queue with starting state.
 	start := statePartition.StartingBlock()
 	result := map[int]int{start: 0}
 	queue := []int{start}
 
-	for len(queue) > 0{
+	for len(queue) > 0 {
 		// Remove and store first state in queue.
 		blockID := queue[0]
 		queue = queue[1:]
 		depth := result[blockID]
 
-		for symbolID := 0; symbolID < statePartition.AlphabetSize; symbolID++{
-			if childStateID := statePartition.Blocks[blockID].Transitions[symbolID]; childStateID != -1{
+		for symbolID := 0; symbolID < statePartition.AlphabetSize; symbolID++ {
+			if childStateID := statePartition.Blocks[blockID].Transitions[symbolID]; childStateID != -1 {
 				childBlockID := statePartition.Find(childStateID)
-				if _, exists := result[childBlockID]; !exists{
+				if _, exists := result[childBlockID]; !exists {
 					result[childBlockID] = depth + 1
 					queue = append(queue, childBlockID)
 				}
@@ -523,4 +570,117 @@ func (statePartition *StatePartition) DepthOfBlocks() map[int]int{
 	}
 
 	return result
+}
+
+// OrderOfBlocks returns the order of each block.
+func (statePartition *StatePartition) OrderOfBlocks() map[int]int {
+	// Map of integer values to keep track of ordered blocks.
+	orderedBlocks := make(map[int]int, statePartition.BlocksCount)
+
+	// Get starting block ID.
+	startingBlock := statePartition.StartingBlock()
+	// Create a FIFO queue with starting block.
+	queue := []int{startingBlock}
+	// Add starting block to ordered blocks.
+	orderedBlocks[startingBlock] = 0
+	// Set index to 1.
+	index := 1
+
+	// Loop until queue is empty.
+	for len(queue) > 0 {
+		// Remove and store first state in queue.
+		blockID := queue[0]
+		queue = queue[1:]
+
+		// Iterate over each symbol (alphabet) within DFA.
+		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
+			// If transition from current state using current symbol is valid.
+			if childStateID := statePartition.Blocks[blockID].Transitions[symbol]; childStateID != -1 {
+				// Get block ID of child state.
+				childBlockID := statePartition.Find(childStateID)
+				// If depth for child block has been computed, skip block.
+				if _, exists := orderedBlocks[childBlockID]; !exists {
+					// Add child block to queue.
+					queue = append(queue, childBlockID)
+					// Set the order of the current block.
+					orderedBlocks[childBlockID] = index
+					// Increment current block order.
+					index++
+				}
+			}
+		}
+	}
+
+	return orderedBlocks
+}
+
+// ToJSON saves the StatePartition to a JSON file given a file path.
+func (statePartition StatePartition) ToJSON(filePath string) bool {
+	// Create file given a path/name.
+	file, err := os.Create(filePath)
+
+	// If file was not created successfully,
+	// print error and return false.
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	// Close file at end of function.
+	defer file.Close()
+
+	// Convert StatePartition to JSON.
+	resultantJSON, err := json.MarshalIndent(statePartition, "", "\t")
+
+	// If StatePartition was not converted successfully,
+	// print error and return false.
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	// Copy JSON to file created.
+	_, err = io.Copy(file, bytes.NewReader(resultantJSON))
+
+	// If JSON was not copied successfully,
+	// print error and return false.
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	// Return true if reached.
+	return true
+}
+
+// StatePartitionFromJSON returns a StatePartition read from a JSON file
+// given a file path. The boolean value returned is set to
+// true if DFA was read successfully.
+func StatePartitionFromJSON(filePath string) (StatePartition, bool) {
+	// Open file from given a path/name.
+	file, err := os.Open(filePath)
+
+	// If file was not opened successfully,
+	// return empty DFA and false.
+	if err != nil {
+		return StatePartition{}, false
+	}
+
+	// Close file at end of function.
+	defer file.Close()
+
+	// Initialize empty StatePartition.
+	resultantStatePartition := StatePartition{}
+
+	// Convert JSON to StatePartition.
+	err = json.NewDecoder(file).Decode(&resultantStatePartition)
+
+	// If JSON was not converted successfully,
+	// return empty StatePartition and false.
+	if err != nil {
+		return StatePartition{}, false
+	}
+
+	// Return populated StatePartition and true if reached.
+	return resultantStatePartition, true
 }

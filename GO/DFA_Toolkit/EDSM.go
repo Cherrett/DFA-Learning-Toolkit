@@ -1,25 +1,14 @@
 package dfatoolkit
 
-// GreedyEDSMFromDataset is a greedy version of Evidence Driven State-Merging.
+// ExhaustiveEDSMFromDataset is a greedy version of Evidence Driven State-Merging.
 // It takes a dataset as an argument which is used to generate an APTA.
-func GreedyEDSMFromDataset(dataset Dataset) (DFA, SearchData) {
+func ExhaustiveEDSMFromDataset(dataset Dataset) (DFA, SearchData) {
 	// Construct an APTA from dataset.
 	APTA := dataset.GetPTA(true)
 
-	// Call GreedyEDSM function using APTA constructed
+	// Call ExhaustiveEDSM function using APTA constructed
 	// above. Return resultant DFA and search data.
-	return GreedyEDSM(APTA)
-}
-
-// FastWindowedEDSMFromDataset is a fast windowed version of Evidence Driven State-Merging.
-// It takes a dataset as an argument which is used to generate an APTA.
-func FastWindowedEDSMFromDataset(dataset Dataset, windowSize int, windowGrow float64) (DFA, SearchData) {
-	// Construct an APTA from dataset.
-	APTA := dataset.GetPTA(true)
-
-	// Call FastWindowedEDSM function using APTA constructed
-	// above. Return resultant DFA and search data.
-	return FastWindowedEDSM(APTA, windowSize, windowGrow)
+	return ExhaustiveEDSM(APTA)
 }
 
 // WindowedEDSMFromDataset is a windowed version of Evidence Driven State-Merging.
@@ -44,9 +33,9 @@ func BlueFringeEDSMFromDataset(dataset Dataset) (DFA, SearchData) {
 	return BlueFringeEDSM(APTA)
 }
 
-// GreedyEDSM is a greedy version of Evidence Driven State-Merging.
+// ExhaustiveEDSM is a greedy version of Evidence Driven State-Merging.
 // It takes a DFA (APTA) as an argument which is used within the greedy search.
-func GreedyEDSM(APTA DFA) (DFA, SearchData) {
+func ExhaustiveEDSM(APTA DFA) (DFA, SearchData) {
 	// Store length of dataset.
 	LengthOfDataset := APTA.LabelledStatesCount()
 
@@ -58,37 +47,9 @@ func GreedyEDSM(APTA DFA) (DFA, SearchData) {
 	// Convert APTA to StatePartition for state merging.
 	statePartition := APTA.ToStatePartition()
 
-	// Call GreedySearchUsingScoringFunction function using state partition and EDSM scoring function
+	// Call ExhaustiveSearchUsingScoringFunction function using state partition and EDSM scoring function
 	// declared above. This function returns the resultant state partition and the search data.
-	statePartition, searchData := GreedySearchUsingScoringFunction(statePartition, EDSM)
-
-	// Convert the state partition to a DFA.
-	resultantDFA := statePartition.ToQuotientDFA()
-
-	// Check if DFA generated is valid.
-	resultantDFA.IsValidPanic()
-
-	// Return resultant DFA and search data.
-	return resultantDFA, searchData
-}
-
-// FastWindowedEDSM is a fast windowed version of Evidence Driven State-Merging.
-// It takes a DFA (APTA) as an argument which is used within the windowed search.
-func FastWindowedEDSM(APTA DFA, windowSize int, windowGrow float64) (DFA, SearchData) {
-	// Store length of dataset.
-	LengthOfDataset := APTA.LabelledStatesCount()
-
-	// EDSM scoring function.
-	EDSM := func(stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition) float64 {
-		return float64(LengthOfDataset - partitionAfter.NumberOfLabelledBlocks())
-	}
-
-	// Convert APTA to StatePartition for state merging.
-	statePartition := APTA.ToStatePartition()
-
-	// Call FastWindowedSearchUsingScoringFunction function using state partition and EDSM scoring function
-	// declared above. This function returns the resultant state partition and the search data.
-	statePartition, searchData := FastWindowedSearchUsingScoringFunction(statePartition, windowSize, windowGrow, EDSM)
+	statePartition, searchData := ExhaustiveSearchUsingScoringFunction(statePartition, EDSM)
 
 	// Convert the state partition to a DFA.
 	resultantDFA := statePartition.ToQuotientDFA()

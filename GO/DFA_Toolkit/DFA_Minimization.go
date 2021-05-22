@@ -12,21 +12,23 @@ func (dfa *DFA) IndistinguishableStatePairs() []StateIDPair {
 	// Map to store distinguishable state pairs.
 	distinguishablePairs := map[StateIDPair]bool{}
 
-	// Remove unreachable states within DFA.
-	dfa.RemoveUnreachableStates()
-
 	// Iterate over all unique state pairs within DFA where stateID != stateID2.
 	for stateID := range dfa.States {
 		for stateID2 := stateID + 1; stateID2 < len(dfa.States); stateID2++ {
 			// If the state pair have different types, add to distinguishable pairs map.
 			if dfa.States[stateID].Label != dfa.States[stateID2].Label {
-				distinguishablePairs[StateIDPair{stateID, stateID2}] = true
+				// Make sure that the smaller stateID is in first position within pair
+				if stateID <= stateID2 {
+					distinguishablePairs[StateIDPair{stateID, stateID2}] = true
+				} else {
+					distinguishablePairs[StateIDPair{stateID2, stateID}] = true
+				}
 			}
 		}
 	}
 
 	// Set counter for length of distinguishable pairs to 0.
-	oldCount := 0
+	oldCount := -1
 
 	// Iterate until no new pairs have been added to distinguishable pairs.
 	for oldCount != len(distinguishablePairs) {
@@ -42,16 +44,20 @@ func (dfa *DFA) IndistinguishableStatePairs() []StateIDPair {
 				} else {
 					// Iterate over each symbol within DFA.
 					for symbol := range dfa.Alphabet {
+						resultantStateID1 := dfa.States[stateID].Transitions[symbol]
+						resultantStateID2 := dfa.States[stateID2].Transitions[symbol]
 						// If both states have a valid transition using current symbol.
-						if dfa.States[stateID].Transitions[symbol] != -1 &&
-							dfa.States[stateID2].Transitions[symbol] != -1 {
+						if resultantStateID1 != -1 && resultantStateID2 != -1 {
 							// If pair containing both resultant state IDs is marked as distinguishable,
 							// mark current state pair as distinguishable.
-							if distinguishablePairs[StateIDPair{dfa.States[stateID].Transitions[symbol],
-								dfa.States[stateID2].Transitions[symbol]}] ||
-								distinguishablePairs[StateIDPair{dfa.States[stateID2].Transitions[symbol],
-									dfa.States[stateID].Transitions[symbol]}] {
-								distinguishablePairs[StateIDPair{stateID, stateID2}] = true
+							if resultantStateID1 <= resultantStateID2 {
+								if distinguishablePairs[StateIDPair{resultantStateID1, resultantStateID2}] {
+									distinguishablePairs[StateIDPair{stateID, stateID2}] = true
+								}
+							} else {
+								if distinguishablePairs[StateIDPair{resultantStateID2, resultantStateID1}] {
+									distinguishablePairs[StateIDPair{stateID, stateID2}] = true
+								}
 							}
 						}
 					}
@@ -87,115 +93,73 @@ func (dfa *DFA) IndistinguishableStatePairs() []StateIDPair {
 // Minimise returns a minimised version of the DFA.
 // P. Linz, An Introduction to Formal Languages and Automata. Jones & Bartlett Publishers, 2011.
 func (dfa DFA) Minimise() DFA {
-	// Get indistinguishable state pairs from Mark function.
-	indistinguishablePairs := dfa.IndistinguishableStatePairs()
-
-	// Partition states into blocks.
-	var currentPartition []map[int]bool
-	for stateID := range dfa.States {
-		exists := false
-		for _, block := range currentPartition {
-			if block[stateID] {
-				exists = true
-			}
-		}
-		if !exists {
-			indistinguishable := false
-			for _, indistinguishablePair := range indistinguishablePairs {
-				if indistinguishablePair.state1 == stateID {
-					for blockIndex, block := range currentPartition {
-						if block[indistinguishablePair.state2] {
-							currentPartition[blockIndex][stateID] = true
-							indistinguishable = true
-							break
-						}
-					}
-					if indistinguishable {
-						break
-					}
-				} else if indistinguishablePair.state2 == stateID {
-					for blockIndex, block := range currentPartition {
-						if block[indistinguishablePair.state1] {
-							currentPartition[blockIndex][stateID] = true
-							indistinguishable = true
-							break
-						}
-					}
-					if indistinguishable {
-						break
-					}
-				}
-			}
-			if !indistinguishable {
-				currentPartition = append(currentPartition, map[int]bool{stateID: true})
-			}
-		}
-	}
-	resultantDFA := DFA{Alphabet: dfa.Alphabet}
-
-	// Create a new state for each block.
-	for blockIndex := range currentPartition {
-		var stateLabel StateLabel = UNKNOWN
-		for stateID := range currentPartition[blockIndex] {
-			stateLabel = dfa.States[stateID].Label
-			break
-		}
-		resultantDFA.AddState(stateLabel)
+	// Check that DFA does not have any rejecting states (only accepting and unlabelled).
+	if dfa.RejectingStatesCount() != 0 {
+		panic("The DFA contains rejecting states so cannot be minimised.")
 	}
 
-	// Set Initial State.
-	for blockIndex := range currentPartition {
-		found := false
-		for stateID := range currentPartition[blockIndex] {
-			if stateID == dfa.StartingStateID {
-				resultantDFA.StartingStateID = blockIndex
-				found = true
-				break
-			}
-		}
-		if found {
-			break
+	// Clone DFA to work on.
+	temporaryDFA := dfa.Clone()
+
+	// Remove unreachable states within DFA.
+	temporaryDFA.RemoveUnreachableStates()
+
+	// If DFA is not complete, add sink state to make it complete.
+	if !temporaryDFA.IsComplete() {
+		temporaryDFA.AddSinkState()
+	}
+
+	// Get indistinguishable state pairs from IndistinguishableStatePairs function.
+	indistinguishablePairs := temporaryDFA.IndistinguishableStatePairs()
+
+	// Convert DFA to state partition.
+	statePartition := temporaryDFA.ToStatePartition()
+
+	// Merge indistinguishable pairs.
+	for _, indistinguishablePair := range indistinguishablePairs {
+		block1 := statePartition.Find(indistinguishablePair.state1)
+		block2 := statePartition.Find(indistinguishablePair.state2)
+		if block1 != block2 {
+			statePartition.Union(block1, block2)
 		}
 	}
 
-	// Create Transitions.
-	for stateID := range dfa.States {
-		stateBlockIndex := 0
-		found := false
-		for blockIndex := range currentPartition {
-			for stateID2 := range currentPartition[blockIndex] {
-				if stateID == stateID2 {
-					stateBlockIndex = blockIndex
-					found = true
-					break
-				}
-			}
-			if found {
-				break
-			}
-		}
-
-		for symbol := range dfa.States[stateID].Transitions {
-			resultantStateBlockIndex := 0
-			if resultantDFA.States[stateBlockIndex].Transitions[symbol] == -1 && dfa.States[stateID].Transitions[symbol] != -1 {
-				found := false
-				for blockIndex := range currentPartition {
-					for stateID2 := range currentPartition[blockIndex] {
-						if dfa.States[stateID].Transitions[symbol] == stateID2 {
-							resultantStateBlockIndex = blockIndex
-							found = true
-							break
-						}
-					}
-					if found {
-						break
-					}
-				}
-				resultantDFA.States[stateBlockIndex].Transitions[symbol] = resultantStateBlockIndex
-			}
-		}
-	}
+	// Convert state partition to Quotient DFA.
+	resultantDFA := statePartition.ToQuotientDFA()
 
 	// Return resultant minimised DFA.
 	return resultantDFA
+}
+
+// AddSinkState adds a sink state within DFA. This is used to convert
+// a non-complete DFA to a complete DFA by adding a sink state.
+func (dfa *DFA) AddSinkState() int {
+	// Return if dfa is complete since sink state is not required.
+	if dfa.IsComplete() {
+		return -1
+	}
+
+	// Add sink state and store its ID.
+	sinkStateID := dfa.AddState(UNLABELLED)
+
+	// Iterate over alphabet within DFA.
+	for symbolID := range dfa.Alphabet {
+		// Add a self-transition using symbol.
+		dfa.AddTransition(symbolID, sinkStateID, sinkStateID)
+	}
+
+	// Iterate over each state within DFA.
+	for stateID := range dfa.States {
+		// Iterate over alphabet within DFA.
+		for symbolID := range dfa.Alphabet {
+			// If a transition does not exist with symbol.
+			if dfa.States[stateID].Transitions[symbolID] == -1 {
+				// Add a transition to sink state using symbol.
+				dfa.States[stateID].Transitions[symbolID] = sinkStateID
+			}
+		}
+	}
+
+	// Return ID of sink state.
+	return sinkStateID
 }

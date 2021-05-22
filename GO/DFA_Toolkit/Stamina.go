@@ -89,11 +89,6 @@ func NewStringInstanceFromStaminaFile(text string, delimiter string) StringInsta
 // a competition to encourage the development and assessment of software model inference
 // techniques. Empirical Software Engineering, 18(4), 791–824. doi:10.1007/s10664-012-9210-3
 func StaminaDFA(alphabetSize int, targetDFASize int) DFA {
-	// Get attempted DFA size by increasing the target DFA size by 25%.
-	// This is done since targetDFASize cannot be reached using original
-	// value since DFA is minimized after the process is finished.
-	attemptedDFASize := int(math.Ceil(float64(targetDFASize) * 1.25))
-
 	// Forward-burning probability.
 	f := 0.31
 	// Backward-burning ratio.
@@ -103,246 +98,329 @@ func StaminaDFA(alphabetSize int, targetDFASize int) DFA {
 	// Probability of parallel transition (edge) labels.
 	p := 0.2
 
+	// Initialize a new DFA.
+	dfa := NewDFA()
+
+	// Add symbols to DFA until alphabet size is reached.
+	for i := 0; i < alphabetSize; i++ {
+		dfa.AddSymbol()
+	}
+
+	// Create and set starting state.
+	if rand.Intn(2) == 0 {
+		dfa.StartingStateID = dfa.AddState(ACCEPTING)
+	} else {
+		dfa.StartingStateID = dfa.AddState(UNLABELLED)
+	}
+
+	// Vertices added counter.
+	numberOfStatesToAdd := targetDFASize
+	minimisedDFAStates := 0
+
 	// Iterate till a valid DFA is generated.
 	for {
-		// Initialize a new DFA.
-		dfa := NewDFA()
-
-		// Add symbols to DFA until alphabet size is reached.
-		for i := 0; i < alphabetSize; i++ {
-			dfa.AddSymbol()
-		}
-
-		// Create first state.
-		if rand.Intn(2) == 0 {
-			dfa.AddState(ACCEPTING)
-		} else {
-			dfa.AddState(UNKNOWN)
-		}
-
 		// Iterate until required amount of states is reached.
-		for len(dfa.States) < attemptedDFASize {
-			// Step 1 within ForestFire algorithm.
-
+		for len(dfa.States)-1 < numberOfStatesToAdd {
 			// Map of visited states.
 			visitedStates := map[int]bool{}
 
+			// Newly created state ID placeholder.
 			newStateID := -1
-			// Create new state.
+
+			// Create new state and randomly choose whether
+			// state is accepting or unlabelled.
 			if rand.Intn(2) == 0 {
 				newStateID = dfa.AddState(ACCEPTING)
 			} else {
-				newStateID = dfa.AddState(UNKNOWN)
+				newStateID = dfa.AddState(UNLABELLED)
 			}
 
-			// Randomly choose an ambassador node.
-			ambassadorNode := rand.Intn(len(dfa.States))
+			// Ambassador state ID placeholder.
+			ambassadorState := -1
+			// Map of tried states to be ambassador state.
+			tried := map[int]bool{newStateID: true}
 
-			// If ambassador node already covers all transitions,
-			// choose another ambassador node. Loop until a valid
-			// ambassador node is found.
-			for dfa.States[ambassadorNode].AllTransitionsExist() || ambassadorNode == newStateID {
-				// Randomly choose an ambassador node.
-				ambassadorNode = rand.Intn(len(dfa.States))
+			// Iterate until a valid ambassador state is found.
+			for {
+				// Slice of state pool for ambassador state selection.
+				var statePool []int
+
+				// Iterate over states within dfa.
+				for stateID := range dfa.States {
+					// Add to state pool if not already tried.
+					if _, alreadyTried := tried[stateID]; !alreadyTried {
+						statePool = append(statePool, stateID)
+					}
+				}
+
+				// Recursively call StaminaDFA if state pool is empty.
+				if len(statePool) == 0 {
+					return StaminaDFA(alphabetSize, targetDFASize)
+				}
+
+				// Randomly select an ambassador state from state pool.
+				ambassadorState = statePool[rand.Intn(len(statePool))]
+
+				// If ambassador state already covers all transitions,
+				// choose another ambassador state. Else break since a
+				// valid ambassador state is found.
+				if !dfa.States[ambassadorState].AllTransitionsExist() {
+					break
+				}
+
+				// Add newly selected ambassador state to tried map.
+				tried[ambassadorState] = true
 			}
 
-			// Select a random symbol within the alphabet.
-			randomSymbol := rand.Intn(alphabetSize)
-
-			// If transition from ambassador node using chosen symbol already exists,
-			// choose another random symbol. Loop until a free symbol is found.
-			for dfa.States[ambassadorNode].Transitions[randomSymbol] != -1 {
-				randomSymbol = rand.Intn(alphabetSize)
-			}
-
-			// Add edge (transition) from  ambassador node to new state using random valid symbol.
-			dfa.AddTransition(randomSymbol, ambassadorNode, newStateID)
+			// Add an edge from the ambassador state to the newly created state.
+			addTransition(ambassadorState, newStateID, &dfa, p)
 
 			// Self loop with probability l.
-			if rand.Float64() < l {
-				// Select a random symbol within the alphabet.
-				randomSymbol = rand.Intn(alphabetSize)
-
-				// Add self-looping edge (transition) using random valid symbol.
-				dfa.AddTransition(randomSymbol, newStateID, newStateID)
+			if util.RandomGeometricProbability(1-l) > 0 && !dfa.States[newStateID].AllTransitionsExist(){
+				// Add a self-loop edge within the newly created state.
+				addTransition(newStateID, newStateID, &dfa, p)
 			}
 
-			// ModifiedForestFire is called using the new state and the ambassador node.
-			ModifiedForestFire(newStateID, ambassadorNode, &dfa, &visitedStates, alphabetSize, f, b, p)
+			// Mark both ambassador state and new state as visited.
+			visitedStates[ambassadorState] = true
+			visitedStates[newStateID] = true
+
+			// modifiedForestFire is called using the new state, the ambassador state, a pointer
+			// to the DFA and to the visited states map, alongside other probability values.
+			modifiedForestFire(newStateID, ambassadorState, &dfa, &visitedStates, f, b, p)
 		}
 
-		// Randomly choose a starting state.
-		dfa.StartingStateID = rand.Intn(len(dfa.States))
+		// Minimise DFA created and remove sink state.
+		minimisedDFA := dfa.minimiseAndRemoveSinkState()
 
-		// Minimise DFA created.
-		dfa = dfa.Minimise()
+		// Store number of states within minimised DFA.
+		minimisedDFAStates = len(minimisedDFA.States)
+		// Increment number of states to add by decrementing the number of
+		// states within minimised dfa from the size of the target DFA.
+		numberOfStatesToAdd += targetDFASize - minimisedDFAStates
 
-		// If the number of states within created DFA is equal
-		// to the target DFA size, the DFA is returned.
-		// Else, try again until required target is found.
-		if len(dfa.States) == targetDFASize {
-			// Return the created DFA since it
+		// If the number of states within minimised DFA is equal (or within +2)
+		// to the target DFA size, the DFA is returned. Else, try again until
+		// required target is found.
+		if minimisedDFAStates + 2 >= targetDFASize {
+			// Return the minimised DFA since it
 			// meets all of the requirements.
-			return dfa
+			return minimisedDFA
 		}
 	}
 }
 
-// ModifiedForestFire is used within the StaminaDFA function to generate random DFAs using the Stamina protocol.
+// modifiedForestFire is used within the StaminaDFA function to generate random DFAs using the Stamina protocol.
 // This is equivalent to steps 2 an 3 within the Forest-Fire algorithm in
 // Jure Leskovec, Jon Kleinberg, and Christos Faloutsos. 2007. Graph evolution:
 // Densification and shrinking diameters. ACM Trans. Knowl. Discov. Data 1, 1
 // (March 2007), 2–es. DOI:https://doi.org/10.1145/1217299.1217301
-func ModifiedForestFire(currentNode int, ambassadorNode int, dfa *DFA, visitedStates *map[int]bool, alphabetSize int, f, b, p float64) {
-	// Step 1 within ForestFire algorithm.
-
-	// Mark current node as visited.
-	(*visitedStates)[currentNode] = true
-
-	// If all transitions from current node are already
-	// filled, return.
-	if dfa.States[currentNode].AllTransitionsExist() {
-		return
-	}
+func modifiedForestFire(currentState int, ambassadorState int, dfa *DFA, visitedStates *map[int]bool, f, b, p float64) {
+	// Generate random number using a geometric distribution as per Stamina protocol.
+	x := util.RandomGeometricProbability(1 - f)
 
 	// Generate random number using a geometric distribution as per Stamina protocol.
-	y := int(math.Ceil(math.Logb(1-rand.Float64()) / (math.Logb(1 - ((f * b) / (1 - (f * b)))))))
+	y := util.RandomGeometricProbability(1 - f*b)
 
-	// Map to store state IDs of nodes which have a transition from ambassador node.
-	// A map is used rather than a slice to avoid duplicate state IDs.
-	toNodes := map[int]bool{}
+	// Slice to store IDs of states which have a transition from ambassador state.
+	// A map is also created to avoid duplicate state IDs.
+	toStatesSet := map[int]bool{}
+	var toStates []int
 
 	// Iterate over each symbol within alphabet.
 	for symbol := range dfa.Alphabet {
-		// If the amount of required nodes
-		// is reached, break loop.
-		if len(toNodes) == y {
-			break
-		}
-
-		// If resultant state is valid, not visited, not in to nodes,
-		// and not equal to current node, add to toNodes map.
-		if resultantStateID := dfa.States[ambassadorNode].Transitions[symbol]; resultantStateID != -1 &&
-			!(*visitedStates)[resultantStateID] && !toNodes[resultantStateID] && resultantStateID != currentNode {
-			toNodes[resultantStateID] = true
+		// If resultant state is valid, not visited, not in to states, and not
+		// equal to current state, add to toStatesSet map and to toStates slice.
+		if resultantStateID := dfa.States[ambassadorState].Transitions[symbol]; resultantStateID != -1 &&
+			!(*visitedStates)[resultantStateID] && !toStatesSet[resultantStateID] {
+			toStatesSet[resultantStateID] = true
+			toStates = append(toStates, resultantStateID)
 		}
 	}
 
-	// Generate random number using a geometric distribution as per Stamina protocol.
-	x := int(math.Ceil(math.Logb(1-rand.Float64()) / (math.Logb(1 - (f / (1 - f))))))
+	// Shuffle to states selected and limit number of states to y.
+	if len(toStates) > y {
+		rand.Shuffle(len(toStates), func(i, j int) { toStates[i], toStates[j] = toStates[j], toStates[i] })
+		toStates = toStates[:y]
+	}
 
-	// Slice to store state IDs of nodes which have a transition to ambassador node.
-	var fromNodes []int
+	// Slice to store IDs of states which have a transition to the ambassador state.
+	var fromStates []int
 
 	// Iterate over states within dfa.
 	for stateID, state := range dfa.States {
-		// If the amount of required nodes
-		// is reached, break loop.
-		if len(fromNodes) == x {
-			break
-		}
-
 		// Check if state already visited.
 		if !(*visitedStates)[stateID] {
 			// Iterate over each symbol within alphabet.
 			for symbol := range dfa.Alphabet {
-				// If resultant state is equal to ID of ambassador node and not equal
-				// to current node, add to fromNodes slice and break.
-				if resultantStateID := state.Transitions[symbol]; resultantStateID == ambassadorNode && stateID != currentNode && !toNodes[stateID] {
-					fromNodes = append(fromNodes, stateID)
+				// If resultant state is equal to ID of ambassador state and not equal
+				// to current state, add to fromStates slice and break.
+				if resultantStateID := state.Transitions[symbol]; resultantStateID == ambassadorState && !toStatesSet[stateID] {
+					fromStates = append(fromStates, stateID)
 					break
 				}
 			}
 		}
 	}
 
-	// Step 2 within ForestFire algorithm.
+	// Shuffle from states selected and limit number of states to x.
+	if len(fromStates) > x {
+		rand.Shuffle(len(fromStates), func(i, j int) { fromStates[i], fromStates[j] = fromStates[j], fromStates[i] })
+		fromStates = fromStates[:x]
+	}
 
-	// Iterate over all from nodes selected.
-	for _, stateID := range fromNodes {
-		// Skip if all transitions already exist within
-		// state. This happens since other recursive
-		// calls can change these transitions.
-		if dfa.States[stateID].AllTransitionsExist() {
-			continue
-		}
-
-		// Select a random symbol within the alphabet.
-		randomSymbol := rand.Intn(alphabetSize)
-
-		// If transition from state using chosen symbol already exists,
-		// choose another random symbol. Loop until a free symbol is found.
-		for dfa.States[stateID].Transitions[randomSymbol] != -1 {
-			randomSymbol = rand.Intn(alphabetSize)
-		}
-
-		// Add edge (transition) from current state to from state using random valid symbol.
-		dfa.AddTransition(randomSymbol, currentNode, stateID)
-
-		// Parallel edge label with probability p.
-		if !dfa.States[currentNode].AllTransitionsExist() && rand.Float64() < p {
-			// Select a random symbol within the alphabet.
-			randomSymbol = rand.Intn(alphabetSize)
-
-			// If transition from current node using chosen symbol already exists,
-			// choose another random symbol. Loop until a free symbol is found.
-			for dfa.States[currentNode].Transitions[randomSymbol] != -1 {
-				randomSymbol = rand.Intn(alphabetSize)
+	// Iterate over all from states selected.
+	for _, fromStateID := range fromStates {
+		// Randomly choose direction of transition.
+		if rand.Intn(2) == 0 {
+			// Check whether any transitions are available from current state.
+			if !dfa.States[currentState].AllTransitionsExist() {
+				// Add edge from current state to 'from' state.
+				addTransition(currentState, fromStateID, dfa, p)
 			}
-
-			// Add parallel edge (transition) label using random valid symbol.
-			dfa.AddTransition(randomSymbol, currentNode, stateID)
-		}
-	}
-
-	// Iterate over all to nodes selected.
-	for stateID := range toNodes {
-		// Skip if all transitions already exist within
-		// state. This happens since other recursive
-		// calls can change these transitions.
-		if dfa.States[stateID].AllTransitionsExist() {
-			continue
-		}
-
-		// Select a random symbol within the alphabet.
-		randomSymbol := rand.Intn(alphabetSize)
-
-		// If transition from state using chosen symbol already exists,
-		// choose another random symbol. Loop until a free symbol is found.
-		for dfa.States[stateID].Transitions[randomSymbol] != -1 {
-			randomSymbol = rand.Intn(alphabetSize)
-		}
-
-		// Add edge (transition) from current state to from state using random valid symbol.
-		dfa.AddTransition(randomSymbol, currentNode, stateID)
-
-		// Parallel edge label with probability p.
-		if !dfa.States[currentNode].AllTransitionsExist() && rand.Float64() < p {
-			// Select a random symbol within the alphabet.
-			randomSymbol = rand.Intn(alphabetSize)
-
-			// If transition from current node using chosen symbol already exists,
-			// choose another random symbol. Loop until a free symbol is found.
-			for dfa.States[currentNode].Transitions[randomSymbol] != -1 {
-				randomSymbol = rand.Intn(alphabetSize)
+		} else {
+			// Check whether any transitions are available from 'from' state.
+			if !dfa.States[fromStateID].AllTransitionsExist() {
+				// Add edge from 'from' state to current state.
+				addTransition(fromStateID, currentState, dfa, p)
 			}
+		}
+		// Mark state as visited.
+		(*visitedStates)[fromStateID] = true
+	}
 
-			// Add parallel edge (transition) label using random valid symbol.
-			dfa.AddTransition(randomSymbol, currentNode, stateID)
+	// Iterate over all to states selected.
+	for _, toStateID := range toStates {
+		// Randomly choose direction of transition.
+		if rand.Intn(2) == 0 {
+			// Check whether any transitions are available from current state.
+			if !dfa.States[currentState].AllTransitionsExist() {
+				// Add edge from current state to 'to' state.
+				addTransition(currentState, toStateID, dfa, p)
+			}
+		} else {
+			// Check whether any transitions are available from 'to' state.
+			if !dfa.States[toStateID].AllTransitionsExist() {
+				// Add edge from 'to' state to current state.
+				addTransition(toStateID, currentState, dfa, p)
+			}
+		}
+		// Mark state as visited.
+		(*visitedStates)[toStateID] = true
+	}
+
+	// Iterate over all from states selected.
+	for _, fromStateID := range fromStates {
+		// Recursively call modifiedForestFire function on 'from' state.
+		modifiedForestFire(currentState, fromStateID, dfa, visitedStates, f, b, p)
+	}
+
+	// Iterate over all to statesselected.
+	for _, toStateID := range toStates {
+		// Recursively call modifiedForestFire function on 'to' state.
+		modifiedForestFire(currentState, toStateID, dfa, visitedStates, f, b, p)
+	}
+}
+
+// addTransition adds a transition from one state to another (can be the same state) while
+// possibly adding a number of parallel edges using mean p.
+// Used within StaminaDFA and modifiedForestFire functions.
+func addTransition(fromState, toState int, dfa *DFA, p float64) {
+	// Call addTransitionInternal function to add a transition
+	// from 'from' state to 'to' state.
+	addTransitionInternal(fromState, toState, dfa)
+
+	// Parallel edge label with mean p.
+	parallelEdges := util.RandomGeometricProbability(1 - p)
+
+	// Randomly choose direction of transition.
+	if rand.Intn(2) == 0 {
+		// Check whether number of parallel edges is reached and if any transitions are available from 'from' state.
+		for i := 0; i < parallelEdges && !dfa.States[fromState].AllTransitionsExist(); i++ {
+			// Call addTransitionInternal function to add a transition
+			// from 'from' state to 'to' state.
+			addTransitionInternal(fromState, toState, dfa)
+		}
+	} else {
+		// Check whether number of parallel edges is reached and if any transitions are available from 'to' state.
+		for i := 0; i < parallelEdges && !dfa.States[toState].AllTransitionsExist(); i++ {
+			// Call addTransitionInternal function to add a transition
+			// from 'to' state to 'from' state.
+			addTransitionInternal(toState, fromState, dfa)
+		}
+	}
+}
+
+// addTransitionInternal adds a transition from one state to another (can be the same state)
+// Used within addTransition function which is used within StaminaDFA and modifiedForestFire functions.
+func addTransitionInternal(fromState, toState int, dfa *DFA) {
+	// Slice to store alphabet pool of 'from' state.
+	var alphabetPool []int
+
+	// Iterate over each symbol within alphabet.
+	for symbolID := range dfa.Alphabet {
+		// If resultant state ID is smaller than 0 (does not exist), add to alphabet pool.
+		if resultantStateID := dfa.States[fromState].Transitions[symbolID]; resultantStateID < 0 {
+			alphabetPool = append(alphabetPool, symbolID)
 		}
 	}
 
-	// Iterate over all from nodes selected.
-	for _, stateID := range fromNodes {
-		// Recursively call ModifiedForestFire function.
-		ModifiedForestFire(stateID, ambassadorNode, dfa, visitedStates, alphabetSize, f, b, p)
+	// Panic if alphabet pool is empty.
+	if len(alphabetPool) == 0 {
+		panic("Alphabet pool cannot be empty.")
 	}
 
-	// Iterate over all to nodes selected.
-	for stateID := range toNodes {
-		// Recursively call ModifiedForestFire function.
-		ModifiedForestFire(stateID, ambassadorNode, dfa, visitedStates, alphabetSize, f, b, p)
+	// Randomly select a symbol from alphabet pool.
+	randomSymbol := alphabetPool[rand.Intn(len(alphabetPool))]
+
+	// Add transition from 'from' state to 'to' state using selected symbol.
+	dfa.AddTransition(randomSymbol, fromState, toState)
+}
+
+// minimiseAndRemoveSinkState is a modified version of the Minimise function. If a non-complete
+// DFA is inputted, a sink state is added and it is minimised. After this, the sink state is removed.
+// Used within StaminaDFA function.
+func (dfa DFA) minimiseAndRemoveSinkState() DFA {
+	// Clone DFA to work on.
+	temporaryDFA := dfa.Clone()
+
+	// Remove unreachable states within DFA.
+	temporaryDFA.RemoveUnreachableStates()
+
+	// If DFA is complete, use normal minimisation function.
+	if temporaryDFA.IsComplete() {
+		return temporaryDFA.Minimise()
 	}
+
+	// Add sink state and store its ID.
+	sinkStateID := temporaryDFA.AddSinkState()
+
+	// Get indistinguishable state pairs from IndistinguishableStatePairs function.
+	indistinguishablePairs := temporaryDFA.IndistinguishableStatePairs()
+
+	// Convert DFA to state partition.
+	statePartition := temporaryDFA.ToStatePartition()
+
+	// Merge indistinguishable pairs.
+	for _, indistinguishablePair := range indistinguishablePairs {
+		block1 := statePartition.Find(indistinguishablePair.state1)
+		block2 := statePartition.Find(indistinguishablePair.state2)
+		if block1 != block2 {
+			statePartition.Union(block1, block2)
+		}
+	}
+
+	// Get the block ID which contains the sink state after merging states.
+	sinkBlockID := statePartition.Find(sinkStateID)
+
+	// Convert state partition to Quotient DFA while getting the mappings used.
+	resultantDFA, blockToStateMap := statePartition.ToQuotientDFAWithMapping()
+
+	// Remove state which contains the sink state.
+	resultantDFA.RemoveState(blockToStateMap[sinkBlockID])
+
+	// Return resultant minimised DFA.
+	return resultantDFA
 }
 
 // StaminaDataset returns a training and testing Dataset using the
@@ -365,7 +443,6 @@ func StaminaDataset(dfa DFA, sparsityPercentage float64, initialStringsGenerated
 	for len(firstSample) < initialStringsGenerated {
 		currentString := StringInstance{make([]int, 0), true}
 		currentState := dfa.StartingState()
-		currentStateID := dfa.StartingStateID
 		valid := true
 		for {
 			if currentState.IsAccepting() {
@@ -377,8 +454,8 @@ func StaminaDataset(dfa DFA, sparsityPercentage float64, initialStringsGenerated
 
 			validTransitions := currentState.ValidTransitions()
 
-			// Break if no valid transitions or if current state is a leaf node.
-			if len(validTransitions) == 0 || currentState.IsLeaf(currentStateID) {
+			// Break if no valid transitions or if current state is a leaf state.
+			if len(validTransitions) == 0 || currentState.IsLeaf() {
 				if !currentState.IsAccepting() {
 					valid = false
 				}
@@ -391,7 +468,6 @@ func StaminaDataset(dfa DFA, sparsityPercentage float64, initialStringsGenerated
 
 			currentString.Value = append(currentString.Value, validSymbol)
 
-			currentStateID = currentState.Transitions[validSymbol]
 			currentState = &dfa.States[currentState.Transitions[validSymbol]]
 		}
 
@@ -646,7 +722,7 @@ func GetDFAFromStaminaFile(fileName string) DFA {
 		if acceptingState {
 			dfa.AddState(ACCEPTING)
 		} else {
-			dfa.AddState(UNKNOWN)
+			dfa.AddState(UNLABELLED)
 		}
 	}
 

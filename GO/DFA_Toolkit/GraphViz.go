@@ -69,7 +69,7 @@ func (dfa *DFA) ToDOT(filePath string, symbolMapping map[int]rune, showOrder boo
 			label = fmt.Sprintf("\"q%d\"", stateID)
 		}
 
-		if state.Label == UNKNOWN {
+		if state.Label == UNLABELLED {
 			_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=%s shape=\"circle\" fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"filled\" fillcolor=\"white\"];\n", stateID, label))
 		} else if state.Label == ACCEPTING {
 			_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=%s shape=\"circle\" peripheries=2 fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"filled\" fillcolor=\"white\"];\n", stateID, label))
@@ -252,7 +252,7 @@ func (statePartition StatePartition) ToDOT(filePath string, symbolMapping map[in
 	// depending on the blockID label.
 	for index, blockID := range rootBlocks {
 		statesWithinBlock := statePartition.ReturnSet(blockID)
-		label := "\"q"
+		label := fmt.Sprintf("\"q%d\\n", blockID)
 		for index2, stateID := range statesWithinBlock {
 			label += fmt.Sprintf("%d", stateID)
 			if index2 < len(statesWithinBlock)-1 {
@@ -266,7 +266,7 @@ func (statePartition StatePartition) ToDOT(filePath string, symbolMapping map[in
 		}
 		label += "\""
 
-		if statePartition.Blocks[blockID].Label == UNKNOWN {
+		if statePartition.Blocks[blockID].Label == UNLABELLED {
 			_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=%s shape=\"circle\" fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"filled\" fillcolor=\"white\"];\n", blockID, label))
 		} else if statePartition.Blocks[blockID].Label == ACCEPTING {
 			_, _ = writer.WriteString(fmt.Sprintf("\tq%d [label=%s shape=\"circle\" peripheries=2 fontname=verdana fontsize=8 color=\"black\" fontcolor=\"black\" style=\"filled\" fillcolor=\"white\"];\n", blockID, label))
