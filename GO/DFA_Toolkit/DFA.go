@@ -294,8 +294,8 @@ func (dfa DFA) IsTree() bool {
 	for stateID := range dfa.States {
 		for symbol := range dfa.Alphabet {
 			resultantStateID := dfa.States[stateID].Transitions[symbol]
-			if resultantStateID != -1{
-				if visitedStates[resultantStateID]{
+			if resultantStateID != -1 {
+				if visitedStates[resultantStateID] {
 					return false
 				}
 				visitedStates[resultantStateID] = true
@@ -309,7 +309,7 @@ func (dfa DFA) IsTree() bool {
 // IsComplete returns true if DFA is complete, false is returned otherwise.
 func (dfa DFA) IsComplete() bool {
 	for _, state := range dfa.States {
-		if state.OutDegree() != len(dfa.Alphabet){
+		if state.OutDegree() != len(dfa.Alphabet) {
 			return false
 		}
 	}
@@ -442,7 +442,7 @@ func (dfa DFA) Describe(detail bool) {
 		fmt.Println("Transitions:")
 		for fromStateID, fromState := range dfa.States {
 			for symbol, toStateID := range fromState.Transitions {
-				if toStateID != -1{
+				if toStateID != -1 {
 					fmt.Println(fromStateID, "--", symbol, "->", toStateID)
 				}
 			}

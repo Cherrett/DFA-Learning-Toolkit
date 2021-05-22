@@ -5,9 +5,9 @@ type StateLabel uint8
 
 // Constants which represent the 3 possible state labels.
 const (
-	REJECTING = iota // 0
-	ACCEPTING        // 1
-	UNLABELLED       // 2
+	REJECTING  = iota // 0
+	ACCEPTING         // 1
+	UNLABELLED        // 2
 )
 
 // State struct which represents a State within a DFA.
@@ -40,17 +40,16 @@ func (state State) InDegree(stateID int) int {
 	count := 0
 
 	// Iterate over each state within reference DFA.
-	for _, state2 := range state.DFA().States{
+	for _, state2 := range state.DFA().States {
 		// Iterate over each transition from state.
 		for _, toStateID := range state2.Transitions {
 			// If a transition with a value equal to the stateID
 			// is found, the in degree counter is incremented.
 			if toStateID == stateID {
-				count ++
+				count++
 			}
 		}
 	}
-
 
 	// Return in degree count.
 	return count
@@ -66,7 +65,7 @@ func (state State) OutDegree() int {
 		// If a transition with a value not equal to -1 is
 		// found (valid), the counter is incremented.
 		if toStateID != -1 {
-			count ++
+			count++
 		}
 	}
 
@@ -199,11 +198,11 @@ func (state State) TotalTransitionsCount() int {
 func (state State) Clone() State {
 	// Initialize cloned State.
 	clonedState := State{
-		Label:                 state.Label,
-		Transitions:           make([]int, len(state.Transitions)),
-		depth:                 state.depth,
-		order: 				   state.order,
-		dfa: 				   state.dfa,
+		Label:       state.Label,
+		Transitions: make([]int, len(state.Transitions)),
+		depth:       state.depth,
+		order:       state.order,
+		dfa:         state.dfa,
 	}
 
 	// Clone the transitions.
@@ -212,4 +211,3 @@ func (state State) Clone() State {
 	// Return cloned State.
 	return clonedState
 }
-

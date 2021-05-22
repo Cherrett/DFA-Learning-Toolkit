@@ -18,9 +18,9 @@ func (dfa *DFA) IndistinguishableStatePairs() []StateIDPair {
 			// If the state pair have different types, add to distinguishable pairs map.
 			if dfa.States[stateID].Label != dfa.States[stateID2].Label {
 				// Make sure that the smaller stateID is in first position within pair
-				if stateID <= stateID2{
+				if stateID <= stateID2 {
 					distinguishablePairs[StateIDPair{stateID, stateID2}] = true
-				}else{
+				} else {
 					distinguishablePairs[StateIDPair{stateID2, stateID}] = true
 				}
 			}
@@ -50,12 +50,12 @@ func (dfa *DFA) IndistinguishableStatePairs() []StateIDPair {
 						if resultantStateID1 != -1 && resultantStateID2 != -1 {
 							// If pair containing both resultant state IDs is marked as distinguishable,
 							// mark current state pair as distinguishable.
-							if resultantStateID1 <= resultantStateID2{
-								if distinguishablePairs[StateIDPair{resultantStateID1, resultantStateID2}]{
+							if resultantStateID1 <= resultantStateID2 {
+								if distinguishablePairs[StateIDPair{resultantStateID1, resultantStateID2}] {
 									distinguishablePairs[StateIDPair{stateID, stateID2}] = true
 								}
-							}else{
-								if distinguishablePairs[StateIDPair{resultantStateID2, resultantStateID1}]{
+							} else {
+								if distinguishablePairs[StateIDPair{resultantStateID2, resultantStateID1}] {
 									distinguishablePairs[StateIDPair{stateID, stateID2}] = true
 								}
 							}
@@ -116,10 +116,10 @@ func (dfa DFA) Minimise() DFA {
 	statePartition := temporaryDFA.ToStatePartition()
 
 	// Merge indistinguishable pairs.
-	for _, indistinguishablePair := range indistinguishablePairs{
+	for _, indistinguishablePair := range indistinguishablePairs {
 		block1 := statePartition.Find(indistinguishablePair.state1)
 		block2 := statePartition.Find(indistinguishablePair.state2)
-		if block1 != block2{
+		if block1 != block2 {
 			statePartition.Union(block1, block2)
 		}
 	}
@@ -135,7 +135,7 @@ func (dfa DFA) Minimise() DFA {
 // a non-complete DFA to a complete DFA by adding a sink state.
 func (dfa *DFA) AddSinkState() int {
 	// Return if dfa is complete since sink state is not required.
-	if dfa.IsComplete(){
+	if dfa.IsComplete() {
 		return -1
 	}
 

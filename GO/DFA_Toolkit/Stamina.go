@@ -120,7 +120,7 @@ func StaminaDFA(alphabetSize int, targetDFASize int) DFA {
 	// Iterate till a valid DFA is generated.
 	for {
 		// Iterate until required amount of states is reached.
-		for len(dfa.States) - 1 < numberOfStatesToAdd {
+		for len(dfa.States)-1 < numberOfStatesToAdd {
 			// Map of visited states.
 			visitedStates := map[int]bool{}
 
@@ -140,23 +140,22 @@ func StaminaDFA(alphabetSize int, targetDFASize int) DFA {
 			// Map of tried states to be ambassador state.
 			tried := map[int]bool{newStateID: true}
 
-
 			// Iterate until a valid ambassador state is found.
-			for{
+			for {
 				// Slice of state pool for ambassador state selection.
 				var statePool []int
 
 				// Iterate over states within dfa.
-				for stateID := range dfa.States{
+				for stateID := range dfa.States {
 					// Add to state pool if not already tried.
-					if _, alreadyTried := tried[stateID]; !alreadyTried{
+					if _, alreadyTried := tried[stateID]; !alreadyTried {
 						statePool = append(statePool, stateID)
 					}
 				}
 
-				// Panic if state pool is empty.
+				// Recursively call StaminaDFA if state pool is empty.
 				if len(statePool) == 0 {
-					panic("Ambassador state pool cannot be empty.")
+					return StaminaDFA(alphabetSize, targetDFASize)
 				}
 
 				// Randomly select an ambassador state from state pool.
@@ -165,7 +164,7 @@ func StaminaDFA(alphabetSize int, targetDFASize int) DFA {
 				// If ambassador state already covers all transitions,
 				// choose another ambassador state. Else break since a
 				// valid ambassador state is found.
-				if !dfa.States[ambassadorState].AllTransitionsExist(){
+				if !dfa.States[ambassadorState].AllTransitionsExist() {
 					break
 				}
 
@@ -177,7 +176,7 @@ func StaminaDFA(alphabetSize int, targetDFASize int) DFA {
 			addTransition(ambassadorState, newStateID, &dfa, p)
 
 			// Self loop with probability l.
-			if  util.RandomGeometricProbability(1 - l) > 0 {
+			if util.RandomGeometricProbability(1-l) > 0 && !dfa.States[newStateID].AllTransitionsExist(){
 				// Add a self-loop edge within the newly created state.
 				addTransition(newStateID, newStateID, &dfa, p)
 			}
@@ -203,7 +202,7 @@ func StaminaDFA(alphabetSize int, targetDFASize int) DFA {
 		// If the number of states within minimised DFA is equal (or within +2)
 		// to the target DFA size, the DFA is returned. Else, try again until
 		// required target is found.
-		if minimisedDFAStates + 2 >= targetDFASize {
+		if minimisedDFAStates+2 >= targetDFASize {
 			// Return the minimised DFA since it
 			// meets all of the requirements.
 			return minimisedDFA
@@ -221,7 +220,7 @@ func modifiedForestFire(currentState int, ambassadorState int, dfa *DFA, visited
 	x := util.RandomGeometricProbability(1 - f)
 
 	// Generate random number using a geometric distribution as per Stamina protocol.
-	y :=  util.RandomGeometricProbability(1 - f * b)
+	y := util.RandomGeometricProbability(1 - f*b)
 
 	// Slice to store IDs of states which have a transition from ambassador state.
 	// A map is also created to avoid duplicate state IDs.
@@ -240,7 +239,7 @@ func modifiedForestFire(currentState int, ambassadorState int, dfa *DFA, visited
 	}
 
 	// Shuffle to states selected and limit number of states to y.
-	if len(toStates) > y{
+	if len(toStates) > y {
 		rand.Shuffle(len(toStates), func(i, j int) { toStates[i], toStates[j] = toStates[j], toStates[i] })
 		toStates = toStates[:y]
 	}
@@ -265,7 +264,7 @@ func modifiedForestFire(currentState int, ambassadorState int, dfa *DFA, visited
 	}
 
 	// Shuffle from states selected and limit number of states to x.
-	if len(fromStates) > x{
+	if len(fromStates) > x {
 		rand.Shuffle(len(fromStates), func(i, j int) { fromStates[i], fromStates[j] = fromStates[j], fromStates[i] })
 		fromStates = fromStates[:x]
 	}
@@ -275,11 +274,11 @@ func modifiedForestFire(currentState int, ambassadorState int, dfa *DFA, visited
 		// Randomly choose direction of transition.
 		if rand.Intn(2) == 0 {
 			// Check whether any transitions are available from current state.
-			if !dfa.States[currentState].AllTransitionsExist(){
+			if !dfa.States[currentState].AllTransitionsExist() {
 				// Add edge from current state to 'from' state.
 				addTransition(currentState, fromStateID, dfa, p)
 			}
-		}else{
+		} else {
 			// Check whether any transitions are available from 'from' state.
 			if !dfa.States[fromStateID].AllTransitionsExist() {
 				// Add edge from 'from' state to current state.
@@ -295,11 +294,11 @@ func modifiedForestFire(currentState int, ambassadorState int, dfa *DFA, visited
 		// Randomly choose direction of transition.
 		if rand.Intn(2) == 0 {
 			// Check whether any transitions are available from current state.
-			if !dfa.States[currentState].AllTransitionsExist(){
+			if !dfa.States[currentState].AllTransitionsExist() {
 				// Add edge from current state to 'to' state.
 				addTransition(currentState, toStateID, dfa, p)
 			}
-		}else{
+		} else {
 			// Check whether any transitions are available from 'to' state.
 			if !dfa.States[toStateID].AllTransitionsExist() {
 				// Add edge from 'to' state to current state.
@@ -326,13 +325,13 @@ func modifiedForestFire(currentState int, ambassadorState int, dfa *DFA, visited
 // addTransition adds a transition from one state to another (can be the same state) while
 // possibly adding a number of parallel edges using mean p.
 // Used within StaminaDFA and modifiedForestFire functions.
-func addTransition(fromState, toState int, dfa *DFA, p float64){
+func addTransition(fromState, toState int, dfa *DFA, p float64) {
 	// Call addTransitionInternal function to add a transition
 	// from 'from' state to 'to' state.
 	addTransitionInternal(fromState, toState, dfa)
 
 	// Parallel edge label with mean p.
-	parallelEdges :=  util.RandomGeometricProbability(1 - p)
+	parallelEdges := util.RandomGeometricProbability(1 - p)
 
 	// Randomly choose direction of transition.
 	if rand.Intn(2) == 0 {
@@ -342,7 +341,7 @@ func addTransition(fromState, toState int, dfa *DFA, p float64){
 			// from 'from' state to 'to' state.
 			addTransitionInternal(fromState, toState, dfa)
 		}
-	}else{
+	} else {
 		// Check whether number of parallel edges is reached and if any transitions are available from 'to' state.
 		for i := 0; i < parallelEdges && !dfa.States[toState].AllTransitionsExist(); i++ {
 			// Call addTransitionInternal function to add a transition
@@ -354,14 +353,14 @@ func addTransition(fromState, toState int, dfa *DFA, p float64){
 
 // addTransitionInternal adds a transition from one state to another (can be the same state)
 // Used within addTransition function which is used within StaminaDFA and modifiedForestFire functions.
-func addTransitionInternal(fromState, toState int, dfa *DFA){
+func addTransitionInternal(fromState, toState int, dfa *DFA) {
 	// Slice to store alphabet pool of 'from' state.
 	var alphabetPool []int
 
 	// Iterate over each symbol within alphabet.
-	for symbolID := range dfa.Alphabet{
+	for symbolID := range dfa.Alphabet {
 		// If resultant state ID is smaller than 0 (does not exist), add to alphabet pool.
-		if resultantStateID := dfa.States[fromState].Transitions[symbolID]; resultantStateID < 0{
+		if resultantStateID := dfa.States[fromState].Transitions[symbolID]; resultantStateID < 0 {
 			alphabetPool = append(alphabetPool, symbolID)
 		}
 	}
@@ -403,10 +402,10 @@ func (dfa DFA) minimiseAndRemoveSinkState() DFA {
 	statePartition := temporaryDFA.ToStatePartition()
 
 	// Merge indistinguishable pairs.
-	for _, indistinguishablePair := range indistinguishablePairs{
+	for _, indistinguishablePair := range indistinguishablePairs {
 		block1 := statePartition.Find(indistinguishablePair.state1)
 		block2 := statePartition.Find(indistinguishablePair.state2)
-		if block1 != block2{
+		if block1 != block2 {
 			statePartition.Union(block1, block2)
 		}
 	}

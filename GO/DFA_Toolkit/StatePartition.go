@@ -546,22 +546,22 @@ func (statePartition *StatePartition) StartingBlock() int {
 }
 
 // DepthOfBlocks returns the depth of each block.
-func (statePartition *StatePartition) DepthOfBlocks() map[int]int{
+func (statePartition *StatePartition) DepthOfBlocks() map[int]int {
 	// Create a FIFO queue with starting state.
 	start := statePartition.StartingBlock()
 	result := map[int]int{start: 0}
 	queue := []int{start}
 
-	for len(queue) > 0{
+	for len(queue) > 0 {
 		// Remove and store first state in queue.
 		blockID := queue[0]
 		queue = queue[1:]
 		depth := result[blockID]
 
-		for symbolID := 0; symbolID < statePartition.AlphabetSize; symbolID++{
-			if childStateID := statePartition.Blocks[blockID].Transitions[symbolID]; childStateID != -1{
+		for symbolID := 0; symbolID < statePartition.AlphabetSize; symbolID++ {
+			if childStateID := statePartition.Blocks[blockID].Transitions[symbolID]; childStateID != -1 {
 				childBlockID := statePartition.Find(childStateID)
-				if _, exists := result[childBlockID]; !exists{
+				if _, exists := result[childBlockID]; !exists {
 					result[childBlockID] = depth + 1
 					queue = append(queue, childBlockID)
 				}
@@ -573,7 +573,7 @@ func (statePartition *StatePartition) DepthOfBlocks() map[int]int{
 }
 
 // OrderOfBlocks returns the order of each block.
-func (statePartition *StatePartition) OrderOfBlocks() map[int]int{
+func (statePartition *StatePartition) OrderOfBlocks() map[int]int {
 	// Map of integer values to keep track of ordered blocks.
 	orderedBlocks := make(map[int]int, statePartition.BlocksCount)
 
