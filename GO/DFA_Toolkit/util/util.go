@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"math/rand"
 	"net/http"
 	"os"
 )
@@ -183,12 +184,16 @@ func (statsTracker StatsTracker) SampleStandardDev() float64{
 
 // Factorial returns the factorial of n by recursively
 // calling itself.
-func Factorial(n int)(result int) {
+func Factorial(n int) int {
 	if n > 0 {
-		result = n * Factorial(n-1)
-		return result
+		return n * Factorial(n-1)
 	}
 	return 1
+}
+
+// RandomGeometricProbability returns a random geometrically distributed integer using a mean value.
+func RandomGeometricProbability(mean float64) int{
+	return int(math.Log(rand.Float64()) / (math.Log(1 - mean)))
 }
 
 // DownloadAllStaminaDatasets downloads all of the stamina datasets to a given directory.
