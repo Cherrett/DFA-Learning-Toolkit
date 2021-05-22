@@ -107,8 +107,8 @@ func TestStaminaDFAGeneration(t *testing.T) {
 		if len(StaminaDFA.Alphabet) != alphabetSize {
 			t.Errorf("StaminaDFA number of symbols = %d, want %d", StaminaDFA.Alphabet, alphabetSize)
 		}
-		if len(StaminaDFA.States) != 50 {
-			t.Errorf("StaminaDFA number of states = %d, want %d", len(StaminaDFA.States), 50)
+		if len(StaminaDFA.States) < 48 || len(StaminaDFA.States) > 50 {
+			t.Errorf("StaminaDFA number of states = %d, want 48 - 50", len(StaminaDFA.States))
 		}
 	}
 }
