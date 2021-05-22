@@ -47,7 +47,7 @@ func (dfa *DFA) IndistinguishableStatePairs() []StateIDPair {
 						resultantStateID1 := dfa.States[stateID].Transitions[symbol]
 						resultantStateID2 := dfa.States[stateID2].Transitions[symbol]
 						// If both states have a valid transition using current symbol.
-						if resultantStateID1 != -1 && resultantStateID2 != -1 {
+						if resultantStateID1 >= 0 && resultantStateID2 >= 0 {
 							// If pair containing both resultant state IDs is marked as distinguishable,
 							// mark current state pair as distinguishable.
 							if resultantStateID1 <= resultantStateID2 {

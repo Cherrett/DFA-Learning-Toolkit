@@ -19,7 +19,7 @@ type ScoringFunction func(stateID1, stateID2 int, partitionBefore, partitionAfte
 // ExhaustiveSearch deterministically merges all possible state pairs.
 // The first valid merge with respect to the rejecting examples is chosen.
 // Returns the resultant state partition and search data when no more valid merges are possible.
-// Used by the regular positive and negative inference (RPNI) algorithm
+// Used by the regular positive and negative inference (RPNI) algorithm.
 func ExhaustiveSearch(statePartition StatePartition) (StatePartition, SearchData) {
 	// Clone StatePartition.
 	statePartition = statePartition.Clone()
@@ -125,7 +125,7 @@ func ExhaustiveSearchUsingScoringFunction(statePartition StatePartition, scoring
 		}
 
 		// Check if any deterministic merges were found.
-		if highestScoringStatePair.Score != -1 {
+		if highestScoringStatePair.Score >= 0 {
 			// Merge the state pairs with the highest score.
 			copiedPartition.MergeStates(highestScoringStatePair.State1, highestScoringStatePair.State2)
 			// Copy changes to original state partition.
@@ -223,7 +223,7 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 			}
 
 			// Break loop if no deterministic merges were found or if the window size is the biggest possible.
-			if highestScoringStatePair.Score != -1 || windowSize >= len(window) {
+			if highestScoringStatePair.Score >= 0 || windowSize >= len(window) {
 				break
 			} else {
 				// No more possible merges were found so increase window size.
@@ -235,7 +235,7 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 			}
 		}
 
-		if highestScoringStatePair.Score != -1 {
+		if highestScoringStatePair.Score >= 0 {
 			// Merge the state pairs with the highest score.
 			copiedPartition.MergeStates(highestScoringStatePair.State1, highestScoringStatePair.State2)
 			// Copy changes to original state partition.
@@ -449,7 +449,7 @@ func GenerateBlueSetFromRedSet(statePartition *StatePartition, redSet map[int]ut
 		// Iterate over each symbol (alphabet) within DFA.
 		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
 			// If transition from current state using current symbol is valid and is not a loop to the current state.
-			if childStateID := statePartition.Blocks[blockID].Transitions[symbol]; childStateID != -1 {
+			if childStateID := statePartition.Blocks[blockID].Transitions[symbol]; childStateID >= 0 {
 				// Get block ID of child state.
 				childBlockID := statePartition.Find(childStateID)
 				// If depth for child block has been computed, skip block.
@@ -519,7 +519,7 @@ func UpdateRedSet(statePartition *StatePartition, redSet map[int]util.Void) (map
 		// Iterate over each symbol (alphabet) within DFA.
 		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
 			// If transition from current state using current symbol is valid and is not a loop to the current state.
-			if childStateID := statePartition.Blocks[blockID].Transitions[symbol]; childStateID != -1 {
+			if childStateID := statePartition.Blocks[blockID].Transitions[symbol]; childStateID >= 0 {
 				// Get block ID of child state.
 				childBlockID := statePartition.Find(childStateID)
 				// If depth for child block has been computed, skip block.
