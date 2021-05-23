@@ -20,13 +20,13 @@ type ScoringFunction func(stateID1, stateID2 int, partitionBefore, partitionAfte
 // The first valid merge with respect to the rejecting examples is chosen.
 // Returns the resultant state partition and search data when no more valid merges are possible.
 // Used by the regular positive and negative inference (RPNI) algorithm.
-func ExhaustiveSearch(statePartition StatePartition) (StatePartition, SearchData) {
+func ExhaustiveSearch(statePartition StatePartition) (StatePartition, MergeData) {
 	// Clone StatePartition.
 	statePartition = statePartition.Clone()
 	// Copy the state partition for undoing and copying changed states.
 	copiedPartition := statePartition.Copy()
 	// Initialize search data.
-	searchData := SearchData{[]StatePairScore{}, 0, 0, time.Duration(0)}
+	mergeData := MergeData{[]StatePairScore{}, 0, 0, time.Duration(0)}
 	// Total merges and valid merges counter.
 	totalMerges, totalValidMerges := 0, 0
 	// Start timer.
@@ -52,7 +52,7 @@ func ExhaustiveSearch(statePartition StatePartition) (StatePartition, SearchData
 					statePartition.CopyChangesFrom(&copiedPartition)
 
 					// Add merged state pair with score to search data.
-					searchData.Merges = append(searchData.Merges, StatePairScore{orderedBlocks[i], orderedBlocks[j], 0})
+					mergeData.Merges = append(mergeData.Merges, StatePairScore{orderedBlocks[i], orderedBlocks[j], 0})
 					break
 				}
 			}
@@ -63,25 +63,25 @@ func ExhaustiveSearch(statePartition StatePartition) (StatePartition, SearchData
 	}
 
 	// Add total and valid merges counts to search data.
-	searchData.AttemptedMergesCount = totalMerges
-	searchData.ValidMergesCount = totalValidMerges
+	mergeData.AttemptedMergesCount = totalMerges
+	mergeData.ValidMergesCount = totalValidMerges
 	// Add duration to search data.
-	searchData.Duration = time.Now().Sub(start)
+	mergeData.Duration = time.Now().Sub(start)
 
 	// Return the final resultant state partition and search data.
-	return statePartition, searchData
+	return statePartition, mergeData
 }
 
 // ExhaustiveSearchUsingScoringFunction deterministically merges all possible state pairs.
 // The state pair to be merged is chosen using a scoring function passed as a parameter.
 // Returns the resultant state partition and search data when no more valid merges are possible.
-func ExhaustiveSearchUsingScoringFunction(statePartition StatePartition, scoringFunction ScoringFunction) (StatePartition, SearchData) {
+func ExhaustiveSearchUsingScoringFunction(statePartition StatePartition, scoringFunction ScoringFunction) (StatePartition, MergeData) {
 	// Clone StatePartition.
 	statePartition = statePartition.Clone()
 	// Copy the state partition for undoing and copying changed states.
 	copiedPartition := statePartition.Copy()
 	// Initialize search data.
-	searchData := SearchData{[]StatePairScore{}, 0, 0, time.Duration(0)}
+	mergeData := MergeData{[]StatePairScore{}, 0, 0, time.Duration(0)}
 	// State pair with the highest score.
 	highestScoringStatePair := StatePairScore{-1, -1, -1}
 	// Total merges and valid merges counter.
@@ -132,7 +132,7 @@ func ExhaustiveSearchUsingScoringFunction(statePartition StatePartition, scoring
 			statePartition.CopyChangesFrom(&copiedPartition)
 
 			// Add merged state pair with score to search data.
-			searchData.Merges = append(searchData.Merges, highestScoringStatePair)
+			mergeData.Merges = append(mergeData.Merges, highestScoringStatePair)
 
 			// Remove previous state pair with the highest score.
 			highestScoringStatePair = StatePairScore{-1, -1, -1}
@@ -142,19 +142,19 @@ func ExhaustiveSearchUsingScoringFunction(statePartition StatePartition, scoring
 	}
 
 	// Add total and valid merges counts to search data.
-	searchData.AttemptedMergesCount = totalMerges
-	searchData.ValidMergesCount = totalValidMerges
+	mergeData.AttemptedMergesCount = totalMerges
+	mergeData.ValidMergesCount = totalValidMerges
 	// Add duration to search data.
-	searchData.Duration = time.Now().Sub(start)
+	mergeData.Duration = time.Now().Sub(start)
 
 	// Return the final resultant state partition and search data.
-	return statePartition, searchData
+	return statePartition, mergeData
 }
 
 // WindowedSearchUsingScoringFunction deterministically merges state pairs within a given window.
 // The state pair to be merged is chosen using a scoring function passed as a parameter.
 // Returns the resultant state partition and search data when no more valid merges are possible.
-func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSize int, windowGrow float64, scoringFunction ScoringFunction) (StatePartition, SearchData) {
+func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSize int, windowGrow float64, scoringFunction ScoringFunction) (StatePartition, MergeData) {
 	// Parameter Error Checking.
 	if windowSize < 1 {
 		panic("Window Size cannot be smaller than 1.")
@@ -168,7 +168,7 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 	// Copy the state partition for undoing and copying changed states.
 	copiedPartition := statePartition.Copy()
 	// Initialize search data.
-	searchData := SearchData{[]StatePairScore{}, 0, 0, time.Duration(0)}
+	mergeData := MergeData{[]StatePairScore{}, 0, 0, time.Duration(0)}
 	// Total merges and valid merges counter.
 	totalMerges, totalValidMerges := 0, 0
 	// Get ordered blocks within partition.
@@ -242,7 +242,7 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 			statePartition.CopyChangesFrom(&copiedPartition)
 
 			// Add merged state pair with score to search data.
-			searchData.Merges = append(searchData.Merges, highestScoringStatePair)
+			mergeData.Merges = append(mergeData.Merges, highestScoringStatePair)
 		} else {
 			break
 		}
@@ -252,13 +252,13 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 	}
 
 	// Add total and valid merges counts to search data.
-	searchData.AttemptedMergesCount = totalMerges
-	searchData.ValidMergesCount = totalValidMerges
+	mergeData.AttemptedMergesCount = totalMerges
+	mergeData.ValidMergesCount = totalValidMerges
 	// Add duration to search data.
-	searchData.Duration = time.Now().Sub(start)
+	mergeData.Duration = time.Now().Sub(start)
 
 	// Return the final resultant state partition and search data.
-	return statePartition, searchData
+	return statePartition, mergeData
 }
 
 // UpdateWindow updates a window given the state partition within a Windowed framework such as the
@@ -294,13 +294,13 @@ func UpdateWindow(window []int, statePartition StatePartition) []int {
 // BlueFringeSearchUsingScoringFunction deterministically merges possible state pairs within red-blue sets.
 // The state pair to be merged is chosen using a scoring function passed as a parameter.
 // Returns the resultant state partition and search data when no more valid merges are possible.
-func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoringFunction ScoringFunction) (StatePartition, SearchData) {
+func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoringFunction ScoringFunction) (StatePartition, MergeData) {
 	// Clone StatePartition.
 	statePartition = statePartition.Clone()
 	// Copy the state partition for undoing and copying changed states.
 	copiedPartition := statePartition.Copy()
 	// Initialize search data.
-	searchData := SearchData{[]StatePairScore{}, 0, 0, time.Duration(0)}
+	mergeData := MergeData{[]StatePairScore{}, 0, 0, time.Duration(0)}
 	// State pair with the highest score.
 	highestScoringStatePair := StatePairScore{-1, -1, -1}
 	// Total merges and valid merges counter.
@@ -308,22 +308,22 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 	// Start timer.
 	start := time.Now()
 
-	// Slice to store red states in insertion order.
+	// Slice to store red states in canonical order.
 	redStates := []int{statePartition.StartingBlock()}
 
 	// Generated slice of ordered blue states from red states.
-	blueStates := GenerateBlueSetFromRedSet(&statePartition, map[int]util.Void{statePartition.StartingBlock(): util.Null})
+	blueStates := GenerateOrderedBlueSetFromRedSet(&statePartition, map[int]util.Void{statePartition.StartingBlock(): util.Null})
 
 	// Initialize merged flag to false.
 	merged := false
 
 	// Iterate until blue set is empty.
 	for len(blueStates) != 0 {
-		// Iterate over every blue state in insertion order.
+		// Iterate over every blue state in canonical order.
 		for _, blueElement := range blueStates {
 			// Set merged flag to false.
 			merged = false
-			// Iterate over every red state in insertion order.
+			// Iterate over every red state in canonical order.
 			for _, redElement := range redStates {
 				// Increment merge count.
 				totalMerges++
@@ -369,29 +369,29 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 			statePartition.CopyChangesFrom(&copiedPartition)
 
 			// Add merged state pair with score to search data.
-			searchData.Merges = append(searchData.Merges, highestScoringStatePair)
+			mergeData.Merges = append(mergeData.Merges, highestScoringStatePair)
 
 			// Remove previous state pair with the highest score.
 			highestScoringStatePair = StatePairScore{-1, -1, -1}
 		}
 		
-		// Update red and blue states using UpdateRedBlueSets function.
-		redStates, blueStates = UpdateRedBlueSets(&statePartition, redStates)
+		// Update red and blue states using UpdateOrderedRedBlueSets function.
+		redStates, blueStates = UpdateOrderedRedBlueSets(&statePartition, redStates)
 	}
 
 	// Add total and valid merges counts to search data.
-	searchData.AttemptedMergesCount = totalMerges
-	searchData.ValidMergesCount = totalValidMerges
+	mergeData.AttemptedMergesCount = totalMerges
+	mergeData.ValidMergesCount = totalValidMerges
 	// Add duration to search data.
-	searchData.Duration = time.Now().Sub(start)
+	mergeData.Duration = time.Now().Sub(start)
 
 	// Return the final resultant state partition and search data.
-	return statePartition, searchData
+	return statePartition, mergeData
 }
 
-// GenerateBlueSetFromRedSet generates the blue set given the state partition and the red set within the Red-Blue framework
+// GenerateOrderedBlueSetFromRedSet generates the blue set given the state partition and the red set within the Red-Blue framework
 // such as the BlueFringeSearchUsingScoringFunction function. It generates and returns the blue set in canonical order.
-func GenerateBlueSetFromRedSet(statePartition *StatePartition, redSet map[int]util.Void) []int {
+func GenerateOrderedBlueSetFromRedSet(statePartition *StatePartition, redSet map[int]util.Void) []int {
 	// Step 1 - Gather all blue states and store in map declared below.
 
 	// Initialize set of blue states to empty set.
@@ -465,10 +465,10 @@ func GenerateBlueSetFromRedSet(statePartition *StatePartition, redSet map[int]ut
 	return orderedBlue
 }
 
-// UpdateRedBlueSets updates the red and blue sets given the state partition and the red set within the Red-Blue framework
+// UpdateOrderedRedBlueSets updates the red and blue sets given the state partition and the red set within the Red-Blue framework
 // such as the BlueFringeSearchUsingScoringFunction function. It returns the red and blue sets in canonical order. This is
 // used when the state partition is changed or when new states have been added to the red set.
-func UpdateRedBlueSets(statePartition *StatePartition, redStates []int) ([]int, []int){
+func UpdateOrderedRedBlueSets(statePartition *StatePartition, redStates []int) ([]int, []int){
 	// Step 1 - Gather root of old red states and store in map declared below.
 
 	// Initialize set of red root states (blocks) to empty set.
