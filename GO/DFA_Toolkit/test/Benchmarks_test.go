@@ -103,15 +103,15 @@ func TestBenchmarkRPNI(t *testing.T) {
 		// Create a target DFA, training set, and testing set.
 		_, trainingSet, testingSet := dfatoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
 
-		resultantDFA, searchData := dfatoolkit.RPNIFromDataset(trainingSet)
+		resultantDFA, mergeData := dfatoolkit.RPNIFromDataset(trainingSet)
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		accuracies.Add(accuracy)
 		numberOfStates.AddInt(len(resultantDFA.States))
-		durations.Add(searchData.Duration.Seconds())
-		mergesPerSec.Add(searchData.AttemptedMergesPerSecond())
-		merges.AddInt(searchData.AttemptedMergesCount)
-		validMerges.AddInt(searchData.ValidMergesCount)
+		durations.Add(mergeData.Duration.Seconds())
+		mergesPerSec.Add(mergeData.AttemptedMergesPerSecond())
+		merges.AddInt(mergeData.AttemptedMergesCount)
+		validMerges.AddInt(mergeData.ValidMergesCount)
 
 		if accuracy >= 0.99 {
 			winners++
@@ -155,15 +155,15 @@ func TestBenchmarkExhaustiveEDSM(t *testing.T) {
 		// Create a target DFA, training set, and testing set.
 		_, trainingSet, testingSet := dfatoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
 
-		resultantDFA, searchData := dfatoolkit.ExhaustiveEDSMFromDataset(trainingSet)
+		resultantDFA, mergeData := dfatoolkit.ExhaustiveEDSMFromDataset(trainingSet)
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		accuracies.Add(accuracy)
 		numberOfStates.AddInt(len(resultantDFA.States))
-		durations.Add(searchData.Duration.Seconds())
-		mergesPerSec.Add(searchData.AttemptedMergesPerSecond())
-		merges.AddInt(searchData.AttemptedMergesCount)
-		validMerges.AddInt(searchData.ValidMergesCount)
+		durations.Add(mergeData.Duration.Seconds())
+		mergesPerSec.Add(mergeData.AttemptedMergesPerSecond())
+		merges.AddInt(mergeData.AttemptedMergesCount)
+		validMerges.AddInt(mergeData.ValidMergesCount)
 
 		if accuracy >= 0.99 {
 			winners++
@@ -209,15 +209,15 @@ func TestBenchmarkWindowedEDSM(t *testing.T) {
 		// Create a target DFA, training set, and testing set.
 		_, trainingSet, testingSet := dfatoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
 
-		resultantDFA, searchData := dfatoolkit.WindowedEDSMFromDataset(trainingSet, targetSize*2, 2.0)
+		resultantDFA, mergeData := dfatoolkit.WindowedEDSMFromDataset(trainingSet, targetSize*2, 2.0)
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		accuracies.Add(accuracy)
 		numberOfStates.AddInt(len(resultantDFA.States))
-		durations.Add(searchData.Duration.Seconds())
-		mergesPerSec.Add(searchData.AttemptedMergesPerSecond())
-		merges.AddInt(searchData.AttemptedMergesCount)
-		validMerges.AddInt(searchData.ValidMergesCount)
+		durations.Add(mergeData.Duration.Seconds())
+		mergesPerSec.Add(mergeData.AttemptedMergesPerSecond())
+		merges.AddInt(mergeData.AttemptedMergesCount)
+		validMerges.AddInt(mergeData.ValidMergesCount)
 
 		if accuracy >= 0.99 {
 			winners++
@@ -263,15 +263,15 @@ func TestBenchmarkBlueFringeEDSM(t *testing.T) {
 		// Create a target DFA, training set, and testing set.
 		_, trainingSet, testingSet := dfatoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
 
-		resultantDFA, searchData := dfatoolkit.BlueFringeEDSMFromDataset(trainingSet)
+		resultantDFA, mergeData := dfatoolkit.BlueFringeEDSMFromDataset(trainingSet)
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		accuracies.Add(accuracy)
 		numberOfStates.AddInt(len(resultantDFA.States))
-		durations.Add(searchData.Duration.Seconds())
-		mergesPerSec.Add(searchData.AttemptedMergesPerSecond())
-		merges.AddInt(searchData.AttemptedMergesCount)
-		validMerges.AddInt(searchData.ValidMergesCount)
+		durations.Add(mergeData.Duration.Seconds())
+		mergesPerSec.Add(mergeData.AttemptedMergesPerSecond())
+		merges.AddInt(mergeData.AttemptedMergesCount)
+		validMerges.AddInt(mergeData.ValidMergesCount)
 
 		if accuracy >= 0.99 {
 			winners++
@@ -324,39 +324,39 @@ func TestBenchmarkEDSM(t *testing.T) {
 
 		// Exhaustive
 		resultantDFA, searchData := dfatoolkit.ExhaustiveEDSM(APTA)
-		durationExhaustive.Add(searchData.Duration.Seconds())
-		mergesPerSecExhaustive.Add(searchData.AttemptedMergesPerSecond())
+		durationExhaustive.Add(mergeData.Duration.Seconds())
+		mergesPerSecExhaustive.Add(mergeData.AttemptedMergesPerSecond())
 		accuracy := resultantDFA.Accuracy(testingSet)
 		accuraciesExhaustive.Add(accuracy)
 		numberOfStatesExhaustive.AddInt(len(resultantDFA.States))
-		mergesExhaustive.AddInt(searchData.AttemptedMergesCount)
-		validMergesExhaustive.AddInt(searchData.ValidMergesCount)
+		mergesExhaustive.AddInt(mergeData.AttemptedMergesCount)
+		validMergesExhaustive.AddInt(mergeData.ValidMergesCount)
 		if accuracy >= 0.99 {
 			winnersExhaustive++
 		}
 
 		// Windowed
-		resultantDFA, searchData = dfatoolkit.WindowedEDSM(APTA, targetSize*2, 2.0)
-		durationWindowed.Add(searchData.Duration.Seconds())
-		mergesPerSecWindowed.Add(searchData.AttemptedMergesPerSecond())
+		resultantDFA, mergeData = dfatoolkit.WindowedEDSM(APTA, targetSize*2, 2.0)
+		durationWindowed.Add(mergeData.Duration.Seconds())
+		mergesPerSecWindowed.Add(mergeData.AttemptedMergesPerSecond())
 		accuracy = resultantDFA.Accuracy(testingSet)
 		accuraciesWindowed.Add(accuracy)
 		numberOfStatesWindowed.AddInt(len(resultantDFA.States))
-		mergesWindowed.AddInt(searchData.AttemptedMergesCount)
-		validMergesWindowed.AddInt(searchData.ValidMergesCount)
+		mergesWindowed.AddInt(mergeData.AttemptedMergesCount)
+		validMergesWindowed.AddInt(mergeData.ValidMergesCount)
 		if accuracy >= 0.99 {
 			winnersWindowed++
 		}
 
 		// Blue-Fringe
-		resultantDFA, searchData = dfatoolkit.BlueFringeEDSM(APTA)
-		durationBlueFringe.Add(searchData.Duration.Seconds())
-		mergesPerSecBlueFringe.Add(searchData.AttemptedMergesPerSecond())
+		resultantDFA, mergeData = dfatoolkit.BlueFringeEDSM(APTA)
+		durationBlueFringe.Add(mergeData.Duration.Seconds())
+		mergesPerSecBlueFringe.Add(mergeData.AttemptedMergesPerSecond())
 		accuracy = resultantDFA.Accuracy(testingSet)
 		accuraciesBlueFringe.Add(accuracy)
 		numberOfStatesBlueFringe.AddInt(len(resultantDFA.States))
-		mergesBlueFringe.AddInt(searchData.AttemptedMergesCount)
-		validMergesBlueFringe.AddInt(searchData.ValidMergesCount)
+		mergesBlueFringe.AddInt(mergeData.AttemptedMergesCount)
+		validMergesBlueFringe.AddInt(mergeData.ValidMergesCount)
 		if accuracy >= 0.99 {
 			winnersBlueFringe++
 		}
@@ -432,64 +432,64 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 		wg.Add(4)
 
 		resultantDFAExhaustive, resultantDFAWindowed, resultantDFABlueFringe := dfatoolkit.DFA{}, dfatoolkit.DFA{}, dfatoolkit.DFA{}
-		searchDataExhaustive, searchDataWindowed, searchDataBlueFringe := dfatoolkit.SearchData{}, dfatoolkit.SearchData{}, dfatoolkit.SearchData{}
+		mergeDataExhaustive, mergeDataWindowed, mergeDataBlueFringe := dfatoolkit.MergeData{}, dfatoolkit.MergeData{}, dfatoolkit.MergeData{}
 
 		// Exhaustive
 		go func() {
 			// Decrement 1 from wait group.
 			defer wg.Done()
-			resultantDFAExhaustive, searchDataExhaustive = dfatoolkit.ExhaustiveEDSM(APTA)
+			resultantDFAExhaustive, mergeDataExhaustive = dfatoolkit.ExhaustiveEDSM(APTA)
 		}()
 
 		// Windowed
 		go func() {
 			// Decrement 1 from wait group.
 			defer wg.Done()
-			resultantDFAWindowed, searchDataWindowed = dfatoolkit.WindowedEDSM(APTA, targetSize*2, 2.0)
+			resultantDFAWindowed, mergeDataWindowed = dfatoolkit.WindowedEDSM(APTA, targetSize*2, 2.0)
 		}()
 
 		// Blue-Fringe
 		go func() {
 			// Decrement 1 from wait group.
 			defer wg.Done()
-			resultantDFABlueFringe, searchDataBlueFringe = dfatoolkit.BlueFringeEDSM(APTA)
+			resultantDFABlueFringe, mergeDataBlueFringe = dfatoolkit.BlueFringeEDSM(APTA)
 		}()
 
 		// Wait for all go routines within wait group to finish executing.
 		wg.Wait()
 
 		// Exhaustive
-		durationExhaustive.Add(searchDataExhaustive.Duration.Seconds())
-		mergesPerSecExhaustive.Add(searchDataExhaustive.AttemptedMergesPerSecond())
+		durationExhaustive.Add(mergeDataExhaustive.Duration.Seconds())
+		mergesPerSecExhaustive.Add(mergeDataExhaustive.AttemptedMergesPerSecond())
 		accuracy := resultantDFAExhaustive.Accuracy(testingSet)
 		accuraciesExhaustive.Add(accuracy)
 		numberOfStatesExhaustive.AddInt(len(resultantDFAExhaustive.States))
-		mergesExhaustive.AddInt(searchDataExhaustive.AttemptedMergesCount)
-		validMergesExhaustive.AddInt(searchDataExhaustive.ValidMergesCount)
+		mergesExhaustive.AddInt(mergeDataExhaustive.AttemptedMergesCount)
+		validMergesExhaustive.AddInt(mergeDataExhaustive.ValidMergesCount)
 		if accuracy >= 0.99 {
 			winnersExhaustive++
 		}
 
 		// Windowed
-		durationWindowed.Add(searchDataWindowed.Duration.Seconds())
-		mergesPerSecWindowed.Add(searchDataWindowed.AttemptedMergesPerSecond())
+		durationWindowed.Add(mergeDataWindowed.Duration.Seconds())
+		mergesPerSecWindowed.Add(mergeDataWindowed.AttemptedMergesPerSecond())
 		accuracy = resultantDFAWindowed.Accuracy(testingSet)
 		accuraciesWindowed.Add(accuracy)
 		numberOfStatesWindowed.AddInt(len(resultantDFAWindowed.States))
-		mergesWindowed.AddInt(searchDataWindowed.AttemptedMergesCount)
-		validMergesWindowed.AddInt(searchDataWindowed.ValidMergesCount)
+		mergesWindowed.AddInt(mergeDataWindowed.AttemptedMergesCount)
+		validMergesWindowed.AddInt(mergeDataWindowed.ValidMergesCount)
 		if accuracy >= 0.99 {
 			winnersWindowed++
 		}
 
 		// Blue-Fringe
-		durationBlueFringe.Add(searchDataBlueFringe.Duration.Seconds())
-		mergesPerSecBlueFringe.Add(searchDataBlueFringe.AttemptedMergesPerSecond())
+		durationBlueFringe.Add(mergeDataBlueFringe.Duration.Seconds())
+		mergesPerSecBlueFringe.Add(mergeDataBlueFringe.AttemptedMergesPerSecond())
 		accuracy = resultantDFABlueFringe.Accuracy(testingSet)
 		accuraciesBlueFringe.Add(accuracy)
 		numberOfStatesBlueFringe.AddInt(len(resultantDFABlueFringe.States))
-		mergesBlueFringe.AddInt(searchDataBlueFringe.AttemptedMergesCount)
-		validMergesBlueFringe.AddInt(searchDataBlueFringe.ValidMergesCount)
+		mergesBlueFringe.AddInt(mergeDataBlueFringe.AttemptedMergesCount)
+		validMergesBlueFringe.AddInt(mergeDataBlueFringe.ValidMergesCount)
 		if accuracy >= 0.99 {
 			winnersBlueFringe++
 		}

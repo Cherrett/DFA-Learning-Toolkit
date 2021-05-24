@@ -2,7 +2,7 @@ package dfatoolkit
 
 // ExhaustiveEDSMFromDataset is a greedy version of Evidence Driven State-Merging.
 // It takes a dataset as an argument which is used to generate an APTA.
-func ExhaustiveEDSMFromDataset(dataset Dataset) (DFA, SearchData) {
+func ExhaustiveEDSMFromDataset(dataset Dataset) (DFA, MergeData) {
 	// Construct an APTA from dataset.
 	APTA := dataset.GetPTA(true)
 
@@ -13,7 +13,7 @@ func ExhaustiveEDSMFromDataset(dataset Dataset) (DFA, SearchData) {
 
 // WindowedEDSMFromDataset is a windowed version of Evidence Driven State-Merging.
 // It takes a dataset as an argument which is used to generate an APTA.
-func WindowedEDSMFromDataset(dataset Dataset, windowSize int, windowGrow float64) (DFA, SearchData) {
+func WindowedEDSMFromDataset(dataset Dataset, windowSize int, windowGrow float64) (DFA, MergeData) {
 	// Construct an APTA from dataset.
 	APTA := dataset.GetPTA(true)
 
@@ -24,7 +24,7 @@ func WindowedEDSMFromDataset(dataset Dataset, windowSize int, windowGrow float64
 
 // BlueFringeEDSMFromDataset is a Blue Fringe version of Evidence Driven State-Merging.
 // It takes a dataset as an argument which is used to generate an APTA.
-func BlueFringeEDSMFromDataset(dataset Dataset) (DFA, SearchData) {
+func BlueFringeEDSMFromDataset(dataset Dataset) (DFA, MergeData) {
 	// Construct an APTA from dataset.
 	APTA := dataset.GetPTA(true)
 
@@ -35,7 +35,7 @@ func BlueFringeEDSMFromDataset(dataset Dataset) (DFA, SearchData) {
 
 // ExhaustiveEDSM is a greedy version of Evidence Driven State-Merging.
 // It takes a DFA (APTA) as an argument which is used within the greedy search.
-func ExhaustiveEDSM(APTA DFA) (DFA, SearchData) {
+func ExhaustiveEDSM(APTA DFA) (DFA, MergeData) {
 	// Store length of dataset.
 	LengthOfDataset := APTA.LabelledStatesCount()
 
@@ -49,7 +49,7 @@ func ExhaustiveEDSM(APTA DFA) (DFA, SearchData) {
 
 	// Call ExhaustiveSearchUsingScoringFunction function using state partition and EDSM scoring function
 	// declared above. This function returns the resultant state partition and the search data.
-	statePartition, searchData := ExhaustiveSearchUsingScoringFunction(statePartition, EDSM)
+	statePartition, mergeData := ExhaustiveSearchUsingScoringFunction(statePartition, EDSM)
 
 	// Convert the state partition to a DFA.
 	resultantDFA := statePartition.ToQuotientDFA()
@@ -58,12 +58,12 @@ func ExhaustiveEDSM(APTA DFA) (DFA, SearchData) {
 	resultantDFA.IsValidPanic()
 
 	// Return resultant DFA and search data.
-	return resultantDFA, searchData
+	return resultantDFA, mergeData
 }
 
 // WindowedEDSM is a windowed version of Evidence Driven State-Merging.
 // It takes a DFA (APTA) as an argument which is used within the windowed search.
-func WindowedEDSM(APTA DFA, windowSize int, windowGrow float64) (DFA, SearchData) {
+func WindowedEDSM(APTA DFA, windowSize int, windowGrow float64) (DFA, MergeData) {
 	// Store length of dataset.
 	LengthOfDataset := APTA.LabelledStatesCount()
 
@@ -77,7 +77,7 @@ func WindowedEDSM(APTA DFA, windowSize int, windowGrow float64) (DFA, SearchData
 
 	// Call FastWindowedSearchUsingScoringFunction function using state partition and EDSM scoring function
 	// declared above. This function returns the resultant state partition and the search data.
-	statePartition, searchData := WindowedSearchUsingScoringFunction(statePartition, windowSize, windowGrow, EDSM)
+	statePartition, mergeData := WindowedSearchUsingScoringFunction(statePartition, windowSize, windowGrow, EDSM)
 
 	// Convert the state partition to a DFA.
 	resultantDFA := statePartition.ToQuotientDFA()
@@ -86,12 +86,12 @@ func WindowedEDSM(APTA DFA, windowSize int, windowGrow float64) (DFA, SearchData
 	resultantDFA.IsValidPanic()
 
 	// Return resultant DFA and search data.
-	return resultantDFA, searchData
+	return resultantDFA, mergeData
 }
 
 // BlueFringeEDSM is a Blue Fringe version of Evidence Driven State-Merging.
 // It takes a DFA (APTA) as an argument which is used within the blue-fringe search.
-func BlueFringeEDSM(APTA DFA) (DFA, SearchData) {
+func BlueFringeEDSM(APTA DFA) (DFA, MergeData) {
 	// Store length of dataset.
 	LengthOfDataset := APTA.LabelledStatesCount()
 
@@ -105,7 +105,7 @@ func BlueFringeEDSM(APTA DFA) (DFA, SearchData) {
 
 	// Call BlueFringeSearchUsingScoringFunction function using state partition and EDSM scoring function
 	// declared above. This function returns the resultant state partition and the search data.
-	statePartition, searchData := BlueFringeSearchUsingScoringFunction(statePartition, EDSM)
+	statePartition, mergeData := BlueFringeSearchUsingScoringFunction(statePartition, EDSM)
 
 	// Convert the state partition to a DFA.
 	resultantDFA := statePartition.ToQuotientDFA()
@@ -114,5 +114,5 @@ func BlueFringeEDSM(APTA DFA) (DFA, SearchData) {
 	resultantDFA.IsValidPanic()
 
 	// Return resultant DFA and search data.
-	return resultantDFA, searchData
+	return resultantDFA, mergeData
 }

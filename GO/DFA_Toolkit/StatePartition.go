@@ -519,7 +519,7 @@ func (statePartition *StatePartition) OrderedBlocks() []int {
 		// Iterate over each symbol (alphabet) within DFA.
 		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
 			// If transition from current state using current symbol is valid.
-			if childStateID := statePartition.Blocks[blockID].Transitions[symbol]; childStateID != -1 {
+			if childStateID := statePartition.Blocks[blockID].Transitions[symbol]; childStateID >= 0 {
 				// Get block ID of child state.
 				childBlockID := statePartition.Find(childStateID)
 				// If depth for child block has been computed, skip block.
@@ -559,7 +559,7 @@ func (statePartition *StatePartition) DepthOfBlocks() map[int]int {
 		depth := result[blockID]
 
 		for symbolID := 0; symbolID < statePartition.AlphabetSize; symbolID++ {
-			if childStateID := statePartition.Blocks[blockID].Transitions[symbolID]; childStateID != -1 {
+			if childStateID := statePartition.Blocks[blockID].Transitions[symbolID]; childStateID >= 0 {
 				childBlockID := statePartition.Find(childStateID)
 				if _, exists := result[childBlockID]; !exists {
 					result[childBlockID] = depth + 1
@@ -595,7 +595,7 @@ func (statePartition *StatePartition) OrderOfBlocks() map[int]int {
 		// Iterate over each symbol (alphabet) within DFA.
 		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
 			// If transition from current state using current symbol is valid.
-			if childStateID := statePartition.Blocks[blockID].Transitions[symbol]; childStateID != -1 {
+			if childStateID := statePartition.Blocks[blockID].Transitions[symbol]; childStateID >= 0 {
 				// Get block ID of child state.
 				childBlockID := statePartition.Find(childStateID)
 				// If depth for child block has been computed, skip block.

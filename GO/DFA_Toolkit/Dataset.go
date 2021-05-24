@@ -77,7 +77,7 @@ func (dataset Dataset) GetPTA(APTA bool) DFA {
 
 			// If a transition exists from the current state to any other state via
 			// the current symbol, set resultant state ID to current state ID.
-			if dfa.States[currentStateID].Transitions[symbol] != -1 {
+			if dfa.States[currentStateID].Transitions[symbol] >= 0 {
 				currentStateID = dfa.States[currentStateID].Transitions[symbol]
 				// Check if last symbol in string.
 				if count == stringInstance.Length() {
@@ -167,7 +167,7 @@ func (stringInstance StringInstance) ConsistentWithDFA(dfa DFA) bool {
 
 		// If a transition exists from the current state to any other state via
 		// the current symbol, set resultant state ID to current state ID.
-		if dfa.States[currentStateID].Transitions[symbol] != -1 {
+		if dfa.States[currentStateID].Transitions[symbol] >= 0 {
 			currentStateID = dfa.States[currentStateID].Transitions[symbol]
 			// Check if last symbol in string.
 			if count == stringInstance.Length() {
@@ -260,7 +260,7 @@ func (stringInstance StringInstance) ConsistentWithStatePartition(statePartition
 
 		// If a transition exists from the current state to any other state via
 		// the current symbol, set resultant state ID to current state ID.
-		if statePartition.Blocks[currentBlockID].Transitions[symbol] != -1 {
+		if statePartition.Blocks[currentBlockID].Transitions[symbol] >= 0 {
 			currentStateID := statePartition.Blocks[currentBlockID].Transitions[symbol]
 			currentBlockID = statePartition.Find(currentStateID)
 			// Check if last symbol in string.
@@ -343,7 +343,7 @@ func (stringInstance StringInstance) ParseToStateLabel(dfa DFA) StateLabel {
 
 		// If a transition exists from the current state to any other state via
 		// the current symbol, set resultant state ID to current state ID.
-		if dfa.States[currentStateID].Transitions[symbol] != -1 {
+		if dfa.States[currentStateID].Transitions[symbol] >= 0 {
 			currentStateID = dfa.States[currentStateID].Transitions[symbol]
 			// Check if last symbol in string.
 			if count == stringInstance.Length() {
@@ -386,7 +386,7 @@ func (stringInstance StringInstance) ParseToState(dfa DFA) (bool, int) {
 
 		// If a transition exists from the current state to any other state via
 		// the current symbol, set resultant state ID to current state ID.
-		if dfa.States[currentStateID].Transitions[symbol] != -1 {
+		if dfa.States[currentStateID].Transitions[symbol] >= 0 {
 			currentStateID = dfa.States[currentStateID].Transitions[symbol]
 			// If last symbol in string, return the current true and the current state ID.
 			if count == stringInstance.Length() {

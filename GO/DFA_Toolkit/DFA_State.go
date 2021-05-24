@@ -34,7 +34,7 @@ func (state State) IsUnknown() bool {
 	return state.Label == UNLABELLED
 }
 
-// InDegree returns the in degree of the state..
+// InDegree returns the in degree of the state.
 func (state State) InDegree(stateID int) int {
 	// Initialize in degree counter.
 	count := 0
@@ -64,7 +64,7 @@ func (state State) OutDegree() int {
 	for _, toStateID := range state.Transitions {
 		// If a transition with a value not equal to -1 is
 		// found (valid), the counter is incremented.
-		if toStateID != -1 {
+		if toStateID >= 0 {
 			count++
 		}
 	}
@@ -146,7 +146,7 @@ func (state State) ValidTransitions() []int {
 		// If a transition with a value not equal to
 		// -1 is found (valid), the symbol is added
 		// to the valid transitions slice.
-		if toStateID != -1 {
+		if toStateID >= 0 {
 			validTransitions = append(validTransitions, symbolID)
 		}
 	}
@@ -169,23 +169,6 @@ func (state State) TransitionsCount(stateID int) int {
 	for symbol := range state.DFA().Alphabet {
 		// If transition is to given state ID, increment transitions count.
 		if state.Transitions[symbol] == stateID {
-			transitionsCount++
-		}
-	}
-
-	// Return transitions count.
-	return transitionsCount
-}
-
-// TotalTransitionsCount returns the number of transitions from given state.
-func (state State) TotalTransitionsCount() int {
-	// Counter to store number of transitions.
-	transitionsCount := 0
-
-	// Iterate over each symbol within DFA.
-	for symbol := range state.DFA().Alphabet {
-		// If transition is valid (not -1), increment transitions count.
-		if state.Transitions[symbol] != -1 {
 			transitionsCount++
 		}
 	}

@@ -231,7 +231,7 @@ func modifiedForestFire(currentState int, ambassadorState int, dfa *DFA, visited
 	for symbol := range dfa.Alphabet {
 		// If resultant state is valid, not visited, not in to states, and not
 		// equal to current state, add to toStatesSet map and to toStates slice.
-		if resultantStateID := dfa.States[ambassadorState].Transitions[symbol]; resultantStateID != -1 &&
+		if resultantStateID := dfa.States[ambassadorState].Transitions[symbol]; resultantStateID >= 0 &&
 			!(*visitedStates)[resultantStateID] && !toStatesSet[resultantStateID] {
 			toStatesSet[resultantStateID] = true
 			toStates = append(toStates, resultantStateID)
@@ -443,25 +443,21 @@ func StaminaDataset(dfa DFA, sparsityPercentage float64, initialStringsGenerated
 	for len(firstSample) < initialStringsGenerated {
 		currentString := StringInstance{make([]int, 0), true}
 		currentState := dfa.StartingState()
-		valid := true
+
 		for {
 			if currentState.IsAccepting() {
 				// End generation with probability 1.0/(1 + 2*outdegree(v).
-				if rand.Float64() < 1.0/float64(1+(2*currentState.TotalTransitionsCount())) {
+				if rand.Float64() < 1.0/float64(1+(2*currentState.OutDegree())) {
 					break
 				}
 			}
 
-			validTransitions := currentState.ValidTransitions()
-
-			// Break if no valid transitions or if current state is a leaf state.
-			if len(validTransitions) == 0 || currentState.IsLeaf() {
-				if !currentState.IsAccepting() {
-					valid = false
-				}
-
+			// Break if out degree of current state is equal to 0.
+			if currentState.OutDegree() == 0 {
 				break
 			}
+
+			validTransitions := currentState.ValidTransitions()
 
 			// Randomly choose a symbol with a valid transitions.
 			validSymbol := validTransitions[rand.Intn(len(validTransitions))]
@@ -471,7 +467,7 @@ func StaminaDataset(dfa DFA, sparsityPercentage float64, initialStringsGenerated
 			currentState = &dfa.States[currentState.Transitions[validSymbol]]
 		}
 
-		if valid {
+		if currentState.IsAccepting() {
 			// Add string to first sample.
 			firstSample = append(firstSample, currentString)
 		}
