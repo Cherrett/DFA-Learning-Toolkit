@@ -928,6 +928,18 @@ func (dfa *DFA) SetOrderAsID() DFA {
 	return resultantDFA
 }
 
+// ChangeRejectingStatesToUnlabelled changes all rejecting states
+// within the DFA to unlabelled.
+func (dfa *DFA) ChangeRejectingStatesToUnlabelled(){
+	// Iterate over each state within DFA.
+	for stateID := range dfa.States{
+		// If label is rejecting, change it to unlabelled.
+		if dfa.States[stateID].Label == REJECTING{
+			dfa.States[stateID].Label = UNLABELLED
+		}
+	}
+}
+
 // ToJSON saves the DFA to a JSON file given a file path.
 func (dfa DFA) ToJSON(filePath string) bool {
 	// Create file given a path/name.
