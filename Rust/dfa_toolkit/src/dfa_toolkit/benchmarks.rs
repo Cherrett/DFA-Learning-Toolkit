@@ -1,16 +1,7 @@
 use std::time::Instant;
+use crate::dfa_toolkit::dfa;
 
-mod dfa;
-mod dfa_state;
-mod state_partition;
-mod static_state_partition;
-
-fn main() {
-    det_merge_benchmark();
-    det_merge_benchmark_static();
-}
-
-fn det_merge_benchmark() {
+pub fn det_merge_benchmark() {
     println!("Normal State Partition");
     // These are target dfa sizes we will test.
     let dfa_sizes = [16, 32, 64];
@@ -63,7 +54,7 @@ fn det_merge_benchmark() {
     }
 }
 
-fn det_merge_benchmark_static() {
+pub fn det_merge_benchmark_static() {
     println!("Static State Partition");
     // These are target dfa sizes we will test.
     let dfa_sizes = [16, 32, 64];

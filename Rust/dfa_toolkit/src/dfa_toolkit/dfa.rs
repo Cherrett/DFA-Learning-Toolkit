@@ -1,6 +1,6 @@
-use crate::dfa_state::State;
 use serde::Deserialize;
 use std::fs;
+use crate::dfa_toolkit::dfa_state::State;
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
