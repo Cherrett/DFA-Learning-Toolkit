@@ -32,10 +32,13 @@ func (dfa *DFA) AddState(stateLabel StateLabel) int {
 	for i := range transitions {
 		transitions[i] = -1
 	}
+
 	// Initialize and add the new state to the slice of states within the DFA.
 	dfa.States = append(dfa.States, State{stateLabel, transitions, -1, -1, dfa})
+
 	// Set computedDepthAndOrder flag to false since DFA was modified.
 	dfa.computedDepthAndOrder = false
+
 	// Return the ID of the newly created state.
 	return len(dfa.States) - 1
 }
@@ -49,8 +52,10 @@ func (dfa *DFA) RemoveState(stateID int) {
 		// Panic if state ID is out of range.
 		panic("stateID is out of range")
 	}
+
 	// Remove state from slice of states.
 	dfa.States = append(dfa.States[:stateID], dfa.States[stateID+1:]...)
+
 	// Update transitions to account for changed State IDs and for removed state.
 	// Iterate over each state within the DFA.
 	for currentStateID := range dfa.States {
@@ -67,10 +72,12 @@ func (dfa *DFA) RemoveState(stateID int) {
 			}
 		}
 	}
+
 	// If the ID of the starting state is bigger then the ID of the removed state, decrement starting state.
 	if dfa.StartingStateID > stateID {
 		dfa.StartingStateID--
 	}
+
 	// Set computedDepthAndOrder flag to false since DFA was modified.
 	dfa.computedDepthAndOrder = false
 }

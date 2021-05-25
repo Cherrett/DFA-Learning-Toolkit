@@ -198,15 +198,15 @@ func (statePartition *StatePartition) ToQuotientDFA() DFA {
 	// Get root blocks within state partition.
 	rootBlocks := statePartition.RootBlocks()
 
+	// Create alphabet within DFA.
+	for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
+		resultantDFA.AddSymbol()
+	}
+
 	// Create a new state within DFA for each root block and
 	// set state label to block label.
 	for _, stateID := range rootBlocks {
 		blockToStateMap[stateID] = resultantDFA.AddState(statePartition.Blocks[stateID].Label)
-	}
-
-	// Create alphabet within DFA.
-	for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
-		resultantDFA.AddSymbol()
 	}
 
 	// Update transitions using transitions within blocks and block to state map.
