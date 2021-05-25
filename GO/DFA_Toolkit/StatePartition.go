@@ -312,43 +312,6 @@ func (statePartition *StatePartition) MergeStates(state1 int, state2 int) bool {
 	return true
 }
 
-// Copy copies the state partition.
-func (statePartition StatePartition) Copy() StatePartition {
-	// Initialize new StatePartition struct using state partition.
-	copiedStatePartition := StatePartition{
-		Blocks:               make([]Block, len(statePartition.Blocks)),
-		BlocksCount:          statePartition.BlocksCount,
-		AcceptingBlocksCount: statePartition.AcceptingBlocksCount,
-		RejectingBlocksCount: statePartition.RejectingBlocksCount,
-		AlphabetSize:         statePartition.AlphabetSize,
-		StartingStateID:      statePartition.StartingStateID,
-		IsCopy:               true,
-		ChangedBlocks:        make([]int, len(statePartition.Blocks)),
-		ChangedBlocksCount:   0,
-	}
-
-	// Iterate over each block within blocks slice.
-	for blockID := range statePartition.Blocks {
-		// Get block pointer from copied state partition.
-		block := &copiedStatePartition.Blocks[blockID]
-		// Get block pointer from original state partition.
-		originalBlock := &statePartition.Blocks[blockID]
-
-		// Update root, size, link, and label.
-		block.Root = originalBlock.Root
-		block.Size = originalBlock.Size
-		block.Link = originalBlock.Link
-		block.Label = originalBlock.Label
-
-		// Initialize and copy transitions.
-		block.Transitions = make([]int, statePartition.AlphabetSize)
-		copy(block.Transitions, originalBlock.Transitions)
-	}
-
-	// Return copied state partition.
-	return copiedStatePartition
-}
-
 // Clone returns a clone of the state partition.
 func (statePartition StatePartition) Clone() StatePartition {
 	// Initialize new StatePartition struct using state partition.
@@ -360,33 +323,48 @@ func (statePartition StatePartition) Clone() StatePartition {
 		AlphabetSize:         statePartition.AlphabetSize,
 		StartingStateID:      statePartition.StartingStateID,
 		IsCopy:               statePartition.IsCopy,
-		ChangedBlocks:        make([]int, len(statePartition.ChangedBlocks)),
 		ChangedBlocksCount:   statePartition.ChangedBlocksCount,
 	}
 
+	// Copy blocks.
+	copy(clonedStatePartition.Blocks, statePartition.Blocks)
+
 	// Iterate over each block within blocks slice.
 	for blockID := range statePartition.Blocks {
-		// Get block pointer from cloned state partition.
-		block := &clonedStatePartition.Blocks[blockID]
-		// Get block pointer from original state partition.
-		originalBlock := &statePartition.Blocks[blockID]
-
-		// Update root, size, link, and label.
-		block.Root = originalBlock.Root
-		block.Size = originalBlock.Size
-		block.Link = originalBlock.Link
-		block.Label = originalBlock.Label
-
-		// Initialize and copy transitions.
-		block.Transitions = make([]int, statePartition.AlphabetSize)
-		copy(block.Transitions, originalBlock.Transitions)
+		// Copy transitions.
+		clonedStatePartition.Blocks[blockID].Transitions = make([]int, statePartition.AlphabetSize)
+		copy(clonedStatePartition.Blocks[blockID].Transitions, statePartition.Blocks[blockID].Transitions)
 	}
 
-	// Copy changed blocks slice.
-	copy(clonedStatePartition.ChangedBlocks, statePartition.ChangedBlocks)
+	// If state partition is already a copy.
+	if statePartition.IsCopy{
+		// Allocate slice for changed blocks.
+		clonedStatePartition.ChangedBlocks = make([]int, len(statePartition.ChangedBlocks))
+		// Copy changed blocks slice.
+		copy(clonedStatePartition.ChangedBlocks, statePartition.ChangedBlocks)
+	}
+
+	// Return cloned state partition.
+	return clonedStatePartition
+}
+
+// Copy returns a copy of the state partition in 'copy' (undo) mode.
+func (statePartition StatePartition) Copy() StatePartition {
+	// Panic if state partition is already a copy.
+	if statePartition.IsCopy {
+		panic("This state partition is already a copy.")
+	}
+
+	// Create a clone of the state partition.
+	copiedStatePartition := statePartition.Clone()
+
+	// Mark copied state partition as a copy.
+	copiedStatePartition.IsCopy = true
+	copiedStatePartition.ChangedBlocksCount = 0
+	copiedStatePartition.ChangedBlocks = make([]int, len(statePartition.Blocks))
 
 	// Return copied state partition.
-	return clonedStatePartition
+	return copiedStatePartition
 }
 
 // RollbackChangesFrom reverts any changes made within state partition given the original state partition.
