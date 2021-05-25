@@ -42,7 +42,7 @@ pub fn det_merge_benchmark() {
                     valid_merges += 1;
                 }
 
-                snapshot.rollback_changes(&part);
+                snapshot.rollback_changes_from(&part);
             }
         }
 

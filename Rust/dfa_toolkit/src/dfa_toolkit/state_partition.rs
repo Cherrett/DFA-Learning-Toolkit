@@ -1,6 +1,7 @@
 use std::borrow::{Borrow, BorrowMut};
 use crate::dfa_toolkit::dfa_state::{StateLabel, ACCEPTING, REJECTING, UNLABELLED};
-use crate::dfa_toolkit::dfa::DFA;
+use crate::dfa_toolkit::dfa::{DFA, new_dfa};
+use std::collections::HashMap;
 
 pub struct Block {
     pub root: i32,
@@ -31,7 +32,7 @@ impl StatePartition {
             blocks_count: dfa.states.len() as i32,
             accepting_blocks_count: 0,
             rejecting_blocks_count: 0,
-            alphabet_size: dfa.symbols_count,
+            alphabet_size: dfa.alphabet.len(),
             starting_state_id: dfa.starting_state_id,
             is_copy: false,
             changed_blocks: vec![],
@@ -45,7 +46,7 @@ impl StatePartition {
                 link: i as i32,
                 label: dfa.states[i].label,
                 changed: false,
-                transitions: Vec::with_capacity(dfa.symbols_count as usize),
+                transitions: dfa.states[i].transitions.to_vec(),
             };
 
             if block.label == ACCEPTING {
@@ -54,11 +55,7 @@ impl StatePartition {
                 state_partition.rejecting_blocks_count += 1;
             }
 
-            for j in 0..dfa.symbols_count {
-                block
-                    .transitions
-                    .push(dfa.states[i].transitions[j as usize]);
-            }
+            block.transitions = dfa.states[i].transitions.to_vec();
 
             state_partition.blocks.push(block);
         }
@@ -66,31 +63,57 @@ impl StatePartition {
         return state_partition;
     }
 
-    pub fn copy(&self) -> StatePartition {
-        let mut copied_state_partition = StatePartition {
+    pub fn clone(&self) -> StatePartition{
+        // Initialize new StatePartition struct using state partition.
+        let mut cloned_state_partition = StatePartition {
             blocks: Vec::with_capacity(self.blocks.len()),
             blocks_count: self.blocks_count,
             accepting_blocks_count: self.accepting_blocks_count,
             rejecting_blocks_count: self.rejecting_blocks_count,
             alphabet_size: self.alphabet_size,
             starting_state_id: self.starting_state_id,
-            is_copy: true,
-            changed_blocks: vec![0; self.blocks.len()],
-            changed_blocks_count: 0,
+            is_copy: self.is_copy,
+            changed_blocks: vec![],
+            changed_blocks_count: self.changed_blocks_count,
         };
 
-        for i in 0..self.blocks.len() {
-            let block_pointer = self.blocks[i].borrow();
-            copied_state_partition.blocks.push(Block {
-                root: block_pointer.root,
-                size: block_pointer.size,
-                link: block_pointer.link,
-                label: block_pointer.label,
-                changed: false,
-                transitions: block_pointer.transitions.to_vec(),
+        // Copy blocks.
+        for block in self.blocks.iter() {
+            cloned_state_partition.blocks.push(Block {
+                root: block.root,
+                size: block.size,
+                link: block.link,
+                label: block.label,
+                changed: block.changed,
+                transitions: block.transitions.to_vec(),
             });
         }
 
+        // If state partition is already a copy.
+        if self.is_copy{
+            // Copy changed blocks vector.
+            cloned_state_partition.changed_blocks = self.changed_blocks.to_vec();
+        }
+
+        // Return cloned state partition.
+        return cloned_state_partition;
+    }
+
+    pub fn copy(&self) -> StatePartition {
+        // Panic if state partition is already a copy.
+        if self.is_copy{
+            panic!("This state partition is already a copy.")
+        }
+
+        // Create a clone of the state partition.
+        let mut copied_state_partition = self.clone();
+
+        // Mark copied state partition as a copy.
+        copied_state_partition.is_copy = true;
+        copied_state_partition.changed_blocks_count = 0;
+        copied_state_partition.changed_blocks = vec![0; self.blocks.len()];
+
+        // Return copied state partition.
         return copied_state_partition;
     }
 
@@ -185,30 +208,30 @@ impl StatePartition {
         return state_id;
     }
 
-    // pub fn return_set(&self, block: i32) -> Vec<i32>{
-    //     let mut block_id = block;
-    //
-    //     // Hash set of state IDs and add root element to set.
-    //     let mut block_elements: Vec<i32> = vec![block_id];
-    //
-    //     // Add root element to set.
-    //     //block_elements.push(block_id);
-    //     // Set root to block ID.
-    //
-    //     let root = block_id;
-    //
-    //     // Iterate until link of current block ID is
-    //     // not equal to the root block.
-    //     while self.blocks[block_id as usize].link != root{
-    //         // Set block ID to link of current block.
-    //         block_id = self.blocks[block_id as usize].link;
-    //         // Add block ID to block elements set.
-    //         block_elements.push(block_id);
-    //     }
-    //
-    //     // Return state IDs within set.
-    //     return block_elements;
-    // }
+    pub fn return_set(&self, block: i32) -> Vec<i32>{
+        let mut block_id = block;
+
+        // Hash set of state IDs and add root element to set.
+        let mut block_elements: Vec<i32> = vec![block_id];
+
+        // Add root element to set.
+        //block_elements.push(block_id);
+        // Set root to block ID.
+
+        let root = block_id;
+
+        // Iterate until link of current block ID is
+        // not equal to the root block.
+        while self.blocks[block_id as usize].link != root{
+            // Set block ID to link of current block.
+            block_id = self.blocks[block_id as usize].link;
+            // Add block ID to block elements set.
+            block_elements.push(block_id);
+        }
+
+        // Return state IDs within set.
+        return block_elements;
+    }
 
     pub fn merge_states(&mut self, state1: i32, state2: i32) -> bool {
         let mut state1_id = state1;
@@ -267,7 +290,8 @@ impl StatePartition {
         return true;
     }
 
-    pub fn rollback_changes(&mut self, original_state_partition: &StatePartition) {
+    // rollback_changes_from reverts any changes made within state partition given the original state partition.
+    pub fn rollback_changes_from(&mut self, original_state_partition: &StatePartition) {
         // If the state partition is a copy, copy values of changed blocks from original
         // state partition. Else, do nothing.
         if self.is_copy {
@@ -296,6 +320,121 @@ impl StatePartition {
             // Empty the changed blocks vector.
             self.changed_blocks_count = 0;
         }
+    }
+
+    // copy_changes_from copies the changes from one state partition to another and resets
+    // the changed values within the copied state partition.
+    pub fn copy_changes_from(&mut self, copied_state_partition: &StatePartition){
+        // If the state partition is a copy, copy values of changed blocks to original
+        // state partition. Else, do nothing.
+        if copied_state_partition.is_copy{
+            // Set blocks count values to the new values.
+            self.blocks_count = copied_state_partition.blocks_count;
+            self.accepting_blocks_count = copied_state_partition.accepting_blocks_count;
+            self.rejecting_blocks_count = copied_state_partition.rejecting_blocks_count;
+
+            // Iterate over each altered block (state).
+            for i in 0..copied_state_partition.changed_blocks_count {
+                let block_id = copied_state_partition.changed_blocks[i as usize];
+                // Get block pointer from copied state partition.
+                let changed_block = copied_state_partition.blocks[block_id as usize].borrow();
+                // Get block pointer from original state partition.
+                let mut original_block = self.blocks[block_id as usize].borrow_mut();
+
+                // Update root, size, link, and label.
+                original_block.root = changed_block.root;
+                original_block.size = changed_block.size;
+                original_block.link = changed_block.link;
+                original_block.label = changed_block.label;
+
+                // Set changed property of changed block to false.
+                original_block.changed = false;
+
+                // Copy transitions from changed to original.
+                original_block.transitions = changed_block.transitions.to_vec();
+            }
+
+            // Empty the changed blocks vector.
+            self.changed_blocks_count = 0;
+        }
+    }
+
+    // number_of_labelled_blocks returns the number of labelled blocks (states) within state partition.
+    pub fn number_of_labelled_blocks(&self) -> i32 {
+        // Return the sum of the accepting and rejecting blocks count.
+        return self.accepting_blocks_count + self.rejecting_blocks_count
+    }
+
+    // root_blocks returns the IDs of root blocks as a slice of integers.
+    pub fn root_blocks(&self) -> Vec<i32>{
+        // Initialize vector using blocks count value.
+        let mut root_blocks = vec![0; self.blocks_count as usize];
+        // Index (count) of root blocks.
+        let mut index = 0;
+
+        // Iterate over each block within partition.
+        for block_id in 0..self.blocks.len(){
+            // Check if root of current block is equal to the block ID
+            if self.blocks[block_id].root == block_id as i32{
+                // Add to rootBlocks slice using index.
+                root_blocks[index] = block_id as i32;
+                // Increment index.
+                index += 1;
+                // If index is equal to blocks count,
+                // break since all root blocks have
+                // been found.
+                if index == self.blocks_count as usize{
+                    break
+                }
+            }
+        }
+
+        // Return populated vector.
+        return root_blocks;
+    }
+
+    // to_quotient_dfa converts a State Partition to a quotient DFA and returns it.
+    pub fn to_quotient_dfa(&mut self) -> DFA{
+        // Hashmap to store corresponding new state for
+        // each root block within state partition.
+        let mut blocks_to_state_map = HashMap::new();
+
+        // Initialize resultant DFA to be returned by function.
+        let mut resultant_dfa = new_dfa();
+
+        // Get root blocks within state partition.
+        let root_blocks = self.root_blocks();
+
+        // Create alphabet within DFA.
+        for _ in 0..self.alphabet_size{
+            resultant_dfa.add_symbol()
+        }
+
+        // Create a new state within DFA for each root block and
+        // set state label to block label.
+        for i in 0..root_blocks.len(){
+            blocks_to_state_map.insert(root_blocks[i], resultant_dfa.add_state(self.blocks[root_blocks[i] as usize].label));
+        }
+
+        // Update transitions using transitions within blocks and block to state map.
+        for i in 0..root_blocks.len(){
+            for symbol in 0..self.alphabet_size{
+                let resultant_state = self.blocks[root_blocks[i] as usize].transitions[symbol];
+                if resultant_state > -1 {
+                    resultant_dfa.states[*blocks_to_state_map.get(&root_blocks[i]).unwrap() as usize].transitions[symbol] = *blocks_to_state_map.get(&self.find(resultant_state)).unwrap();
+                }
+            }
+        }
+
+        // Set starting state using block to state map.
+        resultant_dfa.starting_state_id = *blocks_to_state_map.get(&self.starting_block()).unwrap();
+
+        // Return populated resultant DFA.
+        return resultant_dfa
+    }
+
+    pub fn starting_block(&mut self) -> i32{
+        return self.find(self.starting_state_id)
     }
 }
 

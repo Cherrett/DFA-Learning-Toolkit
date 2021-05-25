@@ -5917,5 +5917,8 @@
 		}
 	],
 	"startingStateId": 0,
-	"symbolsCount": 2
+	"alphabet": [
+		0,
+		1
+	]
 }
