@@ -218,7 +218,7 @@ func TestStateMergingAndDFAEquivalence(t *testing.T) {
 		t.Errorf("State Partition should be valid.")
 	}
 
-	if !mergedDFA1.Equal(mergedDFA2) {
+	if !mergedDFA1.SameAs(mergedDFA2) {
 		t.Errorf("Merged DFAs should be equal.")
 	}
 }
@@ -375,10 +375,10 @@ func TestRPNI(t *testing.T) {
 	// Get accuracy from resultant DFA on testing set.
 	accuracy := resultantDFA.Accuracy(test)
 
-	if mergeData.AttemptedMergesCount != 3158232 ||
-		mergeData.ValidMergesCount != 109 ||
-		len(resultantDFA.States) != 108 ||
-		accuracy != 0.5222222222222223 {
+	if mergeData.AttemptedMergesCount != 9831 ||
+		mergeData.ValidMergesCount != 108 ||
+		len(resultantDFA.States) != 107 ||
+		accuracy != 0.5188888888888888 {
 		t.Errorf("Discrepancies found in result of RPNI.")
 	}
 }

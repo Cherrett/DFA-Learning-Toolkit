@@ -85,9 +85,9 @@ func TestBenchmarkRPNI(t *testing.T) {
 	// Number of iterations.
 	n := 128
 	// Target size.
-	targetSize := 32
+	targetSize := 64
 	// Training and testing set sizes.
-	trainingSetSize, testingSetSize := 607, 1800
+	trainingSetSize, testingSetSize := 4456, 1800
 
 	winners := 0
 	accuracies := util.NewStatsTracker()
@@ -124,8 +124,8 @@ func TestBenchmarkRPNI(t *testing.T) {
 	PrintBenchmarkInformation(accuracies, numberOfStates, durations, mergesPerSec, merges, validMerges)
 	fmt.Println("--------------------------------------------------------------------------------------------")
 
-	if successfulPercentage > 0 {
-		t.Error("The percentage of successful DFAs is bigger than 0%.")
+	if successfulPercentage < 50.0 {
+		t.Error("The percentage of successful DFAs is smaller than 50%.")
 	}
 }
 

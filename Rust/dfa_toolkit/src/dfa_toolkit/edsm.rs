@@ -25,7 +25,7 @@ pub fn exhaustive_edsm(apta: DFA) -> (DFA, MergeData){
     let resultant_dfa = result.0.to_quotient_dfa();
 
     // Check if DFA generated is valid.
-    //resultant_dfa.is_valid_panic();
+    resultant_dfa.is_valid_panic();
 
     // Return resultant DFA.
     return (resultant_dfa, result.1)
