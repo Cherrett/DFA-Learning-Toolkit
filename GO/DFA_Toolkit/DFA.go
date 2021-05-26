@@ -572,8 +572,8 @@ func (dfa DFA) Clone() DFA {
 	return clonedDFA
 }
 
-// Equal checks whether DFA is equal to the given DFA.
-func (dfa DFA) Equal(dfa2 DFA) bool {
+// SameAs checks whether DFA is the same as the given DFA.
+func (dfa DFA) SameAs(dfa2 DFA) bool {
 	// Minimise both DFAs.
 	dfa1 := dfa.Minimise()
 	dfa2 = dfa2.Minimise()
@@ -624,11 +624,11 @@ func (dfa DFA) Equal(dfa2 DFA) bool {
 	return true
 }
 
-// SameAs checks whether DFA is the same as the given DFA.
+// Equal checks whether DFA is equal to the given DFA.
 // This function makes use of DeepEqual and if it
 // returns false, it does not necessarily mean that
-// the DFAs are not equal. Use Equal() for equivalence.
-func (dfa DFA) SameAs(dfa2 DFA) bool {
+// the DFAs are not equal. Use SameAs() for equivalence.
+func (dfa DFA) Equal(dfa2 DFA) bool {
 	return reflect.DeepEqual(dfa, dfa2)
 }
 

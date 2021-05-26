@@ -16,11 +16,11 @@ type StatePairScore struct {
 // ScoringFunction takes two stateIDs and two state partitions as input and returns a score as a float.
 type ScoringFunction func(stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition) float64
 
-// ExhaustiveSearch deterministically merges all possible state pairs.
+// RPNISearch deterministically merges all possible state pairs within red-blue framework.
 // The first valid merge with respect to the rejecting examples is chosen.
 // Returns the resultant state partition and search data when no more valid merges are possible.
 // Used by the regular positive and negative inference (RPNI) algorithm.
-func ExhaustiveSearch(statePartition StatePartition) (StatePartition, MergeData) {
+func RPNISearch(statePartition StatePartition) (StatePartition, MergeData) {
 	// Clone StatePartition.
 	statePartition = statePartition.Clone()
 	// Copy the state partition for undoing and copying changed states.
@@ -30,35 +30,50 @@ func ExhaustiveSearch(statePartition StatePartition) (StatePartition, MergeData)
 	// Start timer.
 	start := time.Now()
 
-	// Get ordered blocks within partition.
-	orderedBlocks := statePartition.OrderedBlocks()
+	// Slice to store red states in canonical order.
+	redStates := []int{statePartition.StartingBlock()}
+	// Generated slice of ordered blue states from red states.
+	blueStates := UpdateRedBlueSets(&statePartition, &redStates)
 
-	// Deterministically merge all valid merges by
-	// iterating over root blocks within partition.
-	for i := 1; i < len(orderedBlocks); i++ {
-		for j := 0; j < i; j++ {
+	// Iterate until blue set is empty.
+	for len(blueStates) > 0 {
+		// Remove and store first state in blue states queue.
+		blueElement := blueStates[0]
+		blueStates = blueStates[1:]
+
+		// Set merged flag to false.
+		merged := false
+
+		// Iterate over every red state in canonical order.
+		for _, redElement := range redStates {
 			// Increment merge count.
 			mergeData.AttemptedMergesCount++
 
 			// Check if states are mergeable.
-			if copiedPartition.MergeStates(orderedBlocks[i], orderedBlocks[j]) {
-				// Do not merge if states are within same block.
-				if !statePartition.WithinSameBlock(orderedBlocks[i], orderedBlocks[j]) {
-					// Increment valid merge count.
-					mergeData.ValidMergesCount++
+			if copiedPartition.MergeStates(redElement, blueElement) {
+				// Increment valid merge count.
+				mergeData.ValidMergesCount++
 
-					// Copy changes to original state partition.
-					statePartition.CopyChangesFrom(&copiedPartition)
+				// Copy changes to original state partition.
+				statePartition.CopyChangesFrom(&copiedPartition)
 
-					// Add merged state pair with score to search data.
-					mergeData.Merges = append(mergeData.Merges, StatePairScore{orderedBlocks[i], orderedBlocks[j], 0})
-					break
-				}
+				// Set merged flag to true.
+				merged = true
+				break
 			}
 
 			// Undo merges from copied partition.
 			copiedPartition.RollbackChangesFrom(statePartition)
 		}
+
+		// If merged flag is false, add current blue state
+		// to red states set and ordered set.
+		if !merged {
+			redStates = append(redStates, blueElement)
+		}
+
+		// Update red and blue states using UpdateOrderedRedBlueSets function.
+		blueStates = UpdateRedBlueSets(&statePartition, &redStates)
 	}
 
 	// Add duration to search data.
@@ -66,6 +81,48 @@ func ExhaustiveSearch(statePartition StatePartition) (StatePartition, MergeData)
 
 	// Return the final resultant state partition and search data.
 	return statePartition, mergeData
+}
+
+// UpdateRedBlueSets updates the red and blue sets given the state partition and the red set within the Red-Blue framework
+// such as the GeneralizedRedBlueMerging function. It returns the blue set and modifies the red set via its pointer. This is
+// used when the state partition is changed or when new states have been added to the red set.
+func UpdateRedBlueSets(statePartition *StatePartition, redStates *[]int) []int {
+	// Step 1 - Gather root of old red states and store in map declared below.
+
+	// Initialize set of red root states (blocks) to empty set.
+	redSet := make(map[int]util.Void, len(*redStates))
+
+	// Iterate over every red state.
+	for i := range *redStates {
+		redElement := &(*redStates)[i]
+		*redElement = statePartition.Find(*redElement)
+
+		redSet[*redElement] = util.Null
+	}
+
+	// Step 2 - Gather all blue states and store in map declared below.
+
+	// Initialize set of blue states to empty set.
+	var blueStates []int
+
+	// Iterate over every red state.
+	for _, element := range *redStates {
+		// Iterate over each symbol within DFA.
+		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
+			if resultantStateID := statePartition.Blocks[element].Transitions[symbol]; resultantStateID > -1 {
+				// Store resultant stateID from red state.
+				resultantStateID = statePartition.Find(resultantStateID)
+				// If transition is valid and resultant state is not red,
+				// add resultant state to blue set.
+				if _, exists := redSet[resultantStateID]; !exists {
+					blueStates = append(blueStates, resultantStateID)
+				}
+			}
+		}
+	}
+
+	// Return populated slice of red states and populated slice of blue states in canonical order.
+	return blueStates
 }
 
 // ExhaustiveSearchUsingScoringFunction deterministically merges all possible state pairs.
@@ -295,9 +352,8 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 
 	// Slice to store red states in canonical order.
 	redStates := []int{statePartition.StartingBlock()}
-
 	// Generated slice of ordered blue states from red states.
-	blueStates := GenerateOrderedBlueSetFromRedSet(&statePartition, map[int]util.Void{statePartition.StartingBlock(): util.Null})
+	blueStates := GenerateOrderedBlueSetFromRedSet(&statePartition, map[int]util.Void{redStates[0]: util.Null})
 
 	// Initialize merged flag to false.
 	merged := false
@@ -313,7 +369,7 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 				// Increment merge count.
 				mergeData.AttemptedMergesCount++
 
-				// If states are mergeable, calculate score and add to detMerges.
+				// Check if states are mergeable.
 				if copiedPartition.MergeStates(blueElement, redElement) {
 					// Increment valid merge count.
 					mergeData.ValidMergesCount++
@@ -455,7 +511,7 @@ func UpdateOrderedRedBlueSets(statePartition *StatePartition, redStates []int) (
 	// Step 1 - Gather root of old red states and store in map declared below.
 
 	// Initialize set of red root states (blocks) to empty set.
-	redSet := map[int]util.Void{}
+	redSet := make(map[int]util.Void, len(redStates))
 
 	// Iterate over every red state.
 	for _, element := range redStates {

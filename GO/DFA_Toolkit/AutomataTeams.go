@@ -17,6 +17,8 @@ type TeamOfAutomata struct {
 	MergeData MergeData
 }
 
+// TeamOfAutomataClassifierFunction takes a string instance as input and returns a state label.
+// An example of how this function type should be used can be seen in BetterHalfWeightedVoteAccuracy.
 type TeamOfAutomataClassifierFunction func(stringInstance StringInstance) StateLabel
 
 // GRBM deterministically merges possible state pairs within red-blue sets.
@@ -38,7 +40,7 @@ func GRBM(statePartition StatePartition) (StatePartition, MergeData) {
 	redStates := []int{statePartition.StartingBlock()}
 
 	// Generated slice of ordered blue states from red states.
-	blueStates := GenerateBlueSetFromRedSet(&statePartition, map[int]util.Void{statePartition.StartingBlock(): util.Null})
+	blueStates := GenerateBlueSetFromRedSetWithShuffle(&statePartition, map[int]util.Void{redStates[0]: util.Null})
 	// Shuffle blue sets.
 	rand.Shuffle(len(blueStates), func(i, j int) { blueStates[i], blueStates[j] = blueStates[j], blueStates[i] })
 
@@ -82,8 +84,8 @@ func GRBM(statePartition StatePartition) (StatePartition, MergeData) {
 				redStates = append(redStates, blueElement)
 			}
 
-			// Update red and blue states using UpdateRedBlueSets function.
-			redStates, blueStates = UpdateRedBlueSets(&statePartition, redStates)
+			// Update red and blue states using UpdateRedBlueSetsWithShuffle function.
+			blueStates = UpdateRedBlueSetsWithShuffle(&statePartition, &redStates)
 		}
 	}
 
@@ -97,13 +99,13 @@ func GRBM(statePartition StatePartition) (StatePartition, MergeData) {
 	return statePartition, mergeData
 }
 
-// GenerateBlueSetFromRedSet generates the blue set given the state partition and the red set within the Red-Blue framework
+// GenerateBlueSetFromRedSetWithShuffle generates the blue set given the state partition and the red set within the Red-Blue framework
 // such as the GeneralizedRedBlueMerging function. It generates and returns the blue set in arbitrary order.
-func GenerateBlueSetFromRedSet(statePartition *StatePartition, redSet map[int]util.Void) []int {
+func GenerateBlueSetFromRedSetWithShuffle(statePartition *StatePartition, redSet map[int]util.Void) []int {
 	// Step 1 - Gather all blue states and store in map declared below.
 
 	// Initialize set of blue states to empty set.
-	var blue []int
+	var blueStates []int
 
 	// Iterate over every red state.
 	for element := range redSet {
@@ -115,45 +117,42 @@ func GenerateBlueSetFromRedSet(statePartition *StatePartition, redSet map[int]ut
 				// If transition is valid and resultant state is not red,
 				// add resultant state to blue set.
 				if _, exists := redSet[resultantStateID]; !exists {
-					blue = append(blue, resultantStateID)
+					blueStates = append(blueStates, resultantStateID)
 				}
 			}
 		}
 	}
 
+	rand.Shuffle(len(blueStates), func(i, j int) { blueStates[i], blueStates[j] = blueStates[j], blueStates[i] })
+
 	// Return populated slice of blue states in canonical order.
-	return blue
+	return blueStates
 }
 
-// UpdateRedBlueSets updates the red and blue sets given the state partition and the red set within the Red-Blue framework
-// such as the GeneralizedRedBlueMerging function. It returns the red and blue sets in arbitrary order. This is
-// used when the state partition is changed or when new states have been added to the red set.
-func UpdateRedBlueSets(statePartition *StatePartition, redStates []int) ([]int, []int) {
+// UpdateRedBlueSetsWithShuffle updates the red and blue sets given the state partition and the red set within the Red-Blue framework
+// such as the GeneralizedRedBlueMerging function. It returns the blue set and modifies the red set via its pointer. Both sets are
+// shuffled . This is used when the state partition is changed or when new states have been added to the red set.
+func UpdateRedBlueSetsWithShuffle(statePartition *StatePartition, redStates *[]int) []int {
 	// Step 1 - Gather root of old red states and store in map declared below.
 
 	// Initialize set of red root states (blocks) to empty set.
-	redSet := map[int]util.Void{}
-	var red []int
+	redSet := make(map[int]util.Void, len(*redStates))
 
 	// Iterate over every red state.
-	for _, element := range redStates {
-		// Get root block of red state.
-		root := statePartition.Find(element)
+	for i := range *redStates {
+		redElement := &(*redStates)[i]
+		*redElement = statePartition.Find(*redElement)
 
-		if _, exists := redSet[root]; !exists {
-			// Add root block to red set.
-			redSet[root] = util.Null
-			red = append(red, root)
-		}
+		redSet[*redElement] = util.Null
 	}
 
 	// Step 2 - Gather all blue states and store in map declared below.
 
 	// Initialize set of blue states to empty set.
-	var blue []int
+	var blueStates []int
 
 	// Iterate over every red state.
-	for element := range redSet {
+	for _, element := range *redStates {
 		// Iterate over each symbol within DFA.
 		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
 			if resultantStateID := statePartition.Blocks[element].Transitions[symbol]; resultantStateID > -1 {
@@ -162,18 +161,18 @@ func UpdateRedBlueSets(statePartition *StatePartition, redStates []int) ([]int, 
 				// If transition is valid and resultant state is not red,
 				// add resultant state to blue set.
 				if _, exists := redSet[resultantStateID]; !exists {
-					blue = append(blue, resultantStateID)
+					blueStates = append(blueStates, resultantStateID)
 				}
 			}
 		}
 	}
 
 	// Shuffle both red and blue sets.
-	rand.Shuffle(len(red), func(i, j int) { red[i], red[j] = red[j], red[i] })
-	rand.Shuffle(len(blue), func(i, j int) { blue[i], blue[j] = blue[j], blue[i] })
+	rand.Shuffle(len(*redStates), func(i, j int) { (*redStates)[i], (*redStates)[j] = (*redStates)[j], (*redStates)[i] })
+	rand.Shuffle(len(blueStates), func(i, j int) { blueStates[i], blueStates[j] = blueStates[j], blueStates[i] })
 
 	// Return populated slice of red states and populated slice of blue states in canonical order.
-	return red, blue
+	return blueStates
 }
 
 // GeneralizedRedBlueMergingFromDataset is a.
@@ -272,6 +271,8 @@ func (teamOfAutomata TeamOfAutomata) Accuracy(dataset Dataset, teamOfAutomataCla
 	return correctClassifications / float64(len(dataset))
 }
 
+// FairVoteAccuracy returns the TeamOfAutomata's Accuracy with respect to a dataset
+// using the fair vote scoring heuristic.
 func (teamOfAutomata TeamOfAutomata) FairVoteAccuracy(dataset Dataset) float64 {
 	fairVote := func(stringInstance StringInstance) StateLabel {
 		accepting := 0
@@ -301,6 +302,8 @@ func (teamOfAutomata TeamOfAutomata) FairVoteAccuracy(dataset Dataset) float64 {
 	return teamOfAutomata.Accuracy(dataset, fairVote)
 }
 
+// WeightedVoteAccuracy returns the TeamOfAutomata's Accuracy with respect to a dataset
+// using the weighted vote scoring heuristic.
 func (teamOfAutomata TeamOfAutomata) WeightedVoteAccuracy(dataset Dataset) float64 {
 	weightedVote := func(stringInstance StringInstance) StateLabel {
 		accepting := 0.0
@@ -331,6 +334,8 @@ func (teamOfAutomata TeamOfAutomata) WeightedVoteAccuracy(dataset Dataset) float
 	return teamOfAutomata.Accuracy(dataset, weightedVote)
 }
 
+// BetterHalfWeightedVoteAccuracy returns the TeamOfAutomata's Accuracy with respect to a dataset
+// using the better half weighted vote scoring heuristic.
 func (teamOfAutomata TeamOfAutomata) BetterHalfWeightedVoteAccuracy(dataset Dataset) float64 {
 	sizeCount := 0.0
 

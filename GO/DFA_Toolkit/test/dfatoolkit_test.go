@@ -218,7 +218,7 @@ func TestStateMergingAndDFAEquivalence(t *testing.T) {
 		t.Errorf("State Partition should be valid.")
 	}
 
-	if !mergedDFA1.Equal(mergedDFA2) {
+	if !mergedDFA1.SameAs(mergedDFA2) {
 		t.Errorf("Merged DFAs should be equal.")
 	}
 }
