@@ -485,7 +485,7 @@ func (dfa DFA) UnreachableStates() []int {
 	currentStates := map[int]bool{dfa.StartingStateID: true}
 
 	// Iterate until current states is empty.
-	for len(currentStates) != 0 {
+	for len(currentStates) > 0 {
 		// Map of next states.
 		nextStates := map[int]bool{}
 		// Iterate over current states.
@@ -494,14 +494,16 @@ func (dfa DFA) UnreachableStates() []int {
 			for symbol := range dfa.Alphabet {
 				// If transition from current state using current symbol
 				// is valid, add resultant state to next states.
-				if dfa.States[stateID].Transitions[symbol] >= 0 {
-					nextStates[dfa.States[stateID].Transitions[symbol]] = true
+				resultantStateID := dfa.States[stateID].Transitions[symbol]
+				if resultantStateID >= 0 {
+					nextStates[resultantStateID] = true
 				}
 			}
 		}
 
 		// Remove all state IDs from current states.
 		currentStates = map[int]bool{}
+
 		// Iterate over next states.
 		for stateID := range nextStates {
 			// If state is not in reachable states map, add to
@@ -516,6 +518,7 @@ func (dfa DFA) UnreachableStates() []int {
 
 	// Slice of unreachable states.
 	var unReachableStates []int
+
 	// Iterate over each state within DFA.
 	for stateID := range dfa.States {
 		// If state ID is not in reachable states map,
@@ -632,15 +635,15 @@ func (dfa DFA) SameAs(dfa2 DFA) bool {
 // IsValidPanic checks whether DFA is valid.
 // Panics if not valid. Used for error checking.
 func (dfa DFA) IsValidPanic() {
-	if dfa.StartingStateID < 0 || dfa.StartingStateID >= len(dfa.States) {
+	if len(dfa.States) < 1 {
+		// Panic if number of states is invalid.
+		panic("DFA does not contain any states.")
+	} else if dfa.StartingStateID < 0 || dfa.StartingStateID >= len(dfa.States) {
 		// Panic if starting state is invalid.
 		panic("Invalid starting state.")
 	} else if len(dfa.Alphabet) < 1 {
 		// Panic if number of symbols is invalid.
 		panic("DFA does not contain any symbols.")
-	} else if len(dfa.States) < 1 {
-		// Panic if number of states is invalid.
-		panic("DFA does not contain any states.")
 	} else if len(dfa.UnreachableStates()) > 0 {
 		// Panic if any unreachable states exist within DFA.
 		panic("Unreachable State exist within DFA.")
@@ -650,18 +653,21 @@ func (dfa DFA) IsValidPanic() {
 // IsValidSafe checks whether DFA is valid.
 // Returns false if not valid.
 func (dfa DFA) IsValidSafe() bool {
-	if dfa.StartingStateID < 0 || dfa.StartingStateID >= len(dfa.States) {
-		// Return false if starting state is invalid.
-		return false
-	}
-	if len(dfa.Alphabet) < 1 {
-		// Return false if number of symbols is invalid.
-		return false
-	}
 	if len(dfa.States) < 1 {
 		// Return false if number of states is invalid.
 		return false
 	}
+
+	if dfa.StartingStateID < 0 || dfa.StartingStateID >= len(dfa.States) {
+		// Return false if starting state is invalid.
+		return false
+	}
+
+	if len(dfa.Alphabet) < 1 {
+		// Return false if number of symbols is invalid.
+		return false
+	}
+
 	if len(dfa.UnreachableStates()) > 0 {
 		// Return false if any unreachable states exist within DFA.
 		return false

@@ -7,7 +7,7 @@ pub const UNLABELLED: i8 = 2;
 pub type StateLabel = i8;
 
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "PascalCase")]
 pub struct State {
     pub label: StateLabel,
     pub transitions: Vec<i32>,
