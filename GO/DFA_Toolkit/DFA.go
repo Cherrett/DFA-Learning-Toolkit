@@ -937,11 +937,11 @@ func (dfa *DFA) SetOrderAsID() DFA {
 
 // ChangeRejectingStatesToUnlabelled changes all rejecting states
 // within the DFA to unlabelled.
-func (dfa *DFA) ChangeRejectingStatesToUnlabelled(){
+func (dfa *DFA) ChangeRejectingStatesToUnlabelled() {
 	// Iterate over each state within DFA.
-	for stateID := range dfa.States{
+	for stateID := range dfa.States {
 		// If label is rejecting, change it to unlabelled.
-		if dfa.States[stateID].Label == REJECTING{
+		if dfa.States[stateID].Label == REJECTING {
 			dfa.States[stateID].Label = UNLABELLED
 		}
 	}

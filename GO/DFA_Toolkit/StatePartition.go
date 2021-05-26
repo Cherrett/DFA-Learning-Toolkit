@@ -337,7 +337,7 @@ func (statePartition StatePartition) Clone() StatePartition {
 	}
 
 	// If state partition is already a copy.
-	if statePartition.IsCopy{
+	if statePartition.IsCopy {
 		// Allocate slice for changed blocks.
 		clonedStatePartition.ChangedBlocks = make([]int, len(statePartition.ChangedBlocks))
 		// Copy changed blocks slice.

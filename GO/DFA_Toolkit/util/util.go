@@ -156,29 +156,29 @@ func (statsTracker StatsTracker) Mean() float64 {
 
 // PopulationVariance returns the population variance value within the StatsTracker struct.
 func (statsTracker StatsTracker) PopulationVariance() float64 {
-	if statsTracker.count > 1{
+	if statsTracker.count > 1 {
 		return statsTracker.m2 / float64(statsTracker.count)
-	}else{
+	} else {
 		return 0.0
 	}
 }
 
 // SampleVariance returns the sample variance value within the StatsTracker struct.
 func (statsTracker StatsTracker) SampleVariance() float64 {
-	if statsTracker.count > 1{
-		return statsTracker.m2 / float64(statsTracker.count - 1)
-	}else{
+	if statsTracker.count > 1 {
+		return statsTracker.m2 / float64(statsTracker.count-1)
+	} else {
 		return 0.0
 	}
 }
 
 // PopulationStandardDev returns the population standard deviation value within the StatsTracker struct.
-func (statsTracker StatsTracker) PopulationStandardDev() float64{
+func (statsTracker StatsTracker) PopulationStandardDev() float64 {
 	return math.Sqrt(statsTracker.PopulationVariance())
 }
 
 // SampleStandardDev returns the sample standard deviation value within the StatsTracker struct.
-func (statsTracker StatsTracker) SampleStandardDev() float64{
+func (statsTracker StatsTracker) SampleStandardDev() float64 {
 	return math.Sqrt(statsTracker.SampleVariance())
 }
 
@@ -192,14 +192,14 @@ func Factorial(n int) int {
 }
 
 // RandomGeometricProbability returns a random geometrically distributed integer using a mean value.
-func RandomGeometricProbability(mean float64) int{
+func RandomGeometricProbability(mean float64) int {
 	return int(math.Log(rand.Float64()) / (math.Log(1 - mean)))
 }
 
 // DownloadAllStaminaDatasets downloads all of the stamina datasets to a given directory.
-func DownloadAllStaminaDatasets(directory string){
+func DownloadAllStaminaDatasets(directory string) {
 	// Iterate from 1 to 100 (number of stamina datasets).
-	for i := 1; i < 101; i++{
+	for i := 1; i < 101; i++ {
 		// Get training and test sets from URL.
 		resp, _ := http.Get(fmt.Sprintf("http://stamina.chefbe.net/downloads/grid/%d_training.txt", i))
 		resp2, _ := http.Get(fmt.Sprintf("http://stamina.chefbe.net/downloads/grid/%d_test.txt", i))

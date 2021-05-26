@@ -176,7 +176,7 @@ func StaminaDFA(alphabetSize int, targetDFASize int) DFA {
 			addTransition(ambassadorState, newStateID, &dfa, p)
 
 			// Self loop with probability l.
-			if util.RandomGeometricProbability(1-l) > 0 && !dfa.States[newStateID].AllTransitionsExist(){
+			if util.RandomGeometricProbability(1-l) > 0 && !dfa.States[newStateID].AllTransitionsExist() {
 				// Add a self-loop edge within the newly created state.
 				addTransition(newStateID, newStateID, &dfa, p)
 			}
@@ -202,7 +202,7 @@ func StaminaDFA(alphabetSize int, targetDFASize int) DFA {
 		// If the number of states within minimised DFA is equal (or within +2)
 		// to the target DFA size, the DFA is returned. Else, try again until
 		// required target is found.
-		if minimisedDFAStates + 2 >= targetDFASize {
+		if minimisedDFAStates+2 >= targetDFASize {
 			// Return the minimised DFA since it
 			// meets all of the requirements.
 			return minimisedDFA

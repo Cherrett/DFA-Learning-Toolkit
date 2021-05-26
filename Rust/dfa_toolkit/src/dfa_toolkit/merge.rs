@@ -86,3 +86,4 @@ pub fn exhaustive_search_using_scoring_function(original_state_partition: StateP
 
     return (state_partition, merge_data);
 }
+

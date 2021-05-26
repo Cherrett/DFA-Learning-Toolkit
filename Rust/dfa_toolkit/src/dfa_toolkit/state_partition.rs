@@ -303,18 +303,14 @@ impl StatePartition {
             // Iterate over each altered block (state).
             for i in 0..self.changed_blocks_count {
                 let block_id = self.changed_blocks[i as usize];
-                // Get block pointer from copied state partition.
-                let mut block = self.blocks[block_id as usize].borrow_mut();
-                // Get block pointer from original state partition.
-                let original_block = original_state_partition.blocks[block_id as usize].borrow();
 
                 // Update root, size, link, and label.
-                block.root = original_block.root;
-                block.size = original_block.size;
-                block.link = original_block.link;
-                block.label = original_block.label;
-                block.changed = false;
-                block.transitions = original_block.transitions.to_vec();
+                self.blocks[block_id as usize].root = original_state_partition.blocks[block_id as usize].root;
+                self.blocks[block_id as usize].size = original_state_partition.blocks[block_id as usize].size;
+                self.blocks[block_id as usize].link = original_state_partition.blocks[block_id as usize].link;
+                self.blocks[block_id as usize].label = original_state_partition.blocks[block_id as usize].label;
+                self.blocks[block_id as usize].changed = false;
+                self.blocks[block_id as usize].transitions = original_state_partition.blocks[block_id as usize].transitions.to_vec();
             }
 
             // Empty the changed blocks vector.

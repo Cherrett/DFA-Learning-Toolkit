@@ -360,7 +360,7 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 			// Remove previous state pair with the highest score.
 			highestScoringStatePair = StatePairScore{-1, -1, -1}
 		}
-		
+
 		// Update red and blue states using UpdateOrderedRedBlueSets function.
 		redStates, blueStates = UpdateOrderedRedBlueSets(&statePartition, redStates)
 	}
@@ -451,7 +451,7 @@ func GenerateOrderedBlueSetFromRedSet(statePartition *StatePartition, redSet map
 // UpdateOrderedRedBlueSets updates the red and blue sets given the state partition and the red set within the Red-Blue framework
 // such as the BlueFringeSearchUsingScoringFunction function. It returns the red and blue sets in canonical order. This is
 // used when the state partition is changed or when new states have been added to the red set.
-func UpdateOrderedRedBlueSets(statePartition *StatePartition, redStates []int) ([]int, []int){
+func UpdateOrderedRedBlueSets(statePartition *StatePartition, redStates []int) ([]int, []int) {
 	// Step 1 - Gather root of old red states and store in map declared below.
 
 	// Initialize set of red root states (blocks) to empty set.
@@ -507,7 +507,7 @@ func UpdateOrderedRedBlueSets(statePartition *StatePartition, redStates []int) (
 	if _, exists := redSet[startingBlock]; exists {
 		orderedRed = append(orderedRed, startingBlock)
 		// Else, if starting block is in blue set, add to blue ordered slice.
-	}else if _, exists = blueSet[startingBlock]; exists {
+	} else if _, exists = blueSet[startingBlock]; exists {
 		orderedBlue = append(orderedBlue, startingBlock)
 	}
 
@@ -532,7 +532,7 @@ func UpdateOrderedRedBlueSets(statePartition *StatePartition, redStates []int) (
 					if _, exists := redSet[childBlockID]; exists {
 						orderedRed = append(orderedRed, childBlockID)
 						// Else, if block is in blue set, add to ordered blue slice.
-					}else if _, exists = blueSet[childBlockID]; exists {
+					} else if _, exists = blueSet[childBlockID]; exists {
 						orderedBlue = append(orderedBlue, childBlockID)
 					}
 
@@ -542,7 +542,6 @@ func UpdateOrderedRedBlueSets(statePartition *StatePartition, redStates []int) (
 			}
 		}
 	}
-
 
 	// Return populated slice of red states and  populated slice of blue states in canonical order.
 	return orderedRed, orderedBlue
