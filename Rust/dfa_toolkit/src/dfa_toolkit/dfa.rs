@@ -5,10 +5,11 @@ use std::collections::{HashSet};
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "PascalCase")]
+/// DFA struct which represents a DFA.
 pub struct DFA {
-    pub states: Vec<State>,
-    pub starting_state_id: i32,
-    pub alphabet: Vec<i32>,
+    pub states: Vec<State>,     // Vector of states within the DFA where the index is the State ID.
+    pub starting_state_id: i32, // Alphabet within DFA.
+    pub alphabet: Vec<i32>,     // The ID of the starting state of the DFA.
     // #[serde(skip)]
     // depth: i32,
     // #[serde(skip)]
@@ -16,19 +17,19 @@ pub struct DFA {
 }
 
 impl DFA {
-    // add_state adds a new state to the DFA with the corresponding State Label.
-    // Returns the new state's ID (index).
+    /// add_state adds a new state to the DFA with the corresponding State Label.
+    /// Returns the new state's ID (index).
     pub fn add_state(&mut self, state_label: StateLabel) -> i32{
         // Create empty transition table with default values of -1 for each symbol within the DFA.
         let transitions = vec![-1 as i32, self.alphabet.len() as i32];
-        // Initialize and add the new state to the slice of states within the DFA.
+        // Initialize and add the new state to the vector of states within the DFA.
         self.states.push(State{ label: state_label, transitions });
 
         // Return the ID of the newly created state.
         return (self.states.len() - 1) as i32;
     }
 
-    // add_symbol adds a new symbol to the DFA.
+    /// add_symbol adds a new symbol to the DFA.
     pub fn add_symbol(&mut self) {
         // Increment symbols count within the DFA.
         self.alphabet.push(self.alphabet.len() as i32);
@@ -38,7 +39,7 @@ impl DFA {
         }
     }
 
-    // labelled_state_count returns the number of labelled states (accepting or rejecting) within DFA.
+    /// labelled_state_count returns the number of labelled states (accepting or rejecting) within DFA.
     pub fn labelled_state_count(&self) -> i32 {
         let mut count = 0;
 
@@ -51,8 +52,8 @@ impl DFA {
         return count;
     }
 
-    // unreachable_states returns the state IDs of unreachable states. Extracted from:
-    // P. Linz, An Introduction to Formal Languages and Automata. Jones & Bartlett Publishers, 2011.
+    /// unreachable_states returns the state IDs of unreachable states. Extracted from:
+    /// P. Linz, An Introduction to Formal Languages and Automata. Jones & Bartlett Publishers, 2011.
     pub fn unreachable_states(&self) -> Vec<i32> {
         // Hash set of reachable states made up of starting state.
         let mut reachable_states = HashSet::new();
@@ -99,7 +100,7 @@ impl DFA {
         // Iterate over each state within DFA.
         for state_id in 0..self.states.len() {
             // If state ID is not in reachable states map,
-            // add to unreachable states slice.
+            // add to unreachable states vector.
             if !reachable_states.contains(&(state_id as i32)) {
                 unreachable_states.push(state_id as i32);
             }
@@ -108,8 +109,8 @@ impl DFA {
         return unreachable_states;
     }
 
-    // is_valid_panic checks whether DFA is valid.
-    // Panics if not valid. Used for error checking.
+    /// is_valid_panic checks whether DFA is valid.
+    /// Panics if not valid. Used for error checking.
     pub fn is_valid_panic(&self) {
         if self.states.len() < 1 {
             // Panic if number of states is invalid.
@@ -127,6 +128,7 @@ impl DFA {
     }
 }
 
+/// new_dfa initializes a new empty DFA.
 pub fn new_dfa() -> DFA {
     return DFA{
         states: vec![],
@@ -135,9 +137,9 @@ pub fn new_dfa() -> DFA {
     }
 }
 
+/// dfa_from_json returns a DFA read from a JSON file given a file path.
 pub fn dfa_from_json(file_path: String) -> DFA {
     let file = fs::File::open(file_path).expect("file should open read only");
-    //let json: serde_json::Value = serde_json::from_reader(file).expect("file should be proper JSON");
     let dfa: DFA = serde_json::from_reader(file).expect("error while reading or parsing");
 
     return dfa;
