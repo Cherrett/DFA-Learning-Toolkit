@@ -39,7 +39,7 @@ func GRBM(statePartition StatePartition) (StatePartition, MergeData) {
 
 	// Generated slice of ordered blue states from red states.
 	blueStates := GenerateBlueSetFromRedSet(&statePartition, map[int]util.Void{statePartition.StartingBlock(): util.Null})
-	// Shuffle both blue sets.
+	// Shuffle blue sets.
 	rand.Shuffle(len(blueStates), func(i, j int) { blueStates[i], blueStates[j] = blueStates[j], blueStates[i] })
 
 	// Initialize merged flag to false.

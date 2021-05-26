@@ -433,3 +433,33 @@ func TestEDSM(t *testing.T) {
 		t.Errorf("Discrepancies found in result of blue-fringe EDSM.")
 	}
 }
+
+func TestAutomataTeams(t *testing.T) {
+	t.Parallel()
+	// Random Seed.
+	rand.Seed(time.Now().UnixNano())
+
+	// Read training set from JSON file.
+	training, valid := dfatoolkit.DatasetFromJSON("../../Datasets/Abbadingo/Generated/train.json")
+
+	if !valid {
+		t.Errorf("Training dataset was not read successfuly from JSON.")
+	}
+
+	// Read testing set from JSON file.
+	test, valid := dfatoolkit.DatasetFromJSON("../../Datasets/Abbadingo/Generated/test.json")
+
+	if !valid {
+		t.Errorf("Testing dataset was not read successfuly from JSON.")
+	}
+
+	// Run AutomataTeams version on training set.
+	teamOfAutomata := dfatoolkit.AutomataTeamsFromDataset(training, 81)
+	fairVoteAccuracy := teamOfAutomata.FairVoteAccuracy(test)
+	weightedVoteAccuracy := teamOfAutomata.WeightedVoteAccuracy(test)
+	betterHalfWeightedVoteAccuracy := teamOfAutomata.BetterHalfWeightedVoteAccuracy(test)
+
+	if fairVoteAccuracy > weightedVoteAccuracy || weightedVoteAccuracy > betterHalfWeightedVoteAccuracy {
+		t.Errorf("Discrepancies found in result of AutomataTeams.")
+	}
+}
