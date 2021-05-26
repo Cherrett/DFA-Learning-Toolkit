@@ -569,6 +569,11 @@ func (dataset Dataset) SymmetricallyStructurallyComplete(dfa DFA) bool {
 	return dfa.SymmetricallyStructurallyComplete(dataset)
 }
 
+// Accuracy returns the DFA's Accuracy with respect to the dataset.
+func (dataset Dataset) Accuracy(dfa DFA) float64 {
+	return dfa.Accuracy(dataset)
+}
+
 // ToJSON saves the dataset to a JSON file given a file path.
 func (dataset Dataset) ToJSON(filePath string) bool {
 	// Sort the dataset by length.

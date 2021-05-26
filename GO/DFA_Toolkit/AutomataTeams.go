@@ -39,7 +39,7 @@ func GRBM(statePartition StatePartition) (StatePartition, MergeData) {
 
 	// Generated slice of ordered blue states from red states.
 	blueStates := GenerateBlueSetFromRedSet(&statePartition, map[int]util.Void{statePartition.StartingBlock(): util.Null})
-	// Shuffle both blue sets.
+	// Shuffle blue sets.
 	rand.Shuffle(len(blueStates), func(i, j int) { blueStates[i], blueStates[j] = blueStates[j], blueStates[i] })
 
 	// Initialize merged flag to false.
@@ -128,7 +128,7 @@ func GenerateBlueSetFromRedSet(statePartition *StatePartition, redSet map[int]ut
 // UpdateRedBlueSets updates the red and blue sets given the state partition and the red set within the Red-Blue framework
 // such as the GeneralizedRedBlueMerging function. It returns the red and blue sets in arbitrary order. This is
 // used when the state partition is changed or when new states have been added to the red set.
-func UpdateRedBlueSets(statePartition *StatePartition, redStates []int) ([]int, []int){
+func UpdateRedBlueSets(statePartition *StatePartition, redStates []int) ([]int, []int) {
 	// Step 1 - Gather root of old red states and store in map declared below.
 
 	// Initialize set of red root states (blocks) to empty set.
@@ -278,18 +278,18 @@ func (teamOfAutomata TeamOfAutomata) FairVoteAccuracy(dataset Dataset) float64 {
 		unlabelledOrRejecting := 0
 
 		for _, dfa := range teamOfAutomata.Team {
-			if stringInstance.ParseToStateLabel(dfa) == ACCEPTING{
+			if stringInstance.ParseToStateLabel(dfa) == ACCEPTING {
 				accepting++
-			}else{
+			} else {
 				unlabelledOrRejecting++
 			}
 		}
 
-		if accepting > unlabelledOrRejecting{
+		if accepting > unlabelledOrRejecting {
 			return ACCEPTING
-		}else if unlabelledOrRejecting > accepting{
+		} else if unlabelledOrRejecting > accepting {
 			return REJECTING
-		}else{
+		} else {
 			if rand.Intn(2) == 0 {
 				return ACCEPTING
 			} else {
@@ -308,18 +308,18 @@ func (teamOfAutomata TeamOfAutomata) WeightedVoteAccuracy(dataset Dataset) float
 
 		for _, dfa := range teamOfAutomata.Team {
 			dfaSize := float64(len(dfa.States))
-			if stringInstance.ParseToStateLabel(dfa) == ACCEPTING{
+			if stringInstance.ParseToStateLabel(dfa) == ACCEPTING {
 				accepting += 1 / (dfaSize * dfaSize)
-			}else{
+			} else {
 				unlabelledOrRejecting += 1 / (dfaSize * dfaSize)
 			}
 		}
 
-		if accepting > unlabelledOrRejecting{
+		if accepting > unlabelledOrRejecting {
 			return ACCEPTING
-		}else if unlabelledOrRejecting > accepting{
+		} else if unlabelledOrRejecting > accepting {
 			return REJECTING
-		}else{
+		} else {
 			if rand.Intn(2) == 0 {
 				return ACCEPTING
 			} else {
@@ -347,22 +347,22 @@ func (teamOfAutomata TeamOfAutomata) BetterHalfWeightedVoteAccuracy(dataset Data
 		for _, dfa := range teamOfAutomata.Team {
 			dfaSize := float64(len(dfa.States))
 
-			if dfaSize > averageSize{
+			if dfaSize > averageSize {
 				continue
 			}
 
-			if stringInstance.ParseToStateLabel(dfa) == ACCEPTING{
+			if stringInstance.ParseToStateLabel(dfa) == ACCEPTING {
 				accepting += 1 / (dfaSize * dfaSize)
-			}else{
+			} else {
 				unlabelledOrRejecting += 1 / (dfaSize * dfaSize)
 			}
 		}
 
-		if accepting > unlabelledOrRejecting{
+		if accepting > unlabelledOrRejecting {
 			return ACCEPTING
-		}else if unlabelledOrRejecting > accepting{
+		} else if unlabelledOrRejecting > accepting {
 			return REJECTING
-		}else{
+		} else {
 			if rand.Intn(2) == 0 {
 				return ACCEPTING
 			} else {
@@ -375,10 +375,10 @@ func (teamOfAutomata TeamOfAutomata) BetterHalfWeightedVoteAccuracy(dataset Data
 }
 
 // AverageNumberOfStates returns the average number of states of DFAs within team.
-func (teamOfAutomata TeamOfAutomata) AverageNumberOfStates() int{
+func (teamOfAutomata TeamOfAutomata) AverageNumberOfStates() int {
 	averageNumberOfStates := util.StatsTracker{}
 
-	for _, dfa := range teamOfAutomata.Team{
+	for _, dfa := range teamOfAutomata.Team {
 		averageNumberOfStates.AddInt(len(dfa.States))
 	}
 

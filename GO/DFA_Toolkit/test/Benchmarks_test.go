@@ -240,14 +240,14 @@ func TestBenchmarkWindowedEDSM(t *testing.T) {
 // TestBenchmarkBlueFringeEDSM benchmarks the performance of the BlueFringeEDSMFromDataset() function.
 func TestBenchmarkBlueFringeEDSM(t *testing.T) {
 	// Random Seed.
-	//rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano())
 
 	// Number of iterations.
-	n := 256
+	n := 128
 	// Target size.
-	targetSize := 64
+	targetSize := 32
 	// Training and testing set sizes.
-	trainingSetSize, testingSetSize := 1521, 1800
+	trainingSetSize, testingSetSize := 607, 1800
 
 	winners := 0
 	accuracies := util.NewStatsTracker()
@@ -323,7 +323,7 @@ func TestBenchmarkEDSM(t *testing.T) {
 		APTA := trainingSet.GetPTA(true)
 
 		// Exhaustive
-		resultantDFA, searchData := dfatoolkit.ExhaustiveEDSM(APTA)
+		resultantDFA, mergeData := dfatoolkit.ExhaustiveEDSM(APTA)
 		durationExhaustive.Add(mergeData.Duration.Seconds())
 		mergesPerSecExhaustive.Add(mergeData.AttemptedMergesPerSecond())
 		accuracy := resultantDFA.Accuracy(testingSet)
@@ -528,12 +528,64 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 	}
 }
 
-func PrintBenchmarkInformation(accuracies, numberOfStates, duration, mergesPerSec, merges, validMerges util.StatsTracker){
+// TestBenchmarkAutomataTeams benchmarks the performance of the GRBM()  function.
+func TestBenchmarkAutomataTeams(t *testing.T) {
+	// Random Seed.
+	rand.Seed(time.Now().UnixNano())
+
+	// Number of iterations.
+	n := 128
+	// Target size.
+	targetSize := 32
+	// Training and testing set sizes.
+	trainingSetSize, testingSetSize := 607, 1800
+
+	winners := 0
+	accuracies := util.NewStatsTracker()
+	numberOfStates := util.NewStatsTracker()
+	durations := util.NewStatsTracker()
+	mergesPerSec := util.NewStatsTracker()
+	merges := util.NewStatsTracker()
+	validMerges := util.NewStatsTracker()
+
+	for i := 0; i < n; i++ {
+		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
+
+		// Create a target DFA, training set, and testing set.
+		_, trainingSet, testingSet := dfatoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
+
+		teamOfAutomata := dfatoolkit.AutomataTeamsFromDataset(trainingSet, 81)
+		accuracy := teamOfAutomata.BetterHalfWeightedVoteAccuracy(testingSet)
+
+		accuracies.Add(accuracy)
+		numberOfStates.AddInt(teamOfAutomata.AverageNumberOfStates())
+		durations.Add(teamOfAutomata.MergeData.Duration.Seconds())
+		mergesPerSec.Add(teamOfAutomata.MergeData.AttemptedMergesPerSecond())
+		merges.AddInt(teamOfAutomata.MergeData.AttemptedMergesCount)
+		validMerges.AddInt(teamOfAutomata.MergeData.ValidMergesCount)
+
+		if accuracy >= 0.99 {
+			winners++
+		}
+	}
+
+	successfulPercentage := (float64(winners) / float64(n)) * 100
+	fmt.Println("--------------------------------------------------------------------------------------------")
+	fmt.Printf("Percentage of 0.99 <= Accuracy: %.2f%%\n\n", successfulPercentage)
+	PrintBenchmarkInformation(accuracies, numberOfStates, durations, mergesPerSec, merges, validMerges)
+	fmt.Println("--------------------------------------------------------------------------------------------")
+
+	if successfulPercentage > 5 {
+		t.Error("The percentage of successful DFAs is bigger than 5%.")
+	}
+}
+
+func PrintBenchmarkInformation(accuracies, numberOfStates, duration, mergesPerSec, merges, validMerges util.StatsTracker) {
 	// Initialize tabwriter.
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 17, 4, 0, '\t', 0)
 
-	_, _ = fmt.Fprintf(w, "\t%s\t%s\t%s\t%s\t\n",  "Minimum", "Maximum", "Average", "Standard Dev")
+	_, _ = fmt.Fprintf(w, "\t%s\t%s\t%s\t%s\t\n", "Minimum", "Maximum", "Average", "Standard Dev")
 	_, _ = fmt.Fprintf(w, "\t%s\t%s\t%s\t%s\t\n", "------------", "------------", "------------", "------------")
 	_, _ = fmt.Fprintf(w, "%s\t%.2f\t%.2f\t%.2f\t%.2f\t\n", "Accuracy", accuracies.Min(), accuracies.Max(), accuracies.Mean(), accuracies.PopulationStandardDev())
 	_, _ = fmt.Fprintf(w, "%s\t%d\t%d\t%d\t%d\t\n", "Number of States", int(numberOfStates.Min()), int(numberOfStates.Max()), int(numberOfStates.Mean()), int(numberOfStates.PopulationStandardDev()))
