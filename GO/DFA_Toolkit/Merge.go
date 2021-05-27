@@ -30,27 +30,27 @@ func RPNISearch(statePartition StatePartition) (StatePartition, MergeData) {
 	// Start timer.
 	start := time.Now()
 
-	// Slice to store red states in canonical order.
+	// Slice to store red states.
 	redStates := []int{statePartition.StartingBlock()}
-	// Generated slice of ordered blue states from red states.
+	// Generated slice of blue states from red states.
 	blueStates := UpdateRedBlueSets(&statePartition, &redStates)
 
 	// Iterate until blue set is empty.
 	for len(blueStates) > 0 {
 		// Remove and store first state in blue states queue.
-		blueElement := blueStates[0]
+		blueState := blueStates[0]
 		blueStates = blueStates[1:]
 
 		// Set merged flag to false.
 		merged := false
 
-		// Iterate over every red state in canonical order.
-		for _, redElement := range redStates {
+		// Iterate over every red state.
+		for _, redState := range redStates {
 			// Increment merge count.
 			mergeData.AttemptedMergesCount++
 
 			// Check if states are mergeable.
-			if copiedPartition.MergeStates(redElement, blueElement) {
+			if copiedPartition.MergeStates(redState, blueState) {
 				// Increment valid merge count.
 				mergeData.ValidMergesCount++
 
@@ -69,7 +69,7 @@ func RPNISearch(statePartition StatePartition) (StatePartition, MergeData) {
 		// If merged flag is false, add current blue state
 		// to red states set and ordered set.
 		if !merged {
-			redStates = append(redStates, blueElement)
+			redStates = append(redStates, blueState)
 		}
 
 		// Update red and blue states using UpdateOrderedRedBlueSets function.
@@ -94,26 +94,28 @@ func UpdateRedBlueSets(statePartition *StatePartition, redStates *[]int) []int {
 
 	// Iterate over every red state.
 	for i := range *redStates {
-		redElement := &(*redStates)[i]
-		*redElement = statePartition.Find(*redElement)
-
-		redSet[*redElement] = util.Null
+		// Get red state.
+		redState := &(*redStates)[i]
+		// Replace red state with its parent using Find.
+		*redState = statePartition.Find(*redState)
+		// Add red state to red set.
+		redSet[*redState] = util.Null
 	}
 
-	// Step 2 - Gather all blue states and store in map declared below.
+	// Step 2 - Gather all blue states and store in slice declared below.
 
-	// Initialize set of blue states to empty set.
+	// Initialize set of blue states to empty slice.
 	var blueStates []int
 
 	// Iterate over every red state.
-	for _, element := range *redStates {
+	for _, redState := range *redStates {
 		// Iterate over each symbol within DFA.
 		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
-			if resultantStateID := statePartition.Blocks[element].Transitions[symbol]; resultantStateID > -1 {
-				// Store resultant stateID from red state.
+			// If transition is valid and resultant state is not red,
+			// add the parent block of the resultant state to blue set.
+			if resultantStateID := statePartition.Blocks[redState].Transitions[symbol]; resultantStateID > -1 {
 				resultantStateID = statePartition.Find(resultantStateID)
-				// If transition is valid and resultant state is not red,
-				// add resultant state to blue set.
+
 				if _, exists := redSet[resultantStateID]; !exists {
 					blueStates = append(blueStates, resultantStateID)
 				}
@@ -121,7 +123,7 @@ func UpdateRedBlueSets(statePartition *StatePartition, redStates *[]int) []int {
 		}
 	}
 
-	// Return populated slice of red states and populated slice of blue states in canonical order.
+	// Return populated slice of blue states.
 	return blueStates
 }
 
@@ -318,10 +320,10 @@ func UpdateWindow(window []int, statePartition StatePartition) []int {
 	// Slice to store new blocks in canonical order (new window).
 	var newWindow []int
 
-	// Iterate over every block within window.
-	for _, element := range window {
-		// Get root block of current block.
-		root := statePartition.Find(element)
+	// Iterate over every state within window.
+	for _, state := range window {
+		// Get root block of current state.
+		root := statePartition.Find(state)
 
 		// If root is already visited, skip.
 		// Else, add root to map and slice.
@@ -361,28 +363,28 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 	// Iterate until blue set is empty.
 	for len(blueStates) != 0 {
 		// Iterate over every blue state in canonical order.
-		for _, blueElement := range blueStates {
+		for _, blueState := range blueStates {
 			// Set merged flag to false.
 			merged = false
 			// Iterate over every red state in canonical order.
-			for _, redElement := range redStates {
+			for _, redState := range redStates {
 				// Increment merge count.
 				mergeData.AttemptedMergesCount++
 
 				// Check if states are mergeable.
-				if copiedPartition.MergeStates(blueElement, redElement) {
+				if copiedPartition.MergeStates(blueState, redState) {
 					// Increment valid merge count.
 					mergeData.ValidMergesCount++
 
 					// Calculate score.
-					score := scoringFunction(blueElement, redElement, statePartition, copiedPartition)
+					score := scoringFunction(blueState, redState, statePartition, copiedPartition)
 
 					// If score is bigger than state pair with the highest score,
 					// set current state pair to state pair with the highest score.
 					if score > highestScoringStatePair.Score {
 						highestScoringStatePair = StatePairScore{
-							State1: blueElement,
-							State2: redElement,
+							State1: blueState,
+							State2: redState,
 							Score:  score,
 						}
 					}
@@ -398,7 +400,7 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 			// If merged flag is false, add current blue state
 			// to red states set and ordered set and exit loop.
 			if !merged {
-				redStates = append(redStates, blueElement)
+				redStates = append(redStates, blueState)
 				break
 			}
 		}
@@ -437,10 +439,10 @@ func GenerateOrderedBlueSetFromRedSet(statePartition *StatePartition, redSet map
 	blue := map[int]util.Void{}
 
 	// Iterate over every red state.
-	for element := range redSet {
+	for redState := range redSet {
 		// Iterate over each symbol within DFA.
 		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
-			if resultantStateID := statePartition.Blocks[element].Transitions[symbol]; resultantStateID > -1 {
+			if resultantStateID := statePartition.Blocks[redState].Transitions[symbol]; resultantStateID > -1 {
 				// Store resultant stateID from red state.
 				resultantStateID = statePartition.Find(resultantStateID)
 				// If transition is valid and resultant state is not red,
@@ -514,9 +516,9 @@ func UpdateOrderedRedBlueSets(statePartition *StatePartition, redStates []int) (
 	redSet := make(map[int]util.Void, len(redStates))
 
 	// Iterate over every red state.
-	for _, element := range redStates {
+	for _, redState := range redStates {
 		// Get root block of red state.
-		root := statePartition.Find(element)
+		root := statePartition.Find(redState)
 
 		// Add root block to red set.
 		redSet[root] = util.Null
@@ -528,10 +530,10 @@ func UpdateOrderedRedBlueSets(statePartition *StatePartition, redStates []int) (
 	blueSet := map[int]util.Void{}
 
 	// Iterate over every red state.
-	for element := range redSet {
+	for redState := range redSet {
 		// Iterate over each symbol within DFA.
 		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
-			if resultantStateID := statePartition.Blocks[element].Transitions[symbol]; resultantStateID > -1 {
+			if resultantStateID := statePartition.Blocks[redState].Transitions[symbol]; resultantStateID > -1 {
 				// Store resultant stateID from red state.
 				resultantStateID = statePartition.Find(resultantStateID)
 				// If transition is valid and resultant state is not red,

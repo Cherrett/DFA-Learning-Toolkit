@@ -19,14 +19,14 @@ pub fn exhaustive_edsm(apta: DFA) -> (DFA, MergeData){
 
     // Call ExhaustiveSearchUsingScoringFunction function using state partition and EDSM scoring function
     // declared above. This function returns the resultant state partition and the search data.
-    let mut result = exhaustive_search_using_scoring_function(state_partition, edsm);
+    let (mut resultant_dfa, merge_data) = exhaustive_search_using_scoring_function(state_partition, edsm);
 
     // Convert the state partition to a DFA.
-    let resultant_dfa = result.0.to_quotient_dfa();
+    let resultant_dfa = resultant_dfa.to_quotient_dfa();
 
     // Check if DFA generated is valid.
     resultant_dfa.is_valid_panic();
 
     // Return resultant DFA.
-    return (resultant_dfa, result.1)
+    return (resultant_dfa, merge_data)
 }

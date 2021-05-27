@@ -15,8 +15,8 @@ import (
 
 // -------------------- BENCHMARKS USING ABBADINGO PROTOCOL --------------------
 
-// TestBenchmarkDetMerge benchmarks the performance of the MergeStates() function.
-func TestBenchmarkDetMerge(t *testing.T) {
+// TestBenchmarkMergeStates benchmarks the performance of the MergeStates() function.
+func TestBenchmarkMergeStates(t *testing.T) {
 	// Random Seed.
 	rand.Seed(time.Now().UnixNano())
 
@@ -48,7 +48,6 @@ func TestBenchmarkDetMerge(t *testing.T) {
 
 		// Create APTA.
 		apta := training.GetPTA(true)
-		//apta := training.APTA(target.AlphabetSize)
 		fmt.Printf("APTA size: %d\n", len(apta.States))
 
 		// Perform all the merges.
