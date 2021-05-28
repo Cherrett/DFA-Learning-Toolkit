@@ -109,6 +109,11 @@ func NewStatsTracker() StatsTracker {
 
 // Add adds a float value to the StatsTracker struct.
 func (statsTracker *StatsTracker) Add(value float64) {
+	// Skip +Inf and -Inf values.
+	if value == math.Inf(1) || value == math.Inf(-1) {
+		return
+	}
+
 	// If value is smaller than the minimum value,
 	// set minimum value within struct to value.
 	if value < statsTracker.min {

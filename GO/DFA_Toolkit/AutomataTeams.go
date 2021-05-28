@@ -3,6 +3,7 @@ package dfatoolkit
 import (
 	"DFA_Toolkit/DFA_Toolkit/util"
 	"math/rand"
+	"sync"
 	"time"
 )
 
@@ -33,8 +34,6 @@ func GRBM(statePartition StatePartition) (StatePartition, MergeData) {
 	mergeData := MergeData{[]StatePairScore{}, 0, 0, time.Duration(0)}
 	// Total merges and valid merges counter.
 	totalMerges, totalValidMerges := 0, 0
-	// Start timer.
-	start := time.Now()
 
 	// Slice to store red states in insertion order.
 	redStates := []int{statePartition.StartingBlock()}
@@ -92,8 +91,6 @@ func GRBM(statePartition StatePartition) (StatePartition, MergeData) {
 	// Add total and valid merges counts to search data.
 	mergeData.AttemptedMergesCount = totalMerges
 	mergeData.ValidMergesCount = totalValidMerges
-	// Add duration to search data.
-	mergeData.Duration = time.Now().Sub(start)
 
 	// Return the final resultant state partition and search data.
 	return statePartition, mergeData
@@ -226,27 +223,58 @@ func AutomataTeams(APTA DFA, teamSize int) TeamOfAutomata {
 
 	// Initialize team.
 	teamOfAutomata := TeamOfAutomata{
-		Team:      make([]DFA, teamSize),
+		Team:      make([]DFA, 0, teamSize),
 		MergeData: MergeData{},
 	}
 
+	// Create wait group.
+	var wg sync.WaitGroup
+
+	// Create channels for DFAs and Merge Data.
+	DFAChannel := make(chan DFA, 1)
+	MergeDataChannel := make(chan MergeData, 1)
+
+	// Start timer.
+	start := time.Now()
+
+	// Create our data and send it into the queue.
+	wg.Add(teamSize)
 	for i := 0; i < teamSize; i++ {
-		// Call GRBM function using state partition declared above.
-		// This function returns the resultant state partition and the search data.
-		resultantStatePartition, mergeData := GRBM(statePartition)
+		go func() {
+			// Call GRBM function using state partition declared above.
+			// This function returns the resultant state partition and the search data.
+			resultantStatePartition, mergeData := GRBM(statePartition)
 
-		// Convert the state partition to a DFA.
-		resultantDFA := resultantStatePartition.ToQuotientDFA()
+			// Convert the state partition to a DFA.
+			resultantDFA := resultantStatePartition.ToQuotientDFA()
 
-		// Check if DFA generated is valid.
-		resultantDFA.IsValidPanic()
+			// Check if DFA generated is valid.
+			resultantDFA.IsValidPanic()
 
-		// Add resultant DFA and merge data to team.
-		teamOfAutomata.Team[i] = resultantDFA
-		teamOfAutomata.MergeData.Duration += mergeData.Duration
-		teamOfAutomata.MergeData.AttemptedMergesCount += mergeData.AttemptedMergesCount
-		teamOfAutomata.MergeData.ValidMergesCount += mergeData.ValidMergesCount
+			DFAChannel <- resultantDFA
+			MergeDataChannel <- mergeData
+		}()
 	}
+
+	go func() {
+		for t := range DFAChannel {
+			teamOfAutomata.Team = append(teamOfAutomata.Team, t)
+		}
+	}()
+
+	go func() {
+		for t := range MergeDataChannel {
+			teamOfAutomata.MergeData.AttemptedMergesCount += t.AttemptedMergesCount
+			teamOfAutomata.MergeData.ValidMergesCount += t.ValidMergesCount
+
+			wg.Done()
+		}
+	}()
+
+	wg.Wait()
+
+	// Add duration to search data.
+	teamOfAutomata.MergeData.Duration = time.Now().Sub(start)
 
 	// Return team of automata.
 	return teamOfAutomata
