@@ -7,6 +7,7 @@ import (
 	"math"
 	"math/rand"
 	"os"
+	"runtime"
 	"sync"
 	"testing"
 	"text/tabwriter"
@@ -904,7 +905,15 @@ func TestBenchmarkFastAll(t *testing.T) {
 func PrintBenchmarkInformation(accuracies, numberOfStates, duration, mergesPerSec, merges, validMerges util.StatsTracker) {
 	// Initialize tabwriter.
 	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 17, 4, 0, '\t', 0)
+
+	// Determine OS tab width using runtime.GOOS.
+	tabWidth := 4
+	
+	if runtime.GOOS != "windows"{
+		tabWidth = 8
+	}
+
+	w.Init(os.Stdout, 17, tabWidth, 0, '\t', 0)
 
 	_, _ = fmt.Fprintf(w, "\t%s\t%s\t%s\t%s\t\n", "Minimum", "Maximum", "Average", "Standard Dev")
 	_, _ = fmt.Fprintf(w, "\t%s\t%s\t%s\t%s\t\n", "------------", "------------", "------------", "------------")
