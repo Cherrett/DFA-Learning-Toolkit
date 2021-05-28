@@ -7,7 +7,7 @@ func ExhaustiveEDSMFromDataset(dataset Dataset) (DFA, MergeData) {
 	APTA := dataset.GetPTA(true)
 
 	// Call ExhaustiveEDSM function using APTA constructed
-	// above. Return resultant DFA and search data.
+	// above. Return resultant DFA and merge data.
 	return ExhaustiveEDSM(APTA)
 }
 
@@ -29,7 +29,7 @@ func BlueFringeEDSMFromDataset(dataset Dataset) (DFA, MergeData) {
 	APTA := dataset.GetPTA(true)
 
 	// Call BlueFringeEDSM function using APTA constructed
-	// above. Return resultant DFA and search data.
+	// above. Return resultant DFA and merge data.
 	return BlueFringeEDSM(APTA)
 }
 
@@ -48,7 +48,7 @@ func ExhaustiveEDSM(APTA DFA) (DFA, MergeData) {
 	statePartition := APTA.ToStatePartition()
 
 	// Call ExhaustiveSearchUsingScoringFunction function using state partition and EDSM scoring function
-	// declared above. This function returns the resultant state partition and the search data.
+	// declared above. This function returns the resultant state partition and the merge data.
 	statePartition, mergeData := ExhaustiveSearchUsingScoringFunction(statePartition, EDSM)
 
 	// Convert the state partition to a DFA.
@@ -57,7 +57,7 @@ func ExhaustiveEDSM(APTA DFA) (DFA, MergeData) {
 	// Check if DFA generated is valid.
 	resultantDFA.IsValidPanic()
 
-	// Return resultant DFA and search data.
+	// Return resultant DFA and merge data.
 	return resultantDFA, mergeData
 }
 
@@ -76,7 +76,7 @@ func WindowedEDSM(APTA DFA, windowSize int, windowGrow float64) (DFA, MergeData)
 	statePartition := APTA.ToStatePartition()
 
 	// Call FastWindowedSearchUsingScoringFunction function using state partition and EDSM scoring function
-	// declared above. This function returns the resultant state partition and the search data.
+	// declared above. This function returns the resultant state partition and the merge data.
 	statePartition, mergeData := WindowedSearchUsingScoringFunction(statePartition, windowSize, windowGrow, EDSM)
 
 	// Convert the state partition to a DFA.
@@ -85,7 +85,7 @@ func WindowedEDSM(APTA DFA, windowSize int, windowGrow float64) (DFA, MergeData)
 	// Check if DFA generated is valid.
 	resultantDFA.IsValidPanic()
 
-	// Return resultant DFA and search data.
+	// Return resultant DFA and merge data.
 	return resultantDFA, mergeData
 }
 
@@ -104,7 +104,7 @@ func BlueFringeEDSM(APTA DFA) (DFA, MergeData) {
 	statePartition := APTA.ToStatePartition()
 
 	// Call BlueFringeSearchUsingScoringFunction function using state partition and EDSM scoring function
-	// declared above. This function returns the resultant state partition and the search data.
+	// declared above. This function returns the resultant state partition and the merge data.
 	statePartition, mergeData := BlueFringeSearchUsingScoringFunction(statePartition, EDSM)
 
 	// Convert the state partition to a DFA.
@@ -113,6 +113,6 @@ func BlueFringeEDSM(APTA DFA) (DFA, MergeData) {
 	// Check if DFA generated is valid.
 	resultantDFA.IsValidPanic()
 
-	// Return resultant DFA and search data.
+	// Return resultant DFA and merge data.
 	return resultantDFA, mergeData
 }

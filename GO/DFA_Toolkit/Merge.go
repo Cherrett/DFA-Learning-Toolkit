@@ -18,14 +18,14 @@ type ScoringFunction func(stateID1, stateID2 int, partitionBefore, partitionAfte
 
 // RPNISearch deterministically merges all possible state pairs within red-blue framework.
 // The first valid merge with respect to the rejecting examples is chosen.
-// Returns the resultant state partition and search data when no more valid merges are possible.
+// Returns the resultant state partition and merge data when no more valid merges are possible.
 // Used by the regular positive and negative inference (RPNI) algorithm.
 func RPNISearch(statePartition StatePartition) (StatePartition, MergeData) {
 	// Clone StatePartition.
 	statePartition = statePartition.Clone()
 	// Copy the state partition for undoing and copying changed states.
 	copiedPartition := statePartition.Copy()
-	// Initialize search data.
+	// Initialize merge data.
 	mergeData := MergeData{[]StatePairScore{}, 0, 0, time.Duration(0)}
 	// Start timer.
 	start := time.Now()
@@ -76,10 +76,10 @@ func RPNISearch(statePartition StatePartition) (StatePartition, MergeData) {
 		blueStates = UpdateRedBlueSets(&statePartition, &redStates)
 	}
 
-	// Add duration to search data.
+	// Add duration to merge data.
 	mergeData.Duration = time.Now().Sub(start)
 
-	// Return the final resultant state partition and search data.
+	// Return the final resultant state partition and merge data.
 	return statePartition, mergeData
 }
 
@@ -129,13 +129,13 @@ func UpdateRedBlueSets(statePartition *StatePartition, redStates *[]int) []int {
 
 // ExhaustiveSearchUsingScoringFunction deterministically merges all possible state pairs.
 // The state pair to be merged is chosen using a scoring function passed as a parameter.
-// Returns the resultant state partition and search data when no more valid merges are possible.
+// Returns the resultant state partition and merge data when no more valid merges are possible.
 func ExhaustiveSearchUsingScoringFunction(statePartition StatePartition, scoringFunction ScoringFunction) (StatePartition, MergeData) {
 	// Clone StatePartition.
 	statePartition = statePartition.Clone()
 	// Copy the state partition for undoing and copying changed states.
 	copiedPartition := statePartition.Copy()
-	// Initialize search data.
+	// Initialize merge data.
 	mergeData := MergeData{[]StatePairScore{}, 0, 0, time.Duration(0)}
 	// State pair with the highest score.
 	highestScoringStatePair := StatePairScore{-1, -1, -1}
@@ -185,7 +185,7 @@ func ExhaustiveSearchUsingScoringFunction(statePartition StatePartition, scoring
 			// Copy changes to original state partition.
 			statePartition.CopyChangesFrom(&copiedPartition)
 
-			// Add merged state pair with score to search data.
+			// Add merged state pair with score to merge data.
 			mergeData.Merges = append(mergeData.Merges, highestScoringStatePair)
 
 			// Remove previous state pair with the highest score.
@@ -195,16 +195,16 @@ func ExhaustiveSearchUsingScoringFunction(statePartition StatePartition, scoring
 		}
 	}
 
-	// Add duration to search data.
+	// Add duration to merge data.
 	mergeData.Duration = time.Now().Sub(start)
 
-	// Return the final resultant state partition and search data.
+	// Return the final resultant state partition and merge data.
 	return statePartition, mergeData
 }
 
 // WindowedSearchUsingScoringFunction deterministically merges state pairs within a given window.
 // The state pair to be merged is chosen using a scoring function passed as a parameter.
-// Returns the resultant state partition and search data when no more valid merges are possible.
+// Returns the resultant state partition and merge data when no more valid merges are possible.
 func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSize int, windowGrow float64, scoringFunction ScoringFunction) (StatePartition, MergeData) {
 	// Parameter Error Checking.
 	if windowSize < 1 {
@@ -218,7 +218,7 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 	statePartition = statePartition.Clone()
 	// Copy the state partition for undoing and copying changed states.
 	copiedPartition := statePartition.Copy()
-	// Initialize search data.
+	// Initialize merge data.
 	mergeData := MergeData{[]StatePairScore{}, 0, 0, time.Duration(0)}
 	// Get ordered blocks within partition.
 	window := statePartition.OrderedBlocks()
@@ -290,7 +290,7 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 			// Copy changes to original state partition.
 			statePartition.CopyChangesFrom(&copiedPartition)
 
-			// Add merged state pair with score to search data.
+			// Add merged state pair with score to merge data.
 			mergeData.Merges = append(mergeData.Merges, highestScoringStatePair)
 		} else {
 			break
@@ -300,10 +300,10 @@ func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSiz
 		window = UpdateWindow(window, statePartition)
 	}
 
-	// Add duration to search data.
+	// Add duration to merge data.
 	mergeData.Duration = time.Now().Sub(start)
 
-	// Return the final resultant state partition and search data.
+	// Return the final resultant state partition and merge data.
 	return statePartition, mergeData
 }
 
@@ -339,13 +339,13 @@ func UpdateWindow(window []int, statePartition StatePartition) []int {
 
 // BlueFringeSearchUsingScoringFunction deterministically merges possible state pairs within red-blue sets.
 // The state pair to be merged is chosen using a scoring function passed as a parameter.
-// Returns the resultant state partition and search data when no more valid merges are possible.
+// Returns the resultant state partition and merge data when no more valid merges are possible.
 func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoringFunction ScoringFunction) (StatePartition, MergeData) {
 	// Clone StatePartition.
 	statePartition = statePartition.Clone()
 	// Copy the state partition for undoing and copying changed states.
 	copiedPartition := statePartition.Copy()
-	// Initialize search data.
+	// Initialize merge data.
 	mergeData := MergeData{[]StatePairScore{}, 0, 0, time.Duration(0)}
 	// State pair with the highest score.
 	highestScoringStatePair := StatePairScore{-1, -1, -1}
@@ -412,7 +412,7 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 			// Copy changes to original state partition.
 			statePartition.CopyChangesFrom(&copiedPartition)
 
-			// Add merged state pair with score to search data.
+			// Add merged state pair with score to merge data.
 			mergeData.Merges = append(mergeData.Merges, highestScoringStatePair)
 
 			// Remove previous state pair with the highest score.
@@ -423,10 +423,10 @@ func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoring
 		redStates, blueStates = UpdateOrderedRedBlueSets(&statePartition, redStates)
 	}
 
-	// Add duration to search data.
+	// Add duration to merge data.
 	mergeData.Duration = time.Now().Sub(start)
 
-	// Return the final resultant state partition and search data.
+	// Return the final resultant state partition and merge data.
 	return statePartition, mergeData
 }
 

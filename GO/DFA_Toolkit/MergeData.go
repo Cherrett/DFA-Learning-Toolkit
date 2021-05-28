@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-// MergeData struct to store merge search data.
+// MergeData struct to store merge merge data.
 type MergeData struct {
 	Merges               []StatePairScore // Slice of state pairs and scores of merges done.
 	AttemptedMergesCount int              // The number of attempted merges.
