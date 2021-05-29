@@ -908,8 +908,8 @@ func PrintBenchmarkInformation(accuracies, numberOfStates, duration, mergesPerSe
 
 	// Determine OS tab width using runtime.GOOS.
 	tabWidth := 4
-	
-	if runtime.GOOS != "windows"{
+
+	if runtime.GOOS != "windows" {
 		tabWidth = 8
 	}
 

@@ -10,10 +10,6 @@ import (
 	"strings"
 )
 
-// AlphabetSymbolMappingAbbadingo represents the alphabet-symbol mapping
-// for the Abbadingo competition standard (using only a's and b's).
-var AlphabetSymbolMappingAbbadingo = map[rune]int{'0': 0, '1': 1}
-
 // GetDatasetFromAbbadingoFile returns a Dataset from an Abbadingo-Format File.
 func GetDatasetFromAbbadingoFile(fileName string) Dataset {
 	// Initialize new Dataset.
@@ -69,12 +65,13 @@ func NewStringInstanceFromAbbadingoFile(text string, delimiter string) StringIns
 	// Add the remaining split string values to value of StringInstance since
 	// these contain the actual string value.
 	for i := 2; i < len(splitString); i++ {
-		runeValue := rune(splitString[i][0])
-		if value, exists := AlphabetSymbolMappingAbbadingo[runeValue]; exists {
-			stringInstance.Value = append(stringInstance.Value, value)
-		} else {
-			panic("Abbadingo datasets only consist of binary values.")
+		intValue, err := strconv.Atoi(splitString[i])
+
+		if err != nil {
+			panic("Not an integer.")
 		}
+
+		stringInstance.Value = append(stringInstance.Value, intValue)
 	}
 
 	// Return populated string instance.
