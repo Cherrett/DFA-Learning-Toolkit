@@ -242,39 +242,29 @@ func TestDFAJSON(t *testing.T) {
 	// Random Seed.
 	rand.Seed(time.Now().UnixNano())
 
-	// Read DFAs from JSON.
-	APTA16, valid := dfalearningtoolkit.DFAFromJSON("../datasets/TestingAPTAs/16.json")
+	aptaNumberOfStates := []int{845, 2545, 7127}
+	aptaDepths := []int{11, 13, 15}
 
-	if !valid {
-		t.Errorf("DFA was not read successfully from JSON (16.json).")
-	}
+	// Iterate over 3 different sizes of target DFA.
+	for i, aptaName := range []int{16, 32, 64}{
+		// Read DFA/APTA from JSON.
+		APTA, valid := dfalearningtoolkit.DFAFromJSON(fmt.Sprintf("../datasets/TestingAPTAs/%d.json", aptaName))
 
-	if len(APTA16.States) != 845 || len(APTA16.Alphabet) != 2 {
-		t.Errorf("DFA read (16.json) has an invalid number of states or alphabet size.")
-	}
+		if !valid {
+			t.Errorf(fmt.Sprintf("DFA was not read successfully from JSON (%d.json).", aptaName))
+		}
 
-	APTA32, valid := dfalearningtoolkit.DFAFromJSON("../datasets/TestingAPTAs/32.json")
+		if !APTA.IsValidSafe() {
+			t.Errorf(fmt.Sprintf("DFA read (%d.json) is not valid.", aptaName))
+		}
 
-	if !valid {
-		t.Errorf("DFA was not read successfully from JSON (32.json).")
-	}
+		if len(APTA.States) != aptaNumberOfStates[i] || len(APTA.Alphabet) != 2 {
+			t.Errorf(fmt.Sprintf("DFA read (%d.json) has an invalid number of states or alphabet size.", aptaName))
+		}
 
-	if len(APTA32.States) != 2545 || len(APTA32.Alphabet) != 2 {
-		t.Errorf("DFA read (32.json) has an invalid number of states or alphabet size.")
-	}
-
-	APTA64, valid := dfalearningtoolkit.DFAFromJSON("../datasets/TestingAPTAs/64.json")
-
-	if !valid {
-		t.Errorf("DFA was not read successfully from JSON (64.json).")
-	}
-
-	if len(APTA64.States) != 7127 || len(APTA64.Alphabet) != 2 {
-		t.Errorf("DFA read (64.json) has an invalid number of states or alphabet size.")
-	}
-
-	if !APTA16.IsValidSafe() || !APTA32.IsValidSafe() || !APTA64.IsValidSafe() {
-		t.Errorf("One of the read DFAs is not valid.")
+		if APTA.Depth() != aptaDepths[i] {
+			t.Errorf(fmt.Sprintf("DFA read (%d.json) has an invalid depth.", aptaName))
+		}
 	}
 }
 
