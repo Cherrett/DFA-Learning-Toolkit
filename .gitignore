@@ -84,13 +84,5 @@ target
 
 env/
 
-GO/AbbadingoDatasets/test.json
-GO/AbbadingoDatasets/test.txt
-GO/DFA_Toolkit/test/DFA_Toolkit_test2.go
-GO/DFA_Toolkit/test/EDSMTest.go
-GO/DFA_Toolkit/test/MergePathTest.go
-GO/DFA_Toolkit/test/StatePartitionTest.go
-GO/testing.jpg
-GO/go.sum
-GO/cpu.pprof
-GO/Datasets/Temp/
+go.sum
+cpu.pprof
