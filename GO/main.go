@@ -1,8 +1,10 @@
 package main
 
 import (
-	dfatoolkit "DFA_Toolkit/DFA_Toolkit"
 	"fmt"
+	dfalearningtoolkit "github.com/Cherrett/DFA-Learning-Toolkit/core"
+	"math"
+	"math/rand"
 )
 
 func main() {
@@ -12,22 +14,30 @@ func main() {
 
 	// Random Seed.
 	// rand.Seed(time.Now().UnixNano())
+	rand.Seed(0)
 
-	// Number of iterations.
-	n := 128
-	// Target size.
-	targetSize := 50
-	// Alphabet size.
-	alphabetSize := 2
-	// Training sparsity percentage.
-	sparsityPercentage := 12.5
+	//dfa := dfatoolkit.NewDFA()
+	//dfa.AddSymbol()
+	//dfa.AddSymbol()
+	//
+	//for i := 0; i < 8; i++ {
+	//	dfa.AddState(dfatoolkit.ACCEPTING)
+	//}
+	//
+	//dfa.AddTransition()
 
-	for i := 0; i < n; i++ {
-		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
+	//_, trainingDataset, _ := dfatoolkit.DefaultStaminaInstance(2, 32, 10.0)
 
-		// Create a target DFA, training set, and testing set.
-		_, trainingSet, _ := dfatoolkit.DefaultStaminaInstance(alphabetSize, targetSize, sparsityPercentage)
+	trainingDataset := dfalearningtoolkit.GetDatasetFromAbbadingoFile("GI_learning_datasets/random_100_100_100.txt")
 
-		trainingSet.GetPTA(true)
-	}
+	fmt.Println("Positive Strings:", trainingDataset.AcceptingStringInstancesCount())
+	fmt.Println("Negative Strings:", trainingDataset.RejectingStringInstancesCount())
+
+	result, mergeData := dfalearningtoolkit.RPNIFromDataset(trainingDataset)
+
+	fmt.Printf("Number of States: %d\n", len(result.States))
+	fmt.Printf("Duration: %.5fs\n", mergeData.Duration.Seconds())
+	fmt.Printf("Merges/s: %d\n", int(math.Round(mergeData.AttemptedMergesPerSecond())))
+	fmt.Printf("Attempted Merges: %d\n", mergeData.AttemptedMergesCount)
+	fmt.Printf("Valid Merges: %d\n", mergeData.ValidMergesCount)
 }

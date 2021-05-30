@@ -1,7 +1,7 @@
-package dfatoolkit
+package dfa_learning_toolkit
 
 import (
-	"DFA_Toolkit/DFA_Toolkit/util"
+	"github.com/Cherrett/DFA-Learning-Toolkit/util"
 	"math/rand"
 	"sync"
 	"time"

@@ -1,9 +1,9 @@
 package dfatoolkit_test
 
 import (
-	"DFA_Toolkit/DFA_Toolkit"
-	"DFA_Toolkit/DFA_Toolkit/util"
 	"fmt"
+	dfalearningtoolkit "github.com/Cherrett/DFA-Learning-Toolkit/core"
+	"github.com/Cherrett/DFA-Learning-Toolkit/util"
 	"math"
 	"math/rand"
 	"os"
@@ -32,10 +32,10 @@ func TestBenchmarkMergeStates(t *testing.T) {
 		trainingSetSize := trainingSetSizes[iterator]
 
 		// Create a target DFA.
-		target := dfatoolkit.AbbadingoDFA(targetSize, true)
+		target := dfalearningtoolkit.AbbadingoDFA(targetSize, true)
 
 		// Training set.
-		training, _ := dfatoolkit.AbbadingoDatasetExact(target, trainingSetSize, 0)
+		training, _ := dfalearningtoolkit.AbbadingoDatasetExact(target, trainingSetSize, 0)
 
 		fmt.Printf("-------------------------------------------------------------\n")
 		fmt.Printf("-------------------------------------------------------------\n")
@@ -101,9 +101,9 @@ func TestBenchmarkRPNI(t *testing.T) {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
 
 		// Create a target DFA, training set, and testing set.
-		_, trainingSet, testingSet := dfatoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
+		_, trainingSet, testingSet := dfalearningtoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
 
-		resultantDFA, mergeData := dfatoolkit.RPNIFromDataset(trainingSet)
+		resultantDFA, mergeData := dfalearningtoolkit.RPNIFromDataset(trainingSet)
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		accuracies.Add(accuracy)
@@ -153,9 +153,9 @@ func TestBenchmarkExhaustiveEDSM(t *testing.T) {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
 
 		// Create a target DFA, training set, and testing set.
-		_, trainingSet, testingSet := dfatoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
+		_, trainingSet, testingSet := dfalearningtoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
 
-		resultantDFA, mergeData := dfatoolkit.ExhaustiveEDSMFromDataset(trainingSet)
+		resultantDFA, mergeData := dfalearningtoolkit.ExhaustiveEDSMFromDataset(trainingSet)
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		accuracies.Add(accuracy)
@@ -207,9 +207,9 @@ func TestBenchmarkWindowedEDSM(t *testing.T) {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
 
 		// Create a target DFA, training set, and testing set.
-		_, trainingSet, testingSet := dfatoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
+		_, trainingSet, testingSet := dfalearningtoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
 
-		resultantDFA, mergeData := dfatoolkit.WindowedEDSMFromDataset(trainingSet, targetSize*2, 2.0)
+		resultantDFA, mergeData := dfalearningtoolkit.WindowedEDSMFromDataset(trainingSet, targetSize*2, 2.0)
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		accuracies.Add(accuracy)
@@ -261,9 +261,9 @@ func TestBenchmarkBlueFringeEDSM(t *testing.T) {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
 
 		// Create a target DFA, training set, and testing set.
-		_, trainingSet, testingSet := dfatoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
+		_, trainingSet, testingSet := dfalearningtoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
 
-		resultantDFA, mergeData := dfatoolkit.BlueFringeEDSMFromDataset(trainingSet)
+		resultantDFA, mergeData := dfalearningtoolkit.BlueFringeEDSMFromDataset(trainingSet)
 		accuracy := resultantDFA.Accuracy(testingSet)
 
 		accuracies.Add(accuracy)
@@ -317,13 +317,13 @@ func TestBenchmarkEDSM(t *testing.T) {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
 
 		// Create a target DFA, training set, and testing set.
-		_, trainingSet, testingSet := dfatoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
+		_, trainingSet, testingSet := dfalearningtoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
 
 		// Construct an APTA from training dataset.
 		APTA := trainingSet.GetPTA(true)
 
 		// Exhaustive
-		resultantDFA, mergeData := dfatoolkit.ExhaustiveEDSM(APTA)
+		resultantDFA, mergeData := dfalearningtoolkit.ExhaustiveEDSM(APTA)
 		durationExhaustive.Add(mergeData.Duration.Seconds())
 		mergesPerSecExhaustive.Add(mergeData.AttemptedMergesPerSecond())
 		accuracy := resultantDFA.Accuracy(testingSet)
@@ -336,7 +336,7 @@ func TestBenchmarkEDSM(t *testing.T) {
 		}
 
 		// Windowed
-		resultantDFA, mergeData = dfatoolkit.WindowedEDSM(APTA, targetSize*2, 2.0)
+		resultantDFA, mergeData = dfalearningtoolkit.WindowedEDSM(APTA, targetSize*2, 2.0)
 		durationWindowed.Add(mergeData.Duration.Seconds())
 		mergesPerSecWindowed.Add(mergeData.AttemptedMergesPerSecond())
 		accuracy = resultantDFA.Accuracy(testingSet)
@@ -349,7 +349,7 @@ func TestBenchmarkEDSM(t *testing.T) {
 		}
 
 		// Blue-Fringe
-		resultantDFA, mergeData = dfatoolkit.BlueFringeEDSM(APTA)
+		resultantDFA, mergeData = dfalearningtoolkit.BlueFringeEDSM(APTA)
 		durationBlueFringe.Add(mergeData.Duration.Seconds())
 		mergesPerSecBlueFringe.Add(mergeData.AttemptedMergesPerSecond())
 		accuracy = resultantDFA.Accuracy(testingSet)
@@ -421,7 +421,7 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
 
 		// Create a target DFA, training set, and testing set.
-		_, trainingSet, testingSet := dfatoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
+		_, trainingSet, testingSet := dfalearningtoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
 
 		// Create APTA from training set.
 		APTA := trainingSet.GetPTA(true)
@@ -431,28 +431,28 @@ func TestBenchmarkFastEDSM(t *testing.T) {
 		// Add 4 EDSM types to wait group.
 		wg.Add(4)
 
-		resultantDFAExhaustive, resultantDFAWindowed, resultantDFABlueFringe := dfatoolkit.DFA{}, dfatoolkit.DFA{}, dfatoolkit.DFA{}
-		mergeDataExhaustive, mergeDataWindowed, mergeDataBlueFringe := dfatoolkit.MergeData{}, dfatoolkit.MergeData{}, dfatoolkit.MergeData{}
+		resultantDFAExhaustive, resultantDFAWindowed, resultantDFABlueFringe := dfalearningtoolkit.DFA{}, dfalearningtoolkit.DFA{}, dfalearningtoolkit.DFA{}
+		mergeDataExhaustive, mergeDataWindowed, mergeDataBlueFringe := dfalearningtoolkit.MergeData{}, dfalearningtoolkit.MergeData{}, dfalearningtoolkit.MergeData{}
 
 		// Exhaustive
 		go func() {
 			// Decrement 1 from wait group.
 			defer wg.Done()
-			resultantDFAExhaustive, mergeDataExhaustive = dfatoolkit.ExhaustiveEDSM(APTA)
+			resultantDFAExhaustive, mergeDataExhaustive = dfalearningtoolkit.ExhaustiveEDSM(APTA)
 		}()
 
 		// Windowed
 		go func() {
 			// Decrement 1 from wait group.
 			defer wg.Done()
-			resultantDFAWindowed, mergeDataWindowed = dfatoolkit.WindowedEDSM(APTA, targetSize*2, 2.0)
+			resultantDFAWindowed, mergeDataWindowed = dfalearningtoolkit.WindowedEDSM(APTA, targetSize*2, 2.0)
 		}()
 
 		// Blue-Fringe
 		go func() {
 			// Decrement 1 from wait group.
 			defer wg.Done()
-			resultantDFABlueFringe, mergeDataBlueFringe = dfatoolkit.BlueFringeEDSM(APTA)
+			resultantDFABlueFringe, mergeDataBlueFringe = dfalearningtoolkit.BlueFringeEDSM(APTA)
 		}()
 
 		// Wait for all go routines within wait group to finish executing.
@@ -552,9 +552,9 @@ func TestBenchmarkAutomataTeams(t *testing.T) {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
 
 		// Create a target DFA, training set, and testing set.
-		_, trainingSet, testingSet := dfatoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
+		_, trainingSet, testingSet := dfalearningtoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
 
-		teamOfAutomata := dfatoolkit.AutomataTeamsFromDataset(trainingSet, 81)
+		teamOfAutomata := dfalearningtoolkit.AutomataTeamsFromDataset(trainingSet, 81)
 		accuracy := teamOfAutomata.BetterHalfWeightedVoteAccuracy(testingSet)
 
 		accuracies.Add(accuracy)
@@ -606,13 +606,13 @@ func TestBenchmarkAll(t *testing.T) {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
 
 		// Create a target DFA, training set, and testing set.
-		_, trainingSet, testingSet := dfatoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
+		_, trainingSet, testingSet := dfalearningtoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
 
 		// Construct an APTA from training dataset.
 		APTA := trainingSet.GetPTA(true)
 
 		// Exhaustive
-		resultantDFA, mergeData := dfatoolkit.ExhaustiveEDSM(APTA)
+		resultantDFA, mergeData := dfalearningtoolkit.ExhaustiveEDSM(APTA)
 		durationExhaustive.Add(mergeData.Duration.Seconds())
 		mergesPerSecExhaustive.Add(mergeData.AttemptedMergesPerSecond())
 		accuracy := resultantDFA.Accuracy(testingSet)
@@ -625,7 +625,7 @@ func TestBenchmarkAll(t *testing.T) {
 		}
 
 		// Windowed
-		resultantDFA, mergeData = dfatoolkit.WindowedEDSM(APTA, targetSize*2, 2.0)
+		resultantDFA, mergeData = dfalearningtoolkit.WindowedEDSM(APTA, targetSize*2, 2.0)
 		durationWindowed.Add(mergeData.Duration.Seconds())
 		mergesPerSecWindowed.Add(mergeData.AttemptedMergesPerSecond())
 		accuracy = resultantDFA.Accuracy(testingSet)
@@ -638,7 +638,7 @@ func TestBenchmarkAll(t *testing.T) {
 		}
 
 		// Blue-Fringe
-		resultantDFA, mergeData = dfatoolkit.BlueFringeEDSM(APTA)
+		resultantDFA, mergeData = dfalearningtoolkit.BlueFringeEDSM(APTA)
 		durationBlueFringe.Add(mergeData.Duration.Seconds())
 		mergesPerSecBlueFringe.Add(mergeData.AttemptedMergesPerSecond())
 		accuracy = resultantDFA.Accuracy(testingSet)
@@ -651,7 +651,7 @@ func TestBenchmarkAll(t *testing.T) {
 		}
 
 		// RPNI
-		resultantDFA, mergeData = dfatoolkit.RPNI(APTA)
+		resultantDFA, mergeData = dfalearningtoolkit.RPNI(APTA)
 		durationRPNI.Add(mergeData.Duration.Seconds())
 		mergesPerSecRPNI.Add(mergeData.AttemptedMergesPerSecond())
 		accuracy = resultantDFA.Accuracy(testingSet)
@@ -664,7 +664,7 @@ func TestBenchmarkAll(t *testing.T) {
 		}
 
 		// Automata Teams
-		team := dfatoolkit.AutomataTeams(APTA, 81)
+		team := dfalearningtoolkit.AutomataTeams(APTA, 81)
 		durationTeams.Add(team.MergeData.Duration.Seconds())
 		mergesPerSecTeams.Add(team.MergeData.AttemptedMergesPerSecond())
 		accuracy = team.BetterHalfWeightedVoteAccuracy(testingSet)
@@ -746,7 +746,7 @@ func TestBenchmarkFastAll(t *testing.T) {
 		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
 
 		// Create a target DFA, training set, and testing set.
-		_, trainingSet, testingSet := dfatoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
+		_, trainingSet, testingSet := dfalearningtoolkit.AbbadingoInstanceExact(targetSize, true, trainingSetSize, testingSetSize)
 
 		// Create APTA from training set.
 		APTA := trainingSet.GetPTA(true)
@@ -756,43 +756,43 @@ func TestBenchmarkFastAll(t *testing.T) {
 		// Add 6 types to wait group.
 		wg.Add(5)
 
-		automataTeam := dfatoolkit.TeamOfAutomata{}
-		resultantDFAExhaustive, resultantDFAWindowed, resultantDFABlueFringe, resultantDFARPNI := dfatoolkit.DFA{}, dfatoolkit.DFA{}, dfatoolkit.DFA{}, dfatoolkit.DFA{}
-		mergeDataExhaustive, mergeDataWindowed, mergeDataBlueFringe, mergeDataRPNI := dfatoolkit.MergeData{}, dfatoolkit.MergeData{}, dfatoolkit.MergeData{}, dfatoolkit.MergeData{}
+		automataTeam := dfalearningtoolkit.TeamOfAutomata{}
+		resultantDFAExhaustive, resultantDFAWindowed, resultantDFABlueFringe, resultantDFARPNI := dfalearningtoolkit.DFA{}, dfalearningtoolkit.DFA{}, dfalearningtoolkit.DFA{}, dfalearningtoolkit.DFA{}
+		mergeDataExhaustive, mergeDataWindowed, mergeDataBlueFringe, mergeDataRPNI := dfalearningtoolkit.MergeData{}, dfalearningtoolkit.MergeData{}, dfalearningtoolkit.MergeData{}, dfalearningtoolkit.MergeData{}
 
 		// Exhaustive
 		go func() {
 			// Decrement 1 from wait group.
 			defer wg.Done()
-			resultantDFAExhaustive, mergeDataExhaustive = dfatoolkit.ExhaustiveEDSM(APTA)
+			resultantDFAExhaustive, mergeDataExhaustive = dfalearningtoolkit.ExhaustiveEDSM(APTA)
 		}()
 
 		// Windowed
 		go func() {
 			// Decrement 1 from wait group.
 			defer wg.Done()
-			resultantDFAWindowed, mergeDataWindowed = dfatoolkit.WindowedEDSM(APTA, targetSize*2, 2.0)
+			resultantDFAWindowed, mergeDataWindowed = dfalearningtoolkit.WindowedEDSM(APTA, targetSize*2, 2.0)
 		}()
 
 		// Blue-Fringe
 		go func() {
 			// Decrement 1 from wait group.
 			defer wg.Done()
-			resultantDFABlueFringe, mergeDataBlueFringe = dfatoolkit.BlueFringeEDSM(APTA)
+			resultantDFABlueFringe, mergeDataBlueFringe = dfalearningtoolkit.BlueFringeEDSM(APTA)
 		}()
 
 		// RPNI
 		go func() {
 			// Decrement 1 from wait group.
 			defer wg.Done()
-			resultantDFARPNI, mergeDataRPNI = dfatoolkit.RPNI(APTA)
+			resultantDFARPNI, mergeDataRPNI = dfalearningtoolkit.RPNI(APTA)
 		}()
 
 		// Automata Teams
 		go func() {
 			// Decrement 1 from wait group.
 			defer wg.Done()
-			automataTeam = dfatoolkit.AutomataTeams(APTA, 81)
+			automataTeam = dfalearningtoolkit.AutomataTeams(APTA, 81)
 		}()
 
 		// Wait for all go routines within wait group to finish executing.
