@@ -32,10 +32,26 @@ jobs:
         go get -u golang.org/x/lint/golint
       
     - name: Run build
-      run: go build
+      run: |
+        go build
+        cd core
+        go build
+        cd ../util
+        go build
+        cd ../test
+        go build
       
     - name: Run vet & lint
       run: |
+        go vet
+        golint
+        cd core
+        go vet
+        golint
+        cd ../util
+        go vet
+        golint
+        cd ../test
         go vet
         golint
     
