@@ -38,8 +38,6 @@ jobs:
         go build
         cd ../util
         go build
-        cd ../test
-        go build
       
     - name: Run vet & lint
       run: |
