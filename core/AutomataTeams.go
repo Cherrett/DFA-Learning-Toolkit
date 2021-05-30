@@ -43,15 +43,12 @@ func GRBM(statePartition StatePartition) (StatePartition, MergeData) {
 	// Shuffle blue sets.
 	rand.Shuffle(len(blueStates), func(i, j int) { blueStates[i], blueStates[j] = blueStates[j], blueStates[i] })
 
-	// Initialize merged flag to false.
-	merged := false
-
 	// Iterate until blue set is empty.
 	for len(blueStates) != 0 {
 		// Iterate over every blue state in insertion order.
 		for _, blueElement := range blueStates {
-			// Set merged flag to false.
-			merged = false
+			// Initialize merged flag to false.
+			merged := false
 			// Iterate over every red state in insertion order.
 			for _, redElement := range redStates {
 				// Increment merge count.
