@@ -28,7 +28,7 @@ func main() {
 
 	//_, trainingDataset, _ := dfatoolkit.DefaultStaminaInstance(2, 32, 10.0)
 
-	trainingDataset := dfalearningtoolkit.GetDatasetFromAbbadingoFile("GI_learning_datasets/random_100_100_100.txt")
+	trainingDataset := dfalearningtoolkit.GetDatasetFromAbbadingoFile("Datasets/GI_learning_datasets/random_100_100_100.txt")
 
 	fmt.Println("Positive Strings:", trainingDataset.AcceptingStringInstancesCount())
 	fmt.Println("Negative Strings:", trainingDataset.RejectingStringInstancesCount())

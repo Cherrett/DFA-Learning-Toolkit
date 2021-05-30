@@ -1,4 +1,4 @@
-name: DFA Learning Tooklit Continuous Integration
+name: Continuous Integration
 
 on:
   pull_request:
@@ -29,13 +29,12 @@ jobs:
         go get -u golang.org/x/lint/golint
       
     - name: Run build
-      run: cd GO && go build
+      run: go build
       
     - name: Run vet & lint
       run: |
-        cd GO
         go vet
         golint
     
     - name: Run testing
-      run: cd GO/test && go test dfatoolkit_test.go -v
+      run: cd test && go test dfatoolkit_test.go -v
