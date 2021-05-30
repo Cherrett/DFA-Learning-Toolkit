@@ -163,18 +163,18 @@ func (statsTracker StatsTracker) Mean() float64 {
 func (statsTracker StatsTracker) PopulationVariance() float64 {
 	if statsTracker.count > 1 {
 		return statsTracker.m2 / float64(statsTracker.count)
-	} else {
-		return 0.0
 	}
+
+	return 0.0
 }
 
 // SampleVariance returns the sample variance value within the StatsTracker struct.
 func (statsTracker StatsTracker) SampleVariance() float64 {
 	if statsTracker.count > 1 {
 		return statsTracker.m2 / float64(statsTracker.count-1)
-	} else {
-		return 0.0
 	}
+
+	return 0.0
 }
 
 // PopulationStandardDev returns the population standard deviation value within the StatsTracker struct.

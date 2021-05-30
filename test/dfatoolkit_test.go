@@ -229,7 +229,7 @@ func TestDatasetJSON(t *testing.T) {
 	training2, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Simple/train.json")
 
 	if !valid {
-		t.Errorf("Dataset was not read successfuly from JSON.")
+		t.Errorf("Dataset was not read successfully from JSON.")
 	}
 
 	if !training1.SameAs(training2) {
@@ -246,7 +246,7 @@ func TestDFAJSON(t *testing.T) {
 	APTA16, valid := dfalearningtoolkit.DFAFromJSON("../Datasets/TestingAPTAs/16.json")
 
 	if !valid {
-		t.Errorf("DFA was not read successfuly from JSON (16.json).")
+		t.Errorf("DFA was not read successfully from JSON (16.json).")
 	}
 
 	if len(APTA16.States) != 845 || len(APTA16.Alphabet) != 2 {
@@ -256,7 +256,7 @@ func TestDFAJSON(t *testing.T) {
 	APTA32, valid := dfalearningtoolkit.DFAFromJSON("../Datasets/TestingAPTAs/32.json")
 
 	if !valid {
-		t.Errorf("DFA was not read successfuly from JSON (32.json).")
+		t.Errorf("DFA was not read successfully from JSON (32.json).")
 	}
 
 	if len(APTA32.States) != 2545 || len(APTA32.Alphabet) != 2 {
@@ -266,7 +266,7 @@ func TestDFAJSON(t *testing.T) {
 	APTA64, valid := dfalearningtoolkit.DFAFromJSON("../Datasets/TestingAPTAs/64.json")
 
 	if !valid {
-		t.Errorf("DFA was not read successfuly from JSON (64.json).")
+		t.Errorf("DFA was not read successfully from JSON (64.json).")
 	}
 
 	if len(APTA64.States) != 7127 || len(APTA64.Alphabet) != 2 {
@@ -354,14 +354,14 @@ func TestRPNI(t *testing.T) {
 	training, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Generated/train.json")
 
 	if !valid {
-		t.Errorf("Training dataset was not read successfuly from JSON.")
+		t.Errorf("Training dataset was not read successfully from JSON.")
 	}
 
 	// Read testing set from JSON file.
 	test, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Generated/test.json")
 
 	if !valid {
-		t.Errorf("Testing dataset was not read successfuly from JSON.")
+		t.Errorf("Testing dataset was not read successfully from JSON.")
 	}
 
 	// Run RPNI version on training set.
@@ -389,14 +389,14 @@ func TestExhaustiveEDSM(t *testing.T) {
 	training, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Generated/train.json")
 
 	if !valid {
-		t.Errorf("Training dataset was not read successfuly from JSON.")
+		t.Errorf("Training dataset was not read successfully from JSON.")
 	}
 
 	// Read testing set from JSON file.
 	test, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Generated/test.json")
 
 	if !valid {
-		t.Errorf("Testing dataset was not read successfuly from JSON.")
+		t.Errorf("Testing dataset was not read successfully from JSON.")
 	}
 
 	// Run Exhaustive EDSM on training set.
@@ -426,7 +426,7 @@ func TestExhaustiveEDSM(t *testing.T) {
 		APTA, valid := dfalearningtoolkit.DFAFromJSON(fmt.Sprintf("../Datasets/TestingAPTAs/%d.json", dfaSize))
 
 		if !valid {
-			t.Errorf("APTA was not read successfuly from JSON.")
+			t.Errorf("APTA was not read successfully from JSON.")
 		}
 
 		// Run Exhaustive EDSM on APTA.
@@ -451,14 +451,14 @@ func TestWindowedEDSM(t *testing.T) {
 	training, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Generated/train.json")
 
 	if !valid {
-		t.Errorf("Training dataset was not read successfuly from JSON.")
+		t.Errorf("Training dataset was not read successfully from JSON.")
 	}
 
 	// Read testing set from JSON file.
 	test, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Generated/test.json")
 
 	if !valid {
-		t.Errorf("Testing dataset was not read successfuly from JSON.")
+		t.Errorf("Testing dataset was not read successfully from JSON.")
 	}
 
 	// Run Windowed EDSM on training set.
@@ -488,7 +488,7 @@ func TestWindowedEDSM(t *testing.T) {
 		APTA, valid := dfalearningtoolkit.DFAFromJSON(fmt.Sprintf("../Datasets/TestingAPTAs/%d.json", dfaSize))
 
 		if !valid {
-			t.Errorf("APTA was not read successfuly from JSON.")
+			t.Errorf("APTA was not read successfully from JSON.")
 		}
 
 		// Run Windowed EDSM on APTA.
@@ -513,14 +513,14 @@ func TestBlueFringeEDSM(t *testing.T) {
 	training, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Generated/train.json")
 
 	if !valid {
-		t.Errorf("Training dataset was not read successfuly from JSON.")
+		t.Errorf("Training dataset was not read successfully from JSON.")
 	}
 
 	// Read testing set from JSON file.
 	test, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Generated/test.json")
 
 	if !valid {
-		t.Errorf("Testing dataset was not read successfuly from JSON.")
+		t.Errorf("Testing dataset was not read successfully from JSON.")
 	}
 
 	// Run Blue-Fringe EDSM on training set.
@@ -550,7 +550,7 @@ func TestBlueFringeEDSM(t *testing.T) {
 		APTA, valid := dfalearningtoolkit.DFAFromJSON(fmt.Sprintf("../Datasets/TestingAPTAs/%d.json", dfaSize))
 
 		if !valid {
-			t.Errorf("APTA was not read successfuly from JSON.")
+			t.Errorf("APTA was not read successfully from JSON.")
 		}
 
 		// Run Blue-Fringe EDSM on APTA.
@@ -573,14 +573,14 @@ func TestAutomataTeams(t *testing.T) {
 	training, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Generated/train.json")
 
 	if !valid {
-		t.Errorf("Training dataset was not read successfuly from JSON.")
+		t.Errorf("Training dataset was not read successfully from JSON.")
 	}
 
 	// Read testing set from JSON file.
 	test, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Generated/test.json")
 
 	if !valid {
-		t.Errorf("Testing dataset was not read successfuly from JSON.")
+		t.Errorf("Testing dataset was not read successfully from JSON.")
 	}
 
 	// Run AutomataTeams version on training set.

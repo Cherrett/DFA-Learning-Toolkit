@@ -1,4 +1,4 @@
-package dfa_learning_toolkit
+package dfalearningtoolkit
 
 import (
 	"github.com/Cherrett/DFA-Learning-Toolkit/util"
@@ -332,9 +332,9 @@ func (teamOfAutomata TeamOfAutomata) FairVoteAccuracy(dataset Dataset) float64 {
 		} else {
 			if rand.Intn(2) == 0 {
 				return ACCEPTING
-			} else {
-				return REJECTING
 			}
+
+			return REJECTING
 		}
 	}
 
@@ -364,9 +364,9 @@ func (teamOfAutomata TeamOfAutomata) WeightedVoteAccuracy(dataset Dataset) float
 		} else {
 			if rand.Intn(2) == 0 {
 				return ACCEPTING
-			} else {
-				return REJECTING
 			}
+
+			return REJECTING
 		}
 	}
 
@@ -409,9 +409,9 @@ func (teamOfAutomata TeamOfAutomata) BetterHalfWeightedVoteAccuracy(dataset Data
 		} else {
 			if rand.Intn(2) == 0 {
 				return ACCEPTING
-			} else {
-				return REJECTING
 			}
+
+			return REJECTING
 		}
 	}
 
