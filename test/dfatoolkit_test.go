@@ -157,26 +157,20 @@ func TestStaminaDatasetGeneration(t *testing.T) {
 		t.Errorf("Expected training dataset to be consistent with APTA")
 	}
 
-	trainingDataset, _ = dfalearningtoolkit.DefaultStaminaDataset(StaminaDFA, 100)
-
-	if !trainingDataset.SymmetricallyStructurallyComplete(StaminaDFA) {
-		t.Errorf("Expected training dataset to be symmetrically structurally complete with DFA")
-	}
-
 	// Cover all possible combinations used in the Stamina competition.
 	for _, alphabetSize := range []int{2, 5, 10, 20, 50} {
 		StaminaDFA = dfalearningtoolkit.StaminaDFA(alphabetSize, 50)
 
 		for _, sparsityPercentage := range []float64{12.5, 25.0, 50.0, 100.0} {
 			trainingDataset, testingDataset = dfalearningtoolkit.DefaultStaminaDataset(StaminaDFA, sparsityPercentage)
-		}
 
-		if trainingDataset.AcceptingStringInstancesCount() == 0 || trainingDataset.RejectingStringInstancesCount() == 0 {
-			t.Errorf("No accepting or rejecting string instances found within training dataset.")
-		}
+			if trainingDataset.AcceptingStringInstancesCount() == 0 || trainingDataset.RejectingStringInstancesCount() == 0 {
+				t.Errorf("No accepting or rejecting string instances found within training dataset.")
+			}
 
-		if testingDataset.AcceptingStringInstancesCount() == 0 || testingDataset.RejectingStringInstancesCount() == 0 {
-			t.Errorf("No accepting or rejecting string instances found within testing dataset.")
+			if testingDataset.AcceptingStringInstancesCount() == 0 || testingDataset.RejectingStringInstancesCount() == 0 {
+				t.Errorf("No accepting or rejecting string instances found within testing dataset.")
+			}
 		}
 	}
 }
