@@ -39,4 +39,3 @@ jobs:
     
     - name: Run testing
       run: cd GO/test && go test dfatoolkit_test.go -v
-  rust-test:
