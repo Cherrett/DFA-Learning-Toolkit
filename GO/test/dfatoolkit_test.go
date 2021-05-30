@@ -1,9 +1,9 @@
 package dfatoolkit_test
 
 import (
-	"DFA_Toolkit/DFA_Toolkit"
-	"DFA_Toolkit/DFA_Toolkit/util"
 	"fmt"
+	dfalearningtoolkit "github.com/Cherrett/DFA-Learning-Toolkit/core"
+	"github.com/Cherrett/DFA-Learning-Toolkit/util"
 	"math"
 	"math/rand"
 	"testing"
@@ -17,7 +17,7 @@ func TestAbbadingoDatasetFromFile(t *testing.T) {
 	// Random Seed.
 	rand.Seed(time.Now().UnixNano())
 
-	dataset := dfatoolkit.GetDatasetFromAbbadingoFile("../../Datasets/Abbadingo/Problem S/train.a")
+	dataset := dfalearningtoolkit.GetDatasetFromAbbadingoFile("../Datasets/Abbadingo/Problem S/train.a")
 
 	if len(dataset) != 60000 {
 		t.Errorf("Abbadingo Problem S length = %d, want 60000", len(dataset))
@@ -45,7 +45,7 @@ func TestAbbadingoDFAGeneration(t *testing.T) {
 
 	numberOfStates := rand.Intn(499) + 1
 
-	AbbadingoDFA := dfatoolkit.AbbadingoDFA(numberOfStates, true)
+	AbbadingoDFA := dfalearningtoolkit.AbbadingoDFA(numberOfStates, true)
 
 	if len(AbbadingoDFA.Alphabet) != 2 {
 		t.Errorf("AbbadingoDFA number of symbols = %d, want 2", AbbadingoDFA.Alphabet)
@@ -67,7 +67,7 @@ func TestAbbadingoDatasetGeneration(t *testing.T) {
 
 	numberOfStates := rand.Intn(99) + 1
 
-	AbbadingoDFA, trainingDataset, testingDataset := dfatoolkit.AbbadingoInstance(numberOfStates, false, 35, 0.25)
+	AbbadingoDFA, trainingDataset, testingDataset := dfalearningtoolkit.AbbadingoInstance(numberOfStates, false, 35, 0.25)
 
 	trainingDatasetConsistentWithDFA := trainingDataset.ConsistentWithDFA(AbbadingoDFA)
 	testingDatasetConsistentWithDFA := testingDataset.ConsistentWithDFA(AbbadingoDFA)
@@ -84,7 +84,7 @@ func TestAbbadingoDatasetGeneration(t *testing.T) {
 		t.Errorf("Expected training dataset to be consistent with APTA")
 	}
 
-	trainingDataset, _ = dfatoolkit.AbbadingoDataset(AbbadingoDFA, 100, 0)
+	trainingDataset, _ = dfalearningtoolkit.AbbadingoDataset(AbbadingoDFA, 100, 0)
 
 	if !trainingDataset.SymmetricallyStructurallyComplete(AbbadingoDFA) {
 		t.Errorf("Expected training dataset to be symmetrically structurally complete with DFA")
@@ -96,7 +96,7 @@ func TestStaminaDatasetFromFile(t *testing.T) {
 	// Random Seed.
 	rand.Seed(time.Now().UnixNano())
 
-	dataset := dfatoolkit.GetDatasetFromStaminaFile("../../Datasets/Stamina/96/96_training.txt")
+	dataset := dfalearningtoolkit.GetDatasetFromStaminaFile("../Datasets/Stamina/96/96_training.txt")
 
 	if len(dataset) != 1093 {
 		t.Errorf("Stamina Dataset 96 length = %d, want 1093", len(dataset))
@@ -123,7 +123,7 @@ func TestStaminaDFAGeneration(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 
 	for _, alphabetSize := range []int{2, 5, 10, 20, 50} {
-		StaminaDFA := dfatoolkit.StaminaDFA(alphabetSize, 50)
+		StaminaDFA := dfalearningtoolkit.StaminaDFA(alphabetSize, 50)
 
 		if len(StaminaDFA.Alphabet) != alphabetSize {
 			t.Errorf("StaminaDFA number of symbols = %d, want %d", StaminaDFA.Alphabet, alphabetSize)
@@ -140,7 +140,7 @@ func TestStaminaDatasetGeneration(t *testing.T) {
 	// random seed
 	rand.Seed(time.Now().UnixNano())
 
-	StaminaDFA, trainingDataset, testingDataset := dfatoolkit.StaminaInstance(50, 50, 100, 25000, 2000)
+	StaminaDFA, trainingDataset, testingDataset := dfalearningtoolkit.StaminaInstance(50, 50, 100, 25000, 2000)
 
 	trainingDatasetConsistentWithDFA := trainingDataset.ConsistentWithDFA(StaminaDFA)
 	testingDatasetConsistentWithDFA := testingDataset.ConsistentWithDFA(StaminaDFA)
@@ -157,7 +157,7 @@ func TestStaminaDatasetGeneration(t *testing.T) {
 		t.Errorf("Expected training dataset to be consistent with APTA")
 	}
 
-	trainingDataset, _ = dfatoolkit.DefaultStaminaDataset(StaminaDFA, 100)
+	trainingDataset, _ = dfalearningtoolkit.DefaultStaminaDataset(StaminaDFA, 100)
 
 	if !trainingDataset.SymmetricallyStructurallyComplete(StaminaDFA) {
 		t.Errorf("Expected training dataset to be symmetrically structurally complete with DFA")
@@ -165,10 +165,10 @@ func TestStaminaDatasetGeneration(t *testing.T) {
 
 	// Cover all possible combinations used in the Stamina competition.
 	for _, alphabetSize := range []int{2, 5, 10, 20, 50} {
-		StaminaDFA = dfatoolkit.StaminaDFA(alphabetSize, 50)
+		StaminaDFA = dfalearningtoolkit.StaminaDFA(alphabetSize, 50)
 
 		for _, sparsityPercentage := range []float64{12.5, 25.0, 50.0, 100.0} {
-			trainingDataset, testingDataset = dfatoolkit.DefaultStaminaDataset(StaminaDFA, sparsityPercentage)
+			trainingDataset, testingDataset = dfalearningtoolkit.DefaultStaminaDataset(StaminaDFA, sparsityPercentage)
 		}
 
 		if trainingDataset.AcceptingStringInstancesCount() == 0 || trainingDataset.RejectingStringInstancesCount() == 0 {
@@ -186,7 +186,7 @@ func TestStateMergingAndDFAEquivalence(t *testing.T) {
 	// Random Seed.
 	rand.Seed(time.Now().UnixNano())
 
-	dataset := dfatoolkit.GetDatasetFromAbbadingoFile("../../Datasets/Abbadingo/Simple/train.a")
+	dataset := dfalearningtoolkit.GetDatasetFromAbbadingoFile("../Datasets/Abbadingo/Simple/train.a")
 
 	APTA := dataset.GetPTA(false)
 
@@ -230,9 +230,9 @@ func TestDatasetJSON(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 
 	// Training set from abbadingo file.
-	training1 := dfatoolkit.GetDatasetFromAbbadingoFile("../../Datasets/Abbadingo/Simple/train.a")
+	training1 := dfalearningtoolkit.GetDatasetFromAbbadingoFile("../Datasets/Abbadingo/Simple/train.a")
 	// Training set from JSON file.
-	training2, valid := dfatoolkit.DatasetFromJSON("../../Datasets/Abbadingo/Simple/train.json")
+	training2, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Simple/train.json")
 
 	if !valid {
 		t.Errorf("Dataset was not read successfuly from JSON.")
@@ -249,7 +249,7 @@ func TestDFAJSON(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 
 	// Read DFAs from JSON.
-	APTA16, valid := dfatoolkit.DFAFromJSON("../../TestingAPTAs/16.json")
+	APTA16, valid := dfalearningtoolkit.DFAFromJSON("../Datasets/TestingAPTAs/16.json")
 
 	if !valid {
 		t.Errorf("DFA was not read successfuly from JSON (16.json).")
@@ -259,7 +259,7 @@ func TestDFAJSON(t *testing.T) {
 		t.Errorf("DFA read (16.json) has an invalid number of states or alphabet size.")
 	}
 
-	APTA32, valid := dfatoolkit.DFAFromJSON("../../TestingAPTAs/32.json")
+	APTA32, valid := dfalearningtoolkit.DFAFromJSON("../Datasets/TestingAPTAs/32.json")
 
 	if !valid {
 		t.Errorf("DFA was not read successfuly from JSON (32.json).")
@@ -269,7 +269,7 @@ func TestDFAJSON(t *testing.T) {
 		t.Errorf("DFA read (32.json) has an invalid number of states or alphabet size.")
 	}
 
-	APTA64, valid := dfatoolkit.DFAFromJSON("../../TestingAPTAs/64.json")
+	APTA64, valid := dfalearningtoolkit.DFAFromJSON("../Datasets/TestingAPTAs/64.json")
 
 	if !valid {
 		t.Errorf("DFA was not read successfuly from JSON (64.json).")
@@ -287,20 +287,20 @@ func TestDFAJSON(t *testing.T) {
 func TestVisualisation(t *testing.T) {
 	t.Parallel()
 	// Training set.
-	training := dfatoolkit.GetDatasetFromAbbadingoFile("../../Datasets/Abbadingo/Simple/train.a")
+	training := dfalearningtoolkit.GetDatasetFromAbbadingoFile("../Datasets/Abbadingo/Simple/train.a")
 
 	test := training.GetPTA(true)
 
 	// Visualisation Examples
-	examplesFilenames := []string{"../../Visualisation/test_leftright", "../../Visualisation/test_leftright_ordered",
-		"../../Visualisation/test_topdown", "../../Visualisation/test_topdown_ordered"}
+	examplesFilenames := []string{"../Datasets/Visualisation/test_leftright", "../Datasets/Visualisation/test_leftright_ordered",
+		"../Datasets/Visualisation/test_topdown", "../Datasets/Visualisation/test_topdown_ordered"}
 	examplesRankByOrder := []bool{false, true, false, true}
 	examplesTopDown := []bool{false, false, true, true}
 
 	// To DOT scenario
 	for exampleIndex := range examplesFilenames {
 		filePath := examplesFilenames[exampleIndex] + ".dot"
-		test.ToDOT(filePath, dfatoolkit.SymbolAlphabetMappingAbbadingo, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
+		test.ToDOT(filePath, dfalearningtoolkit.SymbolAlphabetMappingAbbadingo, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex])
 		if !util.FileExists(filePath) {
 			t.Errorf("DFA toDOT failed, %s file not found.", filePath)
 		}
@@ -309,7 +309,7 @@ func TestVisualisation(t *testing.T) {
 	// To PNG scenario
 	for exampleIndex := range examplesFilenames {
 		filePath := examplesFilenames[exampleIndex] + ".png"
-		if !test.ToPNG(filePath, dfatoolkit.SymbolAlphabetMappingAbbadingo, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex]) {
+		if !test.ToPNG(filePath, dfalearningtoolkit.SymbolAlphabetMappingAbbadingo, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex]) {
 			t.Errorf("GraphViz Error. Probabbly not installed properly.")
 		}
 		if !util.FileExists(filePath) {
@@ -320,7 +320,7 @@ func TestVisualisation(t *testing.T) {
 	// To JPG scenario
 	for exampleIndex := range examplesFilenames {
 		filePath := examplesFilenames[exampleIndex] + ".jpg"
-		if !test.ToJPG(filePath, dfatoolkit.SymbolAlphabetMappingAbbadingo, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex]) {
+		if !test.ToJPG(filePath, dfalearningtoolkit.SymbolAlphabetMappingAbbadingo, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex]) {
 			t.Errorf("GraphViz Error. Probabbly not installed properly.")
 		}
 		if !util.FileExists(filePath) {
@@ -331,7 +331,7 @@ func TestVisualisation(t *testing.T) {
 	// To PDF scenario
 	for exampleIndex := range examplesFilenames {
 		filePath := examplesFilenames[exampleIndex] + ".pdf"
-		if !test.ToPDF(filePath, dfatoolkit.SymbolAlphabetMappingAbbadingo, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex]) {
+		if !test.ToPDF(filePath, dfalearningtoolkit.SymbolAlphabetMappingAbbadingo, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex]) {
 			t.Errorf("GraphViz Error. Probabbly not installed properly.")
 		}
 		if !util.FileExists(filePath) {
@@ -342,7 +342,7 @@ func TestVisualisation(t *testing.T) {
 	// To SVG scenario
 	for exampleIndex := range examplesFilenames {
 		filePath := examplesFilenames[exampleIndex] + ".svg"
-		if !test.ToSVG(filePath, dfatoolkit.SymbolAlphabetMappingAbbadingo, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex]) {
+		if !test.ToSVG(filePath, dfalearningtoolkit.SymbolAlphabetMappingAbbadingo, examplesRankByOrder[exampleIndex], examplesTopDown[exampleIndex]) {
 			t.Errorf("GraphViz Error. Probabbly not installed properly.")
 		}
 		if !util.FileExists(filePath) {
@@ -357,21 +357,21 @@ func TestRPNI(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 
 	// Read training set from JSON file.
-	training, valid := dfatoolkit.DatasetFromJSON("../../Datasets/Abbadingo/Generated/train.json")
+	training, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Generated/train.json")
 
 	if !valid {
 		t.Errorf("Training dataset was not read successfuly from JSON.")
 	}
 
 	// Read testing set from JSON file.
-	test, valid := dfatoolkit.DatasetFromJSON("../../Datasets/Abbadingo/Generated/test.json")
+	test, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Generated/test.json")
 
 	if !valid {
 		t.Errorf("Testing dataset was not read successfuly from JSON.")
 	}
 
 	// Run RPNI version on training set.
-	resultantDFA, mergeData := dfatoolkit.RPNIFromDataset(training)
+	resultantDFA, mergeData := dfalearningtoolkit.RPNIFromDataset(training)
 
 	// Get accuracy from resultant DFA on testing set.
 	accuracy := resultantDFA.Accuracy(test)
@@ -392,21 +392,21 @@ func TestExhaustiveEDSM(t *testing.T) {
 	// Part 1 - Training and Testing Sets from file.
 
 	// Read training set from JSON file.
-	training, valid := dfatoolkit.DatasetFromJSON("../../Datasets/Abbadingo/Generated/train.json")
+	training, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Generated/train.json")
 
 	if !valid {
 		t.Errorf("Training dataset was not read successfuly from JSON.")
 	}
 
 	// Read testing set from JSON file.
-	test, valid := dfatoolkit.DatasetFromJSON("../../Datasets/Abbadingo/Generated/test.json")
+	test, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Generated/test.json")
 
 	if !valid {
 		t.Errorf("Testing dataset was not read successfuly from JSON.")
 	}
 
 	// Run Exhaustive EDSM on training set.
-	resultantDFA, mergeData := dfatoolkit.ExhaustiveEDSMFromDataset(training)
+	resultantDFA, mergeData := dfalearningtoolkit.ExhaustiveEDSMFromDataset(training)
 
 	// Get accuracy from resultant DFA on testing set.
 	accuracy := resultantDFA.Accuracy(test)
@@ -429,14 +429,14 @@ func TestExhaustiveEDSM(t *testing.T) {
 	// Iterate over 2 different sizes of target DFA.
 	for i, dfaSize := range []int{16, 32} {
 		// Read APTA from JSON file.
-		APTA, valid := dfatoolkit.DFAFromJSON(fmt.Sprintf("../../TestingAPTAs/%d.json", dfaSize))
+		APTA, valid := dfalearningtoolkit.DFAFromJSON(fmt.Sprintf("../Datasets/TestingAPTAs/%d.json", dfaSize))
 
 		if !valid {
 			t.Errorf("APTA was not read successfuly from JSON.")
 		}
 
 		// Run Exhaustive EDSM on APTA.
-		resultantDFA, mergeData = dfatoolkit.ExhaustiveEDSM(APTA)
+		resultantDFA, mergeData = dfalearningtoolkit.ExhaustiveEDSM(APTA)
 
 		if len(resultantDFA.States) != resultantNumberOfStates[i] ||
 			mergeData.AttemptedMergesCount != resultantAttemptedMergesCount[i] ||
@@ -454,21 +454,21 @@ func TestWindowedEDSM(t *testing.T) {
 	// Part 1 - Training and Testing Sets from file.
 
 	// Read training set from JSON file.
-	training, valid := dfatoolkit.DatasetFromJSON("../../Datasets/Abbadingo/Generated/train.json")
+	training, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Generated/train.json")
 
 	if !valid {
 		t.Errorf("Training dataset was not read successfuly from JSON.")
 	}
 
 	// Read testing set from JSON file.
-	test, valid := dfatoolkit.DatasetFromJSON("../../Datasets/Abbadingo/Generated/test.json")
+	test, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Generated/test.json")
 
 	if !valid {
 		t.Errorf("Testing dataset was not read successfuly from JSON.")
 	}
 
 	// Run Windowed EDSM on training set.
-	resultantDFA, mergeData := dfatoolkit.WindowedEDSMFromDataset(training, 32*2, 2.0)
+	resultantDFA, mergeData := dfalearningtoolkit.WindowedEDSMFromDataset(training, 32*2, 2.0)
 
 	// Get accuracy from resultant DFA on testing set.
 	accuracy := resultantDFA.Accuracy(test)
@@ -491,14 +491,14 @@ func TestWindowedEDSM(t *testing.T) {
 	// Iterate over 3 different sizes of target DFA.
 	for i, dfaSize := range []int{16, 32, 64} {
 		// Read APTA from JSON file.
-		APTA, valid := dfatoolkit.DFAFromJSON(fmt.Sprintf("../../TestingAPTAs/%d.json", dfaSize))
+		APTA, valid := dfalearningtoolkit.DFAFromJSON(fmt.Sprintf("../Datasets/TestingAPTAs/%d.json", dfaSize))
 
 		if !valid {
 			t.Errorf("APTA was not read successfuly from JSON.")
 		}
 
 		// Run Windowed EDSM on APTA.
-		resultantDFA, mergeData = dfatoolkit.WindowedEDSM(APTA, dfaSize*2, 2.0)
+		resultantDFA, mergeData = dfalearningtoolkit.WindowedEDSM(APTA, dfaSize*2, 2.0)
 
 		if len(resultantDFA.States) != resultantNumberOfStates[i] ||
 			mergeData.AttemptedMergesCount != resultantAttemptedMergesCount[i] ||
@@ -516,21 +516,21 @@ func TestBlueFringeEDSM(t *testing.T) {
 	// Part 1 - Training and Testing Sets from file.
 
 	// Read training set from JSON file.
-	training, valid := dfatoolkit.DatasetFromJSON("../../Datasets/Abbadingo/Generated/train.json")
+	training, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Generated/train.json")
 
 	if !valid {
 		t.Errorf("Training dataset was not read successfuly from JSON.")
 	}
 
 	// Read testing set from JSON file.
-	test, valid := dfatoolkit.DatasetFromJSON("../../Datasets/Abbadingo/Generated/test.json")
+	test, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Generated/test.json")
 
 	if !valid {
 		t.Errorf("Testing dataset was not read successfuly from JSON.")
 	}
 
 	// Run Blue-Fringe EDSM on training set.
-	resultantDFA, mergeData := dfatoolkit.BlueFringeEDSMFromDataset(training)
+	resultantDFA, mergeData := dfalearningtoolkit.BlueFringeEDSMFromDataset(training)
 
 	// Get accuracy from resultant DFA on testing set.
 	accuracy := resultantDFA.Accuracy(test)
@@ -553,14 +553,14 @@ func TestBlueFringeEDSM(t *testing.T) {
 	// Iterate over 3 different sizes of target DFA.
 	for i, dfaSize := range []int{16, 32, 64} {
 		// Read APTA from JSON file.
-		APTA, valid := dfatoolkit.DFAFromJSON(fmt.Sprintf("../../TestingAPTAs/%d.json", dfaSize))
+		APTA, valid := dfalearningtoolkit.DFAFromJSON(fmt.Sprintf("../Datasets/TestingAPTAs/%d.json", dfaSize))
 
 		if !valid {
 			t.Errorf("APTA was not read successfuly from JSON.")
 		}
 
 		// Run Blue-Fringe EDSM on APTA.
-		resultantDFA, mergeData = dfatoolkit.BlueFringeEDSM(APTA)
+		resultantDFA, mergeData = dfalearningtoolkit.BlueFringeEDSM(APTA)
 
 		if len(resultantDFA.States) != resultantNumberOfStates[i] ||
 			mergeData.AttemptedMergesCount != resultantAttemptedMergesCount[i] ||
@@ -576,21 +576,21 @@ func TestAutomataTeams(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 
 	// Read training set from JSON file.
-	training, valid := dfatoolkit.DatasetFromJSON("../../Datasets/Abbadingo/Generated/train.json")
+	training, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Generated/train.json")
 
 	if !valid {
 		t.Errorf("Training dataset was not read successfuly from JSON.")
 	}
 
 	// Read testing set from JSON file.
-	test, valid := dfatoolkit.DatasetFromJSON("../../Datasets/Abbadingo/Generated/test.json")
+	test, valid := dfalearningtoolkit.DatasetFromJSON("../Datasets/Abbadingo/Generated/test.json")
 
 	if !valid {
 		t.Errorf("Testing dataset was not read successfuly from JSON.")
 	}
 
 	// Run AutomataTeams version on training set.
-	teamOfAutomata := dfatoolkit.AutomataTeamsFromDataset(training, 81)
+	teamOfAutomata := dfalearningtoolkit.AutomataTeamsFromDataset(training, 81)
 	fairVoteAccuracy := teamOfAutomata.FairVoteAccuracy(test)
 	weightedVoteAccuracy := teamOfAutomata.WeightedVoteAccuracy(test)
 	betterHalfWeightedVoteAccuracy := teamOfAutomata.BetterHalfWeightedVoteAccuracy(test)

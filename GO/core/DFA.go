@@ -1,10 +1,10 @@
-package dfatoolkit
+package dfa_learning_toolkit
 
 import (
-	"DFA_Toolkit/DFA_Toolkit/util"
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/Cherrett/DFA-Learning-Toolkit/util"
 	"io"
 	"os"
 	"reflect"

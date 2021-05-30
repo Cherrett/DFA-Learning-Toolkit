@@ -1,4 +1,4 @@
-package dfatoolkit
+package dfa_learning_toolkit
 
 import (
 	"bytes"

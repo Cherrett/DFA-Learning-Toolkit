@@ -1,4 +1,4 @@
-package dfatoolkit
+package dfa_learning_toolkit
 
 // ExhaustiveEDSMFromDataset is a greedy version of Evidence Driven State-Merging.
 // It takes a dataset as an argument which is used to generate an APTA.

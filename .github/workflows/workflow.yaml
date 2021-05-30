@@ -1,4 +1,4 @@
-name: DFA-Tooklit Build Test
+name: DFA Learning Tooklit Continuous Integration
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
     - master
 
 jobs:
-  test:
+  go-test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -29,13 +29,13 @@ jobs:
         go get -u golang.org/x/lint/golint
       
     - name: Run build
-      run: cd GO/DFA_Toolkit && go build . 
+      run: cd GO && go build
       
     - name: Run vet & lint
       run: |
-        cd GO/DFA_Toolkit
-        go vet .
-        golint .
+        cd GO
+        go vet
+        golint
     
     - name: Run testing
-      run: cd GO/DFA_Toolkit/test && go test dfatoolkit_test.go -v
+  rust-test:

@@ -1,4 +1,4 @@
-package dfatoolkit
+package dfa_learning_toolkit
 
 // StateLabel type as an 8-bit unsigned integer.
 type StateLabel uint8

@@ -1,9 +1,9 @@
-package dfatoolkit
+package dfa_learning_toolkit
 
 import (
-	"DFA_Toolkit/DFA_Toolkit/util"
 	"bufio"
 	"fmt"
+	"github.com/Cherrett/DFA-Learning-Toolkit/util"
 	"math"
 	"math/rand"
 	"os"
