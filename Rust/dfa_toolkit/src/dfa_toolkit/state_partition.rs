@@ -468,7 +468,7 @@ impl StatePartition {
         // Loop until queue is empty.
         while queue.len() > 0 {
             // Remove and store first state in queue.
-            let block_id = queue.pop();
+            let block_id = queue.pop().unwrap();
 
             // Iterate over each symbol (alphabet) within DFA.
             for symbol in 0..self.alphabet_size {
@@ -479,13 +479,13 @@ impl StatePartition {
                     // Get block ID of child state.
                     let child_block_id = self.find(child_state_id);
                     // If depth for child block has been computed, skip block.
-                    if !order_computed.contains(*child_block_id) {
+                    if !order_computed[child_block_id as usize] {
                         // Add child block to queue.
                         queue.push(child_block_id);
                         // Set the order of the current block.
                         ordered_blocks[index] = child_block_id;
                         // Mark block as computed.
-                        order_computed[child_block_id] = true;
+                        order_computed[child_block_id as usize] = true;
                         // Increment current block order.
                         index += 1;
                     }

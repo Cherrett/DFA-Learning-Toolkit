@@ -3,6 +3,7 @@ package dfatoolkit_test
 import (
 	"DFA_Toolkit/DFA_Toolkit"
 	"DFA_Toolkit/DFA_Toolkit/util"
+	"fmt"
 	"math"
 	"math/rand"
 	"testing"
@@ -383,10 +384,12 @@ func TestRPNI(t *testing.T) {
 	}
 }
 
-func TestEDSM(t *testing.T) {
+func TestExhaustiveEDSM(t *testing.T) {
 	t.Parallel()
 	// Random Seed.
 	rand.Seed(time.Now().UnixNano())
+
+	// Part 1 - Training and Testing Sets from file.
 
 	// Read training set from JSON file.
 	training, valid := dfatoolkit.DatasetFromJSON("../../Datasets/Abbadingo/Generated/train.json")
@@ -402,35 +405,168 @@ func TestEDSM(t *testing.T) {
 		t.Errorf("Testing dataset was not read successfuly from JSON.")
 	}
 
-	// Run all EDSM version on training set.
-	exhaustiveResultantDFA, exhaustiveMergeData := dfatoolkit.ExhaustiveEDSMFromDataset(training)
-	windowedResultantDFA, windowedMergeData := dfatoolkit.WindowedEDSMFromDataset(training, 64, 2.0)
-	blueFringeResultantDFA, blueFringeMergeData := dfatoolkit.BlueFringeEDSMFromDataset(training)
+	// Run Exhaustive EDSM on training set.
+	resultantDFA, mergeData := dfatoolkit.ExhaustiveEDSMFromDataset(training)
 
-	// Get accuracy from resultant DFAs on testing set.
-	exhaustiveAccuracy := exhaustiveResultantDFA.Accuracy(test)
-	windowedAccuracy := windowedResultantDFA.Accuracy(test)
-	blueFringeAccuracy := blueFringeResultantDFA.Accuracy(test)
+	// Get accuracy from resultant DFA on testing set.
+	accuracy := resultantDFA.Accuracy(test)
 
-	if exhaustiveMergeData.AttemptedMergesCount != 15426663 ||
-		exhaustiveMergeData.ValidMergesCount != 13591962 ||
-		len(exhaustiveResultantDFA.States) != 31 ||
-		exhaustiveAccuracy != 0.9933333333333333 {
-		t.Errorf("Discrepancies found in result of exhaustive EDSM.")
+	// Confirm merge data and DFA values.
+	if mergeData.AttemptedMergesCount != 15426663 ||
+		mergeData.ValidMergesCount != 13591962 ||
+		len(resultantDFA.States) != 31 ||
+		accuracy != 0.9933333333333333 {
+		t.Errorf("Discrepancies found in result of exhaustive EDSM (Part 1).")
 	}
 
-	if windowedMergeData.AttemptedMergesCount != 62786 ||
-		windowedMergeData.ValidMergesCount != 14018 ||
-		len(windowedResultantDFA.States) != 31 ||
-		windowedAccuracy != 0.9933333333333333 {
-		t.Errorf("Discrepancies found in result of windowed EDSM.")
+	// Part 2 - APTAs from files.
+
+	// Slices of expected values.
+	resultantNumberOfStates := []int{25, 31}
+	resultantAttemptedMergesCount := []int{1060866, 15426663}
+	resultantValidMergesCount := []int{868076, 13591962}
+
+	// Iterate over 2 different sizes of target DFA.
+	for i, dfaSize := range []int{16, 32} {
+		// Read APTA from JSON file.
+		APTA, valid := dfatoolkit.DFAFromJSON(fmt.Sprintf("../../TestingAPTAs/%d.json", dfaSize))
+
+		if !valid {
+			t.Errorf("APTA was not read successfuly from JSON.")
+		}
+
+		// Run Exhaustive EDSM on APTA.
+		resultantDFA, mergeData = dfatoolkit.ExhaustiveEDSM(APTA)
+
+		if len(resultantDFA.States) != resultantNumberOfStates[i] ||
+			mergeData.AttemptedMergesCount != resultantAttemptedMergesCount[i] ||
+			mergeData.ValidMergesCount != resultantValidMergesCount[i] {
+			t.Errorf("Discrepancies found in result of exhaustive EDSM (Part 2).")
+		}
+	}
+}
+
+func TestWindowedEDSM(t *testing.T) {
+	t.Parallel()
+	// Random Seed.
+	rand.Seed(time.Now().UnixNano())
+
+	// Part 1 - Training and Testing Sets from file.
+
+	// Read training set from JSON file.
+	training, valid := dfatoolkit.DatasetFromJSON("../../Datasets/Abbadingo/Generated/train.json")
+
+	if !valid {
+		t.Errorf("Training dataset was not read successfuly from JSON.")
 	}
 
-	if blueFringeMergeData.AttemptedMergesCount != 12215 ||
-		blueFringeMergeData.ValidMergesCount != 789 ||
-		len(blueFringeResultantDFA.States) != 31 ||
-		blueFringeAccuracy != 0.9933333333333333 {
-		t.Errorf("Discrepancies found in result of blue-fringe EDSM.")
+	// Read testing set from JSON file.
+	test, valid := dfatoolkit.DatasetFromJSON("../../Datasets/Abbadingo/Generated/test.json")
+
+	if !valid {
+		t.Errorf("Testing dataset was not read successfuly from JSON.")
+	}
+
+	// Run Windowed EDSM on training set.
+	resultantDFA, mergeData := dfatoolkit.WindowedEDSMFromDataset(training, 32*2, 2.0)
+
+	// Get accuracy from resultant DFA on testing set.
+	accuracy := resultantDFA.Accuracy(test)
+
+	// Confirm merge data and DFA values.
+	if mergeData.AttemptedMergesCount != 62786 ||
+		mergeData.ValidMergesCount != 14018 ||
+		len(resultantDFA.States) != 31 ||
+		accuracy != 0.9933333333333333 {
+		t.Errorf("Discrepancies found in result of windowed EDSM (Part 1).")
+	}
+
+	// Part 2 - APTAs from files.
+
+	// Slices of expected values.
+	resultantNumberOfStates := []int{25, 31, 208}
+	resultantAttemptedMergesCount := []int{13078, 62786, 4819261}
+	resultantValidMergesCount := []int{1861, 14018, 420270}
+
+	// Iterate over 3 different sizes of target DFA.
+	for i, dfaSize := range []int{16, 32, 64} {
+		// Read APTA from JSON file.
+		APTA, valid := dfatoolkit.DFAFromJSON(fmt.Sprintf("../../TestingAPTAs/%d.json", dfaSize))
+
+		if !valid {
+			t.Errorf("APTA was not read successfuly from JSON.")
+		}
+
+		// Run Windowed EDSM on APTA.
+		resultantDFA, mergeData = dfatoolkit.WindowedEDSM(APTA, dfaSize*2, 2.0)
+
+		if len(resultantDFA.States) != resultantNumberOfStates[i] ||
+			mergeData.AttemptedMergesCount != resultantAttemptedMergesCount[i] ||
+			mergeData.ValidMergesCount != resultantValidMergesCount[i] {
+			t.Errorf("Discrepancies found in result of windowed EDSM (Part 2).")
+		}
+	}
+}
+
+func TestBlueFringeEDSM(t *testing.T) {
+	t.Parallel()
+	// Random Seed.
+	rand.Seed(time.Now().UnixNano())
+
+	// Part 1 - Training and Testing Sets from file.
+
+	// Read training set from JSON file.
+	training, valid := dfatoolkit.DatasetFromJSON("../../Datasets/Abbadingo/Generated/train.json")
+
+	if !valid {
+		t.Errorf("Training dataset was not read successfuly from JSON.")
+	}
+
+	// Read testing set from JSON file.
+	test, valid := dfatoolkit.DatasetFromJSON("../../Datasets/Abbadingo/Generated/test.json")
+
+	if !valid {
+		t.Errorf("Testing dataset was not read successfuly from JSON.")
+	}
+
+	// Run Blue-Fringe EDSM on training set.
+	resultantDFA, mergeData := dfatoolkit.BlueFringeEDSMFromDataset(training)
+
+	// Get accuracy from resultant DFA on testing set.
+	accuracy := resultantDFA.Accuracy(test)
+
+	// Confirm merge data and DFA values.
+	if mergeData.AttemptedMergesCount != 12215 ||
+		mergeData.ValidMergesCount != 789 ||
+		len(resultantDFA.States) != 31 ||
+		accuracy != 0.9933333333333333 {
+		t.Errorf("Discrepancies found in result of blue-fringe EDSM (Part 1).")
+	}
+
+	// Part 2 - APTAs from files.
+
+	// Slices of expected values.
+	resultantNumberOfStates := []int{25, 31, 200}
+	resultantAttemptedMergesCount := []int{5685, 12215, 1477532}
+	resultantValidMergesCount := []int{764, 789, 73290}
+
+	// Iterate over 3 different sizes of target DFA.
+	for i, dfaSize := range []int{16, 32, 64} {
+		// Read APTA from JSON file.
+		APTA, valid := dfatoolkit.DFAFromJSON(fmt.Sprintf("../../TestingAPTAs/%d.json", dfaSize))
+
+		if !valid {
+			t.Errorf("APTA was not read successfuly from JSON.")
+		}
+
+		// Run Blue-Fringe EDSM on APTA.
+		resultantDFA, mergeData = dfatoolkit.BlueFringeEDSM(APTA)
+
+		if len(resultantDFA.States) != resultantNumberOfStates[i] ||
+			mergeData.AttemptedMergesCount != resultantAttemptedMergesCount[i] ||
+			mergeData.ValidMergesCount != resultantValidMergesCount[i] {
+			t.Errorf("Discrepancies found in result of blue-fringe EDSM (Part 2).")
+		}
 	}
 }
 

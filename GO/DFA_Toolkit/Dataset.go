@@ -198,7 +198,7 @@ func (stringInstance StringInstance) ConsistentWithDFA(dfa DFA) bool {
 func (dataset Dataset) ConsistentWithDFA(dfa DFA) bool {
 	// Set consistent flag to true.
 	consistent := true
-	// Create wait group
+	// Create wait group.
 	var wg sync.WaitGroup
 	// Add length of dataset to wait group.
 	wg.Add(dataset.Count())
@@ -213,7 +213,9 @@ func (dataset Dataset) ConsistentWithDFA(dfa DFA) bool {
 			// consistent flag is already set to false, skip
 			// checking the remaining string instances.
 			if consistent {
-				consistent = stringInstance.ConsistentWithDFA(dfa)
+				if !stringInstance.ConsistentWithDFA(dfa) {
+					consistent = false
+				}
 			}
 		}(stringInstance, dfa)
 	}
@@ -292,7 +294,7 @@ func (stringInstance StringInstance) ConsistentWithStatePartition(statePartition
 func (dataset Dataset) ConsistentWithStatePartition(statePartition StatePartition) bool {
 	// Set consistent flag to true.
 	consistent := true
-	// Create wait group
+	// Create wait group.
 	var wg sync.WaitGroup
 	// Add length of dataset to wait group.
 	wg.Add(dataset.Count())
@@ -307,7 +309,9 @@ func (dataset Dataset) ConsistentWithStatePartition(statePartition StatePartitio
 			// consistent flag is already set to false, skip
 			// checking the remaining string instances.
 			if consistent {
-				consistent = stringInstance.ConsistentWithStatePartition(statePartition)
+				if !stringInstance.ConsistentWithStatePartition(statePartition) {
+					consistent = false
+				}
 			}
 		}(stringInstance, statePartition)
 	}

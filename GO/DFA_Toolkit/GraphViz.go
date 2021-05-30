@@ -9,7 +9,7 @@ import (
 
 // SymbolAlphabetMappingAbbadingo represents the symbol-alphabet mapping for
 // the Abbadingo competition standard (using only a's and b's / 0s and 1s).
-var SymbolAlphabetMappingAbbadingo = map[int]rune{0: 'a', 1: 'b'}
+var SymbolAlphabetMappingAbbadingo = map[int]string{0: "a", 1: "b"}
 
 // GraphViz.go consists of various functions which create a visualisation of a
 // given DFA or State Partition. Please note that GraphViz must be downloaded
@@ -17,12 +17,15 @@ var SymbolAlphabetMappingAbbadingo = map[int]rune{0: 'a', 1: 'b'}
 
 // ToDOT creates a .dot file using the DOT language. This DOT file
 // contains a representation for the given DFA which can then be used
-// to generate a visual representation of the DFA. If showOrder is set
-// to true, the canonical order of the states is shown inside the node
-// within DFA. If topDown is set to true, the visual representation
-// will be top down. A left to right representation is used otherwise.
-// This function is also called from all of the functions below.
-func (dfa *DFA) ToDOT(filePath string, symbolMapping map[int]rune, showOrder bool, topDown bool) {
+// to generate a visual representation of the DFA. The symbolMapping 
+// parameter is a map which maps each symbol within the alphabet to a
+// string. This can be set to nil, which will map each symbol with a 
+// number starting from 0. If showOrder is set to true, the canonical 
+// order of the states is shown inside the node within DFA. If topDown 
+// is set to true, the visual representation will be top down. A left
+// to right representation is used otherwise. This function is also
+// called from all of the functions below.
+func (dfa *DFA) ToDOT(filePath string, symbolMapping map[int]string, showOrder bool, topDown bool) {
 	// If show order is set to true, make sure
 	// that depth and order for DFA are computed.
 	if showOrder {
@@ -93,7 +96,7 @@ func (dfa *DFA) ToDOT(filePath string, symbolMapping map[int]rune, showOrder boo
 				if value, exists := symbolMapping[symbol]; exists {
 					resultantStateID := state.Transitions[symbol]
 					if resultantStateID > -1 {
-						_, _ = writer.WriteString(fmt.Sprintf("\tq%d->q%d [label=\"%s\" fontname=verdana fontsize=8];\n", stateID, resultantStateID, string(value)))
+						_, _ = writer.WriteString(fmt.Sprintf("\tq%d->q%d [label=\"%s\" fontname=verdana fontsize=8];\n", stateID, resultantStateID, value))
 					}
 				} else {
 					panic(fmt.Sprintf("Symbol ID %d not in symbolMapping map.", symbol))
@@ -109,14 +112,16 @@ func (dfa *DFA) ToDOT(filePath string, symbolMapping map[int]rune, showOrder boo
 	_ = writer.Flush()
 }
 
-// ToPNG creates and saves a .png image to the given file path.
-// Please note that GraphViz must be downloaded and installed before
-// hand from https://graphviz.org/download/. If showOrder is set
-// to true, the canonical order of the states is shown inside the node
-// within DFA. If topDown is set to true, the visual representation
-// will be top down. A left to right representation is used otherwise.
-// Returns true if successful or false if an error occurs.
-func (dfa DFA) ToPNG(filePath string, symbolMapping map[int]rune, showOrder bool, topDown bool) bool {
+// ToPNG creates and saves a .png image which represents the DFA to the 
+// given file path. Please note that GraphViz must be downloaded and
+// installed before hand from https://graphviz.org/download/. The symbolMapping
+// parameter is a map which maps each symbol within the alphabet to a string.
+// This can be set to nil, which will map each symbol with a number starting
+// from 0. If showOrder is set to true, the canonical order of the states is
+// shown inside the node within DFA. If topDown is set to true, the visual
+// representation will be top down. A left to right representation is used
+// otherwise. Returns true if successful or false if an error occurs.
+func (dfa DFA) ToPNG(filePath string, symbolMapping map[int]string, showOrder bool, topDown bool) bool {
 	defer os.Remove("temp.dot")
 	dfa.ToDOT("temp.dot", symbolMapping, showOrder, topDown)
 
@@ -133,14 +138,16 @@ func (dfa DFA) ToPNG(filePath string, symbolMapping map[int]rune, showOrder bool
 	return true
 }
 
-// ToJPG creates and saves a .jpg image to the given file path.
-// Please note that GraphViz must be downloaded and installed before
-// hand from https://graphviz.org/download/. If showOrder is set
-// to true, the canonical order of the states is shown inside the node
-// within DFA. If topDown is set to true, the visual representation
-// will be top down. A left to right representation is used otherwise.
-// Returns true if successful or false if an error occurs.
-func (dfa DFA) ToJPG(filePath string, symbolMapping map[int]rune, showOrder bool, topDown bool) bool {
+// ToJPG creates and saves a .jpg image which represents the DFA to the 
+// given file path. Please note that GraphViz must be downloaded and
+// installed before hand from https://graphviz.org/download/. The symbolMapping
+// parameter is a map which maps each symbol within the alphabet to a string.
+// This can be set to nil, which will map each symbol with a number starting
+// from 0. If showOrder is set to true, the canonical order of the states is
+// shown inside the node within DFA. If topDown is set to true, the visual
+// representation will be top down. A left to right representation is used
+// otherwise. Returns true if successful or false if an error occurs.
+func (dfa DFA) ToJPG(filePath string, symbolMapping map[int]string, showOrder bool, topDown bool) bool {
 	defer os.Remove("temp.dot")
 	dfa.ToDOT("temp.dot", symbolMapping, showOrder, topDown)
 
@@ -157,14 +164,16 @@ func (dfa DFA) ToJPG(filePath string, symbolMapping map[int]rune, showOrder bool
 	return true
 }
 
-// ToPDF creates and saves a .pdf file to the given file path.
-// Please note that GraphViz must be downloaded and installed before
-// hand from https://graphviz.org/download/. If showOrder is set
-// to true, the canonical order of the states is shown inside the node
-// within DFA. If topDown is set to true, the visual representation
-// will be top down. A left to right representation is used otherwise.
-// Returns true if successful or false if an error occurs.
-func (dfa DFA) ToPDF(filePath string, symbolMapping map[int]rune, showOrder bool, topDown bool) bool {
+// ToPDF creates and saves a .pdf file which represents the DFA to the 
+// given file path. Please note that GraphViz must be downloaded and
+// installed before hand from https://graphviz.org/download/. The symbolMapping
+// parameter is a map which maps each symbol within the alphabet to a string.
+// This can be set to nil, which will map each symbol with a number starting
+// from 0. If showOrder is set to true, the canonical order of the states is
+// shown inside the node within DFA. If topDown is set to true, the visual
+// representation will be top down. A left to right representation is used
+// otherwise. Returns true if successful or false if an error occurs.
+func (dfa DFA) ToPDF(filePath string, symbolMapping map[int]string, showOrder bool, topDown bool) bool {
 	defer os.Remove("temp.dot")
 	dfa.ToDOT("temp.dot", symbolMapping, showOrder, topDown)
 
@@ -181,14 +190,16 @@ func (dfa DFA) ToPDF(filePath string, symbolMapping map[int]rune, showOrder bool
 	return true
 }
 
-// ToSVG creates and saves a .svg file to the given file path.
-// Please note that GraphViz must be downloaded and installed before
-// hand from https://graphviz.org/download/. If showOrder is set
-// to true, the canonical order of the states is shown inside the node
-// within DFA. If topDown is set to true, the visual representation
-// will be top down. A left to right representation is used otherwise.
-// Returns true if successful or false if an error occurs.
-func (dfa DFA) ToSVG(filePath string, symbolMapping map[int]rune, showOrder bool, topDown bool) bool {
+// ToSVG creates and saves a .svg file which represents the DFA to the 
+// given file path. Please note that GraphViz must be downloaded and
+// installed before hand from https://graphviz.org/download/. The symbolMapping
+// parameter is a map which maps each symbol within the alphabet to a string.
+// This can be set to nil, which will map each symbol with a number starting
+// from 0. If showOrder is set to true, the canonical order of the states is
+// shown inside the node within DFA. If topDown is set to true, the visual
+// representation will be top down. A left to right representation is used
+// otherwise. Returns true if successful or false if an error occurs.
+func (dfa DFA) ToSVG(filePath string, symbolMapping map[int]string, showOrder bool, topDown bool) bool {
 	defer os.Remove("temp.dot")
 	dfa.ToDOT("temp.dot", symbolMapping, showOrder, topDown)
 
@@ -207,13 +218,14 @@ func (dfa DFA) ToSVG(filePath string, symbolMapping map[int]rune, showOrder bool
 
 // ToDOT creates a .dot file using the DOT language. This DOT file
 // contains a representation for the given StatePartition which can then
-// be used to generate a visual representation of the DFA represented by
-// the State Partition. If showOrder is set to true, the canonical order
-// of the states is shown inside the node within DFA. If topDown is set
-// to true, the visual representation will be top down. A left to right
-// representation is used otherwise. This function is also called from
-// all of the functions below.
-func (statePartition StatePartition) ToDOT(filePath string, symbolMapping map[int]rune, showOrder bool, topDown bool) {
+// be used to generate a visual representation of the DFA represented by the
+// State Partition. The symbolMapping parameter is a map which maps each symbol
+// within the alphabet to a string. This can be set to nil, which will map each
+// symbol with a number starting from 0. If showOrder is set to true, the canonical
+// order of the states is shown inside the node within partition. If topDown is set
+// to true, the visual representation will be top down. A left to right representation
+// is used otherwise. This function is also called from all of the functions below.
+func (statePartition StatePartition) ToDOT(filePath string, symbolMapping map[int]string, showOrder bool, topDown bool) {
 	var rootBlocks []int
 
 	// If show order is set to true, get root blocks in order.
@@ -290,7 +302,7 @@ func (statePartition StatePartition) ToDOT(filePath string, symbolMapping map[in
 				if value, exists := symbolMapping[symbol]; exists {
 					if resultantBlockID := statePartition.Blocks[blockID].Transitions[symbol]; resultantBlockID > -1 {
 						resultantBlockRootID := statePartition.Find(resultantBlockID)
-						_, _ = writer.WriteString(fmt.Sprintf("\tq%d->q%d [label=\"%s\" fontname=verdana fontsize=8];\n", blockID, resultantBlockRootID, string(value)))
+						_, _ = writer.WriteString(fmt.Sprintf("\tq%d->q%d [label=\"%s\" fontname=verdana fontsize=8];\n", blockID, resultantBlockRootID, value))
 					}
 				} else {
 					panic(fmt.Sprintf("Symbol ID %d not in symbolMapping map.", symbol))
@@ -306,14 +318,16 @@ func (statePartition StatePartition) ToDOT(filePath string, symbolMapping map[in
 	_ = writer.Flush()
 }
 
-// ToPNG creates and saves a .png image to the given file path.
-// Please note that GraphViz must be downloaded and installed before
-// hand from https://graphviz.org/download/. If showOrder is set
-// to true, the canonical order of the states is shown inside the node
-// within DFA. If topDown is set to true, the visual representation
-// will be top down. A left to right representation is used otherwise.
-// Returns true if successful or false if an error occurs.
-func (statePartition StatePartition) ToPNG(filePath string, symbolMapping map[int]rune, showOrder bool, topDown bool) bool {
+// ToPNG creates and saves a .png image which represents the state partition
+// to the given file path. Please note that GraphViz must be downloaded and
+// installed before hand from https://graphviz.org/download/. The symbolMapping
+// parameter is a map which maps each symbol within the alphabet to a string.
+// This can be set to nil, which will map each symbol with a number starting
+// from 0. If showOrder is set to true, the canonical order of the states is
+// shown inside the node within partition. If topDown is set to true, the
+// visual representation will be top down. A left to right representation is
+// used otherwise. Returns true if successful or false if an error occurs.
+func (statePartition StatePartition) ToPNG(filePath string, symbolMapping map[int]string, showOrder bool, topDown bool) bool {
 	defer os.Remove("temp.dot")
 	statePartition.ToDOT("temp.dot", symbolMapping, showOrder, topDown)
 
@@ -330,14 +344,16 @@ func (statePartition StatePartition) ToPNG(filePath string, symbolMapping map[in
 	return true
 }
 
-// ToJPG creates and saves a .jpg image to the given file path.
-// Please note that GraphViz must be downloaded and installed before
-// hand from https://graphviz.org/download/. If showOrder is set
-// to true, the canonical order of the states is shown inside the node
-// within DFA. If topDown is set to true, the visual representation
-// will be top down. A left to right representation is used otherwise.
-// Returns true if successful or false if an error occurs.
-func (statePartition StatePartition) ToJPG(filePath string, symbolMapping map[int]rune, showOrder bool, topDown bool) bool {
+// ToJPG creates and saves a .jpg image which represents the state partition
+// to the given file path. Please note that GraphViz must be downloaded and
+// installed before hand from https://graphviz.org/download/. The symbolMapping
+// parameter is a map which maps each symbol within the alphabet to a string.
+// This can be set to nil, which will map each symbol with a number starting
+// from 0. If showOrder is set to true, the canonical order of the states is
+// shown inside the node within partition. If topDown is set to true, the
+// visual representation will be top down. A left to right representation is
+// used otherwise. Returns true if successful or false if an error occurs.
+func (statePartition StatePartition) ToJPG(filePath string, symbolMapping map[int]string, showOrder bool, topDown bool) bool {
 	defer os.Remove("temp.dot")
 	statePartition.ToDOT("temp.dot", symbolMapping, showOrder, topDown)
 
@@ -354,14 +370,16 @@ func (statePartition StatePartition) ToJPG(filePath string, symbolMapping map[in
 	return true
 }
 
-// ToPDF creates and saves a .pdf file to the given file path.
-// Please note that GraphViz must be downloaded and installed before
-// hand from https://graphviz.org/download/. If showOrder is set
-// to true, the canonical order of the states is shown inside the node
-// within DFA. If topDown is set to true, the visual representation
-// will be top down. A left to right representation is used otherwise.
-// Returns true if successful or false if an error occurs.
-func (statePartition StatePartition) ToPDF(filePath string, symbolMapping map[int]rune, showOrder bool, topDown bool) bool {
+// ToPDF creates and saves a .pdf file which represents the state partition
+// to the given file path. Please note that GraphViz must be downloaded and
+// installed before hand from https://graphviz.org/download/. The symbolMapping
+// parameter is a map which maps each symbol within the alphabet to a string.
+// This can be set to nil, which will map each symbol with a number starting
+// from 0. If showOrder is set to true, the canonical order of the states is
+// shown inside the node within partition. If topDown is set to true, the
+// visual representation will be top down. A left to right representation is
+// used otherwise. Returns true if successful or false if an error occurs.
+func (statePartition StatePartition) ToPDF(filePath string, symbolMapping map[int]string, showOrder bool, topDown bool) bool {
 	defer os.Remove("temp.dot")
 	statePartition.ToDOT("temp.dot", symbolMapping, showOrder, topDown)
 
@@ -378,14 +396,16 @@ func (statePartition StatePartition) ToPDF(filePath string, symbolMapping map[in
 	return true
 }
 
-// ToSVG creates and saves a .svg file to the given file path.
-// Please note that GraphViz must be downloaded and installed before
-// hand from https://graphviz.org/download/. If showOrder is set
-// to true, the canonical order of the states is shown inside the node
-// within DFA. If topDown is set to true, the visual representation
-// will be top down. A left to right representation is used otherwise.
-// Returns true if successful or false if an error occurs.
-func (statePartition StatePartition) ToSVG(filePath string, symbolMapping map[int]rune, showOrder bool, topDown bool) bool {
+// ToSVG creates and saves a .svg file which represents the state partition
+// to the given file path. Please note that GraphViz must be downloaded and
+// installed before hand from https://graphviz.org/download/. The symbolMapping
+// parameter is a map which maps each symbol within the alphabet to a string.
+// This can be set to nil, which will map each symbol with a number starting
+// from 0. If showOrder is set to true, the canonical order of the states is
+// shown inside the node within partition. If topDown is set to true, the
+// visual representation will be top down. A left to right representation is
+// used otherwise. Returns true if successful or false if an error occurs.
+func (statePartition StatePartition) ToSVG(filePath string, symbolMapping map[int]string, showOrder bool, topDown bool) bool {
 	defer os.Remove("temp.dot")
 	statePartition.ToDOT("temp.dot", symbolMapping, showOrder, topDown)
 
