@@ -17,11 +17,11 @@ var SymbolAlphabetMappingAbbadingo = map[int]string{0: "a", 1: "b"}
 
 // ToDOT creates a .dot file using the DOT language. This DOT file
 // contains a representation for the given DFA which can then be used
-// to generate a visual representation of the DFA. The symbolMapping 
+// to generate a visual representation of the DFA. The symbolMapping
 // parameter is a map which maps each symbol within the alphabet to a
-// string. This can be set to nil, which will map each symbol with a 
-// number starting from 0. If showOrder is set to true, the canonical 
-// order of the states is shown inside the node within DFA. If topDown 
+// string. This can be set to nil, which will map each symbol with a
+// number starting from 0. If showOrder is set to true, the canonical
+// order of the states is shown inside the node within DFA. If topDown
 // is set to true, the visual representation will be top down. A left
 // to right representation is used otherwise. This function is also
 // called from all of the functions below.
@@ -112,7 +112,7 @@ func (dfa *DFA) ToDOT(filePath string, symbolMapping map[int]string, showOrder b
 	_ = writer.Flush()
 }
 
-// ToPNG creates and saves a .png image which represents the DFA to the 
+// ToPNG creates and saves a .png image which represents the DFA to the
 // given file path. Please note that GraphViz must be downloaded and
 // installed before hand from https://graphviz.org/download/. The symbolMapping
 // parameter is a map which maps each symbol within the alphabet to a string.
@@ -138,7 +138,7 @@ func (dfa DFA) ToPNG(filePath string, symbolMapping map[int]string, showOrder bo
 	return true
 }
 
-// ToJPG creates and saves a .jpg image which represents the DFA to the 
+// ToJPG creates and saves a .jpg image which represents the DFA to the
 // given file path. Please note that GraphViz must be downloaded and
 // installed before hand from https://graphviz.org/download/. The symbolMapping
 // parameter is a map which maps each symbol within the alphabet to a string.
@@ -164,7 +164,7 @@ func (dfa DFA) ToJPG(filePath string, symbolMapping map[int]string, showOrder bo
 	return true
 }
 
-// ToPDF creates and saves a .pdf file which represents the DFA to the 
+// ToPDF creates and saves a .pdf file which represents the DFA to the
 // given file path. Please note that GraphViz must be downloaded and
 // installed before hand from https://graphviz.org/download/. The symbolMapping
 // parameter is a map which maps each symbol within the alphabet to a string.
@@ -190,7 +190,7 @@ func (dfa DFA) ToPDF(filePath string, symbolMapping map[int]string, showOrder bo
 	return true
 }
 
-// ToSVG creates and saves a .svg file which represents the DFA to the 
+// ToSVG creates and saves a .svg file which represents the DFA to the
 // given file path. Please note that GraphViz must be downloaded and
 // installed before hand from https://graphviz.org/download/. The symbolMapping
 // parameter is a map which maps each symbol within the alphabet to a string.

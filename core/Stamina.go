@@ -125,7 +125,7 @@ func StaminaDFA(alphabetSize int, targetDFASize int) DFA {
 			visitedStates := map[int]bool{}
 
 			// Newly created state ID placeholder.
-			newStateID := -1
+			var newStateID int
 
 			// Create new state and randomly choose whether
 			// state is accepting or unlabelled.

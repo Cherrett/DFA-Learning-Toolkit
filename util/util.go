@@ -223,7 +223,7 @@ func DownloadAllStaminaDatasets(directory string) {
 
 		// Copy to files.
 		_, _ = io.Copy(out, resp.Body)
-		_, err = io.Copy(out2, resp2.Body)
+		_, _ = io.Copy(out2, resp2.Body)
 
 		// Close io/file buffers.
 		_ = resp.Body.Close()
