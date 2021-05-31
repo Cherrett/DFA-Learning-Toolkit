@@ -275,3 +275,17 @@ func (dataset Dataset) ToAbbadingoFile(filePath string) {
 	// Flush writer.
 	_ = writer.Flush()
 }
+
+// GenerateJSONAPTAs generates a number of APTAs and writes them to a JSON file.
+func GenerateJSONAPTAs(directory string, iterations, targetDFASize, trainingSetSize int) {
+	for i := 0; i < iterations; i ++ {
+		// Generate training set.
+		_, trainingSet, _ := AbbadingoInstanceExact(targetDFASize, true, trainingSetSize, 1800)
+
+		// Get APTA from training set.
+		apta := trainingSet.GetPTA(true)
+
+		// Write APTA to JSON.
+		apta.ToJSON(fmt.Sprintf("%s/%d.json", directory, i))
+	}
+}
