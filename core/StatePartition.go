@@ -108,8 +108,8 @@ func (statePartition *StatePartition) Union(blockID1 int, blockID2 int) {
 	// Increment size (score) of parent node by size of child node.
 	parent.Size += child.Size
 
-	// If label of parent is unknown and label of child is
-	// not unknown, set label of parent to label of child.
+	// If label of parent is unlabelled and label of child is
+	// labelled, set label of parent to label of child.
 	if parent.Label == UNLABELLED && child.Label != UNLABELLED {
 		parent.Label = child.Label
 	} else if parent.Label == ACCEPTING && child.Label == ACCEPTING {

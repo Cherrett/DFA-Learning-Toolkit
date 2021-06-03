@@ -112,7 +112,7 @@ func (dataset Dataset) GetPTA(APTA bool) DFA {
 					} else {
 						newStateID = dfa.AddState(REJECTING)
 					}
-					// If not last symbol in string, add an unknown state.
+					// If not last symbol in string, add an unlabelled state.
 				} else {
 					newStateID = dfa.AddState(UNLABELLED)
 				}
@@ -351,7 +351,7 @@ func (stringInstance StringInstance) ParseToStateLabel(dfa DFA) StateLabel {
 			currentStateID = dfa.States[currentStateID].Transitions[symbol]
 			// Check if last symbol in string.
 			if count == stringInstance.Length() {
-				// If state is unknown or rejecting, return rejecting.
+				// If state is unlabelled or rejecting, return rejecting.
 				if dfa.States[currentStateID].Label == UNLABELLED || dfa.States[currentStateID].Label == REJECTING {
 					return REJECTING
 				}
