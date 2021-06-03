@@ -5,6 +5,7 @@ import (
 	dfalearningtoolkit "github.com/Cherrett/DFA-Learning-Toolkit/core"
 	"math"
 	"math/rand"
+	"time"
 )
 
 func main() {
@@ -13,31 +14,31 @@ func main() {
 	// go tool pprof -http=:8081 cpu.pprof
 
 	// Random Seed.
-	// rand.Seed(time.Now().UnixNano())
-	rand.Seed(0)
+	rand.Seed(time.Now().UnixNano())
+	
+	for _, fileName := range []string{"2_16_100.txt", "2_32_250.txt", "2_32_500.txt", "2_64_750.txt"}{
+		trainingDataset := dfalearningtoolkit.GetDatasetFromStaminaFile(fmt.Sprintf("datasets/Comparison/%s", fileName))
 
-	//dfa := dfatoolkit.NewDFA()
-	//dfa.AddSymbol()
-	//dfa.AddSymbol()
-	//
-	//for i := 0; i < 8; i++ {
-	//	dfa.AddState(dfatoolkit.ACCEPTING)
-	//}
-	//
-	//dfa.AddTransition()
+		fmt.Println("Positive Strings:", trainingDataset.AcceptingStringInstancesCount())
+		fmt.Println("Negative Strings:", trainingDataset.RejectingStringInstancesCount())
+		fmt.Println("Total Strings:", len(trainingDataset))
 
-	//_, trainingDataset, _ := dfatoolkit.DefaultStaminaInstance(2, 32, 10.0)
+		result, mergeData := dfalearningtoolkit.RPNIFromDataset(trainingDataset)
 
-	trainingDataset := dfalearningtoolkit.GetDatasetFromAbbadingoFile("datasets/GI_learning_datasets/random_100_100_100.txt")
+		fmt.Printf("-------------RPNI-------------\n")
+		fmt.Printf("Number of States: %d\n", len(result.States))
+		fmt.Printf("Duration: %.5fs\n", mergeData.Duration.Seconds())
+		fmt.Printf("Merges/s: %d\n", int(math.Round(mergeData.AttemptedMergesPerSecond())))
+		fmt.Printf("Attempted Merges: %d\n", mergeData.AttemptedMergesCount)
+		fmt.Printf("Valid Merges: %d\n", mergeData.ValidMergesCount)
 
-	fmt.Println("Positive Strings:", trainingDataset.AcceptingStringInstancesCount())
-	fmt.Println("Negative Strings:", trainingDataset.RejectingStringInstancesCount())
+		result, mergeData = dfalearningtoolkit.BlueFringeEDSMFromDataset(trainingDataset)
 
-	result, mergeData := dfalearningtoolkit.RPNIFromDataset(trainingDataset)
-
-	fmt.Printf("Number of States: %d\n", len(result.States))
-	fmt.Printf("Duration: %.5fs\n", mergeData.Duration.Seconds())
-	fmt.Printf("Merges/s: %d\n", int(math.Round(mergeData.AttemptedMergesPerSecond())))
-	fmt.Printf("Attempted Merges: %d\n", mergeData.AttemptedMergesCount)
-	fmt.Printf("Valid Merges: %d\n", mergeData.ValidMergesCount)
+		fmt.Printf("-------------EDSM-------------\n")
+		fmt.Printf("Number of States: %d\n", len(result.States))
+		fmt.Printf("Duration: %.5fs\n", mergeData.Duration.Seconds())
+		fmt.Printf("Merges/s: %d\n", int(math.Round(mergeData.AttemptedMergesPerSecond())))
+		fmt.Printf("Attempted Merges: %d\n", mergeData.AttemptedMergesCount)
+		fmt.Printf("Valid Merges: %d\n", mergeData.ValidMergesCount)
+	}
 }

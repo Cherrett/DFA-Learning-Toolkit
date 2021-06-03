@@ -21,7 +21,22 @@ type DFA struct {
 
 // NewDFA initializes a new empty DFA.
 func NewDFA() DFA {
+	// Initialize and return new empty DFA.
 	return DFA{States: make([]State, 0), StartingStateID: -1, Alphabet: make([]int, 0), depth: -1, computedDepthAndOrder: false}
+}
+
+// NewDFAWithAlphabetSize initializes a new empty DFA with a given alphabet size.
+func NewDFAWithAlphabetSize(alphabetSize int) DFA {
+	// Initialize new empty DFA.
+	resultantDFA := DFA{States: make([]State, 0), StartingStateID: -1, Alphabet: make([]int, 0), depth: -1, computedDepthAndOrder: false}
+
+	// Add required symbols within alphabet.
+	for i := 0; i < alphabetSize; i ++ {
+		resultantDFA.AddSymbol()
+	}
+
+	// Return initialized DFA.
+	return resultantDFA
 }
 
 // AddState adds a new state to the DFA with the corresponding State Label.

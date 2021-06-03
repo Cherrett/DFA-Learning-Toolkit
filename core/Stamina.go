@@ -98,13 +98,8 @@ func StaminaDFA(alphabetSize int, targetDFASize int) DFA {
 	// Probability of parallel transition (edge) labels.
 	p := 0.2
 
-	// Initialize a new DFA.
-	dfa := NewDFA()
-
-	// Add symbols to DFA until alphabet size is reached.
-	for i := 0; i < alphabetSize; i++ {
-		dfa.AddSymbol()
-	}
+	// Initialize a new DFA with alphabet size.
+	dfa := NewDFAWithAlphabetSize(alphabetSize)
 
 	// Create and set starting state.
 	if rand.Intn(2) == 0 {
