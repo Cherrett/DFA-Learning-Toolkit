@@ -97,7 +97,7 @@ func AbbadingoDFA(numberOfStates int, exact bool) DFA {
 		dfa.AddSymbol()
 
 		// Create new states and assign either
-		// an accepting or unknown label.
+		// an accepting or unlabelled label.
 		for i := 0; i < dfaSize; i++ {
 			if rand.Intn(2) == 0 {
 				dfa.AddState(ACCEPTING)

@@ -21,7 +21,22 @@ type DFA struct {
 
 // NewDFA initializes a new empty DFA.
 func NewDFA() DFA {
+	// Initialize and return new empty DFA.
 	return DFA{States: make([]State, 0), StartingStateID: -1, Alphabet: make([]int, 0), depth: -1, computedDepthAndOrder: false}
+}
+
+// NewDFAWithAlphabetSize initializes a new empty DFA with a given alphabet size.
+func NewDFAWithAlphabetSize(alphabetSize int) DFA {
+	// Initialize new empty DFA.
+	resultantDFA := DFA{States: make([]State, 0), StartingStateID: -1, Alphabet: make([]int, 0), depth: -1, computedDepthAndOrder: false}
+
+	// Add required symbols within alphabet.
+	for i := 0; i < alphabetSize; i ++ {
+		resultantDFA.AddSymbol()
+	}
+
+	// Return initialized DFA.
+	return resultantDFA
 }
 
 // AddState adds a new state to the DFA with the corresponding State Label.
@@ -169,8 +184,8 @@ func (dfa DFA) RejectingStates() []int {
 	return acceptingStates
 }
 
-// UnknownStates returns state IDs of unknown states within DFA.
-func (dfa DFA) UnknownStates() []int {
+// UnlabelledStates returns state IDs of Unlabelled states within DFA.
+func (dfa DFA) UnlabelledStates() []int {
 	var acceptingStates []int
 
 	for stateID := range dfa.States {
@@ -217,8 +232,8 @@ func (dfa DFA) RejectingStatesCount() int {
 	return count
 }
 
-// UnknownStatesCount returns the number of unknown states within DFA.
-func (dfa DFA) UnknownStatesCount() int {
+// UnlabelledStatesCount returns the number of Unlabelled states within DFA.
+func (dfa DFA) UnlabelledStatesCount() int {
 	count := 0
 
 	for stateID := range dfa.States {
@@ -826,7 +841,7 @@ func (dfa DFA) SymmetricallyStructurallyComplete(dataset Dataset) bool {
 				currentStateID = dfa.States[currentStateID].Transitions[symbol]
 				// Check if last symbol in string.
 				if count == stringInstance.Length() {
-					// If state is unlabelled (unknown) and string instance is accepting, return false.
+					// If state is unlabelled and string instance is accepting, return false.
 					if dfa.States[currentStateID].Label == UNLABELLED && stringInstance.Accepting {
 						return false
 					}

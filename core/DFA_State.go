@@ -12,7 +12,7 @@ const (
 
 // State struct which represents a State within a DFA.
 type State struct {
-	Label       StateLabel // State Label (Rejecting, Accepting, or Unknown).
+	Label       StateLabel // State Label (Rejecting, Accepting, or Unlabelled).
 	Transitions []int      // Transition Table where each element corresponds to a transition for each symbol.
 	depth       int        // Depth of State within DFA.
 	order       int        // Order of State within DFA.
@@ -29,8 +29,8 @@ func (state State) IsRejecting() bool {
 	return state.Label == REJECTING
 }
 
-// IsUnknown returns true if state label is unknown, otherwise returns false.
-func (state State) IsUnknown() bool {
+// IsUnlabelled returns true if state label is unlabelled, otherwise returns false.
+func (state State) IsUnlabelled() bool {
 	return state.Label == UNLABELLED
 }
 
