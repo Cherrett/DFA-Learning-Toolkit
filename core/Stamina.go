@@ -83,7 +83,7 @@ func NewStringInstanceFromStaminaFile(text string, delimiter string) StringInsta
 	return stringInstance
 }
 
-// StaminaDFA returns a random DFA using the Stamina protocol given a number of states.
+// StaminaDFA returns a random DFA using the StaMinA protocol given a number of states.
 // This process is described in http://stamina.chefbe.net/machines and in
 // Walkinshaw, N., Lambeau, B., Damas, C., Bogdanov, K., & Dupont, P. (2012). STAMINA:
 // a competition to encourage the development and assessment of software model inference
@@ -419,7 +419,7 @@ func (dfa DFA) minimiseAndRemoveSinkState() DFA {
 }
 
 // StaminaDataset returns a training and testing Dataset using the
-// Stamina protocol given a DFA and a sparsity percentage.
+// StaMinA protocol given a DFA and a sparsity percentage.
 // This process is described in http://stamina.chefbe.net/samples and in
 // Walkinshaw, N., Lambeau, B., Damas, C., Bogdanov, K., & Dupont, P. (2012). STAMINA:
 // a competition to encourage the development and assessment of software model inference

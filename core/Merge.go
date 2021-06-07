@@ -16,11 +16,11 @@ type StatePairScore struct {
 // ScoringFunction takes two stateIDs and two state partitions as input and returns a score as a float.
 type ScoringFunction func(stateID1, stateID2 int, partitionBefore, partitionAfter StatePartition) float64
 
-// RPNISearch deterministically merges all possible state pairs within red-blue framework.
+// RedBlueSearch deterministically merges all possible state pairs within red-blue framework.
 // The first valid merge with respect to the rejecting examples is chosen.
 // Returns the resultant state partition and merge data when no more valid merges are possible.
 // Used by the regular positive and negative inference (RPNI) algorithm.
-func RPNISearch(statePartition StatePartition) (StatePartition, MergeData) {
+func RedBlueSearch(statePartition StatePartition) (StatePartition, MergeData) {
 	// Clone StatePartition.
 	statePartition = statePartition.Clone()
 	// Copy the state partition for undoing and copying changed states.
@@ -84,7 +84,7 @@ func RPNISearch(statePartition StatePartition) (StatePartition, MergeData) {
 }
 
 // UpdateRedBlueSets updates the red and blue sets given the state partition and the red set within the Red-Blue framework
-// such as the GeneralizedRedBlueMerging function. It returns the blue set and modifies the red set via its pointer. This is
+// such as the RedBlueSearch function. It returns the blue set and modifies the red set via its pointer. This is
 // used when the state partition is changed or when new states have been added to the red set.
 func UpdateRedBlueSets(statePartition *StatePartition, redStates *[]int) []int {
 	// Step 1 - Gather root of old red states and store in map declared below.
