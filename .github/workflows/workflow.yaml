@@ -54,4 +54,4 @@ jobs:
         golint
     
     - name: Run testing
-      run: cd test && go test dfalearningtoolkit_test.go -v
+      run: cd test && go test dfalearningtoolkit_test.go -v -timeout 30m

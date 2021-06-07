@@ -15,7 +15,7 @@ func main() {
 
 	// Random Seed.
 	rand.Seed(time.Now().UnixNano())
-	
+
 	for _, fileName := range []string{"2_16_100.txt", "2_32_250.txt", "2_32_500.txt", "2_64_750.txt"}{
 		trainingDataset := dfalearningtoolkit.GetDatasetFromStaminaFile(fmt.Sprintf("datasets/Comparison/%s", fileName))
 
