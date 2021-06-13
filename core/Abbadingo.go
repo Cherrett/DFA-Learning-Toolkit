@@ -278,7 +278,7 @@ func (dataset Dataset) ToAbbadingoFile(filePath string) {
 
 // GenerateJSONAPTAs generates a number of APTAs and writes them to a JSON file.
 func GenerateJSONAPTAs(directory string, iterations, targetDFASize, trainingSetSize int) {
-	for i := 0; i < iterations; i ++ {
+	for i := 0; i < iterations; i++ {
 		// Generate training set.
 		_, trainingSet, _ := AbbadingoInstanceExact(targetDFASize, true, trainingSetSize, 1800)
 

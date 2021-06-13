@@ -88,13 +88,13 @@ func (dfa *DFA) ToDOT(filePath string, symbolMapping map[int]string, showOrder b
 	for stateID, state := range dfa.States {
 		for symbol := range dfa.Alphabet {
 			if symbolMapping == nil {
-				resultantStateID := state.Transitions[symbol]
+				resultantStateID := state.GetTransitionValue(symbol)
 				if resultantStateID > -1 {
 					_, _ = writer.WriteString(fmt.Sprintf("\tq%d->q%d [label=\"%d\" fontname=verdana fontsize=8];\n", stateID, resultantStateID, symbol))
 				}
 			} else {
 				if value, exists := symbolMapping[symbol]; exists {
-					resultantStateID := state.Transitions[symbol]
+					resultantStateID := state.GetTransitionValue(symbol)
 					if resultantStateID > -1 {
 						_, _ = writer.WriteString(fmt.Sprintf("\tq%d->q%d [label=\"%s\" fontname=verdana fontsize=8];\n", stateID, resultantStateID, value))
 					}

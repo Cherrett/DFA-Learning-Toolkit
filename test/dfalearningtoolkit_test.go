@@ -246,7 +246,7 @@ func TestDFAJSON(t *testing.T) {
 	aptaDepths := []int{11, 13, 15}
 
 	// Iterate over 3 different sizes of target DFA.
-	for i, aptaName := range []int{16, 32, 64}{
+	for i, aptaName := range []int{16, 32, 64} {
 		// Read DFA/APTA from JSON.
 		APTA, valid := dfalearningtoolkit.DFAFromJSON(fmt.Sprintf("../datasets/TestingAPTAs/%d.json", aptaName))
 
@@ -420,7 +420,7 @@ func TestExhaustiveEDSM(t *testing.T) {
 		}
 
 		// Run Exhaustive EDSM on APTA.
-		resultantDFA, mergeData = dfalearningtoolkit.ExhaustiveEDSM(APTA)
+		resultantDFA, mergeData = dfalearningtoolkit.ExhaustiveEDSM(*APTA)
 
 		if len(resultantDFA.States) != resultantNumberOfStates[i] ||
 			mergeData.AttemptedMergesCount != resultantAttemptedMergesCount[i] ||
@@ -482,7 +482,7 @@ func TestWindowedEDSM(t *testing.T) {
 		}
 
 		// Run Windowed EDSM on APTA.
-		resultantDFA, mergeData = dfalearningtoolkit.WindowedEDSM(APTA, dfaSize*2, 2.0)
+		resultantDFA, mergeData = dfalearningtoolkit.WindowedEDSM(*APTA, dfaSize*2, 2.0)
 
 		if len(resultantDFA.States) != resultantNumberOfStates[i] ||
 			mergeData.AttemptedMergesCount != resultantAttemptedMergesCount[i] ||
@@ -544,7 +544,7 @@ func TestBlueFringeEDSM(t *testing.T) {
 		}
 
 		// Run Blue-Fringe EDSM on APTA.
-		resultantDFA, mergeData = dfalearningtoolkit.BlueFringeEDSM(APTA)
+		resultantDFA, mergeData = dfalearningtoolkit.BlueFringeEDSM(*APTA)
 
 		if len(resultantDFA.States) != resultantNumberOfStates[i] ||
 			mergeData.AttemptedMergesCount != resultantAttemptedMergesCount[i] ||

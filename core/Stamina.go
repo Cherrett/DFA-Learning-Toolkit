@@ -226,7 +226,7 @@ func modifiedForestFire(currentState int, ambassadorState int, dfa *DFA, visited
 	for symbol := range dfa.Alphabet {
 		// If resultant state is valid, not visited, not in to states, and not
 		// equal to current state, add to toStatesSet map and to toStates slice.
-		if resultantStateID := dfa.States[ambassadorState].Transitions[symbol]; resultantStateID >= 0 &&
+		if resultantStateID := dfa.States[ambassadorState].GetTransitionValue(symbol); resultantStateID >= 0 &&
 			!(*visitedStates)[resultantStateID] && !toStatesSet[resultantStateID] {
 			toStatesSet[resultantStateID] = true
 			toStates = append(toStates, resultantStateID)
@@ -250,7 +250,7 @@ func modifiedForestFire(currentState int, ambassadorState int, dfa *DFA, visited
 			for symbol := range dfa.Alphabet {
 				// If resultant state is equal to ID of ambassador state and not equal
 				// to current state, add to fromStates slice and break.
-				if resultantStateID := state.Transitions[symbol]; resultantStateID == ambassadorState && !toStatesSet[stateID] {
+				if resultantStateID := state.GetTransitionValue(symbol); resultantStateID == ambassadorState && !toStatesSet[stateID] {
 					fromStates = append(fromStates, stateID)
 					break
 				}
@@ -353,10 +353,10 @@ func addTransitionInternal(fromState, toState int, dfa *DFA) {
 	var alphabetPool []int
 
 	// Iterate over each symbol within alphabet.
-	for symbolID := range dfa.Alphabet {
+	for symbol := range dfa.Alphabet {
 		// If resultant state ID is smaller than 0 (does not exist), add to alphabet pool.
-		if resultantStateID := dfa.States[fromState].Transitions[symbolID]; resultantStateID < 0 {
-			alphabetPool = append(alphabetPool, symbolID)
+		if resultantStateID := dfa.States[fromState].GetTransitionValue(symbol); resultantStateID < 0 {
+			alphabetPool = append(alphabetPool, symbol)
 		}
 	}
 
@@ -459,7 +459,7 @@ func StaminaDataset(dfa DFA, sparsityPercentage float64, initialStringsGenerated
 
 			currentString.Value = append(currentString.Value, validSymbol)
 
-			currentState = &dfa.States[currentState.Transitions[validSymbol]]
+			currentState = &dfa.States[currentState.GetTransitionValue(validSymbol)]
 		}
 
 		if currentState.IsAccepting() {
@@ -790,12 +790,12 @@ func (dfa DFA) ToStaminaFile(filePath string) {
 	// Iterate over each state within dfa.
 	for stateID, state := range dfa.States {
 		// Write transitions information.
-		for symbolID := range dfa.Alphabet {
+		for symbol := range dfa.Alphabet {
 			// Write if transition exists.
-			if resultantStateID := state.Transitions[symbolID]; resultantStateID > -1 {
+			if resultantStateID := state.GetTransitionValue(symbol); resultantStateID > -1 {
 				_, _ = writer.WriteString(strconv.Itoa(stateID) + " " +
 					strconv.Itoa(resultantStateID) + " " +
-					strconv.Itoa(symbolID) + "\n")
+					strconv.Itoa(symbol) + "\n")
 			}
 		}
 	}

@@ -581,7 +581,7 @@ func TestBenchmarkAutomataTeams(t *testing.T) {
 }
 
 // TestBenchmarkAll benchmarks the performance of the ExhaustiveEDSMFromDataset(), FastWindowedEDSMFromDataset(),
-// WindowedEDSMFromDataset(), BlueFringeEDSMFromDataset(), RPNIFromDataset() and GRBM() functions while comparing their performance.
+// WindowedEDSMFromDataset(), BlueFringeEDSMFromDataset(), RPNIFromDataset() and AutomataTeams() functions while comparing their performance.
 func TestBenchmarkAll(t *testing.T) {
 	// Random Seed.
 	rand.Seed(time.Now().UnixNano())
@@ -721,7 +721,7 @@ func TestBenchmarkAll(t *testing.T) {
 }
 
 // TestBenchmarkFastAll concurrently benchmarks the performance of the ExhaustiveEDSM(), FastWindowedEDSM(),
-// WindowedEDSM(), BlueFringeEDSM(), RPNI() and GRBM() functions while comparing their performance.
+// WindowedEDSM(), BlueFringeEDSM(), RPNI() and AutomataTeams() functions while comparing their performance.
 func TestBenchmarkFastAll(t *testing.T) {
 	// Random Seed.
 	rand.Seed(time.Now().UnixNano())
@@ -926,5 +926,3 @@ func PrintBenchmarkInformation(accuracies, numberOfStates, duration, mergesPerSe
 
 	_ = w.Flush()
 }
-
-// -------------------- BENCHMARKS USING STAMINA PROTOCOL --------------------
