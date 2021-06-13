@@ -10,7 +10,10 @@ const (
 	UNLABELLED        // 2
 )
 
-// State struct which represents a State within a DFA.
+// State struct which represents a State within a DFA. Please note that while
+// the Transitions are made to be accessible from outside of this toolkit use
+// AddTransition, UpdateTransition and GetTransitionValue where required. It
+// was left public to be accessible to json.Marshal for import/export.
 type State struct {
 	Label       StateLabel // State Label (Rejecting, Accepting, or Unlabelled).
 	Transitions []int      // Transition Table where each element corresponds to a transition for each symbol.
@@ -32,6 +35,60 @@ func (state State) IsRejecting() bool {
 // IsUnlabelled returns true if state label is unlabelled, otherwise returns false.
 func (state State) IsUnlabelled() bool {
 	return state.Label == UNLABELLED
+}
+
+// GetTransitions returns the transitions from the current state.
+func (state State) GetTransitions() []int {
+	// Return transitions.
+	return state.Transitions
+}
+
+// AddTransition adds a transition given a stateID. The stateID can be set to -1
+// which indicates that the transition for this symbol does not exist (not valid).
+func (state *State) AddTransition(stateID int) {
+	// Panic if stateID is out of range.
+	if stateID > len(state.dfa.States)-1 {
+		panic("stateID out of range.")
+	}
+
+	// Add new transition using stateID value.
+	state.Transitions = append(state.Transitions, stateID)
+
+	// Set computedDepthAndOrder flag to false since DFA was modified.
+	state.dfa.computedDepthAndOrder = false
+}
+
+// UpdateTransition updates a transition given a symbolID and stateID. This
+// is recommended to be used when changing transitions since it updates the
+// computedDepthAndOrder flag within DFA. The stateID can be set to -1 to
+// 'remove' the transition or any other stateID to add or modify a transition.
+func (state *State) UpdateTransition(symbolID, stateID int) {
+	// Panic if symbolID is out of range.
+	if symbolID > len(state.Transitions)-1 {
+		panic("symbolID out of range.")
+	}
+
+	// Panic if stateID is out of range.
+	if stateID > len(state.dfa.States)-1 {
+		panic("stateID out of range.")
+	}
+
+	// Update transition.
+	state.Transitions[symbolID] = stateID
+
+	// Set computedDepthAndOrder flag to false since DFA was modified.
+	state.dfa.computedDepthAndOrder = false
+}
+
+// GetTransitionValue returns the transition value given a symbolID.
+func (state State) GetTransitionValue(symbolID int) int {
+	// Panic if symbolID is out of range.
+	if symbolID > len(state.Transitions)-1 {
+		panic("symbolID out of range.")
+	}
+
+	// Return transition value given symbolID.
+	return state.Transitions[symbolID]
 }
 
 // InDegree returns the in degree of the state.
@@ -168,7 +225,7 @@ func (state State) TransitionsCount(stateID int) int {
 	// Iterate over each symbol within DFA.
 	for symbol := range state.DFA().Alphabet {
 		// If transition is to given state ID, increment transitions count.
-		if state.Transitions[symbol] == stateID {
+		if state.GetTransitionValue(symbol) == stateID {
 			transitionsCount++
 		}
 	}

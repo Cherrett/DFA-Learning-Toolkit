@@ -44,8 +44,8 @@ func (dfa *DFA) IndistinguishableStatePairs() []StateIDPair {
 				} else {
 					// Iterate over each symbol within DFA.
 					for symbol := range dfa.Alphabet {
-						resultantStateID1 := dfa.States[stateID].Transitions[symbol]
-						resultantStateID2 := dfa.States[stateID2].Transitions[symbol]
+						resultantStateID1 := dfa.States[stateID].GetTransitionValue(symbol)
+						resultantStateID2 := dfa.States[stateID2].GetTransitionValue(symbol)
 						// If both states have a valid transition using current symbol.
 						if resultantStateID1 >= 0 && resultantStateID2 >= 0 {
 							// If pair containing both resultant state IDs is marked as distinguishable,
@@ -151,11 +151,11 @@ func (dfa *DFA) AddSinkState() int {
 	// Iterate over each state within DFA.
 	for stateID := range dfa.States {
 		// Iterate over alphabet within DFA.
-		for symbolID := range dfa.Alphabet {
+		for symbol := range dfa.Alphabet {
 			// If a transition does not exist with symbol.
-			if dfa.States[stateID].Transitions[symbolID] == -1 {
+			if dfa.States[stateID].GetTransitionValue(symbol) == -1 {
 				// Add a transition to sink state using symbol.
-				dfa.States[stateID].Transitions[symbolID] = sinkStateID
+				dfa.States[stateID].UpdateTransition(symbol, sinkStateID)
 			}
 		}
 	}

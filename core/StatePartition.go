@@ -60,7 +60,7 @@ func NewStatePartition(referenceDFA DFA) StatePartition {
 		// Initialize transitions.
 		statePartition.Blocks[i].Transitions = make([]int, statePartition.AlphabetSize)
 		for symbol := range referenceDFA.Alphabet {
-			statePartition.Blocks[i].Transitions[symbol] = referenceDFA.States[i].Transitions[symbol]
+			statePartition.Blocks[i].Transitions[symbol] = referenceDFA.States[i].GetTransitionValue(symbol)
 		}
 	}
 
@@ -208,7 +208,7 @@ func (statePartition *StatePartition) ToQuotientDFA() DFA {
 	for _, stateID := range rootBlocks {
 		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
 			if resultantState := statePartition.Blocks[stateID].Transitions[symbol]; resultantState > -1 {
-				resultantDFA.States[blockToStateMap[stateID]].Transitions[symbol] = blockToStateMap[statePartition.Find(resultantState)]
+				resultantDFA.States[blockToStateMap[stateID]].UpdateTransition(symbol, blockToStateMap[statePartition.Find(resultantState)])
 			}
 		}
 	}
@@ -243,7 +243,7 @@ func (statePartition *StatePartition) ToQuotientDFAWithMapping() (DFA, map[int]i
 	for _, stateID := range rootBlocks {
 		for symbol := 0; symbol < statePartition.AlphabetSize; symbol++ {
 			if resultantState := statePartition.Blocks[stateID].Transitions[symbol]; resultantState > -1 {
-				resultantDFA.States[blockToStateMap[stateID]].Transitions[symbol] = blockToStateMap[statePartition.Find(resultantState)]
+				resultantDFA.States[blockToStateMap[stateID]].UpdateTransition(symbol, blockToStateMap[statePartition.Find(resultantState)])
 			}
 		}
 	}

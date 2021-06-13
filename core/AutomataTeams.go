@@ -169,8 +169,8 @@ func UpdateRedBlueSetsWithShuffle(statePartition *StatePartition, redStates *[]i
 	return blueStates
 }
 
-// GeneralizedRedBlueMergingFromDataset is a.
-// It takes a dataset as an argument which is used to generate an APTA.
+// GeneralizedRedBlueMergingFromDataset takes a dataset as an argument which is used to generate an APTA.
+// This APTA is then used within the GeneralizedRedBlueMerging to do a GRBM search on.
 func GeneralizedRedBlueMergingFromDataset(dataset Dataset) (DFA, MergeData) {
 	// Construct an APTA from dataset.
 	APTA := dataset.GetPTA(true)
@@ -180,8 +180,7 @@ func GeneralizedRedBlueMergingFromDataset(dataset Dataset) (DFA, MergeData) {
 	return GeneralizedRedBlueMerging(APTA)
 }
 
-// GeneralizedRedBlueMerging is a.
-// It takes a DFA (APTA) as an argument which is used within the greedy search.
+// GeneralizedRedBlueMerging takes a DFA (APTA) as an argument which is used within the GRBM search.
 func GeneralizedRedBlueMerging(APTA DFA) (DFA, MergeData) {
 	// Convert APTA to StatePartition for state merging.
 	statePartition := APTA.ToStatePartition()
@@ -396,6 +395,51 @@ func (teamOfAutomata TeamOfAutomata) BetterHalfWeightedVoteAccuracy(dataset Data
 				accepting += 1 / (dfaSize * dfaSize)
 			} else {
 				unlabelledOrRejecting += 1 / (dfaSize * dfaSize)
+			}
+		}
+
+		if accepting > unlabelledOrRejecting {
+			return ACCEPTING
+		} else if unlabelledOrRejecting > accepting {
+			return REJECTING
+		} else {
+			if rand.Intn(2) == 0 {
+				return ACCEPTING
+			}
+
+			return REJECTING
+		}
+	}
+
+	return teamOfAutomata.Accuracy(dataset, weightedVote)
+}
+
+// SmallestDFAVoteAccuracy returns the TeamOfAutomata's Accuracy with respect to a dataset
+// using the smallest dfa vote scoring heuristic.
+func (teamOfAutomata TeamOfAutomata) SmallestDFAVoteAccuracy(dataset Dataset) float64 {
+	smallestSize := 0
+
+	for _, dfa := range teamOfAutomata.Team {
+		if len(dfa.States) < smallestSize {
+			smallestSize = len(dfa.States)
+		}
+	}
+
+	weightedVote := func(stringInstance StringInstance) StateLabel {
+		accepting := 0.0
+		unlabelledOrRejecting := 0.0
+
+		for _, dfa := range teamOfAutomata.Team {
+			dfaSize := len(dfa.States)
+
+			if dfaSize == smallestSize {
+				continue
+			}
+
+			if stringInstance.ParseToStateLabel(dfa) == ACCEPTING {
+				accepting++
+			} else {
+				unlabelledOrRejecting++
 			}
 		}
 

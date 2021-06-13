@@ -77,8 +77,8 @@ func (dataset Dataset) GetPTA(APTA bool) DFA {
 
 			// If a transition exists from the current state to any other state via
 			// the current symbol, set resultant state ID to current state ID.
-			if dfa.States[currentStateID].Transitions[symbol] >= 0 {
-				currentStateID = dfa.States[currentStateID].Transitions[symbol]
+			if resultantStateID := dfa.States[currentStateID].GetTransitionValue(symbol); resultantStateID >= 0 {
+				currentStateID = resultantStateID
 				// Check if last symbol in string.
 				if count == stringInstance.Length() {
 					if stringInstance.Accepting {
@@ -167,8 +167,8 @@ func (stringInstance StringInstance) ConsistentWithDFA(dfa DFA) bool {
 
 		// If a transition exists from the current state to any other state via
 		// the current symbol, set resultant state ID to current state ID.
-		if dfa.States[currentStateID].Transitions[symbol] >= 0 {
-			currentStateID = dfa.States[currentStateID].Transitions[symbol]
+		if resultantStateID := dfa.States[currentStateID].GetTransitionValue(symbol); resultantStateID >= 0 {
+			currentStateID = resultantStateID
 			// Check if last symbol in string.
 			if count == stringInstance.Length() {
 				if stringInstance.Accepting {
@@ -347,8 +347,8 @@ func (stringInstance StringInstance) ParseToStateLabel(dfa DFA) StateLabel {
 
 		// If a transition exists from the current state to any other state via
 		// the current symbol, set resultant state ID to current state ID.
-		if dfa.States[currentStateID].Transitions[symbol] >= 0 {
-			currentStateID = dfa.States[currentStateID].Transitions[symbol]
+		if resultantStateID := dfa.States[currentStateID].GetTransitionValue(symbol); resultantStateID >= 0 {
+			currentStateID = resultantStateID
 			// Check if last symbol in string.
 			if count == stringInstance.Length() {
 				// If state is unlabelled or rejecting, return rejecting.
@@ -390,8 +390,8 @@ func (stringInstance StringInstance) ParseToState(dfa DFA) (bool, int) {
 
 		// If a transition exists from the current state to any other state via
 		// the current symbol, set resultant state ID to current state ID.
-		if dfa.States[currentStateID].Transitions[symbol] >= 0 {
-			currentStateID = dfa.States[currentStateID].Transitions[symbol]
+		if resultantStateID := dfa.States[currentStateID].GetTransitionValue(symbol); resultantStateID >= 0 {
+			currentStateID = resultantStateID
 			// If last symbol in string, return the current true and the current state ID.
 			if count == stringInstance.Length() {
 				return true, currentStateID
