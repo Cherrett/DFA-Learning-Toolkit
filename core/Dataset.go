@@ -513,31 +513,54 @@ func (dataset Dataset) Count() int {
 	return len(dataset)
 }
 
+// AverageLength returns the average length of string instances within dataset.
+func (dataset Dataset) AverageLength() float64 {
+	// Store sum count.
+	sum := 0
+
+	// Iterate over string instances and add
+	// string length to sum count.
+	for _, stringInstance := range dataset {
+		sum += stringInstance.Length()
+	}
+
+	// Divide sum count by length of dataset and return it.
+	return float64(sum) / float64(dataset.Count())
+}
+
 // AcceptingStringInstancesCount returns the number of accepting
 // string instances within dataset.
 func (dataset Dataset) AcceptingStringInstancesCount() int {
+	// Store count.
 	count := 0
 
+	// Iterate over string instances and
+	// increment count if string is accepting.
 	for _, stringInstance := range dataset {
 		if stringInstance.Accepting {
 			count++
 		}
 	}
 
+	// Return count.
 	return count
 }
 
 // RejectingStringInstancesCount returns the number of accepting
 // string instances within dataset.
 func (dataset Dataset) RejectingStringInstancesCount() int {
+	// Store count.
 	count := 0
 
+	// Iterate over string instances and
+	// increment count if string is rejecting.
 	for _, stringInstance := range dataset {
 		if !stringInstance.Accepting {
 			count++
 		}
 	}
 
+	// Return count.
 	return count
 }
 

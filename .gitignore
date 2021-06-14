@@ -86,3 +86,5 @@ env/
 
 go.sum
 cpu.pprof
+datasets/Generated Abbadingo/*/*
+datasets/Comparison/*/*

@@ -64,11 +64,11 @@ func main() {
 		totalTime := (time.Now()).Sub(start).Seconds()
 		fmt.Printf("Total merges: %d\n", totalMerges)
 		fmt.Printf("Valid merges: %d\n", validMerges)
-		fmt.Printf("Time: %.2fs\n", totalTime)
+		fmt.Printf("Time: %.4fs\n", totalTime)
 		fmt.Printf("Merges per second: %.2f\n", float64(totalMerges)/totalTime)
 	}
 
-	fmt.Println("\n Exhaustive EDSM")
+	fmt.Println("\nExhaustive EDSM")
 
 	// Number of iterations.
 	n := 128
@@ -100,7 +100,7 @@ func main() {
 	PrintBenchmarkInformation(numberOfStates, durations, mergesPerSec, merges, validMerges)
 	fmt.Println("--------------------------------------------------------------------------------------------")
 
-	fmt.Println("\n RPNI")
+	fmt.Println("\nRPNI")
 
 	// Number of iterations.
 	n = 128
@@ -149,7 +149,7 @@ func PrintBenchmarkInformation(numberOfStates, duration, mergesPerSec, merges, v
 	_, _ = fmt.Fprintf(w, "\t%s\t%s\t%s\t%s\t\n", "Minimum", "Maximum", "Average", "Standard Dev")
 	_, _ = fmt.Fprintf(w, "\t%s\t%s\t%s\t%s\t\n", "------------", "------------", "------------", "------------")
 	_, _ = fmt.Fprintf(w, "%s\t%d\t%d\t%d\t%d\t\n", "Number of States", int(numberOfStates.Min()), int(numberOfStates.Max()), int(numberOfStates.Mean()), int(numberOfStates.PopulationStandardDev()))
-	_, _ = fmt.Fprintf(w, "%s\t%.2f\t%.2f\t%.2f\t%.2f\t\n", "Duration", duration.Min(), duration.Max(), duration.Mean(), duration.PopulationStandardDev())
+	_, _ = fmt.Fprintf(w, "%s\t%.4f\t%.4f\t%.4f\t%.4f\t\n", "Duration", duration.Min(), duration.Max(), duration.Mean(), duration.PopulationStandardDev())
 	_, _ = fmt.Fprintf(w, "%s\t%d\t%d\t%d\t%d\t\n", "Merges/s", int(math.Round(mergesPerSec.Min())), int(math.Round(mergesPerSec.Max())), int(math.Round(mergesPerSec.Mean())), int(math.Round(mergesPerSec.PopulationStandardDev())))
 	_, _ = fmt.Fprintf(w, "%s\t%d\t%d\t%d\t%d\t\n", "Attempted Merges", int(merges.Min()), int(merges.Max()), int(merges.Mean()), int(merges.PopulationStandardDev()))
 	_, _ = fmt.Fprintf(w, "%s\t%d\t%d\t%d\t%d\t\n", "Valid Merges", int(validMerges.Min()), int(validMerges.Max()), int(validMerges.Mean()), int(validMerges.PopulationStandardDev()))
