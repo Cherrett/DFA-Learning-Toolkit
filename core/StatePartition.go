@@ -144,6 +144,7 @@ func (statePartition *StatePartition) Find(stateID int) int {
 			statePartition.ChangedBlock(stateID)
 			statePartition.Blocks[stateID].Root = statePartition.Blocks[statePartition.Blocks[stateID].Root].Root
 		}
+
 		stateID = statePartition.Blocks[stateID].Root
 	}
 
@@ -255,26 +256,26 @@ func (statePartition *StatePartition) ToQuotientDFAWithMapping() (DFA, map[int]i
 	return resultantDFA, blockToStateMap
 }
 
-// MergeStates recursively merges states to merge state1 and state2. Returns false if merge
-// results in a non-deterministic automaton. Returns true if merge was successful.
-func (statePartition *StatePartition) MergeStates(state1 int, state2 int) bool {
+// MergeStates recursively merges states to merge stateID1 and stateID2. Returns false if
+// merge results in a non-deterministic automaton. Returns true if merge was successful.
+func (statePartition *StatePartition) MergeStates(stateID1 int, stateID2 int) bool {
 	// If parent blocks (root) are the same as state ID, skip finding the root.
 	// Else, find the parent block (root) using Find function.
-	if statePartition.Blocks[state1].Root != state1 {
-		state1 = statePartition.Find(state1)
+	if statePartition.Blocks[stateID1].Root != stateID1 {
+		stateID1 = statePartition.Find(stateID1)
 	}
-	if statePartition.Blocks[state2].Root != state2 {
-		state2 = statePartition.Find(state2)
+	if statePartition.Blocks[stateID2].Root != stateID2 {
+		stateID2 = statePartition.Find(stateID2)
 	}
 
 	// Return true if states are already in the same block
 	// since merge is not required.
-	if state1 == state2 {
+	if stateID1 == stateID2 {
 		return true
 	}
 
 	// Get pointer of both blocks.
-	block1, block2 := &statePartition.Blocks[state1], &statePartition.Blocks[state2]
+	block1, block2 := &statePartition.Blocks[stateID1], &statePartition.Blocks[stateID2]
 
 	// If labels are contradicting, return false since this results
 	// in a non-deterministic automaton so merge cannot be done.
@@ -283,7 +284,7 @@ func (statePartition *StatePartition) MergeStates(state1 int, state2 int) bool {
 	}
 
 	// Merge states within state partition.
-	statePartition.Union(state1, state2)
+	statePartition.Union(stateID1, stateID2)
 
 	// Iterate over alphabet.
 	for i := 0; i < statePartition.AlphabetSize; i++ {
@@ -463,7 +464,7 @@ func (statePartition StatePartition) RootBlocks() []int {
 // OrderedBlocks returns the IDs of root blocks in order as a slice of integers.
 func (statePartition *StatePartition) OrderedBlocks() []int {
 	// Slice of boolean values to keep track of orders calculated.
-	orderComputed := make([]bool, statePartition.BlocksCount)
+	orderComputed := make([]bool, len(statePartition.Blocks))
 	// Slice of integer values to keep track of ordered blocks.
 	orderedBlocks := make([]int, statePartition.BlocksCount)
 

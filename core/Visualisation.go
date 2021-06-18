@@ -11,9 +11,9 @@ import (
 // the Abbadingo competition standard (using only a's and b's / 0s and 1s).
 var SymbolAlphabetMappingAbbadingo = map[int]string{0: "a", 1: "b"}
 
-// GraphViz.go consists of various functions which create a visualisation of a
-// given DFA or State Partition. Please note that GraphViz must be downloaded
-// and installed before hand from https://graphviz.org/download/.
+// Visualisation.go consists of various functions which create a visualisation of a
+// given DFA or State Partition. Please note that Graphviz must be downloaded
+// and installed before hand from https://graphviz.org/download.
 
 // ToDOT creates a .dot file using the DOT language. This DOT file
 // contains a representation for the given DFA which can then be used
