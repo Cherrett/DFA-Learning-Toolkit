@@ -11,12 +11,12 @@ import (
 )
 
 // GetDatasetFromAbbadingoFile returns a Dataset from an Abbadingo-Format File.
-func GetDatasetFromAbbadingoFile(fileName string) Dataset {
+func GetDatasetFromAbbadingoFile(filePath string) Dataset {
 	// Initialize new Dataset.
 	dataset := Dataset{}
 
 	// Open given file name.
-	file, err := os.Open(fileName)
+	file, err := os.Open(filePath)
 
 	// Panic if file does not exist.
 	if err != nil {

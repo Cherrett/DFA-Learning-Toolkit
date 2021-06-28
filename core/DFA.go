@@ -1022,14 +1022,14 @@ func (dfa DFA) ToJSON(filePath string) bool {
 // DFAFromJSON returns a pointer to a DFA read from a JSON file
 // given a file path. The boolean value returned is set to true
 // if DFA was read successfully.
-func DFAFromJSON(filePath string) (*DFA, bool) {
+func DFAFromJSON(filePath string) (DFA, bool) {
 	// Open file from given a path/name.
 	file, err := os.Open(filePath)
 
 	// If file was not opened successfully,
 	// return empty DFA and false.
 	if err != nil {
-		return &DFA{}, false
+		return DFA{}, false
 	}
 
 	// Close file at end of function.
@@ -1044,7 +1044,7 @@ func DFAFromJSON(filePath string) (*DFA, bool) {
 	// If JSON was not converted successfully,
 	// return empty DFA and false.
 	if err != nil {
-		return &DFA{}, false
+		return DFA{}, false
 	}
 
 	// Update DFA pointers within states.
@@ -1053,5 +1053,5 @@ func DFAFromJSON(filePath string) (*DFA, bool) {
 	}
 
 	// Return populated DFA and true if reached.
-	return &resultantDFA, true
+	return resultantDFA, true
 }

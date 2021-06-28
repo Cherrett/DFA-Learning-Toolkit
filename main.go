@@ -1,158 +1,175 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	dfalearningtoolkit "github.com/Cherrett/DFA-Learning-Toolkit/core"
-	"github.com/Cherrett/DFA-Learning-Toolkit/util"
-	"math"
-	"math/rand"
 	"os"
-	"runtime"
-	"text/tabwriter"
-	"time"
+	"strconv"
+	"strings"
 )
 
 func main() {
-	// PROFILING
-	// defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
-	// go tool pprof -http=:8081 cpu.pprof
+	var dfa dfalearningtoolkit.DFA
+	var dataset dfalearningtoolkit.Dataset = nil
+	reader := bufio.NewReader(os.Stdin)
+	exit := false
+	restart := false
 
-	// Random Seed.
-	rand.Seed(time.Now().UnixNano())
+	for !exit {
+		restart = false
+		fmt.Println("\nSelect from the following options\n1. Generate DFA and Dataset\n2. Read DFA/APTA from file\n3. Read Dataset from file\n4. Exit")
 
-	fmt.Println("BenchmarkMergeStates")
+		choice := readIntInput("Choice: ", reader)
 
-	// These are target DFA sizes we will test.
-	dfaSizes := []int{16, 32, 64}
-	// These are the training set sizes we will test.
-	trainingSetSizes := []int{230, 607, 1521}
+		// First main choice.
+		switch choice {
+		case 1:
+			// Generate DFA and Dataset
+			valid := false
 
-	// Benchmark over the problem instances.
-	for iterator := range dfaSizes {
-		targetSize := dfaSizes[iterator]
-		trainingSetSize := trainingSetSizes[iterator]
+			for !valid {
+				fmt.Println("\nSelect from the following options\n1. Generate DFA and Dataset using the Abbadingo Protocol\n2. Generate DFA and Dataset using the Stamina Protocol")
+				choice = readIntInput("Choice: ", reader)
 
-		fmt.Printf("-------------------------------------------------------------\n")
-		fmt.Printf("-------------------------------------------------------------\n")
-		fmt.Printf("BENCHMARK %d (Target: %d states, Training: %d strings\n", iterator+1, targetSize, trainingSetSize)
-		fmt.Printf("-------------------------------------------------------------\n")
-		fmt.Printf("-------------------------------------------------------------\n")
+				switch choice {
+				case 1:
+					valid = true
+					targetDFASize := readIntInput("Input size of target DFA: ", reader)
+					numberOfTrainingExamples := readIntInput("Input number of training examples: ", reader)
+					_, dataset, _ = dfalearningtoolkit.AbbadingoInstanceExact(targetDFASize, true, numberOfTrainingExamples, 0)
+				case 2:
+					valid = true
+					alphabetSize := readIntInput("Input alphabet size: ", reader)
+					targetDFASize := readIntInput("Input size of target DFA: ", reader)
+					sparsityPercentage := readFloatInput("Input sparsity percentage of training set (in floating point form): ", reader)
 
-		// Read APTA.
-		apta, _ := dfalearningtoolkit.DFAFromJSON(fmt.Sprintf("datasets/TestingAPTAs/%d.json", targetSize))
-
-		fmt.Printf("APTA size: %d\n", len(apta.States))
-
-		// Perform all the merges.
-		part := apta.ToStatePartition()
-		snapshot := part.Copy()
-		totalMerges := 0
-		validMerges := 0
-		start := time.Now()
-
-		for i := 0; i < len(apta.States); i++ {
-			for j := i + 1; j < len(apta.States); j++ {
-				totalMerges++
-				if snapshot.MergeStates(i, j) {
-					validMerges++
+					_, dataset, _ = dfalearningtoolkit.DefaultStaminaInstance(alphabetSize, targetDFASize, sparsityPercentage)
+				default:
+					fmt.Println("Invalid choice. Please choose from options 1-2.")
 				}
-
-				snapshot.RollbackChangesFrom(part)
 			}
+
+		case 2:
+			// Read DFA/APTA from file
+			valid := false
+
+			for !valid {
+				fmt.Println("\nSelect from the following options\n1. Read DFA/APTA from JSON\n2. Read DFA/APTA from Stamina file")
+				choice = readIntInput("Choice: ", reader)
+
+				switch choice {
+				case 1:
+					valid = true
+					filePath := readInput("Input file path of JSON DFA file: ", reader)
+					dfa, valid = dfalearningtoolkit.DFAFromJSON(filePath)
+				case 2:
+					filePath := readInput("Input file path of Stamina DFA file: ", reader)
+					dfa = dfalearningtoolkit.GetDFAFromStaminaFile(filePath)
+					valid = true
+				default:
+					fmt.Println("Invalid choice. Please choose from options 1-2.")
+				}
+			}
+		case 3:
+			// Read Dataset from file
+			valid := false
+
+			for !valid {
+				fmt.Println("\nSelect from the following options\n1. Read Dataset from JSON\n2. Read Dataset from Abbadingo file\n3. Read Dataset from Stamina file")
+				choice = readIntInput("Choice: ", reader)
+
+				switch choice {
+				case 1:
+					valid = true
+					filePath := readInput("Input file path of JSON Dataset file: ", reader)
+					dataset, valid = dfalearningtoolkit.DatasetFromJSON(filePath)
+				case 2:
+					filePath := readInput("Input file path of Abbadingo Dataset file: ", reader)
+					dataset = dfalearningtoolkit.GetDatasetFromAbbadingoFile(filePath)
+					valid = true
+				case 3:
+					filePath := readInput("Input file path of Stamina Dataset file: ", reader)
+					dataset = dfalearningtoolkit.GetDatasetFromStaminaFile(filePath)
+					valid = true
+				default:
+					fmt.Println("Invalid choice. Please choose from options 1-2.")
+				}
+			}
+		case 4:
+			fmt.Println("Exiting.")
+			exit = true
+		default:
+			fmt.Println("Invalid choice. Please choose from options 1-4.")
+			restart = true
 		}
 
-		totalTime := (time.Now()).Sub(start).Seconds()
-		fmt.Printf("Total merges: %d\n", totalMerges)
-		fmt.Printf("Valid merges: %d\n", validMerges)
-		fmt.Printf("Time: %.4fs\n", totalTime)
-		fmt.Printf("Merges per second: %.2f\n", float64(totalMerges)/totalTime)
+		for !exit && !restart {
+			// Second main choice.
+			fmt.Println("\nSelect from the following options\n1. Run EDSM on DFA/APTA or Dataset generated/read\n2. Run RPNI on DFA/APTA or Dataset generated/read\n3. Run AutomataTeams on DFA or Dataset generated/read\n4. Visualisation of DFA/APTA\n5. Exit")
+			choice = readIntInput("Choice: ", reader)
+
+			switch choice {
+			case 1:
+
+			case 2:
+
+			case 3:
+
+			case 4:
+
+			case 5:
+				fmt.Println("Exiting.")
+				exit = true
+			default:
+				fmt.Println("Invalid choice. Please choose from options 1-4.")
+			}
+
+			dfa.ToJSON("")
+			dataset.ToJSON("")
+		}
 	}
-
-	fmt.Println("\nExhaustive EDSM")
-
-	// Number of iterations.
-	n := 128
-	// Target size.
-	targetSize := 32
-
-	numberOfStates := util.NewStatsTracker()
-	durations := util.NewStatsTracker()
-	mergesPerSec := util.NewStatsTracker()
-	merges := util.NewStatsTracker()
-	validMerges := util.NewStatsTracker()
-
-	for i := 0; i < n; i++ {
-		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
-
-		// Read APTA from file.
-		apta, _ := dfalearningtoolkit.DFAFromJSON(fmt.Sprintf("datasets/Generated Abbadingo/%d/%d.json", targetSize, i))
-
-		resultantDFA, mergeData := dfalearningtoolkit.ExhaustiveEDSM(*apta)
-
-		numberOfStates.AddInt(len(resultantDFA.States))
-		durations.Add(mergeData.Duration.Seconds())
-		mergesPerSec.Add(mergeData.AttemptedMergesPerSecond())
-		merges.AddInt(mergeData.AttemptedMergesCount)
-		validMerges.AddInt(mergeData.ValidMergesCount)
-	}
-
-	fmt.Println("--------------------------------------------------------------------------------------------")
-	PrintBenchmarkInformation(numberOfStates, durations, mergesPerSec, merges, validMerges)
-	fmt.Println("--------------------------------------------------------------------------------------------")
-
-	fmt.Println("\nRPNI")
-
-	// Number of iterations.
-	n = 128
-	// Target size.
-	targetSize = 32
-
-	numberOfStates = util.NewStatsTracker()
-	durations = util.NewStatsTracker()
-	mergesPerSec = util.NewStatsTracker()
-	merges = util.NewStatsTracker()
-	validMerges = util.NewStatsTracker()
-
-	for i := 0; i < n; i++ {
-		fmt.Printf("BENCHMARK %d/%d\n", i+1, n)
-
-		// Read APTA from file.
-		apta, _ := dfalearningtoolkit.DFAFromJSON(fmt.Sprintf("datasets/Generated Abbadingo/%d/%d.json", targetSize, i))
-
-		resultantDFA, mergeData := dfalearningtoolkit.RPNI(*apta)
-
-		numberOfStates.AddInt(len(resultantDFA.States))
-		durations.Add(mergeData.Duration.Seconds())
-		mergesPerSec.Add(mergeData.AttemptedMergesPerSecond())
-		merges.AddInt(mergeData.AttemptedMergesCount)
-		validMerges.AddInt(mergeData.ValidMergesCount)
-	}
-
-	fmt.Println("--------------------------------------------------------------------------------------------")
-	PrintBenchmarkInformation(numberOfStates, durations, mergesPerSec, merges, validMerges)
-	fmt.Println("--------------------------------------------------------------------------------------------")
 }
 
-func PrintBenchmarkInformation(numberOfStates, duration, mergesPerSec, merges, validMerges util.StatsTracker) {
-	// Initialize tabwriter.
-	w := new(tabwriter.Writer)
+func readInput(prompt string, reader *bufio.Reader) string {
+	fmt.Print(prompt)
+	value, err := reader.ReadString('\n')
 
-	// Determine OS tab width using runtime.GOOS.
-	tabWidth := 4
-
-	if runtime.GOOS != "windows" {
-		tabWidth = 8
+	if err != nil {
+		fmt.Println("Invalid input.")
+		fmt.Print(prompt)
+		value, err = reader.ReadString('\n')
 	}
 
-	w.Init(os.Stdout, 17, tabWidth, 0, '\t', 0)
+	return strings.TrimRight(value, "\r\n")
+}
 
-	_, _ = fmt.Fprintf(w, "\t%s\t%s\t%s\t%s\t\n", "Minimum", "Maximum", "Average", "Standard Dev")
-	_, _ = fmt.Fprintf(w, "\t%s\t%s\t%s\t%s\t\n", "------------", "------------", "------------", "------------")
-	_, _ = fmt.Fprintf(w, "%s\t%d\t%d\t%d\t%d\t\n", "Number of States", int(numberOfStates.Min()), int(numberOfStates.Max()), int(numberOfStates.Mean()), int(numberOfStates.PopulationStandardDev()))
-	_, _ = fmt.Fprintf(w, "%s\t%.4f\t%.4f\t%.4f\t%.4f\t\n", "Duration", duration.Min(), duration.Max(), duration.Mean(), duration.PopulationStandardDev())
-	_, _ = fmt.Fprintf(w, "%s\t%d\t%d\t%d\t%d\t\n", "Merges/s", int(math.Round(mergesPerSec.Min())), int(math.Round(mergesPerSec.Max())), int(math.Round(mergesPerSec.Mean())), int(math.Round(mergesPerSec.PopulationStandardDev())))
-	_, _ = fmt.Fprintf(w, "%s\t%d\t%d\t%d\t%d\t\n", "Attempted Merges", int(merges.Min()), int(merges.Max()), int(merges.Mean()), int(merges.PopulationStandardDev()))
-	_, _ = fmt.Fprintf(w, "%s\t%d\t%d\t%d\t%d\t\n", "Valid Merges", int(validMerges.Min()), int(validMerges.Max()), int(validMerges.Mean()), int(validMerges.PopulationStandardDev()))
+func readIntInput(prompt string, reader *bufio.Reader) int {
+	fmt.Print(prompt)
+	value, err := reader.ReadString('\n')
+	intValue, err2 := strconv.Atoi(strings.TrimRight(value, "\r\n"))
 
-	_ = w.Flush()
+	if err != nil || err2 != nil {
+		fmt.Println("Invalid input.")
+		fmt.Print(prompt)
+		value, err = reader.ReadString('\n')
+		intValue, err2 = strconv.Atoi(strings.TrimRight(value, "\r\n"))
+	}
+
+	return intValue
+}
+
+func readFloatInput(prompt string, reader *bufio.Reader) float64 {
+	fmt.Print(prompt)
+	value, err := reader.ReadString('\n')
+	floatValue, err2 := strconv.ParseFloat(strings.TrimRight(value, "\r\n"), 64)
+
+	if err != nil || err2 != nil {
+		fmt.Println("Invalid input.")
+		fmt.Print(prompt)
+		value, err = reader.ReadString('\n')
+		floatValue, err2 = strconv.ParseFloat(strings.TrimRight(value, "\r\n"), 64)
+	}
+
+	return floatValue
 }

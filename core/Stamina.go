@@ -12,12 +12,12 @@ import (
 )
 
 // GetDatasetFromStaminaFile returns a Dataset from a Stamina-Format File.
-func GetDatasetFromStaminaFile(fileName string) Dataset {
+func GetDatasetFromStaminaFile(filePath string) Dataset {
 	// Initialize new Dataset.
 	dataset := Dataset{}
 
 	// Open given file name.
-	file, err := os.Open(fileName)
+	file, err := os.Open(filePath)
 
 	// Panic if file does not exist.
 	if err != nil {
@@ -646,12 +646,12 @@ func (dataset Dataset) ToStaminaFile(filePath string) {
 }
 
 // GetDFAFromStaminaFile returns a DFA from a Stamina-Format File (adl).
-func GetDFAFromStaminaFile(fileName string) DFA {
+func GetDFAFromStaminaFile(filePath string) DFA {
 	// Initialize new DFA.
 	dfa := NewDFA()
 
 	// Open given file name.
-	file, err := os.Open(fileName)
+	file, err := os.Open(filePath)
 
 	// Panic if file does not exist.
 	if err != nil {
