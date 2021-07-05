@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#375EAB">
+
+  <title>util - Go Documentation Server</title>
+
+<link type="text/css" rel="stylesheet" href="lib/godoc/style.css">
+
+<script>window.initFuncs = [];</script>
+<script src="lib/godoc/jquery.js" defer></script>
+
+
+
+<script>var goVersion = "go1.16.5";</script>
+<script src="lib/godoc/godocs.js" defer></script>
+</head>
+<body>
+
+<div id='lowframe' style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide"><a href="util.html">Go Documentation Server</a></div>
+<div class="top-heading" id="heading-narrow"><a href="util.html">GoDoc</a></div>
+<a href="#" id="menu-button"><span id="menu-button-arrow">&#9661;</span></a>
+</div></div>
+
+
+
+<div id="page" class="wide">
+<div class="container">
+
+
+  <h1>
+    Package util
+    <span class="text-muted"></span>
+  </h1>
+
+
+
+
+
+
+
+<div id="nav"></div>
+
+
+<!--
+	Copyright 2009 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+<!--
+	Note: Static (i.e., not template-generated) href and id
+	attributes start with "pkg-" to make it impossible for
+	them to conflict with generated attributes (some of which
+	correspond to Go identifiers).
+-->
+
+	<script>
+	document.ANALYSIS_DATA = null;
+	document.CALLGRAPH = null;
+	</script>
+
+	
+		
+		<div id="short-nav">
+			<dl>
+			<dd><code>import "github.com/Cherrett/DFA-Learning-Toolkit/util"</code></dd>
+			</dl>
+			<dl>
+			<dd><a href="#pkg-overview" class="overviewLink">Overview</a></dd>
+			<dd><a href="#pkg-index" class="indexLink">Index</a></dd>
+			
+			
+			</dl>
+		</div>
+		<!-- The package's Name is printed as title by the top-level template -->
+		<div id="pkg-overview" class="toggleVisible">
+			<div class="collapsed">
+				<h2 class="toggleButton" title="Click to show Overview section">Overview ▹</h2>
+			</div>
+			<div class="expanded">
+				<h2 class="toggleButton" title="Click to hide Overview section">Overview ▾</h2>
+				
+				
+			</div>
+		</div>
+
+		<div id="pkg-index" class="toggleVisible">
+		<div class="collapsed">
+			<h2 class="toggleButton" title="Click to show Index section">Index ▹</h2>
+		</div>
+		<div class="expanded">
+			<h2 class="toggleButton" title="Click to hide Index section">Index ▾</h2>
+
+		<!-- Table of contents for API; must be named manual-nav to turn off auto nav. -->
+			<div id="manual-nav">
+			<dl>
+			
+			
+			
+				
+				<dd><a href="#DownloadAllStaminaDatasets">func DownloadAllStaminaDatasets(directory string)</a></dd>
+			
+				
+				<dd><a href="#Factorial">func Factorial(n int) int</a></dd>
+			
+				
+				<dd><a href="#FileExists">func FileExists(filePath string) bool</a></dd>
+			
+				
+				<dd><a href="#Max">func Max(x, y int) int</a></dd>
+			
+				
+				<dd><a href="#MaxSlice">func MaxSlice(slice []int) int</a></dd>
+			
+				
+				<dd><a href="#Min">func Min(x, y int) int</a></dd>
+			
+				
+				<dd><a href="#RandomGeometricProbability">func RandomGeometricProbability(mean float64) int</a></dd>
+			
+				
+				<dd><a href="#SumMap">func SumMap(currentMap map[int]int, key bool) int</a></dd>
+			
+				
+				<dd><a href="#SumSlice">func SumSlice(slice []int) int</a></dd>
+			
+			
+				
+				<dd><a href="#StatsTracker">type StatsTracker</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#NewStatsTracker">func NewStatsTracker() StatsTracker</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatsTracker.Add">func (statsTracker *StatsTracker) Add(value float64)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatsTracker.AddInt">func (statsTracker *StatsTracker) AddInt(intValue int)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatsTracker.Max">func (statsTracker StatsTracker) Max() float64</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatsTracker.Mean">func (statsTracker StatsTracker) Mean() float64</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatsTracker.Min">func (statsTracker StatsTracker) Min() float64</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatsTracker.PopulationStandardDev">func (statsTracker StatsTracker) PopulationStandardDev() float64</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatsTracker.PopulationVariance">func (statsTracker StatsTracker) PopulationVariance() float64</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatsTracker.SampleStandardDev">func (statsTracker StatsTracker) SampleStandardDev() float64</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatsTracker.SampleVariance">func (statsTracker StatsTracker) SampleVariance() float64</a></dd>
+				
+			
+				
+				<dd><a href="#Void">type Void</a></dd>
+				
+				
+			
+			
+			</dl>
+			</div><!-- #manual-nav -->
+
+		
+
+		
+			<h3>Package files</h3>
+			<p>
+			<span style="font-size:90%">
+			
+				<a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go">util.go</a>
+			
+			</span>
+			</p>
+		
+		</div><!-- .expanded -->
+		</div><!-- #pkg-index -->
+
+		
+
+		
+		
+		
+			
+			
+			<h2 id="DownloadAllStaminaDatasets">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go?s=5085:5134#L195">DownloadAllStaminaDatasets</a>
+				<a class="permalink" href="#DownloadAllStaminaDatasets">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func DownloadAllStaminaDatasets(directory <a href="/pkg/builtin/#string">string</a>)</pre>
+			<p>
+DownloadAllStaminaDatasets downloads all of the stamina datasets to a given directory.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="Factorial">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go?s=4681:4706#L182">Factorial</a>
+				<a class="permalink" href="#Factorial">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func Factorial(n <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#int">int</a></pre>
+			<p>
+Factorial returns the factorial of n by recursively
+calling itself.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="FileExists">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go?s=1241:1278#L68">FileExists</a>
+				<a class="permalink" href="#FileExists">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func FileExists(filePath <a href="/pkg/builtin/#string">string</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+			<p>
+FileExists checks if a given.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="Max">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go?s=334:356#L11">Max</a>
+				<a class="permalink" href="#Max">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func Max(x, y <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#int">int</a></pre>
+			<p>
+Max returns the larger of x or y.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="MaxSlice">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go?s=571:601#L27">MaxSlice</a>
+				<a class="permalink" href="#MaxSlice">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func MaxSlice(slice []<a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#int">int</a></pre>
+			<p>
+MaxSlice returns the largest value within a slice.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="Min">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go?s=445:467#L19">Min</a>
+				<a class="permalink" href="#Min">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func Min(x, y <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#int">int</a></pre>
+			<p>
+Min returns the smallest of x or y.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="RandomGeometricProbability">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go?s=4874:4923#L190">RandomGeometricProbability</a>
+				<a class="permalink" href="#RandomGeometricProbability">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func RandomGeometricProbability(mean <a href="/pkg/builtin/#float64">float64</a>) <a href="/pkg/builtin/#int">int</a></pre>
+			<p>
+RandomGeometricProbability returns a random geometrically distributed integer using a mean value.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="SumMap">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go?s=970:1019#L51">SumMap</a>
+				<a class="permalink" href="#SumMap">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func SumMap(currentMap map[<a href="/pkg/builtin/#int">int</a>]<a href="/pkg/builtin/#int">int</a>, key <a href="/pkg/builtin/#bool">bool</a>) <a href="/pkg/builtin/#int">int</a></pre>
+			<p>
+SumMap returns the summed values within a map.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="SumSlice">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go?s=793:823#L40">SumSlice</a>
+				<a class="permalink" href="#SumSlice">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func SumSlice(slice []<a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#int">int</a></pre>
+			<p>
+SumSlice returns the summed values within a slice.
+</p>
+
+			
+			
+
+		
+		
+			
+			
+			<h2 id="StatsTracker">type <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go?s=1620:1882#L81">StatsTracker</a>
+				<a class="permalink" href="#StatsTracker">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+StatsTracker struct is used to keep track of
+minimum, maximum, average, variance and
+standard deviation values given a sequence
+of values. Mean and variance calculation
+is done using Welford&#39;s online algorithm.
+</p>
+
+			<pre>type StatsTracker struct {
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="NewStatsTracker">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go?s=1944:1979#L90">NewStatsTracker</a>
+					<a class="permalink" href="#NewStatsTracker">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func NewStatsTracker() <a href="#StatsTracker">StatsTracker</a></pre>
+				<p>
+NewStatsTracker returns an empty StatsTracker struct.
+</p>
+
+				
+				
+			
+
+			
+				
+				<h3 id="StatsTracker.Add">func (*StatsTracker) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go?s=2160:2212#L101">Add</a>
+					<a class="permalink" href="#StatsTracker.Add">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statsTracker *<a href="#StatsTracker">StatsTracker</a>) Add(value <a href="/pkg/builtin/#float64">float64</a>)</pre>
+				<p>
+Add adds a float value to the StatsTracker struct.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatsTracker.AddInt">func (*StatsTracker) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go?s=2945:2999#L130">AddInt</a>
+					<a class="permalink" href="#StatsTracker.AddInt">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statsTracker *<a href="#StatsTracker">StatsTracker</a>) AddInt(intValue <a href="/pkg/builtin/#int">int</a>)</pre>
+				<p>
+AddInt adds an integer value to the StatsTracker struct.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatsTracker.Max">func (StatsTracker) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go?s=3303:3349#L141">Max</a>
+					<a class="permalink" href="#StatsTracker.Max">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statsTracker <a href="#StatsTracker">StatsTracker</a>) Max() <a href="/pkg/builtin/#float64">float64</a></pre>
+				<p>
+Max returns the maximum value within the StatsTracker struct.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatsTracker.Mean">func (StatsTracker) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go?s=3451:3498#L146">Mean</a>
+					<a class="permalink" href="#StatsTracker.Mean">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statsTracker <a href="#StatsTracker">StatsTracker</a>) Mean() <a href="/pkg/builtin/#float64">float64</a></pre>
+				<p>
+Mean returns the average value within the StatsTracker struct.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatsTracker.Min">func (StatsTracker) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go?s=3156:3202#L136">Min</a>
+					<a class="permalink" href="#StatsTracker.Min">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statsTracker <a href="#StatsTracker">StatsTracker</a>) Min() <a href="/pkg/builtin/#float64">float64</a></pre>
+				<p>
+Min returns the minimum value within the StatsTracker struct.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatsTracker.PopulationStandardDev">func (StatsTracker) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go?s=4261:4325#L171">PopulationStandardDev</a>
+					<a class="permalink" href="#StatsTracker.PopulationStandardDev">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statsTracker <a href="#StatsTracker">StatsTracker</a>) PopulationStandardDev() <a href="/pkg/builtin/#float64">float64</a></pre>
+				<p>
+PopulationStandardDev returns the population standard deviation value within the StatsTracker struct.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatsTracker.PopulationVariance">func (StatsTracker) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go?s=3722:3783#L153">PopulationVariance</a>
+					<a class="permalink" href="#StatsTracker.PopulationVariance">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statsTracker <a href="#StatsTracker">StatsTracker</a>) PopulationVariance() <a href="/pkg/builtin/#float64">float64</a></pre>
+				<p>
+PopulationVariance returns the population variance value within the StatsTracker struct.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatsTracker.SampleStandardDev">func (StatsTracker) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go?s=4486:4546#L176">SampleStandardDev</a>
+					<a class="permalink" href="#StatsTracker.SampleStandardDev">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statsTracker <a href="#StatsTracker">StatsTracker</a>) SampleStandardDev() <a href="/pkg/builtin/#float64">float64</a></pre>
+				<p>
+SampleStandardDev returns the sample standard deviation value within the StatsTracker struct.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatsTracker.SampleVariance">func (StatsTracker) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go?s=3982:4039#L162">SampleVariance</a>
+					<a class="permalink" href="#StatsTracker.SampleVariance">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statsTracker <a href="#StatsTracker">StatsTracker</a>) SampleVariance() <a href="/pkg/builtin/#float64">float64</a></pre>
+				<p>
+SampleVariance returns the sample variance value within the StatsTracker struct.
+</p>
+
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Void">type <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/util/util.go?s=179:197#L4">Void</a>
+				<a class="permalink" href="#Void">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+Void struct represents an empty struct.
+Used to decrease memory overhead of maps.
+</p>
+
+			<pre>type Void struct{}
+</pre>
+
+			
+
+			
+				<p>
+Null variable of type Void.
+Used to decrease memory overhead of maps.
+</p>
+
+				<pre>var <span id="Null">Null</span> <a href="#Void">Void</a></pre>
+			
+
+			
+			
+			
+
+			
+
+			
+		
+	
+
+	
+
+
+
+
+
+
+
+<div id="footer">
+Build version go1.16.5.<br>
+Except as <a href="https://developers.google.com/site-policies#restrictions">noted</a>,
+the content of this page is licensed under the
+Creative Commons Attribution 3.0 License,
+and code is licensed under a <a href="/LICENSE">BSD license</a>.<br>
+<a href="https://golang.org/doc/tos.html">Terms of Service</a> |
+<a href="https://www.google.com/intl/en/policies/privacy/">Privacy Policy</a>
+</div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+</body>
+</html>
