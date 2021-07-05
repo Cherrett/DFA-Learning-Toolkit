@@ -12,12 +12,12 @@ import (
 )
 
 // GetDatasetFromStaminaFile returns a Dataset from a Stamina-Format File.
-func GetDatasetFromStaminaFile(fileName string) Dataset {
+func GetDatasetFromStaminaFile(filePath string) Dataset {
 	// Initialize new Dataset.
 	dataset := Dataset{}
 
 	// Open given file name.
-	file, err := os.Open(fileName)
+	file, err := os.Open(filePath)
 
 	// Panic if file does not exist.
 	if err != nil {
@@ -310,7 +310,7 @@ func modifiedForestFire(currentState int, ambassadorState int, dfa *DFA, visited
 		modifiedForestFire(currentState, fromStateID, dfa, visitedStates, f, b, p)
 	}
 
-	// Iterate over all to statesselected.
+	// Iterate over all to states selected.
 	for _, toStateID := range toStates {
 		// Recursively call modifiedForestFire function on 'to' state.
 		modifiedForestFire(currentState, toStateID, dfa, visitedStates, f, b, p)
@@ -541,7 +541,7 @@ func StaminaDataset(dfa DFA, sparsityPercentage float64, initialStringsGenerated
 		}
 	}
 
-	// Step 4 - Populate Training Sample.
+	// Step 3 - Populate Training Set.
 	requiredStrings := float64(len(secondSet)) * (sparsityPercentage / 100)
 	acceptingStringInstances = secondSet.AcceptingStringInstances()
 	rejectingStringInstances = secondSet.RejectingStringInstances()
@@ -559,17 +559,15 @@ func StaminaDataset(dfa DFA, sparsityPercentage float64, initialStringsGenerated
 		counter++
 	}
 
-	// Step 3 - Populate Test Sample.
+	// Step 4 - Populate Testing Set.
 	for len(testingDataset) < maximumTestingStringInstances && len(firstSet) > 0 {
 		randomIndex := rand.Intn(len(firstSet))
 		randomString := firstSet[randomIndex]
 		firstSet = append(firstSet[:randomIndex], firstSet[randomIndex+1:]...)
 
-		if randomString.WithinDataset(trainingDataset) || randomString.WithinDataset(testingDataset) {
-			continue
+		if !randomString.WithinDataset(trainingDataset) && !randomString.WithinDataset(testingDataset) {
+			testingDataset = append(testingDataset, randomString)
 		}
-
-		testingDataset = append(testingDataset, randomString)
 	}
 
 	// Return populated training and testing datasets.
@@ -646,12 +644,12 @@ func (dataset Dataset) ToStaminaFile(filePath string) {
 }
 
 // GetDFAFromStaminaFile returns a DFA from a Stamina-Format File (adl).
-func GetDFAFromStaminaFile(fileName string) DFA {
+func GetDFAFromStaminaFile(filePath string) DFA {
 	// Initialize new DFA.
 	dfa := NewDFA()
 
 	// Open given file name.
-	file, err := os.Open(fileName)
+	file, err := os.Open(filePath)
 
 	// Panic if file does not exist.
 	if err != nil {

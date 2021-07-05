@@ -1,0 +1,4001 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#375EAB">
+
+  <title>dfalearningtoolkit - Go Documentation Server</title>
+
+<link type="text/css" rel="stylesheet" href="lib/godoc/style.css">
+
+<script>window.initFuncs = [];</script>
+<script src="lib/godoc/jquery.js" defer></script>
+
+
+
+<script>var goVersion = "go1.16.5";</script>
+<script src="lib/godoc/godocs.js" defer></script>
+</head>
+<body>
+
+<div id='lowframe' style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide"><a href="core.html">Go Documentation Server</a></div>
+<div class="top-heading" id="heading-narrow"><a href="core.html">GoDoc</a></div>
+<a href="#" id="menu-button"><span id="menu-button-arrow">&#9661;</span></a>
+</div></div>
+
+
+
+<div id="page" class="wide">
+<div class="container">
+
+
+  <h1>
+    Package dfalearningtoolkit
+    <span class="text-muted"></span>
+  </h1>
+
+
+
+
+
+
+
+<div id="nav"></div>
+
+
+<!--
+	Copyright 2009 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+<!--
+	Note: Static (i.e., not template-generated) href and id
+	attributes start with "pkg-" to make it impossible for
+	them to conflict with generated attributes (some of which
+	correspond to Go identifiers).
+-->
+
+	<script>
+	document.ANALYSIS_DATA = null;
+	document.CALLGRAPH = null;
+	</script>
+
+	
+		
+		<div id="short-nav">
+			<dl>
+			<dd><code>import "github.com/Cherrett/DFA-Learning-Toolkit/core"</code></dd>
+			</dl>
+			<dl>
+			<dd><a href="#pkg-overview" class="overviewLink">Overview</a></dd>
+			<dd><a href="#pkg-index" class="indexLink">Index</a></dd>
+			
+			
+			</dl>
+		</div>
+		<!-- The package's Name is printed as title by the top-level template -->
+		<div id="pkg-overview" class="toggleVisible">
+			<div class="collapsed">
+				<h2 class="toggleButton" title="Click to show Overview section">Overview ▹</h2>
+			</div>
+			<div class="expanded">
+				<h2 class="toggleButton" title="Click to hide Overview section">Overview ▾</h2>
+				
+				
+			</div>
+		</div>
+
+		<div id="pkg-index" class="toggleVisible">
+		<div class="collapsed">
+			<h2 class="toggleButton" title="Click to show Index section">Index ▹</h2>
+		</div>
+		<div class="expanded">
+			<h2 class="toggleButton" title="Click to hide Index section">Index ▾</h2>
+
+		<!-- Table of contents for API; must be named manual-nav to turn off auto nav. -->
+			<div id="manual-nav">
+			<dl>
+			
+				<dd><a href="#pkg-constants">Constants</a></dd>
+			
+			
+				<dd><a href="#pkg-variables">Variables</a></dd>
+			
+			
+				
+				<dd><a href="#AbbadingoDataset">func AbbadingoDataset(dfa DFA, sparsityPercentage float64, testingRatio float64) (Dataset, Dataset)</a></dd>
+			
+				
+				<dd><a href="#AbbadingoDatasetExact">func AbbadingoDatasetExact(dfa DFA, trainingSetSize int, testingSetSize int) (Dataset, Dataset)</a></dd>
+			
+				
+				<dd><a href="#AbbadingoInstance">func AbbadingoInstance(numberOfStates int, exact bool, sparsityPercentage float64, testingRatio float64) (DFA, Dataset, Dataset)</a></dd>
+			
+				
+				<dd><a href="#AbbadingoInstanceExact">func AbbadingoInstanceExact(numberOfStates int, exact bool, trainingSetSize int, testingSetSize int) (DFA, Dataset, Dataset)</a></dd>
+			
+				
+				<dd><a href="#BlueFringeEDSM">func BlueFringeEDSM(APTA DFA) (DFA, MergeData)</a></dd>
+			
+				
+				<dd><a href="#BlueFringeEDSMFromDataset">func BlueFringeEDSMFromDataset(dataset Dataset) (DFA, MergeData)</a></dd>
+			
+				
+				<dd><a href="#BlueFringeSearchUsingScoringFunction">func BlueFringeSearchUsingScoringFunction(statePartition StatePartition, scoringFunction ScoringFunction) (StatePartition, MergeData)</a></dd>
+			
+				
+				<dd><a href="#DefaultStaminaDataset">func DefaultStaminaDataset(dfa DFA, sparsityPercentage float64) (Dataset, Dataset)</a></dd>
+			
+				
+				<dd><a href="#DefaultStaminaInstance">func DefaultStaminaInstance(alphabetSize, targetDFASize int, sparsityPercentage float64) (DFA, Dataset, Dataset)</a></dd>
+			
+				
+				<dd><a href="#ExhaustiveEDSM">func ExhaustiveEDSM(APTA DFA) (DFA, MergeData)</a></dd>
+			
+				
+				<dd><a href="#ExhaustiveEDSMFromDataset">func ExhaustiveEDSMFromDataset(dataset Dataset) (DFA, MergeData)</a></dd>
+			
+				
+				<dd><a href="#ExhaustiveSearchUsingScoringFunction">func ExhaustiveSearchUsingScoringFunction(statePartition StatePartition, scoringFunction ScoringFunction) (StatePartition, MergeData)</a></dd>
+			
+				
+				<dd><a href="#GRBM">func GRBM(statePartition StatePartition) (StatePartition, MergeData)</a></dd>
+			
+				
+				<dd><a href="#GeneralizedRedBlueMerging">func GeneralizedRedBlueMerging(APTA DFA) (DFA, MergeData)</a></dd>
+			
+				
+				<dd><a href="#GeneralizedRedBlueMergingFromDataset">func GeneralizedRedBlueMergingFromDataset(dataset Dataset) (DFA, MergeData)</a></dd>
+			
+				
+				<dd><a href="#GenerateBlueSetFromRedSetWithShuffle">func GenerateBlueSetFromRedSetWithShuffle(statePartition *StatePartition, redSet map[int]util.Void) []int</a></dd>
+			
+				
+				<dd><a href="#GenerateJSONAPTAs">func GenerateJSONAPTAs(directory string, iterations, targetDFASize, trainingSetSize int)</a></dd>
+			
+				
+				<dd><a href="#GenerateOrderedBlueSetFromRedSet">func GenerateOrderedBlueSetFromRedSet(statePartition *StatePartition, redSet map[int]util.Void) []int</a></dd>
+			
+				
+				<dd><a href="#RPNI">func RPNI(APTA DFA) (DFA, MergeData)</a></dd>
+			
+				
+				<dd><a href="#RPNIFromDataset">func RPNIFromDataset(dataset Dataset) (DFA, MergeData)</a></dd>
+			
+				
+				<dd><a href="#RedBlueSearch">func RedBlueSearch(statePartition StatePartition) (StatePartition, MergeData)</a></dd>
+			
+				
+				<dd><a href="#StaminaDataset">func StaminaDataset(dfa DFA, sparsityPercentage float64, initialStringsGenerated, maximumTestingStringInstances int) (Dataset, Dataset)</a></dd>
+			
+				
+				<dd><a href="#StaminaInstance">func StaminaInstance(alphabetSize, targetDFASize int, sparsityPercentage float64, initialStringsGenerated, maximumTestingStringInstances int) (DFA, Dataset, Dataset)</a></dd>
+			
+				
+				<dd><a href="#UpdateOrderedRedBlueSets">func UpdateOrderedRedBlueSets(statePartition *StatePartition, redStates []int) ([]int, []int)</a></dd>
+			
+				
+				<dd><a href="#UpdateRedBlueSets">func UpdateRedBlueSets(statePartition *StatePartition, redStates *[]int) []int</a></dd>
+			
+				
+				<dd><a href="#UpdateRedBlueSetsWithShuffle">func UpdateRedBlueSetsWithShuffle(statePartition *StatePartition, redStates *[]int) []int</a></dd>
+			
+				
+				<dd><a href="#UpdateWindow">func UpdateWindow(window []int, statePartition StatePartition) []int</a></dd>
+			
+				
+				<dd><a href="#WindowedEDSM">func WindowedEDSM(APTA DFA, windowSize int, windowGrow float64) (DFA, MergeData)</a></dd>
+			
+				
+				<dd><a href="#WindowedEDSMFromDataset">func WindowedEDSMFromDataset(dataset Dataset, windowSize int, windowGrow float64) (DFA, MergeData)</a></dd>
+			
+				
+				<dd><a href="#WindowedSearchUsingScoringFunction">func WindowedSearchUsingScoringFunction(statePartition StatePartition, windowSize int, windowGrow float64, scoringFunction ScoringFunction) (StatePartition, MergeData)</a></dd>
+			
+			
+				
+				<dd><a href="#Block">type Block</a></dd>
+				
+				
+			
+				
+				<dd><a href="#DFA">type DFA</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#AbbadingoDFA">func AbbadingoDFA(numberOfStates int, exact bool) DFA</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFAFromJSON">func DFAFromJSON(filePath string) (DFA, bool)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#GetDFAFromStaminaFile">func GetDFAFromStaminaFile(filePath string) DFA</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#NewDFA">func NewDFA() DFA</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#NewDFAWithAlphabetSize">func NewDFAWithAlphabetSize(alphabetSize int) DFA</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StaminaDFA">func StaminaDFA(alphabetSize int, targetDFASize int) DFA</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.AcceptingStates">func (dfa DFA) AcceptingStates() []int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.AcceptingStatesCount">func (dfa DFA) AcceptingStatesCount() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.Accuracy">func (dfa DFA) Accuracy(dataset Dataset) float64</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.AddSinkState">func (dfa *DFA) AddSinkState() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.AddState">func (dfa *DFA) AddState(stateLabel StateLabel) int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.AddSymbol">func (dfa *DFA) AddSymbol()</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.AddTransition">func (dfa *DFA) AddTransition(symbol int, fromStateID int, toStateID int)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.AllStates">func (dfa DFA) AllStates() []int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.CalculateDepthAndOrder">func (dfa *DFA) CalculateDepthAndOrder()</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.ChangeRejectingStatesToUnlabelled">func (dfa *DFA) ChangeRejectingStatesToUnlabelled()</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.Clone">func (dfa DFA) Clone() *DFA</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.Depth">func (dfa *DFA) Depth() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.Describe">func (dfa DFA) Describe(detail bool)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.Equal">func (dfa DFA) Equal(dfa2 DFA) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.IndistinguishableStatePairs">func (dfa *DFA) IndistinguishableStatePairs() []StateIDPair</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.IsComplete">func (dfa DFA) IsComplete() bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.IsTree">func (dfa DFA) IsTree() bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.IsValidPanic">func (dfa DFA) IsValidPanic()</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.IsValidSafe">func (dfa DFA) IsValidSafe() bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.LabelledStates">func (dfa DFA) LabelledStates() []int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.LabelledStatesCount">func (dfa DFA) LabelledStatesCount() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.LeavesCount">func (dfa DFA) LeavesCount() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.LoopsCount">func (dfa DFA) LoopsCount() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.Minimise">func (dfa DFA) Minimise() DFA</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.OrderedStates">func (dfa *DFA) OrderedStates() []int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.RejectingStates">func (dfa DFA) RejectingStates() []int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.RejectingStatesCount">func (dfa DFA) RejectingStatesCount() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.RemoveNonAcceptingLeaves">func (dfa *DFA) RemoveNonAcceptingLeaves()</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.RemoveState">func (dfa *DFA) RemoveState(stateID int)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.RemoveTransition">func (dfa *DFA) RemoveTransition(symbol int, fromStateID int)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.RemoveUnreachableStates">func (dfa *DFA) RemoveUnreachableStates()</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.SameAs">func (dfa DFA) SameAs(dfa2 DFA) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.SetOrderAsID">func (dfa *DFA) SetOrderAsID() DFA</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.StartingState">func (dfa DFA) StartingState() *State</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.StructurallyComplete">func (dfa DFA) StructurallyComplete(dataset Dataset) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.SymmetricallyStructurallyComplete">func (dfa DFA) SymmetricallyStructurallyComplete(dataset Dataset) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.ToDOT">func (dfa *DFA) ToDOT(filePath string, symbolMapping map[int]string, showOrder bool, topDown bool)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.ToJPG">func (dfa DFA) ToJPG(filePath string, symbolMapping map[int]string, showOrder bool, topDown bool) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.ToJSON">func (dfa DFA) ToJSON(filePath string) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.ToPDF">func (dfa DFA) ToPDF(filePath string, symbolMapping map[int]string, showOrder bool, topDown bool) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.ToPNG">func (dfa DFA) ToPNG(filePath string, symbolMapping map[int]string, showOrder bool, topDown bool) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.ToSVG">func (dfa DFA) ToSVG(filePath string, symbolMapping map[int]string, showOrder bool, topDown bool) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.ToStaminaFile">func (dfa DFA) ToStaminaFile(filePath string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.ToStatePartition">func (dfa DFA) ToStatePartition() StatePartition</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.TransitionsCount">func (dfa DFA) TransitionsCount() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.TransitionsCountForSymbol">func (dfa DFA) TransitionsCountForSymbol(symbol int) int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.UnlabelledStates">func (dfa DFA) UnlabelledStates() []int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.UnlabelledStatesCount">func (dfa DFA) UnlabelledStatesCount() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DFA.UnreachableStates">func (dfa DFA) UnreachableStates() []int</a></dd>
+				
+			
+				
+				<dd><a href="#Dataset">type Dataset</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#DatasetFromJSON">func DatasetFromJSON(filePath string) (Dataset, bool)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#GetDatasetFromAbbadingoFile">func GetDatasetFromAbbadingoFile(filePath string) Dataset</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#GetDatasetFromStaminaFile">func GetDatasetFromStaminaFile(filePath string) Dataset</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Dataset.AcceptingStringInstances">func (dataset Dataset) AcceptingStringInstances() Dataset</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Dataset.AcceptingStringInstancesCount">func (dataset Dataset) AcceptingStringInstancesCount() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Dataset.AcceptingStringInstancesRatio">func (dataset Dataset) AcceptingStringInstancesRatio() float64</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Dataset.Accuracy">func (dataset Dataset) Accuracy(dfa DFA) float64</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Dataset.AverageLength">func (dataset Dataset) AverageLength() float64</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Dataset.ConsistentWithDFA">func (dataset Dataset) ConsistentWithDFA(dfa DFA) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Dataset.ConsistentWithStatePartition">func (dataset Dataset) ConsistentWithStatePartition(statePartition StatePartition) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Dataset.Count">func (dataset Dataset) Count() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Dataset.GetPTA">func (dataset Dataset) GetPTA(APTA bool) DFA</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Dataset.RejectingStringInstances">func (dataset Dataset) RejectingStringInstances() Dataset</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Dataset.RejectingStringInstancesCount">func (dataset Dataset) RejectingStringInstancesCount() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Dataset.RejectingStringInstancesRatio">func (dataset Dataset) RejectingStringInstancesRatio() float64</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Dataset.SameAs">func (dataset Dataset) SameAs(dataset2 Dataset) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Dataset.SortDatasetByLength">func (dataset Dataset) SortDatasetByLength() Dataset</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Dataset.StructurallyComplete">func (dataset Dataset) StructurallyComplete(dfa DFA) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Dataset.SymmetricallyStructurallyComplete">func (dataset Dataset) SymmetricallyStructurallyComplete(dfa DFA) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Dataset.ToAbbadingoFile">func (dataset Dataset) ToAbbadingoFile(filePath string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Dataset.ToJSON">func (dataset Dataset) ToJSON(filePath string) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Dataset.ToStaminaFile">func (dataset Dataset) ToStaminaFile(filePath string)</a></dd>
+				
+			
+				
+				<dd><a href="#MergeData">type MergeData</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#MergeData.AttemptedMergesPerSecond">func (mergeData MergeData) AttemptedMergesPerSecond() float64</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#MergeData.MergesCount">func (mergeData MergeData) MergesCount() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#MergeData.Print">func (mergeData MergeData) Print()</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#MergeData.ToJSON">func (mergeData MergeData) ToJSON(filePath string) bool</a></dd>
+				
+			
+				
+				<dd><a href="#ScoringFunction">type ScoringFunction</a></dd>
+				
+				
+			
+				
+				<dd><a href="#State">type State</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#State.AddTransition">func (state *State) AddTransition(stateID int)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#State.AllTransitionsExist">func (state State) AllTransitionsExist() bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#State.Clone">func (state State) Clone() State</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#State.DFA">func (state State) DFA() *DFA</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#State.Depth">func (state *State) Depth() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#State.GetTransitionValue">func (state State) GetTransitionValue(symbolID int) int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#State.GetTransitions">func (state State) GetTransitions() []int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#State.InDegree">func (state State) InDegree(stateID int) int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#State.IsAccepting">func (state State) IsAccepting() bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#State.IsLeaf">func (state State) IsLeaf() bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#State.IsRejecting">func (state State) IsRejecting() bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#State.IsUnlabelled">func (state State) IsUnlabelled() bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#State.Order">func (state *State) Order() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#State.OutDegree">func (state State) OutDegree() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#State.TransitionExists">func (state State) TransitionExists(stateID int) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#State.TransitionsCount">func (state State) TransitionsCount(stateID int) int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#State.UpdateTransition">func (state *State) UpdateTransition(symbolID, stateID int)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#State.ValidTransitions">func (state State) ValidTransitions() []int</a></dd>
+				
+			
+				
+				<dd><a href="#StateIDPair">type StateIDPair</a></dd>
+				
+				
+			
+				
+				<dd><a href="#StateLabel">type StateLabel</a></dd>
+				
+				
+			
+				
+				<dd><a href="#StatePairScore">type StatePairScore</a></dd>
+				
+				
+			
+				
+				<dd><a href="#StatePartition">type StatePartition</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#NewStatePartition">func NewStatePartition(referenceDFA DFA) StatePartition</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartitionFromJSON">func StatePartitionFromJSON(filePath string) (StatePartition, bool)</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.ChangedBlock">func (statePartition *StatePartition) ChangedBlock(blockID int)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.Clone">func (statePartition StatePartition) Clone() StatePartition</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.Copy">func (statePartition StatePartition) Copy() StatePartition</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.CopyChangesFrom">func (statePartition *StatePartition) CopyChangesFrom(copiedStatePartition *StatePartition)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.DepthOfBlocks">func (statePartition *StatePartition) DepthOfBlocks() map[int]int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.Find">func (statePartition *StatePartition) Find(stateID int) int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.MergeStates">func (statePartition *StatePartition) MergeStates(stateID1 int, stateID2 int) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.NumberOfLabelledBlocks">func (statePartition StatePartition) NumberOfLabelledBlocks() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.OrderOfBlocks">func (statePartition *StatePartition) OrderOfBlocks() map[int]int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.OrderedBlocks">func (statePartition *StatePartition) OrderedBlocks() []int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.ReturnSet">func (statePartition StatePartition) ReturnSet(blockID int) []int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.RollbackChangesFrom">func (statePartition *StatePartition) RollbackChangesFrom(originalStatePartition StatePartition)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.RootBlocks">func (statePartition StatePartition) RootBlocks() []int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.StartingBlock">func (statePartition *StatePartition) StartingBlock() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.ToDOT">func (statePartition StatePartition) ToDOT(filePath string, symbolMapping map[int]string, showOrder bool, topDown bool)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.ToJPG">func (statePartition StatePartition) ToJPG(filePath string, symbolMapping map[int]string, showOrder bool, topDown bool) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.ToJSON">func (statePartition StatePartition) ToJSON(filePath string) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.ToPDF">func (statePartition StatePartition) ToPDF(filePath string, symbolMapping map[int]string, showOrder bool, topDown bool) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.ToPNG">func (statePartition StatePartition) ToPNG(filePath string, symbolMapping map[int]string, showOrder bool, topDown bool) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.ToQuotientDFA">func (statePartition *StatePartition) ToQuotientDFA() DFA</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.ToQuotientDFAWithMapping">func (statePartition *StatePartition) ToQuotientDFAWithMapping() (DFA, map[int]int)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.ToSVG">func (statePartition StatePartition) ToSVG(filePath string, symbolMapping map[int]string, showOrder bool, topDown bool) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.Union">func (statePartition *StatePartition) Union(blockID1 int, blockID2 int)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StatePartition.WithinSameBlock">func (statePartition *StatePartition) WithinSameBlock(stateID1 int, stateID2 int) bool</a></dd>
+				
+			
+				
+				<dd><a href="#StringInstance">type StringInstance</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#BinaryStringToStringInstance">func BinaryStringToStringInstance(dfa DFA, binaryString string) StringInstance</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#NewStringInstanceFromAbbadingoFile">func NewStringInstanceFromAbbadingoFile(text string, delimiter string) StringInstance</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#NewStringInstanceFromStaminaFile">func NewStringInstanceFromStaminaFile(text string, delimiter string) StringInstance</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StringInstance.ConsistentWithDFA">func (stringInstance StringInstance) ConsistentWithDFA(dfa DFA) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StringInstance.ConsistentWithStatePartition">func (stringInstance StringInstance) ConsistentWithStatePartition(statePartition StatePartition) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StringInstance.Length">func (stringInstance StringInstance) Length() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StringInstance.ParseToState">func (stringInstance StringInstance) ParseToState(dfa DFA) (bool, int)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StringInstance.ParseToStateLabel">func (stringInstance StringInstance) ParseToStateLabel(dfa DFA) StateLabel</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#StringInstance.WithinDataset">func (stringInstance StringInstance) WithinDataset(dataset Dataset) bool</a></dd>
+				
+			
+				
+				<dd><a href="#TeamOfAutomata">type TeamOfAutomata</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#AutomataTeams">func AutomataTeams(APTA DFA, teamSize int) TeamOfAutomata</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#AutomataTeamsFromDataset">func AutomataTeamsFromDataset(dataset Dataset, teamSize int) TeamOfAutomata</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#TeamOfAutomata.Accuracy">func (teamOfAutomata TeamOfAutomata) Accuracy(dataset Dataset, teamOfAutomataClassifierFunction TeamOfAutomataClassifierFunction) float64</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#TeamOfAutomata.AverageNumberOfStates">func (teamOfAutomata TeamOfAutomata) AverageNumberOfStates() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#TeamOfAutomata.BetterHalfWeightedVoteAccuracy">func (teamOfAutomata TeamOfAutomata) BetterHalfWeightedVoteAccuracy(dataset Dataset) float64</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#TeamOfAutomata.FairVoteAccuracy">func (teamOfAutomata TeamOfAutomata) FairVoteAccuracy(dataset Dataset) float64</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#TeamOfAutomata.SmallestDFAVoteAccuracy">func (teamOfAutomata TeamOfAutomata) SmallestDFAVoteAccuracy(dataset Dataset) float64</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#TeamOfAutomata.WeightedVoteAccuracy">func (teamOfAutomata TeamOfAutomata) WeightedVoteAccuracy(dataset Dataset) float64</a></dd>
+				
+			
+				
+				<dd><a href="#TeamOfAutomataClassifierFunction">type TeamOfAutomataClassifierFunction</a></dd>
+				
+				
+			
+				
+				<dd><a href="#Transition">type Transition</a></dd>
+				
+				
+			
+			
+			</dl>
+			</div><!-- #manual-nav -->
+
+		
+
+		
+			<h3>Package files</h3>
+			<p>
+			<span style="font-size:90%">
+			
+				<a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Abbadingo.go">Abbadingo.go</a>
+			
+				<a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/AutomataTeams.go">AutomataTeams.go</a>
+			
+				<a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go">DFA.go</a>
+			
+				<a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_Minimization.go">DFA_Minimization.go</a>
+			
+				<a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_State.go">DFA_State.go</a>
+			
+				<a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go">Dataset.go</a>
+			
+				<a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/EDSM.go">EDSM.go</a>
+			
+				<a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/MergeData.go">MergeData.go</a>
+			
+				<a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/RPNI.go">RPNI.go</a>
+			
+				<a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/SearchAlgorithms.go">SearchAlgorithms.go</a>
+			
+				<a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Stamina.go">Stamina.go</a>
+			
+				<a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go">StatePartition.go</a>
+			
+				<a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Visualisation.go">Visualisation.go</a>
+			
+			</span>
+			</p>
+		
+		</div><!-- .expanded -->
+		</div><!-- #pkg-index -->
+
+		
+
+		
+			<h2 id="pkg-constants">Constants</h2>
+			
+				<p>
+Constants which represent the 3 possible state labels.
+</p>
+
+				<pre>const (
+    <span id="REJECTING">REJECTING</span>  = <a href="/pkg/builtin/#iota">iota</a> <span class="comment">// 0</span>
+    <span id="ACCEPTING">ACCEPTING</span>         <span class="comment">// 1</span>
+    <span id="UNLABELLED">UNLABELLED</span>        <span class="comment">// 2</span>
+)</pre>
+			
+		
+		
+			<h2 id="pkg-variables">Variables</h2>
+			
+				<p>
+SymbolAlphabetMappingAbbadingo represents the symbol-alphabet mapping for
+the Abbadingo competition standard (using only a&#39;s and b&#39;s / 0s and 1s).
+</p>
+
+				<pre>var <span id="SymbolAlphabetMappingAbbadingo">SymbolAlphabetMappingAbbadingo</span> = map[<a href="/pkg/builtin/#int">int</a>]<a href="/pkg/builtin/#string">string</a>{0: &#34;a&#34;, 1: &#34;b&#34;}</pre>
+			
+		
+		
+			
+			
+			<h2 id="AbbadingoDataset">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Abbadingo.go?s=4095:4194#L138">AbbadingoDataset</a>
+				<a class="permalink" href="#AbbadingoDataset">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func AbbadingoDataset(dfa <a href="#DFA">DFA</a>, sparsityPercentage <a href="/pkg/builtin/#float64">float64</a>, testingRatio <a href="/pkg/builtin/#float64">float64</a>) (<a href="#Dataset">Dataset</a>, <a href="#Dataset">Dataset</a>)</pre>
+			<p>
+AbbadingoDataset returns a training and testing Dataset using the
+Abbadingo protocol given a DFA, a sparsity percentage and a training:testing ratio.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="AbbadingoDatasetExact">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Abbadingo.go?s=5005:5100#L155">AbbadingoDatasetExact</a>
+				<a class="permalink" href="#AbbadingoDatasetExact">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func AbbadingoDatasetExact(dfa <a href="#DFA">DFA</a>, trainingSetSize <a href="/pkg/builtin/#int">int</a>, testingSetSize <a href="/pkg/builtin/#int">int</a>) (<a href="#Dataset">Dataset</a>, <a href="#Dataset">Dataset</a>)</pre>
+			<p>
+AbbadingoDatasetExact returns a training and testing Dataset using the
+Abbadingo protocol given a DFA and a set size for each.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="AbbadingoInstance">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Abbadingo.go?s=6963:7091#L205">AbbadingoInstance</a>
+				<a class="permalink" href="#AbbadingoInstance">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func AbbadingoInstance(numberOfStates <a href="/pkg/builtin/#int">int</a>, exact <a href="/pkg/builtin/#bool">bool</a>, sparsityPercentage <a href="/pkg/builtin/#float64">float64</a>, testingRatio <a href="/pkg/builtin/#float64">float64</a>) (<a href="#DFA">DFA</a>, <a href="#Dataset">Dataset</a>, <a href="#Dataset">Dataset</a>)</pre>
+			<p>
+AbbadingoInstance returns a random DFA using the Abbadingo protocol given a number of states while
+returning a training and testing dataset built on the generated DFA given a sparsity percentage and
+a training:testing ratio. If exact is set to true, the resultant DFA will have the required depth as
+per Abbadingo protocol.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="AbbadingoInstanceExact">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Abbadingo.go?s=7570:7694#L215">AbbadingoInstanceExact</a>
+				<a class="permalink" href="#AbbadingoInstanceExact">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func AbbadingoInstanceExact(numberOfStates <a href="/pkg/builtin/#int">int</a>, exact <a href="/pkg/builtin/#bool">bool</a>, trainingSetSize <a href="/pkg/builtin/#int">int</a>, testingSetSize <a href="/pkg/builtin/#int">int</a>) (<a href="#DFA">DFA</a>, <a href="#Dataset">Dataset</a>, <a href="#Dataset">Dataset</a>)</pre>
+			<p>
+AbbadingoInstanceExact returns a random DFA using the Abbadingo protocol given a number of states while
+returning a training and testing dataset built on the generated DFA given a set size for each.
+If exact is set to true, the resultant DFA will have the required depth as per Abbadingo protocol.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="BlueFringeEDSM">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/EDSM.go?s=3862:3908#L84">BlueFringeEDSM</a>
+				<a class="permalink" href="#BlueFringeEDSM">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func BlueFringeEDSM(APTA <a href="#DFA">DFA</a>) (<a href="#DFA">DFA</a>, <a href="#MergeData">MergeData</a>)</pre>
+			<p>
+BlueFringeEDSM is a Blue Fringe version of Evidence Driven State-Merging.
+It takes a DFA (APTA) as an argument which is used within the blue-fringe search.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="BlueFringeEDSMFromDataset">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/EDSM.go?s=1107:1171#L17">BlueFringeEDSMFromDataset</a>
+				<a class="permalink" href="#BlueFringeEDSMFromDataset">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func BlueFringeEDSMFromDataset(dataset <a href="#Dataset">Dataset</a>) (<a href="#DFA">DFA</a>, <a href="#MergeData">MergeData</a>)</pre>
+			<p>
+BlueFringeEDSMFromDataset is a Blue Fringe version of Evidence Driven State-Merging.
+It takes a dataset as an argument which is used to generate an APTA.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="BlueFringeSearchUsingScoringFunction">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/SearchAlgorithms.go?s=12810:12943#L333">BlueFringeSearchUsingScoringFunction</a>
+				<a class="permalink" href="#BlueFringeSearchUsingScoringFunction">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func BlueFringeSearchUsingScoringFunction(statePartition <a href="#StatePartition">StatePartition</a>, scoringFunction <a href="#ScoringFunction">ScoringFunction</a>) (<a href="#StatePartition">StatePartition</a>, <a href="#MergeData">MergeData</a>)</pre>
+			<p>
+BlueFringeSearchUsingScoringFunction deterministically merges possible state pairs within red-blue sets.
+The state pair to be merged is chosen using a scoring function passed as a parameter.
+Returns the resultant state partition and merge data when no more valid merges are possible.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="DefaultStaminaDataset">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Stamina.go?s=20361:20443#L571">DefaultStaminaDataset</a>
+				<a class="permalink" href="#DefaultStaminaDataset">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func DefaultStaminaDataset(dfa <a href="#DFA">DFA</a>, sparsityPercentage <a href="/pkg/builtin/#float64">float64</a>) (<a href="#Dataset">Dataset</a>, <a href="#Dataset">Dataset</a>)</pre>
+			<p>
+DefaultStaminaDataset returns a training and testing Dataset using the
+Stamina protocol given a DFA and a sparsity percentage.
+The default values for the initial strings generated (20000) and the maximum testing string
+instances (1500) which were used within the Stamina competition are used within this function.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="DefaultStaminaInstance">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Stamina.go?s=21561:21673#L589">DefaultStaminaInstance</a>
+				<a class="permalink" href="#DefaultStaminaInstance">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func DefaultStaminaInstance(alphabetSize, targetDFASize <a href="/pkg/builtin/#int">int</a>, sparsityPercentage <a href="/pkg/builtin/#float64">float64</a>) (<a href="#DFA">DFA</a>, <a href="#Dataset">Dataset</a>, <a href="#Dataset">Dataset</a>)</pre>
+			<p>
+DefaultStaminaInstance returns a random DFA using the Stamina protocol given a target size while
+returning a training and testing dataset built on the generated DFA given a sparsity percentage.
+The default values for the initial strings generated (20000) and the maximum testing string
+instances (1500) which were used within the Stamina competition are used within this function.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="ExhaustiveEDSM">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/EDSM.go?s=1540:1586#L28">ExhaustiveEDSM</a>
+				<a class="permalink" href="#ExhaustiveEDSM">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func ExhaustiveEDSM(APTA <a href="#DFA">DFA</a>) (<a href="#DFA">DFA</a>, <a href="#MergeData">MergeData</a>)</pre>
+			<p>
+ExhaustiveEDSM is a greedy version of Evidence Driven State-Merging.
+It takes a DFA (APTA) as an argument which is used within the greedy search.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="ExhaustiveEDSMFromDataset">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/EDSM.go?s=187:251#L1">ExhaustiveEDSMFromDataset</a>
+				<a class="permalink" href="#ExhaustiveEDSMFromDataset">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func ExhaustiveEDSMFromDataset(dataset <a href="#Dataset">Dataset</a>) (<a href="#DFA">DFA</a>, <a href="#MergeData">MergeData</a>)</pre>
+			<p>
+ExhaustiveEDSMFromDataset is a greedy version of Evidence Driven State-Merging.
+It takes a dataset as an argument which is used to generate an APTA.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="ExhaustiveSearchUsingScoringFunction">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/SearchAlgorithms.go?s=4863:4996#L123">ExhaustiveSearchUsingScoringFunction</a>
+				<a class="permalink" href="#ExhaustiveSearchUsingScoringFunction">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func ExhaustiveSearchUsingScoringFunction(statePartition <a href="#StatePartition">StatePartition</a>, scoringFunction <a href="#ScoringFunction">ScoringFunction</a>) (<a href="#StatePartition">StatePartition</a>, <a href="#MergeData">MergeData</a>)</pre>
+			<p>
+ExhaustiveSearchUsingScoringFunction deterministically merges all possible state pairs.
+The state pair to be merged is chosen using a scoring function passed as a parameter.
+Returns the resultant state partition and merge data when no more valid merges are possible.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="GRBM">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/AutomataTeams.go?s=1163:1231#L18">GRBM</a>
+				<a class="permalink" href="#GRBM">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func GRBM(statePartition <a href="#StatePartition">StatePartition</a>) (<a href="#StatePartition">StatePartition</a>, <a href="#MergeData">MergeData</a>)</pre>
+			<p>
+GRBM deterministically merges possible state pairs within red-blue sets.
+The state pair to be merged is chosen using a scoring function passed as a parameter.
+Returns the resultant state partition and merge data when no more valid merges are possible.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="GeneralizedRedBlueMerging">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/AutomataTeams.go?s=7609:7666#L174">GeneralizedRedBlueMerging</a>
+				<a class="permalink" href="#GeneralizedRedBlueMerging">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func GeneralizedRedBlueMerging(APTA <a href="#DFA">DFA</a>) (<a href="#DFA">DFA</a>, <a href="#MergeData">MergeData</a>)</pre>
+			<p>
+GeneralizedRedBlueMerging takes a DFA (APTA) as an argument which is used within the GRBM search.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="GeneralizedRedBlueMergingFromDataset">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/AutomataTeams.go?s=7195:7270#L164">GeneralizedRedBlueMergingFromDataset</a>
+				<a class="permalink" href="#GeneralizedRedBlueMergingFromDataset">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func GeneralizedRedBlueMergingFromDataset(dataset <a href="#Dataset">Dataset</a>) (<a href="#DFA">DFA</a>, <a href="#MergeData">MergeData</a>)</pre>
+			<p>
+GeneralizedRedBlueMergingFromDataset takes a dataset as an argument which is used to generate an APTA.
+This APTA is then used within the GeneralizedRedBlueMerging to do a GRBM search on.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="GenerateBlueSetFromRedSetWithShuffle">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/AutomataTeams.go?s=3868:3973#L88">GenerateBlueSetFromRedSetWithShuffle</a>
+				<a class="permalink" href="#GenerateBlueSetFromRedSetWithShuffle">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func GenerateBlueSetFromRedSetWithShuffle(statePartition *<a href="#StatePartition">StatePartition</a>, redSet map[<a href="/pkg/builtin/#int">int</a>]<a href="/pkg/github.com/Cherrett/DFA-Learning-Toolkit/util/">util</a>.<a href="/pkg/github.com/Cherrett/DFA-Learning-Toolkit/util/#Void">Void</a>) []<a href="/pkg/builtin/#int">int</a></pre>
+			<p>
+GenerateBlueSetFromRedSetWithShuffle generates the blue set given the state partition and the red set within the Red-Blue framework
+such as the GeneralizedRedBlueMerging function. It generates and returns the blue set in arbitrary order.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="GenerateJSONAPTAs">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Abbadingo.go?s=9464:9552#L270">GenerateJSONAPTAs</a>
+				<a class="permalink" href="#GenerateJSONAPTAs">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func GenerateJSONAPTAs(directory <a href="/pkg/builtin/#string">string</a>, iterations, targetDFASize, trainingSetSize <a href="/pkg/builtin/#int">int</a>)</pre>
+			<p>
+GenerateJSONAPTAs generates a number of APTAs and writes them to a JSON file.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="GenerateOrderedBlueSetFromRedSet">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/SearchAlgorithms.go?s=16223:16324#L425">GenerateOrderedBlueSetFromRedSet</a>
+				<a class="permalink" href="#GenerateOrderedBlueSetFromRedSet">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func GenerateOrderedBlueSetFromRedSet(statePartition *<a href="#StatePartition">StatePartition</a>, redSet map[<a href="/pkg/builtin/#int">int</a>]<a href="/pkg/github.com/Cherrett/DFA-Learning-Toolkit/util/">util</a>.<a href="/pkg/github.com/Cherrett/DFA-Learning-Toolkit/util/#Void">Void</a>) []<a href="/pkg/builtin/#int">int</a></pre>
+			<p>
+GenerateOrderedBlueSetFromRedSet generates the blue set given the state partition and the red set within the Red-Blue framework
+such as the BlueFringeSearchUsingScoringFunction function. It generates and returns the blue set in canonical order.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="RPNI">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/RPNI.go?s=719:755#L8">RPNI</a>
+				<a class="permalink" href="#RPNI">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func RPNI(APTA <a href="#DFA">DFA</a>) (<a href="#DFA">DFA</a>, <a href="#MergeData">MergeData</a>)</pre>
+			<p>
+RPNI returns a DFA and merge data generated by the regular
+positive and negative inference (RPNI) algorithm. It takes an
+APTA as a parameter which is passed to the RedBlueSearch function.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="RPNIFromDataset">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/RPNI.go?s=269:323#L1">RPNIFromDataset</a>
+				<a class="permalink" href="#RPNIFromDataset">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func RPNIFromDataset(dataset <a href="#Dataset">Dataset</a>) (<a href="#DFA">DFA</a>, <a href="#MergeData">MergeData</a>)</pre>
+			<p>
+RPNIFromDataset returns a DFA and merge data generated by the regular
+positive and negative inference (RPNI) algorithm. It takes a dataset as
+a parameter which is used to generate an APTA while passing it to the RPNI function.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="RedBlueSearch">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/SearchAlgorithms.go?s=918:995#L13">RedBlueSearch</a>
+				<a class="permalink" href="#RedBlueSearch">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func RedBlueSearch(statePartition <a href="#StatePartition">StatePartition</a>) (<a href="#StatePartition">StatePartition</a>, <a href="#MergeData">MergeData</a>)</pre>
+			<p>
+RedBlueSearch deterministically merges all possible state pairs within red-blue framework.
+The first valid merge with respect to the rejecting examples is chosen.
+Returns the resultant state partition and merge data when no more valid merges are possible.
+Used by the regular positive and negative inference (RPNI) algorithm.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="StaminaDataset">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Stamina.go?s=15334:15469#L417">StaminaDataset</a>
+				<a class="permalink" href="#StaminaDataset">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func StaminaDataset(dfa <a href="#DFA">DFA</a>, sparsityPercentage <a href="/pkg/builtin/#float64">float64</a>, initialStringsGenerated, maximumTestingStringInstances <a href="/pkg/builtin/#int">int</a>) (<a href="#Dataset">Dataset</a>, <a href="#Dataset">Dataset</a>)</pre>
+			<p>
+StaminaDataset returns a training and testing Dataset using the
+StaMinA protocol given a DFA and a sparsity percentage.
+This process is described in <a href="http://stamina.chefbe.net/samples">http://stamina.chefbe.net/samples</a> and in
+Walkinshaw, N., Lambeau, B., Damas, C., Bogdanov, K., &amp; Dupont, P. (2012). STAMINA:
+a competition to encourage the development and assessment of software model inference
+techniques. Empirical Software Engineering, 18(4), 791–824. doi:10.1007/s10664-012-9210-3
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="StaminaInstance">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Stamina.go?s=20787:20952#L578">StaminaInstance</a>
+				<a class="permalink" href="#StaminaInstance">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func StaminaInstance(alphabetSize, targetDFASize <a href="/pkg/builtin/#int">int</a>, sparsityPercentage <a href="/pkg/builtin/#float64">float64</a>, initialStringsGenerated, maximumTestingStringInstances <a href="/pkg/builtin/#int">int</a>) (<a href="#DFA">DFA</a>, <a href="#Dataset">Dataset</a>, <a href="#Dataset">Dataset</a>)</pre>
+			<p>
+StaminaInstance returns a random DFA using the Stamina protocol given a target size while
+returning a training and testing dataset built on the generated DFA given a sparsity percentage,
+an initial string generated value, and a maximum testing string instances value.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="UpdateOrderedRedBlueSets">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/SearchAlgorithms.go?s=19271:19364#L502">UpdateOrderedRedBlueSets</a>
+				<a class="permalink" href="#UpdateOrderedRedBlueSets">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func UpdateOrderedRedBlueSets(statePartition *<a href="#StatePartition">StatePartition</a>, redStates []<a href="/pkg/builtin/#int">int</a>) ([]<a href="/pkg/builtin/#int">int</a>, []<a href="/pkg/builtin/#int">int</a>)</pre>
+			<p>
+UpdateOrderedRedBlueSets updates the red and blue sets given the state partition and the red set within the Red-Blue framework
+such as the BlueFringeSearchUsingScoringFunction function. It returns the red and blue sets in canonical order. This is
+used when the state partition is changed or when new states have been added to the red set.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="UpdateRedBlueSets">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/SearchAlgorithms.go?s=3182:3260#L79">UpdateRedBlueSets</a>
+				<a class="permalink" href="#UpdateRedBlueSets">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func UpdateRedBlueSets(statePartition *<a href="#StatePartition">StatePartition</a>, redStates *[]<a href="/pkg/builtin/#int">int</a>) []<a href="/pkg/builtin/#int">int</a></pre>
+			<p>
+UpdateRedBlueSets updates the red and blue sets given the state partition and the red set within the Red-Blue framework
+such as the RedBlueSearch function. It returns the blue set and modifies the red set via its pointer. This is
+used when the state partition is changed or when new states have been added to the red set.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="UpdateRedBlueSetsWithShuffle">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/AutomataTeams.go?s=5340:5429#L119">UpdateRedBlueSetsWithShuffle</a>
+				<a class="permalink" href="#UpdateRedBlueSetsWithShuffle">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func UpdateRedBlueSetsWithShuffle(statePartition *<a href="#StatePartition">StatePartition</a>, redStates *[]<a href="/pkg/builtin/#int">int</a>) []<a href="/pkg/builtin/#int">int</a></pre>
+			<p>
+UpdateRedBlueSetsWithShuffle updates the red and blue sets given the state partition and the red set within the Red-Blue framework
+such as the GeneralizedRedBlueMerging function. It returns the blue set and modifies the red set via its pointer. Both sets are
+shuffled . This is used when the state partition is changed or when new states have been added to the red set.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="UpdateWindow">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/SearchAlgorithms.go?s=11711:11779#L305">UpdateWindow</a>
+				<a class="permalink" href="#UpdateWindow">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func UpdateWindow(window []<a href="/pkg/builtin/#int">int</a>, statePartition <a href="#StatePartition">StatePartition</a>) []<a href="/pkg/builtin/#int">int</a></pre>
+			<p>
+UpdateWindow updates a window given the state partition within a Windowed framework such as the
+WindowedSearchUsingScoringFunction function. It returns the new window as a slice of integers.
+This works by gathering the root of each block within the previous window and assigns it to the
+position of the first index of any block which is part of that block. This is used to avoid attempting
+merges more than once within a windowed search.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="WindowedEDSM">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/EDSM.go?s=2668:2748#L56">WindowedEDSM</a>
+				<a class="permalink" href="#WindowedEDSM">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func WindowedEDSM(APTA <a href="#DFA">DFA</a>, windowSize <a href="/pkg/builtin/#int">int</a>, windowGrow <a href="/pkg/builtin/#float64">float64</a>) (<a href="#DFA">DFA</a>, <a href="#MergeData">MergeData</a>)</pre>
+			<p>
+WindowedEDSM is a windowed version of Evidence Driven State-Merging.
+It takes a DFA (APTA) as an argument which is used within the windowed search.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="WindowedEDSMFromDataset">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/EDSM.go?s=623:721#L6">WindowedEDSMFromDataset</a>
+				<a class="permalink" href="#WindowedEDSMFromDataset">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func WindowedEDSMFromDataset(dataset <a href="#Dataset">Dataset</a>, windowSize <a href="/pkg/builtin/#int">int</a>, windowGrow <a href="/pkg/builtin/#float64">float64</a>) (<a href="#DFA">DFA</a>, <a href="#MergeData">MergeData</a>)</pre>
+			<p>
+WindowedEDSMFromDataset is a windowed version of Evidence Driven State-Merging.
+It takes a dataset as an argument which is used to generate an APTA.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="WindowedSearchUsingScoringFunction">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/SearchAlgorithms.go?s=7661:7828#L198">WindowedSearchUsingScoringFunction</a>
+				<a class="permalink" href="#WindowedSearchUsingScoringFunction">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func WindowedSearchUsingScoringFunction(statePartition <a href="#StatePartition">StatePartition</a>, windowSize <a href="/pkg/builtin/#int">int</a>, windowGrow <a href="/pkg/builtin/#float64">float64</a>, scoringFunction <a href="#ScoringFunction">ScoringFunction</a>) (<a href="#StatePartition">StatePartition</a>, <a href="#MergeData">MergeData</a>)</pre>
+			<p>
+WindowedSearchUsingScoringFunction deterministically merges state pairs within a given window.
+The state pair to be merged is chosen using a scoring function passed as a parameter.
+Returns the resultant state partition and merge data when no more valid merges are possible.
+</p>
+
+			
+			
+
+		
+		
+			
+			
+			<h2 id="Block">type <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=146:542#L2">Block</a>
+				<a class="permalink" href="#Block">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+Block struct which represents a block within a partition.
+</p>
+
+			<pre>type Block struct {
+<span id="Block.Root"></span>    Root        <a href="/pkg/builtin/#int">int</a>        <span class="comment">// Parent block of state.</span>
+<span id="Block.Size"></span>    Size        <a href="/pkg/builtin/#int">int</a>        <span class="comment">// Size (score) of block.</span>
+<span id="Block.Link"></span>    Link        <a href="/pkg/builtin/#int">int</a>        <span class="comment">// Index of next state within the block.</span>
+<span id="Block.Label"></span>    Label       <a href="#StateLabel">StateLabel</a> <span class="comment">// Label of block.</span>
+<span id="Block.Changed"></span>    Changed     <a href="/pkg/builtin/#bool">bool</a>       <span class="comment">// Whether block has been changed.</span>
+<span id="Block.Transitions"></span>    Transitions []<a href="/pkg/builtin/#int">int</a>      <span class="comment">// Transition Table where each element corresponds to a transition for each symbol.</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="DFA">type <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=183:565#L4">DFA</a>
+				<a class="permalink" href="#DFA">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+DFA struct which represents a DFA.
+</p>
+
+			<pre>type DFA struct {
+<span id="DFA.States"></span>    States          []<a href="#State">State</a> <span class="comment">// Slice of states within the DFA where the index is the State ID.</span>
+<span id="DFA.Alphabet"></span>    Alphabet        []<a href="/pkg/builtin/#int">int</a>   <span class="comment">// Alphabet within DFA.</span>
+<span id="DFA.StartingStateID"></span>    StartingStateID <a href="/pkg/builtin/#int">int</a>     <span class="comment">// The ID of the starting state of the DFA.</span>
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="AbbadingoDFA">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Abbadingo.go?s=2201:2254#L73">AbbadingoDFA</a>
+					<a class="permalink" href="#AbbadingoDFA">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func AbbadingoDFA(numberOfStates <a href="/pkg/builtin/#int">int</a>, exact <a href="/pkg/builtin/#bool">bool</a>) <a href="#DFA">DFA</a></pre>
+				<p>
+AbbadingoDFA returns a random DFA using the Abbadingo protocol given a number of states.
+If exact is set to true, the resultant DFA will have the required depth as per Abbadingo protocol.
+</p>
+
+				
+				
+			
+				
+				<h3 id="DFAFromJSON">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=30883:30928#L1015">DFAFromJSON</a>
+					<a class="permalink" href="#DFAFromJSON">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func DFAFromJSON(filePath <a href="/pkg/builtin/#string">string</a>) (<a href="#DFA">DFA</a>, <a href="/pkg/builtin/#bool">bool</a>)</pre>
+				<p>
+DFAFromJSON returns a pointer to a DFA read from a JSON file
+given a file path. The boolean value returned is set to true
+if DFA was read successfully.
+</p>
+
+				
+				
+			
+				
+				<h3 id="GetDFAFromStaminaFile">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Stamina.go?s=23041:23088#L637">GetDFAFromStaminaFile</a>
+					<a class="permalink" href="#GetDFAFromStaminaFile">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func GetDFAFromStaminaFile(filePath <a href="/pkg/builtin/#string">string</a>) <a href="#DFA">DFA</a></pre>
+				<p>
+GetDFAFromStaminaFile returns a DFA from a Stamina-Format File (adl).
+</p>
+
+				
+				
+			
+				
+				<h3 id="NewDFA">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=606:623#L13">NewDFA</a>
+					<a class="permalink" href="#NewDFA">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func NewDFA() <a href="#DFA">DFA</a></pre>
+				<p>
+NewDFA initializes a new empty DFA.
+</p>
+
+				
+				
+			
+				
+				<h3 id="NewDFAWithAlphabetSize">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=878:927#L19">NewDFAWithAlphabetSize</a>
+					<a class="permalink" href="#NewDFAWithAlphabetSize">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func NewDFAWithAlphabetSize(alphabetSize <a href="/pkg/builtin/#int">int</a>) <a href="#DFA">DFA</a></pre>
+				<p>
+NewDFAWithAlphabetSize initializes a new empty DFA with a given alphabet size.
+</p>
+
+				
+				
+			
+				
+				<h3 id="StaminaDFA">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Stamina.go?s=2686:2742#L81">StaminaDFA</a>
+					<a class="permalink" href="#StaminaDFA">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func StaminaDFA(alphabetSize <a href="/pkg/builtin/#int">int</a>, targetDFASize <a href="/pkg/builtin/#int">int</a>) <a href="#DFA">DFA</a></pre>
+				<p>
+StaminaDFA returns a random DFA using the StaMinA protocol given a number of states.
+This process is described in <a href="http://stamina.chefbe.net/machines">http://stamina.chefbe.net/machines</a> and in
+Walkinshaw, N., Lambeau, B., Damas, C., Bogdanov, K., &amp; Dupont, P. (2012). STAMINA:
+a competition to encourage the development and assessment of software model inference
+techniques. Empirical Software Engineering, 18(4), 791–824. doi:10.1007/s10664-012-9210-3
+</p>
+
+				
+				
+			
+
+			
+				
+				<h3 id="DFA.AcceptingStates">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=5850:5888#L155">AcceptingStates</a>
+					<a class="permalink" href="#DFA.AcceptingStates">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) AcceptingStates() []<a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+AcceptingStates returns state IDs of accepting states within DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.AcceptingStatesCount">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=7093:7134#L203">AcceptingStatesCount</a>
+					<a class="permalink" href="#DFA.AcceptingStatesCount">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) AcceptingStatesCount() <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+AcceptingStatesCount returns the number of accepting states within DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.Accuracy">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=14378:14426#L475">Accuracy</a>
+					<a class="permalink" href="#DFA.Accuracy">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) Accuracy(dataset <a href="#Dataset">Dataset</a>) <a href="/pkg/builtin/#float64">float64</a></pre>
+				<p>
+Accuracy returns the DFA&#39;s Accuracy with respect to a dataset.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.AddSinkState">func (*DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_Minimization.go?s=5126:5160#L126">AddSinkState</a>
+					<a class="permalink" href="#DFA.AddSinkState">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa *<a href="#DFA">DFA</a>) AddSinkState() <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+AddSinkState adds a sink state within DFA. This is used to convert
+a non-complete DFA to a complete DFA by adding a sink state.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.AddState">func (*DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=1373:1424#L34">AddState</a>
+					<a class="permalink" href="#DFA.AddState">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa *<a href="#DFA">DFA</a>) AddState(stateLabel <a href="#StateLabel">StateLabel</a>) <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+AddState adds a new state to the DFA with the corresponding State Label.
+Returns the new state&#39;s ID (index).
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.AddSymbol">func (*DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=3606:3633#L91">AddSymbol</a>
+					<a class="permalink" href="#DFA.AddSymbol">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa *<a href="#DFA">DFA</a>) AddSymbol()</pre>
+				<p>
+AddSymbol adds a new symbol to the DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.AddTransition">func (*DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=4011:4084#L101">AddTransition</a>
+					<a class="permalink" href="#DFA.AddTransition">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa *<a href="#DFA">DFA</a>) AddTransition(symbol <a href="/pkg/builtin/#int">int</a>, fromStateID <a href="/pkg/builtin/#int">int</a>, toStateID <a href="/pkg/builtin/#int">int</a>)</pre>
+				<p>
+AddTransition adds a new transition for a given symbol from one state to another.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.AllStates">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=5322:5354#L132">AllStates</a>
+					<a class="permalink" href="#DFA.AllStates">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) AllStates() []<a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+AllStates returns all state IDs within DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.CalculateDepthAndOrder">func (*DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=10892:10932#L356">CalculateDepthAndOrder</a>
+					<a class="permalink" href="#DFA.CalculateDepthAndOrder">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa *<a href="#DFA">DFA</a>) CalculateDepthAndOrder()</pre>
+				<p>
+CalculateDepthAndOrder computes the depth and Order for each state within DFA.
+This is done by traversing the DFA in a breadth-first order.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.ChangeRejectingStatesToUnlabelled">func (*DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=29604:29655#L963">ChangeRejectingStatesToUnlabelled</a>
+					<a class="permalink" href="#DFA.ChangeRejectingStatesToUnlabelled">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa *<a href="#DFA">DFA</a>) ChangeRejectingStatesToUnlabelled()</pre>
+				<p>
+ChangeRejectingStatesToUnlabelled changes all rejecting states
+within the DFA to unlabelled.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.Clone">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=17358:17385#L567">Clone</a>
+					<a class="permalink" href="#DFA.Clone">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) Clone() *<a href="#DFA">DFA</a></pre>
+				<p>
+Clone returns a clone of the DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.Depth">func (*DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=10522:10549#L343">Depth</a>
+					<a class="permalink" href="#DFA.Depth">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa *<a href="#DFA">DFA</a>) Depth() <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+Depth returns the DFA&#39;s depth which is defined as the maximum over all nodes x of
+the length of the shortest path from the root to x.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.Describe">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=13389:13425#L436">Describe</a>
+					<a class="permalink" href="#DFA.Describe">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) Describe(detail <a href="/pkg/builtin/#bool">bool</a>)</pre>
+				<p>
+Describe prints the details of the DFA. If detail is set to true,
+each state and each transition will also be printed.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.Equal">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=19963:19998#L647">Equal</a>
+					<a class="permalink" href="#DFA.Equal">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) Equal(dfa2 <a href="#DFA">DFA</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+Equal checks whether DFA is equal to the given DFA.
+This function makes use of DeepEqual and if it
+returns false, it does not necessarily mean that
+the DFAs are not equal. Use SameAs() for equivalence.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.IndistinguishableStatePairs">func (*DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_Minimization.go?s=330:389#L1">IndistinguishableStatePairs</a>
+					<a class="permalink" href="#DFA.IndistinguishableStatePairs">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa *<a href="#DFA">DFA</a>) IndistinguishableStatePairs() []<a href="#StateIDPair">StateIDPair</a></pre>
+				<p>
+IndistinguishableStatePairs returns a slice of indistinguishable state pairs within DFA.
+P. Linz, An Introduction to Formal Languages and Automata. Jones &amp; Bartlett Publishers, 2011.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.IsComplete">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=10225:10257#L331">IsComplete</a>
+					<a class="permalink" href="#DFA.IsComplete">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) IsComplete() <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+IsComplete returns true if DFA is complete, false is returned otherwise.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.IsTree">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=9770:9798#L313">IsTree</a>
+					<a class="permalink" href="#DFA.IsTree">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) IsTree() <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+IsTree returns true if DFA is a tree, false is returned otherwise.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.IsValidPanic">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=20135:20164#L653">IsValidPanic</a>
+					<a class="permalink" href="#DFA.IsValidPanic">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) IsValidPanic()</pre>
+				<p>
+IsValidPanic checks whether DFA is valid.
+Panics if not valid. Used for error checking.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.IsValidSafe">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=20788:20821#L671">IsValidSafe</a>
+					<a class="permalink" href="#DFA.IsValidSafe">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) IsValidSafe() <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+IsValidSafe checks whether DFA is valid.
+Returns false if not valid.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.LabelledStates">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=5546:5583#L142">LabelledStates</a>
+					<a class="permalink" href="#DFA.LabelledStates">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) LabelledStates() []<a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+LabelledStates returns state IDs of labelled states within DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.LabelledStatesCount">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=6804:6844#L191">LabelledStatesCount</a>
+					<a class="permalink" href="#DFA.LabelledStatesCount">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) LabelledStatesCount() <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+LabelledStatesCount returns the number of labelled states (accepting or rejecting) within DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.LeavesCount">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=8421:8453#L265">LeavesCount</a>
+					<a class="permalink" href="#DFA.LeavesCount">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) LeavesCount() <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+LeavesCount returns the number of leaves within DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.LoopsCount">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=9140:9171#L292">LoopsCount</a>
+					<a class="permalink" href="#DFA.LoopsCount">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) LoopsCount() <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+LoopsCount returns the number of loops within DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.Minimise">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_Minimization.go?s=3762:3791#L85">Minimise</a>
+					<a class="permalink" href="#DFA.Minimise">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) Minimise() <a href="#DFA">DFA</a></pre>
+				<p>
+Minimise returns a minimised version of the DFA.
+P. Linz, An Introduction to Formal Languages and Automata. Jones &amp; Bartlett Publishers, 2011.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.OrderedStates">func (*DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=12725:12762#L414">OrderedStates</a>
+					<a class="permalink" href="#DFA.OrderedStates">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa *<a href="#DFA">DFA</a>) OrderedStates() []<a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+OrderedStates returns the state IDs in order.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.RejectingStates">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=6157:6195#L167">RejectingStates</a>
+					<a class="permalink" href="#DFA.RejectingStates">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) RejectingStates() []<a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+RejectingStates returns state IDs of rejecting states within DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.RejectingStatesCount">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=7341:7382#L215">RejectingStatesCount</a>
+					<a class="permalink" href="#DFA.RejectingStatesCount">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) RejectingStatesCount() <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+RejectingStatesCount returns the number of rejecting states within DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.RemoveNonAcceptingLeaves">func (*DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=27478:27520#L889">RemoveNonAcceptingLeaves</a>
+					<a class="permalink" href="#DFA.RemoveNonAcceptingLeaves">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa *<a href="#DFA">DFA</a>) RemoveNonAcceptingLeaves()</pre>
+				<p>
+RemoveNonAcceptingLeaves removes all states which
+are leaves within DFA and are not accepting states.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.RemoveState">func (*DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=2031:2071#L52">RemoveState</a>
+					<a class="permalink" href="#DFA.RemoveState">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa *<a href="#DFA">DFA</a>) RemoveState(stateID <a href="/pkg/builtin/#int">int</a>)</pre>
+				<p>
+RemoveState removes a state from DFA with the corresponding State ID.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.RemoveTransition">func (*DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=4723:4784#L118">RemoveTransition</a>
+					<a class="permalink" href="#DFA.RemoveTransition">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa *<a href="#DFA">DFA</a>) RemoveTransition(symbol <a href="/pkg/builtin/#int">int</a>, fromStateID <a href="/pkg/builtin/#int">int</a>)</pre>
+				<p>
+RemoveTransition removes a transition for a given symbol from one state to another.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.RemoveUnreachableStates">func (*DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=16887:16928#L550">RemoveUnreachableStates</a>
+					<a class="permalink" href="#DFA.RemoveUnreachableStates">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa *<a href="#DFA">DFA</a>) RemoveUnreachableStates()</pre>
+				<p>
+RemoveUnreachableStates removes unreachable states from DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.SameAs">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=18058:18094#L592">SameAs</a>
+					<a class="permalink" href="#DFA.SameAs">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) SameAs(dfa2 <a href="#DFA">DFA</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+SameAs checks whether DFA is the same as the given DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.SetOrderAsID">func (*DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=28272:28306#L917">SetOrderAsID</a>
+					<a class="permalink" href="#DFA.SetOrderAsID">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa *<a href="#DFA">DFA</a>) SetOrderAsID() <a href="#DFA">DFA</a></pre>
+				<p>
+SetOrderAsID returns a new DFA where the State IDs are
+the order of the states within the original DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.StartingState">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=17237:17274#L562">StartingState</a>
+					<a class="permalink" href="#DFA.StartingState">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) StartingState() *<a href="#State">State</a></pre>
+				<p>
+StartingState returns a pointer to the starting state within the DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.StructurallyComplete">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=21611:21668#L706">StructurallyComplete</a>
+					<a class="permalink" href="#DFA.StructurallyComplete">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) StructurallyComplete(dataset <a href="#Dataset">Dataset</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+StructurallyComplete checks if DFA is structurally
+complete with respect to a Dataset.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.SymmetricallyStructurallyComplete">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=24442:24512#L796">SymmetricallyStructurallyComplete</a>
+					<a class="permalink" href="#DFA.SymmetricallyStructurallyComplete">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) SymmetricallyStructurallyComplete(dataset <a href="#Dataset">Dataset</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+SymmetricallyStructurallyComplete checks if DFA is symmetrically
+structurally complete with respect to a Dataset.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.ToDOT">func (*DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Visualisation.go?s=1190:1288#L18">ToDOT</a>
+					<a class="permalink" href="#DFA.ToDOT">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa *<a href="#DFA">DFA</a>) ToDOT(filePath <a href="/pkg/builtin/#string">string</a>, symbolMapping map[<a href="/pkg/builtin/#int">int</a>]<a href="/pkg/builtin/#string">string</a>, showOrder <a href="/pkg/builtin/#bool">bool</a>, topDown <a href="/pkg/builtin/#bool">bool</a>)</pre>
+				<p>
+ToDOT creates a .dot file using the DOT language. This DOT file
+contains a representation for the given DFA which can then be used
+to generate a visual representation of the DFA. The symbolMapping
+parameter is a map which maps each symbol within the alphabet to a
+string. This can be set to nil, which will map each symbol with a
+number starting from 0. If showOrder is set to true, the canonical
+order of the states is shown inside the node within DFA. If topDown
+is set to true, the visual representation will be top down. A left
+to right representation is used otherwise. This function is also
+called from all of the functions below.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.ToJPG">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Visualisation.go?s=6291:6393#L140">ToJPG</a>
+					<a class="permalink" href="#DFA.ToJPG">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) ToJPG(filePath <a href="/pkg/builtin/#string">string</a>, symbolMapping map[<a href="/pkg/builtin/#int">int</a>]<a href="/pkg/builtin/#string">string</a>, showOrder <a href="/pkg/builtin/#bool">bool</a>, topDown <a href="/pkg/builtin/#bool">bool</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+ToJPG creates and saves a .jpg image which represents the DFA to the
+given file path. Please note that GraphViz must be downloaded and
+installed before hand from <a href="https://graphviz.org/download/">https://graphviz.org/download/</a>. The symbolMapping
+parameter is a map which maps each symbol within the alphabet to a string.
+This can be set to nil, which will map each symbol with a number starting
+from 0. If showOrder is set to true, the canonical order of the states is
+shown inside the node within DFA. If topDown is set to true, the visual
+representation will be top down. A left to right representation is used
+otherwise. Returns true if successful or false if an error occurs.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.ToJSON">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=29942:29985#L974">ToJSON</a>
+					<a class="permalink" href="#DFA.ToJSON">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) ToJSON(filePath <a href="/pkg/builtin/#string">string</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+ToJSON saves the DFA to a JSON file given a file path.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.ToPDF">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Visualisation.go?s=7462:7564#L166">ToPDF</a>
+					<a class="permalink" href="#DFA.ToPDF">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) ToPDF(filePath <a href="/pkg/builtin/#string">string</a>, symbolMapping map[<a href="/pkg/builtin/#int">int</a>]<a href="/pkg/builtin/#string">string</a>, showOrder <a href="/pkg/builtin/#bool">bool</a>, topDown <a href="/pkg/builtin/#bool">bool</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+ToPDF creates and saves a .pdf file which represents the DFA to the
+given file path. Please note that GraphViz must be downloaded and
+installed before hand from <a href="https://graphviz.org/download/">https://graphviz.org/download/</a>. The symbolMapping
+parameter is a map which maps each symbol within the alphabet to a string.
+This can be set to nil, which will map each symbol with a number starting
+from 0. If showOrder is set to true, the canonical order of the states is
+shown inside the node within DFA. If topDown is set to true, the visual
+representation will be top down. A left to right representation is used
+otherwise. Returns true if successful or false if an error occurs.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.ToPNG">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Visualisation.go?s=5119:5221#L114">ToPNG</a>
+					<a class="permalink" href="#DFA.ToPNG">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) ToPNG(filePath <a href="/pkg/builtin/#string">string</a>, symbolMapping map[<a href="/pkg/builtin/#int">int</a>]<a href="/pkg/builtin/#string">string</a>, showOrder <a href="/pkg/builtin/#bool">bool</a>, topDown <a href="/pkg/builtin/#bool">bool</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+ToPNG creates and saves a .png image which represents the DFA to the
+given file path. Please note that GraphViz must be downloaded and
+installed before hand from <a href="https://graphviz.org/download/">https://graphviz.org/download/</a>. The symbolMapping
+parameter is a map which maps each symbol within the alphabet to a string.
+This can be set to nil, which will map each symbol with a number starting
+from 0. If showOrder is set to true, the canonical order of the states is
+shown inside the node within DFA. If topDown is set to true, the visual
+representation will be top down. A left to right representation is used
+otherwise. Returns true if successful or false if an error occurs.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.ToSVG">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Visualisation.go?s=8633:8735#L192">ToSVG</a>
+					<a class="permalink" href="#DFA.ToSVG">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) ToSVG(filePath <a href="/pkg/builtin/#string">string</a>, symbolMapping map[<a href="/pkg/builtin/#int">int</a>]<a href="/pkg/builtin/#string">string</a>, showOrder <a href="/pkg/builtin/#bool">bool</a>, topDown <a href="/pkg/builtin/#bool">bool</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+ToSVG creates and saves a .svg file which represents the DFA to the
+given file path. Please note that GraphViz must be downloaded and
+installed before hand from <a href="https://graphviz.org/download/">https://graphviz.org/download/</a>. The symbolMapping
+parameter is a map which maps each symbol within the alphabet to a string.
+This can be set to nil, which will map each symbol with a number starting
+from 0. If showOrder is set to true, the canonical order of the states is
+shown inside the node within DFA. If topDown is set to true, the visual
+representation will be top down. A left to right representation is used
+otherwise. Returns true if successful or false if an error occurs.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.ToStaminaFile">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Stamina.go?s=25521:25566#L752">ToStaminaFile</a>
+					<a class="permalink" href="#DFA.ToStaminaFile">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) ToStaminaFile(filePath <a href="/pkg/builtin/#string">string</a>)</pre>
+				<p>
+ToStaminaFile writes a given DFA to file in Stamina-Format (adl).
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.ToStatePartition">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=6995:7043#L175">ToStatePartition</a>
+					<a class="permalink" href="#DFA.ToStatePartition">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) ToStatePartition() <a href="#StatePartition">StatePartition</a></pre>
+				<p>
+ToStatePartition converts a DFA to a State Partition.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.TransitionsCount">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=7832:7869#L239">TransitionsCount</a>
+					<a class="permalink" href="#DFA.TransitionsCount">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) TransitionsCount() <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+TransitionsCount returns the number of transitions within DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.TransitionsCountForSymbol">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=8158:8214#L253">TransitionsCountForSymbol</a>
+					<a class="permalink" href="#DFA.TransitionsCountForSymbol">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) TransitionsCountForSymbol(symbol <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+TransitionsCountForSymbol returns the number of transitions for a given symbol within DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.UnlabelledStates">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=6466:6505#L179">UnlabelledStates</a>
+					<a class="permalink" href="#DFA.UnlabelledStates">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) UnlabelledStates() []<a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+UnlabelledStates returns state IDs of Unlabelled states within DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.UnlabelledStatesCount">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=7591:7633#L227">UnlabelledStatesCount</a>
+					<a class="permalink" href="#DFA.UnlabelledStatesCount">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) UnlabelledStatesCount() <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+UnlabelledStatesCount returns the number of Unlabelled states within DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="DFA.UnreachableStates">func (DFA) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=15182:15222#L495">UnreachableStates</a>
+					<a class="permalink" href="#DFA.UnreachableStates">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dfa <a href="#DFA">DFA</a>) UnreachableStates() []<a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+UnreachableStates returns the state IDs of unreachable states. Extracted from:
+P. Linz, An Introduction to Formal Languages and Automata. Jones &amp; Bartlett Publishers, 2011.
+</p>
+
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Dataset">type <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=442:471#L13">Dataset</a>
+				<a class="permalink" href="#Dataset">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+Dataset which is a slice of string instances.
+</p>
+
+			<pre>type Dataset []<a href="#StringInstance">StringInstance</a></pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="DatasetFromJSON">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=21064:21117#L639">DatasetFromJSON</a>
+					<a class="permalink" href="#DatasetFromJSON">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func DatasetFromJSON(filePath <a href="/pkg/builtin/#string">string</a>) (<a href="#Dataset">Dataset</a>, <a href="/pkg/builtin/#bool">bool</a>)</pre>
+				<p>
+DatasetFromJSON returns a dataset read from a JSON file
+given a file path. The boolean value returned is set to
+true if Dataset was read successfully.
+</p>
+
+				
+				
+			
+				
+				<h3 id="GetDatasetFromAbbadingoFile">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Abbadingo.go?s=185:242#L4">GetDatasetFromAbbadingoFile</a>
+					<a class="permalink" href="#GetDatasetFromAbbadingoFile">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func GetDatasetFromAbbadingoFile(filePath <a href="/pkg/builtin/#string">string</a>) <a href="#Dataset">Dataset</a></pre>
+				<p>
+GetDatasetFromAbbadingoFile returns a Dataset from an Abbadingo-Format File.
+</p>
+
+				
+				
+			
+				
+				<h3 id="GetDatasetFromStaminaFile">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Stamina.go?s=229:284#L5">GetDatasetFromStaminaFile</a>
+					<a class="permalink" href="#GetDatasetFromStaminaFile">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func GetDatasetFromStaminaFile(filePath <a href="/pkg/builtin/#string">string</a>) <a href="#Dataset">Dataset</a></pre>
+				<p>
+GetDatasetFromStaminaFile returns a Dataset from a Stamina-Format File.
+</p>
+
+				
+				
+			
+
+			
+				
+				<h3 id="Dataset.AcceptingStringInstances">func (Dataset) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=16108:16165#L470">AcceptingStringInstances</a>
+					<a class="permalink" href="#Dataset.AcceptingStringInstances">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dataset <a href="#Dataset">Dataset</a>) AcceptingStringInstances() <a href="#Dataset">Dataset</a></pre>
+				<p>
+AcceptingStringInstances returns the accepting string instances.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Dataset.AcceptingStringInstancesCount">func (Dataset) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=17674:17732#L523">AcceptingStringInstancesCount</a>
+					<a class="permalink" href="#Dataset.AcceptingStringInstancesCount">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dataset <a href="#Dataset">Dataset</a>) AcceptingStringInstancesCount() <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+AcceptingStringInstancesCount returns the number of accepting
+string instances within dataset.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Dataset.AcceptingStringInstancesRatio">func (Dataset) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=18548:18610#L559">AcceptingStringInstancesRatio</a>
+					<a class="permalink" href="#Dataset.AcceptingStringInstancesRatio">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dataset <a href="#Dataset">Dataset</a>) AcceptingStringInstancesRatio() <a href="/pkg/builtin/#float64">float64</a></pre>
+				<p>
+AcceptingStringInstancesRatio returns the ratio of accepting string
+instances to the rejecting string instances within dataset.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Dataset.Accuracy">func (Dataset) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=19845:19893#L590">Accuracy</a>
+					<a class="permalink" href="#Dataset.Accuracy">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dataset <a href="#Dataset">Dataset</a>) Accuracy(dfa <a href="#DFA">DFA</a>) <a href="/pkg/builtin/#float64">float64</a></pre>
+				<p>
+Accuracy returns the DFA&#39;s Accuracy with respect to the dataset.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Dataset.AverageLength">func (Dataset) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=17215:17261#L507">AverageLength</a>
+					<a class="permalink" href="#Dataset.AverageLength">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dataset <a href="#Dataset">Dataset</a>) AverageLength() <a href="/pkg/builtin/#float64">float64</a></pre>
+				<p>
+AverageLength returns the average length of string instances within dataset.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Dataset.ConsistentWithDFA">func (Dataset) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=6523:6577#L188">ConsistentWithDFA</a>
+					<a class="permalink" href="#Dataset.ConsistentWithDFA">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dataset <a href="#Dataset">Dataset</a>) ConsistentWithDFA(dfa <a href="#DFA">DFA</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+ConsistentWithDFA checks whether dataset is consistent with a given DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Dataset.ConsistentWithStatePartition">func (Dataset) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=9751:9838#L284">ConsistentWithStatePartition</a>
+					<a class="permalink" href="#Dataset.ConsistentWithStatePartition">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dataset <a href="#Dataset">Dataset</a>) ConsistentWithStatePartition(statePartition <a href="#StatePartition">StatePartition</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+ConsistentWithStatePartition checks whether dataset is consistent with a given StatePartition.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Dataset.Count">func (Dataset) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=17069:17103#L502">Count</a>
+					<a class="permalink" href="#Dataset.Count">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dataset <a href="#Dataset">Dataset</a>) Count() <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+Count returns the number of string instances within dataset.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Dataset.GetPTA">func (Dataset) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=578:622#L17">GetPTA</a>
+					<a class="permalink" href="#Dataset.GetPTA">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dataset <a href="#Dataset">Dataset</a>) GetPTA(APTA <a href="/pkg/builtin/#bool">bool</a>) <a href="#DFA">DFA</a></pre>
+				<p>
+GetPTA returns an APTA/PTA (DFA) given a dataset.
+If APTA is set to true, an APTA is returned.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Dataset.RejectingStringInstances">func (Dataset) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=16590:16647#L486">RejectingStringInstances</a>
+					<a class="permalink" href="#Dataset.RejectingStringInstances">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dataset <a href="#Dataset">Dataset</a>) RejectingStringInstances() <a href="#Dataset">Dataset</a></pre>
+				<p>
+RejectingStringInstances returns the rejecting string instances.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Dataset.RejectingStringInstancesCount">func (Dataset) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=18094:18152#L541">RejectingStringInstancesCount</a>
+					<a class="permalink" href="#Dataset.RejectingStringInstancesCount">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dataset <a href="#Dataset">Dataset</a>) RejectingStringInstancesCount() <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+RejectingStringInstancesCount returns the number of accepting
+string instances within dataset.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Dataset.RejectingStringInstancesRatio">func (Dataset) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=18837:18899#L565">RejectingStringInstancesRatio</a>
+					<a class="permalink" href="#Dataset.RejectingStringInstancesRatio">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dataset <a href="#Dataset">Dataset</a>) RejectingStringInstancesRatio() <a href="/pkg/builtin/#float64">float64</a></pre>
+				<p>
+RejectingStringInstancesRatio returns the ratio of rejecting string
+instances to the accepting string instances within dataset.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Dataset.SameAs">func (Dataset) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=19119:19171#L571">SameAs</a>
+					<a class="permalink" href="#Dataset.SameAs">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dataset <a href="#Dataset">Dataset</a>) SameAs(dataset2 <a href="#Dataset">Dataset</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+SameAs checks whether Dataset is the same as the given Dataset.
+Both datasets are sorted before checking with DeepEqual.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Dataset.SortDatasetByLength">func (Dataset) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=15762:15814#L459">SortDatasetByLength</a>
+					<a class="permalink" href="#Dataset.SortDatasetByLength">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dataset <a href="#Dataset">Dataset</a>) SortDatasetByLength() <a href="#Dataset">Dataset</a></pre>
+				<p>
+SortDatasetByLength sorts the given dataset by length and returns it.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Dataset.StructurallyComplete">func (Dataset) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=19410:19467#L579">StructurallyComplete</a>
+					<a class="permalink" href="#Dataset.StructurallyComplete">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dataset <a href="#Dataset">Dataset</a>) StructurallyComplete(dfa <a href="#DFA">DFA</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+StructurallyComplete checks if Dataset is structurally
+complete with respect to a DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Dataset.SymmetricallyStructurallyComplete">func (Dataset) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=19641:19711#L585">SymmetricallyStructurallyComplete</a>
+					<a class="permalink" href="#Dataset.SymmetricallyStructurallyComplete">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dataset <a href="#Dataset">Dataset</a>) SymmetricallyStructurallyComplete(dfa <a href="#DFA">DFA</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+SymmetricallyStructurallyComplete checks if Dataset is symmetrically
+structurally complete with respect to a DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Dataset.ToAbbadingoFile">func (Dataset) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Abbadingo.go?s=7941:7996#L223">ToAbbadingoFile</a>
+					<a class="permalink" href="#Dataset.ToAbbadingoFile">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dataset <a href="#Dataset">Dataset</a>) ToAbbadingoFile(filePath <a href="/pkg/builtin/#string">string</a>)</pre>
+				<p>
+ToAbbadingoFile writes a given Dataset to file in Abbadingo-Format.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Dataset.ToJSON">func (Dataset) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=19996:20047#L595">ToJSON</a>
+					<a class="permalink" href="#Dataset.ToJSON">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dataset <a href="#Dataset">Dataset</a>) ToJSON(filePath <a href="/pkg/builtin/#string">string</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+ToJSON saves the dataset to a JSON file given a file path.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Dataset.ToStaminaFile">func (Dataset) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Stamina.go?s=21907:21960#L597">ToStaminaFile</a>
+					<a class="permalink" href="#Dataset.ToStaminaFile">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (dataset <a href="#Dataset">Dataset</a>) ToStaminaFile(filePath <a href="/pkg/builtin/#string">string</a>)</pre>
+				<p>
+ToStaminaFile writes a given Dataset to file in Stamina-Format.
+</p>
+
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="MergeData">type <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/MergeData.go?s=148:507#L4">MergeData</a>
+				<a class="permalink" href="#MergeData">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+MergeData struct to store merge merge data.
+</p>
+
+			<pre>type MergeData struct {
+<span id="MergeData.Merges"></span>    Merges               []<a href="#StatePairScore">StatePairScore</a> <span class="comment">// Slice of state pairs and scores of merges done.</span>
+<span id="MergeData.AttemptedMergesCount"></span>    AttemptedMergesCount <a href="/pkg/builtin/#int">int</a>              <span class="comment">// The number of attempted merges.</span>
+<span id="MergeData.ValidMergesCount"></span>    ValidMergesCount     <a href="/pkg/builtin/#int">int</a>              <span class="comment">// The number of valid attempted merges.</span>
+<span id="MergeData.Duration"></span>    Duration             <a href="/pkg/time/">time</a>.<a href="/pkg/time/#Duration">Duration</a>    <span class="comment">// The duration for the search function to finish.</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+				
+				<h3 id="MergeData.AttemptedMergesPerSecond">func (MergeData) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/MergeData.go?s=798:859#L19">AttemptedMergesPerSecond</a>
+					<a class="permalink" href="#MergeData.AttemptedMergesPerSecond">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (mergeData <a href="#MergeData">MergeData</a>) AttemptedMergesPerSecond() <a href="/pkg/builtin/#float64">float64</a></pre>
+				<p>
+AttemptedMergesPerSecond returns the number of attempted
+merges per second. Used for performance evaluation.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="MergeData.MergesCount">func (MergeData) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/MergeData.go?s=603:647#L13">MergesCount</a>
+					<a class="permalink" href="#MergeData.MergesCount">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (mergeData <a href="#MergeData">MergeData</a>) MergesCount() <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+MergesCount returns the number of merges done before
+reaching the final StatePartition.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="MergeData.Print">func (MergeData) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/MergeData.go?s=1003:1037#L24">Print</a>
+					<a class="permalink" href="#MergeData.Print">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (mergeData <a href="#MergeData">MergeData</a>) Print()</pre>
+				<p>
+Print prints some of the merge data to standard output.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="MergeData.ToJSON">func (MergeData) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/MergeData.go?s=1342:1397#L31">ToJSON</a>
+					<a class="permalink" href="#MergeData.ToJSON">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (mergeData <a href="#MergeData">MergeData</a>) ToJSON(filePath <a href="/pkg/builtin/#string">string</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+ToJSON saves the MergeData to a JSON file given a file path.
+</p>
+
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="ScoringFunction">type <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/SearchAlgorithms.go?s=467:572#L7">ScoringFunction</a>
+				<a class="permalink" href="#ScoringFunction">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+ScoringFunction takes two stateIDs and two state partitions as input and returns a score as a float.
+</p>
+
+			<pre>type ScoringFunction func(stateID1, stateID2 <a href="/pkg/builtin/#int">int</a>, partitionBefore, partitionAfter <a href="#StatePartition">StatePartition</a>) <a href="/pkg/builtin/#float64">float64</a></pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="State">type <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_State.go?s=561:942#L7">State</a>
+				<a class="permalink" href="#State">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+State struct which represents a State within a DFA. Please note that while
+the Transitions are made to be accessible from outside of this toolkit use
+AddTransition, UpdateTransition and GetTransitionValue where required. It
+was left public to be accessible to json.Marshal for import/export.
+</p>
+
+			<pre>type State struct {
+<span id="State.Label"></span>    Label       <a href="#StateLabel">StateLabel</a> <span class="comment">// State Label (Rejecting, Accepting, or Unlabelled).</span>
+<span id="State.Transitions"></span>    Transitions []<a href="/pkg/builtin/#int">int</a>      <span class="comment">// Transition Table where each element corresponds to a transition for each symbol.</span>
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+				
+				<h3 id="State.AddTransition">func (*State) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_State.go?s=1774:1820#L38">AddTransition</a>
+					<a class="permalink" href="#State.AddTransition">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (state *<a href="#State">State</a>) AddTransition(stateID <a href="/pkg/builtin/#int">int</a>)</pre>
+				<p>
+AddTransition adds a transition given a stateID. The stateID can be set to -1
+which indicates that the transition for this symbol does not exist (not valid).
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="State.AllTransitionsExist">func (State) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_State.go?s=5046:5091#L150">AllTransitionsExist</a>
+					<a class="permalink" href="#State.AllTransitionsExist">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (state <a href="#State">State</a>) AllTransitionsExist() <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+AllTransitionsExist checks whether all transitions from a given state
+exist (not -1). In other words, whether the state has a transition for
+each of the symbols within the alphabet.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="State.Clone">func (State) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_State.go?s=7396:7428#L228">Clone</a>
+					<a class="permalink" href="#State.Clone">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (state <a href="#State">State</a>) Clone() <a href="#State">State</a></pre>
+				<p>
+Clone returns a clone of the State.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="State.DFA">func (State) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_State.go?s=6792:6821#L206">DFA</a>
+					<a class="permalink" href="#State.DFA">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (state <a href="#State">State</a>) DFA() *<a href="#DFA">DFA</a></pre>
+				<p>
+DFA returns a pointer to the DFA which contains this State.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="State.Depth">func (*State) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_State.go?s=4544:4575#L130">Depth</a>
+					<a class="permalink" href="#State.Depth">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (state *<a href="#State">State</a>) Depth() <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+Depth returns the state&#39;s depth within DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="State.GetTransitionValue">func (State) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_State.go?s=3032:3087#L74">GetTransitionValue</a>
+					<a class="permalink" href="#State.GetTransitionValue">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (state <a href="#State">State</a>) GetTransitionValue(symbolID <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+GetTransitionValue returns the transition value given a symbolID.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="State.GetTransitions">func (State) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_State.go?s=1506:1547#L31">GetTransitions</a>
+					<a class="permalink" href="#State.GetTransitions">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (state <a href="#State">State</a>) GetTransitions() []<a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+GetTransitions returns the transitions from the current state.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="State.InDegree">func (State) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_State.go?s=3351:3395#L85">InDegree</a>
+					<a class="permalink" href="#State.InDegree">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (state <a href="#State">State</a>) InDegree(stateID <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+InDegree returns the in degree of the state.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="State.IsAccepting">func (State) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_State.go?s=1029:1066#L16">IsAccepting</a>
+					<a class="permalink" href="#State.IsAccepting">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (state <a href="#State">State</a>) IsAccepting() <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+IsAccepting returns true if state label is accepting, otherwise returns false.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="State.IsLeaf">func (State) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_State.go?s=4423:4455#L125">IsLeaf</a>
+					<a class="permalink" href="#State.IsLeaf">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (state <a href="#State">State</a>) IsLeaf() <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+IsLeaf checks whether given state is a leaf within DFA.
+In other words, whether the state has any valid transitions.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="State.IsRejecting">func (State) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_State.go?s=1192:1229#L21">IsRejecting</a>
+					<a class="permalink" href="#State.IsRejecting">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (state <a href="#State">State</a>) IsRejecting() <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+IsRejecting returns true if state label is rejecting, otherwise returns false.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="State.IsUnlabelled">func (State) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_State.go?s=1357:1395#L26">IsUnlabelled</a>
+					<a class="permalink" href="#State.IsUnlabelled">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (state <a href="#State">State</a>) IsUnlabelled() <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+IsUnlabelled returns true if state label is unlabelled, otherwise returns false.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="State.Order">func (*State) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_State.go?s=4722:4753#L139">Order</a>
+					<a class="permalink" href="#State.Order">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (state *<a href="#State">State</a>) Order() <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+Order returns the state&#39;s order within DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="State.OutDegree">func (State) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_State.go?s=3916:3950#L106">OutDegree</a>
+					<a class="permalink" href="#State.OutDegree">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (state <a href="#State">State</a>) OutDegree() <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+OutDegree returns the out degree of the state..
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="State.TransitionExists">func (State) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_State.go?s=5592:5645#L168">TransitionExists</a>
+					<a class="permalink" href="#State.TransitionExists">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (state <a href="#State">State</a>) TransitionExists(stateID <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+TransitionExists checks whether a transition exists from a given state
+to another state, regardless of the symbol.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="State.TransitionsCount">func (State) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_State.go?s=6923:6975#L211">TransitionsCount</a>
+					<a class="permalink" href="#State.TransitionsCount">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (state <a href="#State">State</a>) TransitionsCount(stateID <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+TransitionsCount returns the number of transitions to given state ID.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="State.UpdateTransition">func (*State) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_State.go?s=2473:2532#L55">UpdateTransition</a>
+					<a class="permalink" href="#State.UpdateTransition">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (state *<a href="#State">State</a>) UpdateTransition(symbolID, stateID <a href="/pkg/builtin/#int">int</a>)</pre>
+				<p>
+UpdateTransition updates a transition given a symbolID and stateID. This
+is recommended to be used when changing transitions since it updates the
+computedDepthAndOrder flag within DFA. The stateID can be set to -1 to
+&#39;remove&#39; the transition or any other stateID to add or modify a transition.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="State.ValidTransitions">func (State) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_State.go?s=6226:6269#L187">ValidTransitions</a>
+					<a class="permalink" href="#State.ValidTransitions">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (state <a href="#State">State</a>) ValidTransitions() []<a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+ValidTransitions returns all transitions from a given state
+that are valid (not -1). The symbolIDs of the corresponding
+valid transitions are returned in a slice of integers.
+</p>
+
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="StateIDPair">type <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_Minimization.go?s=81:135#L1">StateIDPair</a>
+				<a class="permalink" href="#StateIDPair">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+StateIDPair which represents a pair of states.
+</p>
+
+			<pre>type StateIDPair struct {
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="StateLabel">type <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA_State.go?s=80:101#L1">StateLabel</a>
+				<a class="permalink" href="#StateLabel">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+StateLabel type as an 8-bit unsigned integer.
+</p>
+
+			<pre>type StateLabel <a href="/pkg/builtin/#uint8">uint8</a></pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="StatePairScore">type <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/SearchAlgorithms.go?s=183:358#L1">StatePairScore</a>
+				<a class="permalink" href="#StatePairScore">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+StatePairScore struct to store state pairs and their merge score.
+</p>
+
+			<pre>type StatePairScore struct {
+<span id="StatePairScore.State1"></span>    State1 <a href="/pkg/builtin/#int">int</a>     <span class="comment">// StateID for first state.</span>
+<span id="StatePairScore.State2"></span>    State2 <a href="/pkg/builtin/#int">int</a>     <span class="comment">// StateID for second state.</span>
+<span id="StatePairScore.Score"></span>    Score  <a href="/pkg/builtin/#float64">float64</a> <span class="comment">// Score of merge for given states.</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="StatePartition">type <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=605:1237#L12">StatePartition</a>
+				<a class="permalink" href="#StatePartition">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+StatePartition struct which represents a State Partition.
+</p>
+
+			<pre>type StatePartition struct {
+<span id="StatePartition.Blocks"></span>    Blocks               []<a href="#Block">Block</a> <span class="comment">// Slice of blocks.</span>
+<span id="StatePartition.BlocksCount"></span>    BlocksCount          <a href="/pkg/builtin/#int">int</a>     <span class="comment">// Number of blocks within partition.</span>
+<span id="StatePartition.AcceptingBlocksCount"></span>    AcceptingBlocksCount <a href="/pkg/builtin/#int">int</a>     <span class="comment">// Number of accepting blocks within partition.</span>
+<span id="StatePartition.RejectingBlocksCount"></span>    RejectingBlocksCount <a href="/pkg/builtin/#int">int</a>     <span class="comment">// Number of rejecting blocks within partition.</span>
+<span id="StatePartition.AlphabetSize"></span>    AlphabetSize         <a href="/pkg/builtin/#int">int</a>     <span class="comment">// Size of alphabet.</span>
+<span id="StatePartition.StartingStateID"></span>    StartingStateID      <a href="/pkg/builtin/#int">int</a>     <span class="comment">// The ID of the starting state.</span>
+
+<span id="StatePartition.IsCopy"></span>    IsCopy             <a href="/pkg/builtin/#bool">bool</a>  <span class="comment">// Whether state partition is a copy (for reverting merges).</span>
+<span id="StatePartition.ChangedBlocks"></span>    ChangedBlocks      []<a href="/pkg/builtin/#int">int</a> <span class="comment">// Slice of changed blocks.</span>
+<span id="StatePartition.ChangedBlocksCount"></span>    ChangedBlocksCount <a href="/pkg/builtin/#int">int</a>   <span class="comment">// Number of changed blocks within partition.</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="NewStatePartition">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=1300:1355#L26">NewStatePartition</a>
+					<a class="permalink" href="#NewStatePartition">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func NewStatePartition(referenceDFA <a href="#DFA">DFA</a>) <a href="#StatePartition">StatePartition</a></pre>
+				<p>
+NewStatePartition returns an initialized State Partition.
+</p>
+
+				
+				
+			
+				
+				<h3 id="StatePartitionFromJSON">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=22825:22892#L618">StatePartitionFromJSON</a>
+					<a class="permalink" href="#StatePartitionFromJSON">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func StatePartitionFromJSON(filePath <a href="/pkg/builtin/#string">string</a>) (<a href="#StatePartition">StatePartition</a>, <a href="/pkg/builtin/#bool">bool</a>)</pre>
+				<p>
+StatePartitionFromJSON returns a StatePartition read from a JSON file
+given a file path. The boolean value returned is set to
+true if DFA was read successfully.
+</p>
+
+				
+				
+			
+
+			
+				
+				<h3 id="StatePartition.ChangedBlock">func (*StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=2730:2793#L62">ChangedBlock</a>
+					<a class="permalink" href="#StatePartition.ChangedBlock">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition *<a href="#StatePartition">StatePartition</a>) ChangedBlock(blockID <a href="/pkg/builtin/#int">int</a>)</pre>
+				<p>
+ChangedBlock updates the required fields to mark block as changed.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.Clone">func (StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=11627:11686#L297">Clone</a>
+					<a class="permalink" href="#StatePartition.Clone">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition <a href="#StatePartition">StatePartition</a>) Clone() <a href="#StatePartition">StatePartition</a></pre>
+				<p>
+Clone returns a clone of the state partition.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.Copy">func (StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=13088:13146#L333">Copy</a>
+					<a class="permalink" href="#StatePartition.Copy">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition <a href="#StatePartition">StatePartition</a>) Copy() <a href="#StatePartition">StatePartition</a></pre>
+				<p>
+Copy returns a copy of the state partition in &#39;copy&#39; (undo) mode.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.CopyChangesFrom">func (*StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=15150:15241#L386">CopyChangesFrom</a>
+					<a class="permalink" href="#StatePartition.CopyChangesFrom">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition *<a href="#StatePartition">StatePartition</a>) CopyChangesFrom(copiedStatePartition *<a href="#StatePartition">StatePartition</a>)</pre>
+				<p>
+CopyChangesFrom copies the changes from one state partition to another and resets
+the changed values within the copied state partition.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.DepthOfBlocks">func (*StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=19616:19681#L508">DepthOfBlocks</a>
+					<a class="permalink" href="#StatePartition.DepthOfBlocks">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition *<a href="#StatePartition">StatePartition</a>) DepthOfBlocks() map[<a href="/pkg/builtin/#int">int</a>]<a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+DepthOfBlocks returns the depth of each block.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.Find">func (*StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=5305:5364#L127">Find</a>
+					<a class="permalink" href="#StatePartition.Find">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition *<a href="#StatePartition">StatePartition</a>) Find(stateID <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+Find traverses each root element while compressing the
+levels to find the root element of the stateID.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.MergeStates">func (*StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=10078:10160#L251">MergeStates</a>
+					<a class="permalink" href="#StatePartition.MergeStates">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition *<a href="#StatePartition">StatePartition</a>) MergeStates(stateID1 <a href="/pkg/builtin/#int">int</a>, stateID2 <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+MergeStates recursively merges states to merge stateID1 and stateID2. Returns false if
+merge results in a non-deterministic automaton. Returns true if merge was successful.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.NumberOfLabelledBlocks">func (StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=16675:16740#L421">NumberOfLabelledBlocks</a>
+					<a class="permalink" href="#StatePartition.NumberOfLabelledBlocks">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition <a href="#StatePartition">StatePartition</a>) NumberOfLabelledBlocks() <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+NumberOfLabelledBlocks returns the number of labelled blocks (states) within state partition.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.OrderOfBlocks">func (*StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=20405:20470#L535">OrderOfBlocks</a>
+					<a class="permalink" href="#StatePartition.OrderOfBlocks">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition *<a href="#StatePartition">StatePartition</a>) OrderOfBlocks() map[<a href="/pkg/builtin/#int">int</a>]<a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+OrderOfBlocks returns the order of each block.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.OrderedBlocks">func (*StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=17779:17838#L455">OrderedBlocks</a>
+					<a class="permalink" href="#StatePartition.OrderedBlocks">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition *<a href="#StatePartition">StatePartition</a>) OrderedBlocks() []<a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+OrderedBlocks returns the IDs of root blocks in order as a slice of integers.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.ReturnSet">func (StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=5982:6047#L145">ReturnSet</a>
+					<a class="permalink" href="#StatePartition.ReturnSet">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition <a href="#StatePartition">StatePartition</a>) ReturnSet(blockID <a href="/pkg/builtin/#int">int</a>) []<a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+ReturnSet returns the state IDs within given block.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.RollbackChangesFrom">func (*StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=13749:13845#L352">RollbackChangesFrom</a>
+					<a class="permalink" href="#StatePartition.RollbackChangesFrom">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition *<a href="#StatePartition">StatePartition</a>) RollbackChangesFrom(originalStatePartition <a href="#StatePartition">StatePartition</a>)</pre>
+				<p>
+RollbackChangesFrom reverts any changes made within state partition given the original state partition.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.RootBlocks">func (StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=16961:17016#L427">RootBlocks</a>
+					<a class="permalink" href="#StatePartition.RootBlocks">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition <a href="#StatePartition">StatePartition</a>) RootBlocks() []<a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+RootBlocks returns the IDs of root blocks as a slice of integers.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.StartingBlock">func (*StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=19443:19500#L503">StartingBlock</a>
+					<a class="permalink" href="#StatePartition.StartingBlock">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition *<a href="#StatePartition">StatePartition</a>) StartingBlock() <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+StartingBlock returns the ID of the block which contains the starting state.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.ToDOT">func (StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Visualisation.go?s=9848:9967#L218">ToDOT</a>
+					<a class="permalink" href="#StatePartition.ToDOT">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition <a href="#StatePartition">StatePartition</a>) ToDOT(filePath <a href="/pkg/builtin/#string">string</a>, symbolMapping map[<a href="/pkg/builtin/#int">int</a>]<a href="/pkg/builtin/#string">string</a>, showOrder <a href="/pkg/builtin/#bool">bool</a>, topDown <a href="/pkg/builtin/#bool">bool</a>)</pre>
+				<p>
+ToDOT creates a .dot file using the DOT language. This DOT file
+contains a representation for the given StatePartition which can then
+be used to generate a visual representation of the DFA represented by the
+State Partition. The symbolMapping parameter is a map which maps each symbol
+within the alphabet to a string. This can be set to nil, which will map each
+symbol with a number starting from 0. If showOrder is set to true, the canonical
+order of the states is shown inside the node within partition. If topDown is set
+to true, the visual representation will be top down. A left to right representation
+is used otherwise. This function is also called from all of the functions below.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.ToJPG">func (StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Visualisation.go?s=15476:15600#L346">ToJPG</a>
+					<a class="permalink" href="#StatePartition.ToJPG">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition <a href="#StatePartition">StatePartition</a>) ToJPG(filePath <a href="/pkg/builtin/#string">string</a>, symbolMapping map[<a href="/pkg/builtin/#int">int</a>]<a href="/pkg/builtin/#string">string</a>, showOrder <a href="/pkg/builtin/#bool">bool</a>, topDown <a href="/pkg/builtin/#bool">bool</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+ToJPG creates and saves a .jpg image which represents the state partition
+to the given file path. Please note that GraphViz must be downloaded and
+installed before hand from <a href="https://graphviz.org/download/">https://graphviz.org/download/</a>. The symbolMapping
+parameter is a map which maps each symbol within the alphabet to a string.
+This can be set to nil, which will map each symbol with a number starting
+from 0. If showOrder is set to true, the canonical order of the states is
+shown inside the node within partition. If topDown is set to true, the
+visual representation will be top down. A left to right representation is
+used otherwise. Returns true if successful or false if an error occurs.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.ToJSON">func (StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=21820:21885#L577">ToJSON</a>
+					<a class="permalink" href="#StatePartition.ToJSON">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition <a href="#StatePartition">StatePartition</a>) ToJSON(filePath <a href="/pkg/builtin/#string">string</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+ToJSON saves the StatePartition to a JSON file given a file path.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.ToPDF">func (StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Visualisation.go?s=16710:16834#L372">ToPDF</a>
+					<a class="permalink" href="#StatePartition.ToPDF">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition <a href="#StatePartition">StatePartition</a>) ToPDF(filePath <a href="/pkg/builtin/#string">string</a>, symbolMapping map[<a href="/pkg/builtin/#int">int</a>]<a href="/pkg/builtin/#string">string</a>, showOrder <a href="/pkg/builtin/#bool">bool</a>, topDown <a href="/pkg/builtin/#bool">bool</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+ToPDF creates and saves a .pdf file which represents the state partition
+to the given file path. Please note that GraphViz must be downloaded and
+installed before hand from <a href="https://graphviz.org/download/">https://graphviz.org/download/</a>. The symbolMapping
+parameter is a map which maps each symbol within the alphabet to a string.
+This can be set to nil, which will map each symbol with a number starting
+from 0. If showOrder is set to true, the canonical order of the states is
+shown inside the node within partition. If topDown is set to true, the
+visual representation will be top down. A left to right representation is
+used otherwise. Returns true if successful or false if an error occurs.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.ToPNG">func (StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Visualisation.go?s=14241:14365#L320">ToPNG</a>
+					<a class="permalink" href="#StatePartition.ToPNG">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition <a href="#StatePartition">StatePartition</a>) ToPNG(filePath <a href="/pkg/builtin/#string">string</a>, symbolMapping map[<a href="/pkg/builtin/#int">int</a>]<a href="/pkg/builtin/#string">string</a>, showOrder <a href="/pkg/builtin/#bool">bool</a>, topDown <a href="/pkg/builtin/#bool">bool</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+ToPNG creates and saves a .png image which represents the state partition
+to the given file path. Please note that GraphViz must be downloaded and
+installed before hand from <a href="https://graphviz.org/download/">https://graphviz.org/download/</a>. The symbolMapping
+parameter is a map which maps each symbol within the alphabet to a string.
+This can be set to nil, which will map each symbol with a number starting
+from 0. If showOrder is set to true, the canonical order of the states is
+shown inside the node within partition. If topDown is set to true, the
+visual representation will be top down. A left to right representation is
+used otherwise. Returns true if successful or false if an error occurs.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.ToQuotientDFA">func (*StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=7188:7245#L181">ToQuotientDFA</a>
+					<a class="permalink" href="#StatePartition.ToQuotientDFA">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition *<a href="#StatePartition">StatePartition</a>) ToQuotientDFA() <a href="#DFA">DFA</a></pre>
+				<p>
+ToQuotientDFA converts a State Partition to a quotient DFA and returns it.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.ToQuotientDFAWithMapping">func (*StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=8593:8676#L216">ToQuotientDFAWithMapping</a>
+					<a class="permalink" href="#StatePartition.ToQuotientDFAWithMapping">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition *<a href="#StatePartition">StatePartition</a>) ToQuotientDFAWithMapping() (<a href="#DFA">DFA</a>, map[<a href="/pkg/builtin/#int">int</a>]<a href="/pkg/builtin/#int">int</a>)</pre>
+				<p>
+ToQuotientDFAWithMapping converts a State Partition to a quotient DFA and returns it. This function
+also returns the state partition&#39;s blocks to state mapping.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.ToSVG">func (StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Visualisation.go?s=17944:18068#L398">ToSVG</a>
+					<a class="permalink" href="#StatePartition.ToSVG">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition <a href="#StatePartition">StatePartition</a>) ToSVG(filePath <a href="/pkg/builtin/#string">string</a>, symbolMapping map[<a href="/pkg/builtin/#int">int</a>]<a href="/pkg/builtin/#string">string</a>, showOrder <a href="/pkg/builtin/#bool">bool</a>, topDown <a href="/pkg/builtin/#bool">bool</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+ToSVG creates and saves a .svg file which represents the state partition
+to the given file path. Please note that GraphViz must be downloaded and
+installed before hand from <a href="https://graphviz.org/download/">https://graphviz.org/download/</a>. The symbolMapping
+parameter is a map which maps each symbol within the alphabet to a string.
+This can be set to nil, which will map each symbol with a number starting
+from 0. If showOrder is set to true, the canonical order of the states is
+shown inside the node within partition. If topDown is set to true, the
+visual representation will be top down. A left to right representation is
+used otherwise. Returns true if successful or false if an error occurs.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.Union">func (*StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=3355:3426#L76">Union</a>
+					<a class="permalink" href="#StatePartition.Union">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition *<a href="#StatePartition">StatePartition</a>) Union(blockID1 <a href="/pkg/builtin/#int">int</a>, blockID2 <a href="/pkg/builtin/#int">int</a>)</pre>
+				<p>
+Union connects two blocks by comparing their respective
+size (score) values to keep the tree flat.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StatePartition.WithinSameBlock">func (*StatePartition) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/StatePartition.go?s=6775:6861#L170">WithinSameBlock</a>
+					<a class="permalink" href="#StatePartition.WithinSameBlock">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (statePartition *<a href="#StatePartition">StatePartition</a>) WithinSameBlock(stateID1 <a href="/pkg/builtin/#int">int</a>, stateID2 <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+WithinSameBlock checks whether two states are within the same block.
+</p>
+
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="StringInstance">type <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=220:388#L7">StringInstance</a>
+				<a class="permalink" href="#StringInstance">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+StringInstance struct which represents
+a string instance within a dataset.
+</p>
+
+			<pre>type StringInstance struct {
+<span id="StringInstance.Value"></span>    Value     []<a href="/pkg/builtin/#int">int</a> <span class="comment">// Slice of integers which represents the symbol values.</span>
+<span id="StringInstance.Accepting"></span>    Accepting <a href="/pkg/builtin/#bool">bool</a>  <span class="comment">// Accepting label flag for StringInstance.</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="BinaryStringToStringInstance">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=14783:14861#L432">BinaryStringToStringInstance</a>
+					<a class="permalink" href="#BinaryStringToStringInstance">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func BinaryStringToStringInstance(dfa <a href="#DFA">DFA</a>, binaryString <a href="/pkg/builtin/#string">string</a>) <a href="#StringInstance">StringInstance</a></pre>
+				<p>
+BinaryStringToStringInstance returns a StringInstances from a binary string.
+</p>
+
+				
+				
+			
+				
+				<h3 id="NewStringInstanceFromAbbadingoFile">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Abbadingo.go?s=1001:1086#L34">NewStringInstanceFromAbbadingoFile</a>
+					<a class="permalink" href="#NewStringInstanceFromAbbadingoFile">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func NewStringInstanceFromAbbadingoFile(text <a href="/pkg/builtin/#string">string</a>, delimiter <a href="/pkg/builtin/#string">string</a>) <a href="#StringInstance">StringInstance</a></pre>
+				<p>
+NewStringInstanceFromAbbadingoFile returns a StringInstance from a line within an Abbadingo-Format File.
+</p>
+
+				
+				
+			
+				
+				<h3 id="NewStringInstanceFromStaminaFile">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Stamina.go?s=995:1078#L33">NewStringInstanceFromStaminaFile</a>
+					<a class="permalink" href="#NewStringInstanceFromStaminaFile">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func NewStringInstanceFromStaminaFile(text <a href="/pkg/builtin/#string">string</a>, delimiter <a href="/pkg/builtin/#string">string</a>) <a href="#StringInstance">StringInstance</a></pre>
+				<p>
+NewStringInstanceFromStaminaFile returns a StringInstance from a line within a Stamina-Format File.
+</p>
+
+				
+				
+			
+
+			
+				
+				<h3 id="StringInstance.ConsistentWithDFA">func (StringInstance) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=4522:4590#L128">ConsistentWithDFA</a>
+					<a class="permalink" href="#StringInstance.ConsistentWithDFA">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (stringInstance <a href="#StringInstance">StringInstance</a>) ConsistentWithDFA(dfa <a href="#DFA">DFA</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+ConsistentWithDFA returns whether a string instance is consistent
+within a given DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StringInstance.ConsistentWithStatePartition">func (StringInstance) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=7561:7662#L223">ConsistentWithStatePartition</a>
+					<a class="permalink" href="#StringInstance.ConsistentWithStatePartition">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (stringInstance <a href="#StringInstance">StringInstance</a>) ConsistentWithStatePartition(statePartition <a href="#StatePartition">StatePartition</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+ConsistentWithStatePartition returns whether a string instance is consistent
+within a given StatePartition.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StringInstance.Length">func (StringInstance) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=4335:4384#L122">Length</a>
+					<a class="permalink" href="#StringInstance.Length">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (stringInstance <a href="#StringInstance">StringInstance</a>) Length() <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+Length returns the length of the string.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StringInstance.ParseToState">func (StringInstance) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=12526:12596#L364">ParseToState</a>
+					<a class="permalink" href="#StringInstance.ParseToState">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (stringInstance <a href="#StringInstance">StringInstance</a>) ParseToState(dfa <a href="#DFA">DFA</a>) (<a href="/pkg/builtin/#bool">bool</a>, <a href="/pkg/builtin/#int">int</a>)</pre>
+				<p>
+ParseToState returns the State ID of a given string instance within
+a given DFA. A boolean is also returned which returns false if string
+instance does not correspond to any state within DFA.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StringInstance.ParseToStateLabel">func (StringInstance) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=10906:10980#L319">ParseToStateLabel</a>
+					<a class="permalink" href="#StringInstance.ParseToStateLabel">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (stringInstance <a href="#StringInstance">StringInstance</a>) ParseToStateLabel(dfa <a href="#DFA">DFA</a>) <a href="#StateLabel">StateLabel</a></pre>
+				<p>
+ParseToStateLabel returns the State Label of a given string instance
+within a given DFA. If state does not exist, REJECTING is returned.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="StringInstance.WithinDataset">func (StringInstance) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/Dataset.go?s=13729:13801#L400">WithinDataset</a>
+					<a class="permalink" href="#StringInstance.WithinDataset">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (stringInstance <a href="#StringInstance">StringInstance</a>) WithinDataset(dataset <a href="#Dataset">Dataset</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				<p>
+WithinDataset checks whether a StringInstance is within given Dataset.
+</p>
+
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="TeamOfAutomata">type <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/AutomataTeams.go?s=536:607#L6">TeamOfAutomata</a>
+				<a class="permalink" href="#TeamOfAutomata">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+TeamOfAutomata represents a team of automata within the AutomataTeams algorithm.
+</p>
+
+			<pre>type TeamOfAutomata struct {
+<span id="TeamOfAutomata.Team"></span>    Team      []<a href="#DFA">DFA</a>
+<span id="TeamOfAutomata.MergeData"></span>    MergeData <a href="#MergeData">MergeData</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="AutomataTeams">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/AutomataTeams.go?s=8906:8963#L206">AutomataTeams</a>
+					<a class="permalink" href="#AutomataTeams">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func AutomataTeams(APTA <a href="#DFA">DFA</a>, teamSize <a href="/pkg/builtin/#int">int</a>) <a href="#TeamOfAutomata">TeamOfAutomata</a></pre>
+				<p>
+AutomataTeams creates a team of automata of size teamSize. This creates a
+TeamOfAutomata instance which can then be used to classify testing examples.
+</p>
+
+				
+				
+			
+				
+				<h3 id="AutomataTeamsFromDataset">func <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/AutomataTeams.go?s=8451:8526#L195">AutomataTeamsFromDataset</a>
+					<a class="permalink" href="#AutomataTeamsFromDataset">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func AutomataTeamsFromDataset(dataset <a href="#Dataset">Dataset</a>, teamSize <a href="/pkg/builtin/#int">int</a>) <a href="#TeamOfAutomata">TeamOfAutomata</a></pre>
+				<p>
+AutomataTeamsFromDataset creates a team of automata of size teamSize. This creates a
+TeamOfAutomata instance which can then be used to classify testing examples.
+It takes a dataset as an argument which is used to generate an APTA.
+</p>
+
+				
+				
+			
+
+			
+				
+				<h3 id="TeamOfAutomata.Accuracy">func (TeamOfAutomata) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/AutomataTeams.go?s=10955:11092#L281">Accuracy</a>
+					<a class="permalink" href="#TeamOfAutomata.Accuracy">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (teamOfAutomata <a href="#TeamOfAutomata">TeamOfAutomata</a>) Accuracy(dataset <a href="#Dataset">Dataset</a>, teamOfAutomataClassifierFunction <a href="#TeamOfAutomataClassifierFunction">TeamOfAutomataClassifierFunction</a>) <a href="/pkg/builtin/#float64">float64</a></pre>
+				<p>
+Accuracy returns the TeamOfAutomata&#39;s Accuracy with respect to a dataset.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="TeamOfAutomata.AverageNumberOfStates">func (TeamOfAutomata) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/AutomataTeams.go?s=15711:15775#L453">AverageNumberOfStates</a>
+					<a class="permalink" href="#TeamOfAutomata.AverageNumberOfStates">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (teamOfAutomata <a href="#TeamOfAutomata">TeamOfAutomata</a>) AverageNumberOfStates() <a href="/pkg/builtin/#int">int</a></pre>
+				<p>
+AverageNumberOfStates returns the average number of states of DFAs within team.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="TeamOfAutomata.BetterHalfWeightedVoteAccuracy">func (TeamOfAutomata) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/AutomataTeams.go?s=13552:13644#L364">BetterHalfWeightedVoteAccuracy</a>
+					<a class="permalink" href="#TeamOfAutomata.BetterHalfWeightedVoteAccuracy">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (teamOfAutomata <a href="#TeamOfAutomata">TeamOfAutomata</a>) BetterHalfWeightedVoteAccuracy(dataset <a href="#Dataset">Dataset</a>) <a href="/pkg/builtin/#float64">float64</a></pre>
+				<p>
+BetterHalfWeightedVoteAccuracy returns the TeamOfAutomata&#39;s Accuracy with respect to a dataset
+using the better half weighted vote scoring heuristic.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="TeamOfAutomata.FairVoteAccuracy">func (TeamOfAutomata) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/AutomataTeams.go?s=11826:11904#L301">FairVoteAccuracy</a>
+					<a class="permalink" href="#TeamOfAutomata.FairVoteAccuracy">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (teamOfAutomata <a href="#TeamOfAutomata">TeamOfAutomata</a>) FairVoteAccuracy(dataset <a href="#Dataset">Dataset</a>) <a href="/pkg/builtin/#float64">float64</a></pre>
+				<p>
+FairVoteAccuracy returns the TeamOfAutomata&#39;s Accuracy with respect to a dataset
+using the fair vote scoring heuristic.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="TeamOfAutomata.SmallestDFAVoteAccuracy">func (TeamOfAutomata) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/AutomataTeams.go?s=14706:14791#L409">SmallestDFAVoteAccuracy</a>
+					<a class="permalink" href="#TeamOfAutomata.SmallestDFAVoteAccuracy">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (teamOfAutomata <a href="#TeamOfAutomata">TeamOfAutomata</a>) SmallestDFAVoteAccuracy(dataset <a href="#Dataset">Dataset</a>) <a href="/pkg/builtin/#float64">float64</a></pre>
+				<p>
+SmallestDFAVoteAccuracy returns the TeamOfAutomata&#39;s Accuracy with respect to a dataset
+using the smallest dfa vote scoring heuristic.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="TeamOfAutomata.WeightedVoteAccuracy">func (TeamOfAutomata) <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/AutomataTeams.go?s=12625:12707#L332">WeightedVoteAccuracy</a>
+					<a class="permalink" href="#TeamOfAutomata.WeightedVoteAccuracy">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (teamOfAutomata <a href="#TeamOfAutomata">TeamOfAutomata</a>) WeightedVoteAccuracy(dataset <a href="#Dataset">Dataset</a>) <a href="/pkg/builtin/#float64">float64</a></pre>
+				<p>
+WeightedVoteAccuracy returns the TeamOfAutomata&#39;s Accuracy with respect to a dataset
+using the weighted vote scoring heuristic.
+</p>
+
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="TeamOfAutomataClassifierFunction">type <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/AutomataTeams.go?s=811:895#L13">TeamOfAutomataClassifierFunction</a>
+				<a class="permalink" href="#TeamOfAutomataClassifierFunction">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+TeamOfAutomataClassifierFunction takes a string instance as input and returns a state label.
+An example of how this function type should be used can be seen in BetterHalfWeightedVoteAccuracy.
+</p>
+
+			<pre>type TeamOfAutomataClassifierFunction func(stringInstance <a href="#StringInstance">StringInstance</a>) <a href="#StateLabel">StateLabel</a></pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="Transition">type <a href="/src/github.com/Cherrett/DFA-Learning-Toolkit/core/DFA.go?s=21464:21516#L699">Transition</a>
+				<a class="permalink" href="#Transition">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+Transition struct which represents a transition.
+Used in SymmetricallyStructurallyComplete and
+StructurallyComplete functions.
+</p>
+
+			<pre>type Transition struct {
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+	
+
+	
+
+
+
+
+
+
+
+<div id="footer">
+Build version go1.16.5.<br>
+Except as <a href="https://developers.google.com/site-policies#restrictions">noted</a>,
+the content of this page is licensed under the
+Creative Commons Attribution 3.0 License,
+and code is licensed under a <a href="/LICENSE">BSD license</a>.<br>
+<a href="https://golang.org/doc/tos.html">Terms of Service</a> |
+<a href="https://www.google.com/intl/en/policies/privacy/">Privacy Policy</a>
+</div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+</body>
+</html>

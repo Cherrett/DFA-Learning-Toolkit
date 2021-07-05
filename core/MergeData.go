@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"time"
 )
@@ -27,6 +28,13 @@ func (mergeData MergeData) MergesCount() int {
 // merges per second. Used for performance evaluation.
 func (mergeData MergeData) AttemptedMergesPerSecond() float64 {
 	return float64(mergeData.AttemptedMergesCount) / mergeData.Duration.Seconds()
+}
+
+// Print prints some of the merge data to standard output.
+func (mergeData MergeData) Print() {
+	fmt.Printf("Duration: %.3f, Merges/s: %d, Attempted Merges: %d, Valid Merges: %d\n",
+		mergeData.Duration.Seconds(), int(math.Round(mergeData.AttemptedMergesPerSecond())),
+		mergeData.AttemptedMergesCount, mergeData.ValidMergesCount)
 }
 
 // ToJSON saves the MergeData to a JSON file given a file path.
