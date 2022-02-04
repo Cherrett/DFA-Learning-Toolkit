@@ -17,7 +17,7 @@
 	├── .gitignore				# .gitignore file.
 	├── go.mod      			# Module file 1.
 	├── go.sum      			# Module file 2.
-	└── main.go					# Main executable with a simple CLI.
+	└── main.go				# Main executable with a simple CLI.
 
 Please note that some datasets were ommited from the submission due to their size.
 These can be found at: https://github.com/Cherrett/DFA-Learning-Datasets.
