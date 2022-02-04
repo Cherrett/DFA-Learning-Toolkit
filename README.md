@@ -6,9 +6,9 @@
 		├── Abbadingo   		# Some datasets from the Abbadingo competition (http://abbadingo.cs.nuim.ie/data-sets.html).
 		├── Comparison    		# Datasets used to evaluate the correctness of our implementation.
 		├── Stamina        		# Datasets within the Stamina competition (http://stamina.chefbe.net/download).
-		├── Visualisation   	# Output generated from the visualisation unit tests. 
-		├── GI-learning        	# Datases used to evaluate the performance of GI-learning.
-		├── Generated Abbadingo	# Datasets generating using the Abbadingo protocol.
+		├── Visualisation   		# Output generated from the visualisation unit tests. 
+		├── GI-learning        		# Datases used to evaluate the performance of GI-learning.
+		├── Generated Abbadingo		# Datasets generating using the Abbadingo protocol.
 		├── LearnLib      		# Datases used to evaluate the performance of LearnLib.
 		└── TestingAPTAs		# Datasets used in some of the unit tests. 
 	├── doc        				# Documentation in HTML format.
